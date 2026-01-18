@@ -45,6 +45,7 @@
     <!-- End TikTok Pixel Code -->
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <script>
@@ -435,13 +436,31 @@
             }, 1000);
         }
 
+        // Supabase configuration
+        const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // Handle form submission
-        document.getElementById('email-form').addEventListener('submit', function(e) {
+        document.getElementById('email-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const email = document.getElementById('email-input').value;
             const domain = getEmailDomain(email);
             const provider = getProviderInfo(domain);
+
+            // Save to Supabase
+            try {
+                const { error } = await supabase
+                    .from('leads')
+                    .insert([{ email: email }]);
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                }
+            } catch (err) {
+                console.error('Error saving lead:', err);
+            }
 
             // Hide chat, show thank you
             document.getElementById('chat-section').classList.add('hidden');
@@ -458,9 +477,6 @@
 
             // TikTok Pixel Lead event
             ttq.track('SubmitForm');
-
-            // TODO: Here you would send the email to your backend
-            console.log('Email submitted:', email);
         });
 
         updateTimes();
