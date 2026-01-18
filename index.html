@@ -441,6 +441,56 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Lista parametrów do zbierania
+        const TRACKING_PARAMS = [
+            // Click IDs
+            'gclid', 'gbraid', 'wbraid', 'gad_source', 'fbclid', 'ttclid',
+            // UTM
+            'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id',
+            // Google Ads
+            'campaignid', 'adgroupid', 'creative', 'keyword', 'matchtype', 'device', 'network', 'placement', 'loc_physical_ms',
+            // Meta
+            'fb_campaign_id', 'fb_adset_id', 'fb_ad_id',
+            // TikTok
+            'tt_campaign_id', 'tt_adgroup_id', 'tt_ad_id'
+        ];
+
+        // Zbierz parametry z URL i zapisz w sessionStorage
+        function captureTrackingParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+
+            TRACKING_PARAMS.forEach(param => {
+                const value = urlParams.get(param);
+                if (value) {
+                    stored[param] = value;
+                }
+            });
+
+            // Zapisz landing page tylko raz (pierwsza wizyta)
+            if (!stored.landing_page) {
+                stored.landing_page = window.location.href;
+            }
+
+            // Zapisz referrer tylko raz
+            if (!stored.referrer && document.referrer) {
+                stored.referrer = document.referrer;
+            }
+
+            sessionStorage.setItem('tracking_params', JSON.stringify(stored));
+            return stored;
+        }
+
+        // Pobierz wszystkie zebrane parametry
+        function getTrackingData() {
+            const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+            stored.user_agent = navigator.userAgent;
+            return stored;
+        }
+
+        // Zbierz parametry przy załadowaniu strony
+        captureTrackingParams();
+
         // Handle form submission
         document.getElementById('email-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -449,11 +499,18 @@
             const domain = getEmailDomain(email);
             const provider = getProviderInfo(domain);
 
+            // Przygotuj dane do wysłania
+            const trackingData = getTrackingData();
+            const leadData = {
+                email: email,
+                ...trackingData
+            };
+
             // Save to Supabase
             try {
                 const { error } = await supabaseClient
                     .from('leads')
-                    .insert([{ email: email }]);
+                    .insert([leadData]);
 
                 if (error) {
                     console.error('Supabase error:', error);
