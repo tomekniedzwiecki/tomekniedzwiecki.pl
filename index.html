@@ -439,7 +439,7 @@
         // Supabase configuration
         const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Handle form submission
         document.getElementById('email-form').addEventListener('submit', async function(e) {
@@ -451,7 +451,7 @@
 
             // Save to Supabase
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('leads')
                     .insert([{ email: email }]);
 
