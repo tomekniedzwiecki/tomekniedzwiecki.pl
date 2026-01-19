@@ -149,25 +149,8 @@
         textarea::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
 
         .gradient-underline {
-            position: relative;
-            display: inline-block;
-        }
-        .gradient-underline::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: -2px;
-            height: 2px;
-            background: linear-gradient(90deg, #9333ea, #ec4899, #f97316, #ec4899, #9333ea);
-            background-size: 200% 100%;
-            border-radius: 2px;
-            animation: underline-wave 4s ease-in-out infinite;
-            box-shadow: 0 0 8px rgba(236, 72, 153, 0.5), 0 0 16px rgba(236, 72, 153, 0.3);
-        }
-        @keyframes underline-wave {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            background: linear-gradient(120deg, rgba(147, 51, 234, 0.45) 0%, rgba(236, 72, 153, 0.45) 100%);
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -234,15 +217,33 @@
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
             </div>
 
-            <p class="text-white font-medium text-lg mb-2">Który kierunek Cię bardziej interesuje?</p>
-            <p class="text-zinc-500 text-sm mb-5">Oba są dobre. Wybierz ten, który pasuje do Ciebie.</p>
+            <p class="text-white font-medium text-lg mb-2">Który <span class="gradient-underline">e-biznes</span> Cię bardziej interesuje?</p>
+            <p class="text-zinc-500 text-sm mb-5">Każdy z nich jest dobry. Wybierz ten, który pasuje do Ciebie.</p>
 
             <div class="space-y-3" id="q1-options">
-                <button type="button" data-value="sklep" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    🛒 Sklep internetowy
+                <button type="button" data-value="sklep" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                    <span>Nowoczesny sklep internetowy</span>
                 </button>
-                <button type="button" data-value="aplikacja" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    📱 Aplikacja / SaaS
+                <button type="button" data-value="aplikacja" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                    </svg>
+                    <span>Aplikacja / Narzędzie / SaaS</span>
+                </button>
+                <button type="button" data-value="produkt_cyfrowy" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-pink-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+                    </svg>
+                    <span>Kurs online / Produkt cyfrowy</span>
+                </button>
+                <button type="button" data-value="nie_wiem" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
+                    <svg class="w-5 h-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                    </svg>
+                    <span>Nie jestem pewien, chcę abyś mi doradził</span>
                 </button>
             </div>
         </div>
@@ -320,8 +321,26 @@
         </div>
     </main>
 
-    <!-- STEP 5: Budget -->
+    <!-- STEP 5: Open Question -->
     <main id="step-5" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+        <div class="w-full max-w-lg fade-in">
+            <div class="text-center mb-8">
+                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
+            </div>
+
+            <p class="text-white font-medium text-lg mb-2">Co jeszcze powinienem o Tobie wiedzieć?</p>
+            <p class="text-zinc-500 text-sm mb-6">Twoja historia, sytuacja, pytania - cokolwiek uznasz za istotne.</p>
+
+            <textarea id="q5-open" rows="6" placeholder="Opcjonalnie — napisz cokolwiek uznasz za ważne..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-6"></textarea>
+
+            <button type="button" id="q5-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors">
+                Dalej →
+            </button>
+        </div>
+    </main>
+
+    <!-- STEP 6: Budget -->
+    <main id="step-6" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-8">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -330,7 +349,7 @@
             <p class="text-white font-medium text-lg mb-2">Jaki budżet możesz zainwestować?</p>
             <p class="text-zinc-500 text-sm mb-5">Na reklamę, towar, narzędzia.</p>
 
-            <div class="space-y-3" id="q5-options">
+            <div class="space-y-3" id="q6-options">
                 <button type="button" data-value="5-10k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
                     5 000 - 10 000 zł
                 </button>
@@ -347,36 +366,67 @@
         </div>
     </main>
 
-    <!-- STEP 6: Thank You -->
-    <main id="step-6" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+    <!-- STEP 7: Phone -->
+    <main id="step-7" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+        <div class="w-full max-w-lg fade-in">
+            <div class="text-center mb-8">
+                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
+            </div>
+
+            <p class="text-white font-medium text-lg mb-2">Podaj numer telefonu</p>
+            <p class="text-zinc-500 text-sm mb-6">Zadzwonimy, aby umówić krótką rozmowę.</p>
+
+            <input type="tel" id="q7-phone" placeholder="np. 600 123 456" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 placeholder:text-zinc-600 mb-6">
+
+            <button type="button" id="q7-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors">
+                Wyślij zgłoszenie
+            </button>
+        </div>
+    </main>
+
+    <!-- STEP 8: Thank You -->
+    <main id="step-8" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-md text-center fade-in">
-            <div class="mb-6">
-                <div class="w-20 h-20 mx-auto bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-full flex items-center justify-center success-icon">
-                    <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <!-- Success Icon with glow -->
+            <div class="mb-8 relative">
+                <div class="absolute inset-0 w-24 h-24 mx-auto bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-full blur-xl opacity-50"></div>
+                <div class="relative w-24 h-24 mx-auto bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-full flex items-center justify-center success-icon shadow-2xl">
+                    <svg class="w-12 h-12 text-white drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path class="success-checkmark" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
             </div>
 
-            <h1 class="text-2xl font-bold mb-2">Dzięki!</h1>
-            <p class="text-zinc-400 mb-8">Przeanalizuję Twoje zgłoszenie i odezwę się <span class="text-white font-medium">w ciągu kilku dni</span>.</p>
+            <!-- Title with gradient -->
+            <h1 class="text-3xl font-bold mb-3 bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Dzięki!</h1>
+            <p class="text-zinc-400 text-lg mb-10">Mój asystent <span class="text-white font-semibold">Maciej</span> przeanalizuje Twoje zgłoszenie.</p>
 
-            <div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5 text-left">
-                <h3 class="text-white font-medium mb-3">Co dalej?</h3>
-                <ul class="space-y-2 text-zinc-400 text-sm">
-                    <li class="flex items-start gap-2">
-                        <span class="text-purple-400">1.</span>
-                        <span>Przeglądam zgłoszenia osobiście</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-pink-400">2.</span>
-                        <span>Jeśli widzę potencjał - krótka rozmowa</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-orange-400">3.</span>
-                        <span>Wybieram osoby do współpracy</span>
-                    </li>
-                </ul>
+            <!-- Timeline -->
+            <div class="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-6 text-left backdrop-blur-sm">
+                <h3 class="text-white font-semibold mb-5 text-center text-sm uppercase tracking-wider">Co dalej?</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">1</div>
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Maciej przegląda zgłoszenia</p>
+                            <p class="text-zinc-500 text-xs">Analizuje każde zgłoszenie indywidualnie</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-pink-500/20 group-hover:scale-110 transition-transform">2</div>
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Krótka rozmowa</p>
+                            <p class="text-zinc-500 text-xs">Jeśli widzi potencjał współpracy</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform">3</div>
+                        <div class="flex-1">
+                            <p class="text-white font-medium">Spotkanie online ze mną</p>
+                            <p class="text-zinc-500 text-xs">Przed ostateczną decyzją o współpracy</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -414,11 +464,11 @@
         function updateProgress() {
             const progress = document.getElementById('progress-fill');
             const bar = document.getElementById('progress-bar');
-            if (currentStep === 0 || currentStep === 6) {
+            if (currentStep === 0 || currentStep === 8) {
                 bar.classList.add('hidden');
             } else {
                 bar.classList.remove('hidden');
-                progress.style.width = ((currentStep) / 5 * 100) + '%';
+                progress.style.width = ((currentStep) / 7 * 100) + '%';
             }
         }
 
@@ -462,17 +512,29 @@
                 document.getElementById('q4-next').disabled = false;
             }
 
+            if (data.open_question) {
+                document.getElementById('q5-open').value = data.open_question;
+            }
+
             if (data.budget) {
-                const btn = document.querySelector(`#q5-options [data-value="${data.budget}"]`);
+                const btn = document.querySelector(`#q6-options [data-value="${data.budget}"]`);
                 if (btn) btn.classList.add('selected');
+            }
+
+            if (data.phone) {
+                document.getElementById('q7-phone').value = data.phone;
             }
 
             // Resume from where user left off
             if (data.lead_id) {
                 leadId = data.lead_id;
                 if (data.completed) {
-                    goToStep(6);
+                    goToStep(8);
+                } else if (data.phone) {
+                    goToStep(7);
                 } else if (data.budget) {
+                    goToStep(7);
+                } else if (data.open_question !== undefined) {
                     goToStep(5);
                 } else if (data.experience) {
                     goToStep(4);
@@ -604,25 +666,43 @@
             goToStep(5);
         });
 
-        // STEP 5: Budget
-        document.querySelectorAll('#q5-options .option-btn').forEach(btn => {
+        // STEP 5: Open question
+        document.getElementById('q5-next').addEventListener('click', function() {
+            const value = document.getElementById('q5-open').value.trim();
+            saveData('open_question', value || '');
+            if (value) {
+                updateLead({ open_question: value });
+            }
+            goToStep(6);
+        });
+
+        // STEP 6: Budget
+        document.querySelectorAll('#q6-options .option-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
-                document.querySelectorAll('#q5-options .option-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('#q6-options .option-btn').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 const value = this.dataset.value;
                 saveData('budget', value);
-                saveData('completed', true);
                 await updateLead({ budget: value });
-
-                gtag('event', 'form_complete', {'event_category': 'engagement'});
-                fbq('track', 'CompleteRegistration');
-                ttq.track('CompleteRegistration');
-
-                setTimeout(() => {
-                    clearData(); // Clear after completion
-                    goToStep(6);
-                }, 300);
+                setTimeout(() => goToStep(7), 300);
             });
+        });
+
+        // STEP 7: Phone
+        document.getElementById('q7-next').addEventListener('click', async function() {
+            const value = document.getElementById('q7-phone').value.trim();
+            saveData('phone', value);
+            saveData('completed', true);
+            if (value) {
+                await updateLead({ phone: value });
+            }
+
+            gtag('event', 'form_complete', {'event_category': 'engagement'});
+            fbq('track', 'CompleteRegistration');
+            ttq.track('CompleteRegistration');
+
+            clearData();
+            goToStep(8);
         });
 
         // Initialize
