@@ -499,21 +499,29 @@
             const domain = getEmailDomain(email);
             const provider = getProviderInfo(domain);
 
-            // Przygotuj dane do wysłania
-            const trackingData = getTrackingData();
-            const leadData = {
-                email: email,
-                ...trackingData
-            };
-
-            // Save to Supabase
+            // Save to Supabase - leads table (only email)
             try {
-                const { error } = await supabaseClient
+                const { data: leadResult, error: leadError } = await supabaseClient
                     .from('leads')
-                    .insert([leadData]);
+                    .insert([{ email: email }])
+                    .select('id')
+                    .single();
 
-                if (error) {
-                    console.error('Supabase error:', error);
+                if (leadError) {
+                    console.error('Lead insert error:', leadError);
+                } else if (leadResult) {
+                    // Save tracking data to separate table
+                    const trackingData = getTrackingData();
+                    const { error: trackingError } = await supabaseClient
+                        .from('lead_tracking')
+                        .insert([{
+                            lead_id: leadResult.id,
+                            ...trackingData
+                        }]);
+
+                    if (trackingError) {
+                        console.error('Tracking insert error:', trackingError);
+                    }
                 }
             } catch (err) {
                 console.error('Error saving lead:', err);
