@@ -601,6 +601,25 @@
             }
         }
 
+        // Email confirmation - fire and forget
+        async function sendConfirmationEmail(email) {
+            try {
+                await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        type: 'zapisy_confirmation',
+                        data: { email }
+                    })
+                });
+            } catch (err) {
+                console.error('Email confirmation error:', err);
+            }
+        }
+
         // Determine traffic source from tracking params
         function getTrafficSource() {
             const tracking = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
@@ -637,6 +656,9 @@
                     const trackingData = getTrackingData();
                     await supabaseClient.from('lead_tracking').insert([{ lead_id: leadId, ...trackingData }]);
                 }
+
+                // Send confirmation email immediately after email submission
+                sendConfirmationEmail(email);
             } catch (err) {
                 console.error('Error:', err);
             }
