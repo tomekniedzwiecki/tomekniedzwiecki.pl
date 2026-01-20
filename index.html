@@ -2,550 +2,1581 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=/zapisy/">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tomasz Niedźwiecki | Inwestuję w ambitnych</title>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17886093904"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'AW-17886093904');
-    </script>
-
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1571065357430677');
-    fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1571065357430677&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code -->
-
-    <!-- TikTok Pixel Code -->
-    <script>
-    !function (w, d, t) {
-      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-      var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
-      ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-      ttq.load('D5MHQD3C77UALNU7I240');
-      ttq.page();
-    }(window, document, 'ttq');
-    </script>
-    <!-- End TikTok Pixel Code -->
-
+    <title>Tomasz Niedźwiecki</title>
+    <meta name="description" content="Inwestuję w ludzi i buduję z nimi biznesy.">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    animation: {
-                        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'pulse-glow': {
-                            '0%, 100%': { opacity: '0.3' },
-                            '50%': { opacity: '0.5' },
-                        }
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-
     <style>
         body {
-            background-color: #09090b;
-        }
-        .avatar-glow {
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(168, 85, 247, 0.2);
+            background: #000;
+            color: #ededed;
         }
 
-        /* Flowing wave gradient border */
-        .gradient-border {
-            padding: 2px;
-            border-radius: 1rem;
-            background: linear-gradient(
-                90deg,
-                #9333ea,
-                #ec4899,
-                #f97316,
-                #ec4899,
-                #9333ea
-            );
-            background-size: 200% 100%;
-            animation: flow-wave 4s ease-in-out infinite;
-        }
-        .gradient-border-inner {
-            background: #18181b;
-            border-radius: calc(1rem - 2px);
-        }
-        @keyframes flow-wave {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        ::selection {
+            background: #fff;
+            color: #000;
         }
 
-        /* Autofill styles */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus {
-            -webkit-text-fill-color: white;
-            -webkit-box-shadow: 0 0 0px 1000px #18181b inset;
-            transition: background-color 5000s ease-in-out 0s;
+        /* ==================== FULLPAGE SCROLL ==================== */
+        .fullpage-container {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .fullpage-container.is-scrolling {
+            scroll-snap-type: none;
+        }
+        .fullpage-section {
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
         }
 
-        /* Success checkmark animation */
-        .success-icon {
-            animation: pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        /* Tetris panel - DESKTOP ONLY */
+        #tetris-panel {
+            display: none;
         }
-        .success-checkmark {
-            stroke-dasharray: 30;
-            stroke-dashoffset: 30;
-            animation: draw-check 0.4s ease-out 0.3s forwards;
-        }
-        @keyframes pop-in {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes draw-check {
-            to { stroke-dashoffset: 0; }
-        }
-
-        /* Chat bubble animation */
-        .chat-bubble {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: bubble-in 0.3s ease-out forwards;
-        }
-        @keyframes bubble-in {
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        @media (min-width: 768px) {
+            #tetris-panel {
+                display: block;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 55%;
+                height: 100vh;
+                z-index: 1;
+            }
+            #tetris-canvas {
+                width: 100%;
+                height: 100%;
+            }
+            .tetris-overlay {
+                position: absolute;
+                inset: 0;
+                background:
+                    linear-gradient(to right,
+                        rgba(0,0,0,1) 0%,
+                        rgba(0,0,0,0.85) 10%,
+                        rgba(0,0,0,0.4) 25%,
+                        rgba(0,0,0,0.1) 45%,
+                        transparent 60%),
+                    radial-gradient(ellipse at 70% 50%,
+                        transparent 40%,
+                        rgba(0,0,0,0.3) 100%);
+                pointer-events: none;
             }
         }
-        .chat-bubble:nth-child(1) { animation-delay: 0.1s; }
-        .chat-bubble:nth-child(2) { animation-delay: 0.35s; }
-        .chat-bubble:nth-child(3) { animation-delay: 0.6s; }
-        .chat-bubble:nth-child(4) { animation-delay: 0.85s; }
+        @media (min-width: 1600px) {
+            #tetris-panel {
+                width: 58%;
+            }
+        }
 
-        .chat-cta {
+        /* Content area */
+        .content-area {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 0 1.5rem;
+        }
+        .content-area > .section-content {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Desktop: LEFT side only */
+        @media (min-width: 768px) {
+            .content-area {
+                width: 45% !important;
+                max-width: 45% !important;
+                padding: 0 3rem;
+            }
+            .content-area > .section-content {
+                max-width: 500px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .content-area {
+                padding: 0 4rem;
+            }
+            .content-area > .section-content {
+                max-width: 540px;
+            }
+        }
+        @media (min-width: 1600px) {
+            .content-area {
+                width: 42% !important;
+                max-width: 42% !important;
+                padding: 0 5rem;
+            }
+            .content-area > .section-content {
+                max-width: 580px;
+            }
+        }
+
+        /* Dots navigation - at the edge between content and tetris */
+        .dots-nav {
+            position: fixed;
+            left: 45%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        @media (min-width: 1600px) {
+            .dots-nav {
+                left: 42%;
+            }
+        }
+        @media (max-width: 767px) {
+            .dots-nav { display: none; }
+        }
+        .dots-nav button {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .dots-nav button:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .dots-nav button.active {
+            background: #fff;
+        }
+        .dots-nav button::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
             opacity: 0;
-            transform: translateY(10px);
-            animation: bubble-in 0.3s ease-out 1.1s forwards;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .dots-nav button:hover::after {
+            opacity: 1;
+        }
+
+        /* Section content animation */
+        .section-content {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .section-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ==================== EXISTING STYLES ==================== */
+        .card {
+            position: relative;
+            background: rgba(10,10,10,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .glow {
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.03),
+                0 8px 40px -12px rgba(0,0,0,0.8),
+                0 0 80px -40px rgba(99,102,241,0.3);
+        }
+
+        .noise::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to bottom, #fff 20%, #71717a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #fff, #d4d4d8);
+            box-shadow:
+                0 1px 2px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                0 0 0 1px rgba(0,0,0,0.1);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to bottom, #f4f4f5, #d4d4d8);
+        }
+
+        .stat-number {
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.03em;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+
+        /* Track record section styles */
+        .track-section {
+            position: relative;
+        }
+        .track-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 50%;
+            bottom: 0;
+            background: radial-gradient(ellipse at 30% 50%, var(--accent-glow, rgba(99,102,241,0.08)) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .track-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+        }
+
+        /* ==================== OFFER CARDS ==================== */
+        .offer-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .offer-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .offer-card:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateX(4px);
+        }
+        .offer-card__icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .offer-card__icon i {
+            font-size: 26px;
+            position: relative;
+            z-index: 1;
+        }
+        .offer-card__icon::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            opacity: 0.15;
+        }
+        .offer-card__icon::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .offer-card:hover .offer-card__icon::after {
+            opacity: 1;
+        }
+        .offer-card__content h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .offer-card__content p {
+            font-size: 14px;
+            color: #71717a;
+            line-height: 1.5;
+        }
+        /* Emerald variant */
+        .offer-card--emerald .offer-card__icon {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .offer-card--emerald .offer-card__icon i {
+            color: #34d399;
+        }
+        .offer-card--emerald .offer-card__icon::after {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+        }
+        .offer-card--emerald:hover {
+            border-color: rgba(16, 185, 129, 0.15);
+        }
+        /* Amber variant */
+        .offer-card--amber .offer-card__icon {
+            background: rgba(255, 180, 0, 0.1);
+            border: 1px solid rgba(255, 180, 0, 0.2);
+        }
+        .offer-card--amber .offer-card__icon i {
+            color: #ffb400;
+        }
+        .offer-card--amber .offer-card__icon::after {
+            background: radial-gradient(circle, rgba(255, 180, 0, 0.15) 0%, transparent 70%);
+        }
+        .offer-card--amber:hover {
+            border-color: rgba(255, 180, 0, 0.15);
+        }
+        /* Purple variant */
+        .offer-card--purple .offer-card__icon {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .offer-card--purple .offer-card__icon i {
+            color: #c084fc;
+        }
+        .offer-card--purple .offer-card__icon::after {
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+        }
+        .offer-card--purple:hover {
+            border-color: rgba(168, 85, 247, 0.15);
+        }
+
+        /* ==================== MOBILE STYLES ==================== */
+        @media (max-width: 767px) {
+            /* Section content always visible on mobile */
+            .section-content {
+                opacity: 1;
+                transform: none;
+            }
+
+            /* Hero adjustments */
+            .fullpage-section[data-section="0"] h1 {
+                font-size: 32px;
+                line-height: 1.2;
+            }
+            .fullpage-section[data-section="0"] .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Track icon smaller on mobile */
+            .track-icon {
+                width: 72px;
+                height: 72px;
+                border-radius: 20px;
+                margin-bottom: 1.5rem;
+            }
+            .track-icon i {
+                font-size: 32px !important;
+            }
+
+            /* Track record headings */
+            .fullpage-section h2 {
+                font-size: 32px !important;
+            }
+
+            /* Subtitle (colored text under heading) */
+            .fullpage-section p[class*="text-emerald-400"],
+            .fullpage-section p[class*="text-[#ffb400]"],
+            .fullpage-section p[class*="text-purple-400"] {
+                font-size: 22px !important;
+                margin-bottom: 1.5rem !important;
+            }
+
+            /* Stats/tags row - wrap and center */
+            .fullpage-section .flex.items-center.gap-8,
+            .fullpage-section .flex.items-center.gap-6 {
+                flex-wrap: wrap;
+                gap: 12px !important;
+            }
+
+            /* Tags row (Sklep, TakeDrop, Inkubator) */
+            .fullpage-section .flex.items-center.gap-4 {
+                flex-wrap: wrap;
+                gap: 8px !important;
+            }
+
+            /* Paragraph text on mobile */
+            .fullpage-section p.text-zinc-400 {
+                font-size: 15px !important;
+                line-height: 1.7;
+            }
+
+            /* Motto quote smaller */
+            .fullpage-section blockquote {
+                font-size: 20px !important;
+                line-height: 1.5;
+            }
+
+            /* Droga section intro - text adjustments */
+            .fullpage-section[data-section="1"] h2 {
+                font-size: 28px !important;
+            }
+
+            /* Współpraca heading */
+            .fullpage-section[data-section="6"] h2 {
+                font-size: 26px !important;
+            }
+
+            /* Offer cards on mobile */
+            .offer-cards {
+                gap: 10px;
+            }
+            .offer-card {
+                padding: 14px 16px;
+                gap: 14px;
+                background: rgba(255,255,255,0.03);
+            }
+            .offer-card__icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+            }
+            .offer-card__icon i {
+                font-size: 22px;
+            }
+            /* Glow always visible on mobile */
+            .offer-card__icon::after {
+                opacity: 0.8;
+                inset: -12px;
+            }
+            .offer-card--emerald .offer-card__icon {
+                background: rgba(16, 185, 129, 0.15);
+                border-color: rgba(16, 185, 129, 0.3);
+            }
+            .offer-card--emerald .offer-card__icon::after {
+                background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+            }
+            .offer-card--amber .offer-card__icon {
+                background: rgba(255, 180, 0, 0.15);
+                border-color: rgba(255, 180, 0, 0.3);
+            }
+            .offer-card--amber .offer-card__icon::after {
+                background: radial-gradient(circle, rgba(255, 180, 0, 0.25) 0%, transparent 70%);
+            }
+            .offer-card--purple .offer-card__icon {
+                background: rgba(168, 85, 247, 0.15);
+                border-color: rgba(168, 85, 247, 0.3);
+            }
+            .offer-card--purple .offer-card__icon::after {
+                background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+            }
+            .offer-card__content h3 {
+                font-size: 15px;
+                margin-bottom: 2px;
+            }
+            .offer-card__content p {
+                font-size: 13px;
+            }
+
+            /* CTA section */
+            .fullpage-section[data-section="7"] h2 {
+                font-size: 32px !important;
+            }
+            .fullpage-section[data-section="7"] .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Footer on mobile */
+            .fullpage-section[data-section="7"] .border-t {
+                padding-top: 1.5rem;
+            }
+
+            /* Track section glow on mobile - full width, centered */
+            .track-section::before {
+                right: 0;
+                background: radial-gradient(ellipse at 50% 40%, var(--accent-glow, rgba(99,102,241,0.15)) 0%, transparent 70%);
+            }
+
+            /* Badge in hero - compact on mobile */
+            .fullpage-section[data-section="0"] .inline-flex {
+                padding: 8px 14px;
+                margin-bottom: 1.5rem;
+            }
+            .fullpage-section[data-section="0"] .inline-flex .text-\[14px\] {
+                font-size: 11px;
+            }
+            .fullpage-section[data-section="0"] .inline-flex .text-white {
+                font-size: 12px;
+            }
+        }
+
+        /* Mobile scroll indicator */
+        .scroll-indicator {
+            display: none;
+        }
+        @media (max-width: 767px) {
+            .scroll-indicator {
+                display: flex;
+                position: absolute;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+                color: rgba(255,255,255,0.5);
+                font-size: 10px;
+                font-weight: 500;
+                letter-spacing: 0.15em;
+                z-index: 20;
+                animation: bounce 2s ease-in-out infinite;
+            }
+            .scroll-indicator svg {
+                width: 18px;
+                height: 18px;
+            }
+            @keyframes bounce {
+                0%, 100% { transform: translateX(-50%) translateY(0); }
+                50% { transform: translateX(-50%) translateY(6px); }
+            }
+        }
+
+        /* Keyboard controls - redesigned */
+        #keyboard-controls {
+            display: none;
+        }
+        @media (min-width: 768px) {
+            #keyboard-controls {
+                display: block;
+                position: absolute;
+                bottom: 40px;
+                right: 40px;
+                z-index: 10;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(16px);
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 16px;
+                padding: 20px 24px;
+            }
+        }
+        .controls-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+        .controls-arrows {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .controls-row {
+            display: flex;
+            gap: 4px;
+        }
+        .key-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .key-hint:hover {
+            background: rgba(52, 211, 153, 0.15);
+            border-color: rgba(52, 211, 153, 0.3);
+            color: #34d399;
+            transform: translateY(-2px);
+        }
+        .key-hint:active, .key-hint.active {
+            background: rgba(52, 211, 153, 0.25);
+            border-color: rgba(52, 211, 153, 0.5);
+            color: #34d399;
+            transform: scale(0.95);
+        }
+        .key-hint.space-key {
+            grid-column: span 3;
+            width: 100%;
+            height: 40px;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+        }
+        .key-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            margin-top: 8px;
+        }
+        .controls-hint {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
         }
     </style>
 </head>
-<body class="text-white min-h-screen">
+<body class="font-sans antialiased overflow-x-hidden">
 
-    <!-- Main Chat Section -->
-    <main id="chat-section" class="min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 sm:py-20">
-        <div class="w-full max-w-md">
-            <!-- Header with avatar, glow, and online indicator -->
-            <div class="text-center mb-4 sm:mb-6">
-                <div class="relative inline-block">
-                    <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-16 h-16 rounded-full object-cover object-top avatar-glow">
-                    <!-- Green online dot -->
-                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-zinc-950"></div>
-                </div>
-                <div class="text-white font-semibold mt-2">Tomasz Niedźwiecki</div>
-                <div class="text-zinc-500 text-xs">Twórca TakeDrop</div>
-            </div>
+    <!-- Dots Navigation -->
+    <nav class="dots-nav" id="dots-nav">
+        <button data-section="0" data-label="Start" class="active"></button>
+        <button data-section="1" data-label="Droga"></button>
+        <button data-section="2" data-label="Sklep"></button>
+        <button data-section="3" data-label="TakeDrop"></button>
+        <button data-section="4" data-label="Inkubator"></button>
+        <button data-section="5" data-label="Motto"></button>
+        <button data-section="6" data-label="Współpraca"></button>
+        <button data-section="7" data-label="Kontakt"></button>
+    </nav>
 
-            <!-- Chat bubbles -->
-            <div class="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
-                <!-- Message 1 -->
-                <div class="flex justify-start chat-bubble">
-                    <div>
-                        <div class="bg-zinc-700 rounded-2xl rounded-bl-sm px-4 py-2 max-w-[80%]">
-                            <p class="text-white text-[15px]">Hej! 👋 Zbudowałem firmę wycenioną na <span class="font-semibold">25 mln zł</span> i sprzedałem udziały.</p>
-                        </div>
-                        <div class="text-zinc-600 text-[11px] mt-1 ml-2 hidden min-[400px]:block" id="time1"></div>
-                    </div>
-                </div>
-                <!-- Message 2 -->
-                <div class="flex justify-start chat-bubble">
-                    <div>
-                        <div class="bg-zinc-700 rounded-2xl rounded-bl-sm px-4 py-2 max-w-[80%]">
-                            <p class="text-white text-[15px]">Teraz zainwestuję w parę osób, którym zbuduję biznes online - sklep lub aplikację.</p>
-                        </div>
-                        <div class="text-zinc-600 text-[11px] mt-1 ml-2 hidden min-[400px]:block" id="time2"></div>
-                    </div>
-                </div>
-                <!-- User message -->
-                <div class="flex flex-col items-end chat-bubble">
-                    <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-2xl rounded-br-sm px-4 py-2">
-                        <p class="text-white text-[15px]">Jakie są warunki i jak się zgłosić?</p>
-                    </div>
-                    <div class="text-zinc-600 text-[11px] mt-1 mr-2 flex items-center gap-1">
-                        <span>Przeczytano</span>
-                        <span id="time3"></span>
-                    </div>
-                </div>
-                <!-- Message 3 -->
-                <div class="flex justify-start chat-bubble">
-                    <div>
-                        <div class="bg-zinc-700 rounded-2xl rounded-bl-sm px-4 py-2 max-w-[80%]">
-                            <p class="text-white text-[15px]">Zostaw maila, prześlę na niego parę pytań 👇</p>
-                        </div>
-                        <div class="text-zinc-600 text-[11px] mt-1 ml-2" id="time4"></div>
-                    </div>
+    <!-- Tetris Panel (Fixed on desktop) -->
+    <div id="tetris-panel">
+        <div id="tetris-canvas"></div>
+        <div class="tetris-overlay"></div>
+
+        <!-- Keyboard controls -->
+        <div id="keyboard-controls">
+            <div class="controls-title">Sterowanie</div>
+            <div class="controls-arrows">
+                <button data-key="up" class="key-hint" title="Obróć">↑</button>
+                <div class="controls-row">
+                    <button data-key="left" class="key-hint" title="Lewo">←</button>
+                    <button data-key="down" class="key-hint" title="W dół">↓</button>
+                    <button data-key="right" class="key-hint" title="Prawo">→</button>
                 </div>
             </div>
-
-            <!-- Email CTA: Animated gradient border -->
-            <div class="gradient-border chat-cta">
-                <form id="email-form" class="gradient-border-inner p-1.5 flex items-center gap-1.5">
-                    <input
-                        type="email"
-                        id="email-input"
-                        placeholder="Twój najlepszy e-mail"
-                        class="flex-1 px-4 py-3 bg-transparent text-white placeholder-zinc-500 text-[15px] focus:outline-none min-w-0"
-                        required
-                    >
-                    <button type="submit" class="px-5 py-2.5 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors flex-shrink-0">
-                        Wyślij
-                    </button>
-                </form>
+            <button data-key="space" class="key-hint space-key" title="Upuść">SPACE</button>
+            <div class="controls-hint">
+                <span>← → Ruch</span>
+                <span>↑ Obróć</span>
+                <span>Space Upuść</span>
             </div>
-
-            <!-- Legal links -->
-            <p class="text-zinc-600 text-[11px] text-center mt-3 chat-cta">
-                Wysyłając akceptujesz <a href="#" class="underline hover:text-zinc-400">regulamin</a> i <a href="#" class="underline hover:text-zinc-400">politykę prywatności</a>
-            </p>
         </div>
-    </main>
+    </div>
 
-    <!-- Thank You Section (hidden by default) -->
-    <main id="thankyou-section" class="min-h-screen flex items-center justify-center px-4 sm:px-6 py-20 hidden">
-        <div class="w-full max-w-md text-center">
-            <!-- Success icon -->
-            <div class="mb-6">
-                <div class="w-20 h-20 mx-auto bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-full flex items-center justify-center success-icon">
-                    <svg class="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path class="success-checkmark" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                </div>
-            </div>
+    <!-- Fullpage Container -->
+    <div class="fullpage-container" id="fullpage">
 
-            <!-- Thank you message -->
-            <h1 class="text-2xl font-bold text-white mb-2">Dzięki!</h1>
-            <p class="text-zinc-400 mb-8">Za chwilę dostaniesz ode mnie wiadomość i zaczniemy rozmowy <span class="text-white font-medium">o inwestycji w Ciebie</span>.</p>
-
-            <!-- Countdown -->
-            <div id="countdown-container" class="mb-6">
-                <p class="text-zinc-500 text-sm mb-2">Wysyłam wiadomość...</p>
-                <span id="countdown" class="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">5</span>
-            </div>
-
-            <!-- Email provider CTA (hidden initially) -->
-            <a id="provider-link" href="#" target="_blank" class="hidden items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white rounded-lg font-semibold text-[15px] hover:opacity-90 transition-opacity mb-6">
-                <span id="provider-name">Otwórz pocztę</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        <!-- Section 1: Hero -->
+        <section class="fullpage-section track-section flex items-center" data-section="0" style="--accent-glow: rgba(99, 102, 241, 0.15)">
+            <!-- Mobile scroll indicator -->
+            <div class="scroll-indicator">
+                <span>PRZEWIŃ</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12l7 7 7-7"/>
                 </svg>
-            </a>
+            </div>
 
-            <!-- Fallback for unknown providers (hidden initially) -->
-            <p id="provider-fallback" class="text-zinc-300 text-sm mb-6 hidden">Otwórz swoją skrzynkę pocztową</p>
+            <div class="content-area px-6">
+                <div class="section-content visible">
+                    <div class="inline-flex items-center gap-2.5 bg-white/[0.05] border border-white/[0.08] rounded-full px-5 py-2 mb-8 backdrop-blur-sm">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span class="text-[14px] tracking-wide"><span class="text-white font-medium">Tomasz Niedźwiecki</span><span class="badge-subtitle"> <span class="text-zinc-500">·</span> <span class="text-zinc-400">Przedsiębiorca · Inwestor</span></span></span>
+                    </div>
 
-            <!-- Reminder -->
-            <p class="text-zinc-500 text-xs">Sprawdź też folder SPAM lub Oferty</p>
-        </div>
-    </main>
+                    <h1 class="text-[clamp(36px,5vw,56px)] font-bold gradient-text leading-[1.15] tracking-[-0.02em] mb-6">
+                        Inwestuję w ludzi<br>i buduję z nimi <span class="whitespace-nowrap">e-biznesy</span>
+                    </h1>
 
+                    <p class="text-[18px] md:text-[20px] text-zinc-400 leading-[1.7] mb-10">
+                        Zbudowałem 3 firmy o łącznych przychodach ponad <span class="text-white font-medium">70 mln zł</span>.
+                        Po sprzedaży udziałów inwestuję w ambitne osoby. Buduję im biznesy,
+                        wdrażam w nie i przekazuję stery zostając wspólnikiem.
+                    </p>
+
+                    <a href="/zapisy"
+                       class="btn-primary inline-flex items-center justify-center gap-2.5 text-black h-14 px-8 rounded-xl text-[16px] font-medium transition-all duration-200 hover:scale-[1.02]">
+                        Zgłoś się
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Track Record Intro -->
+        <section class="fullpage-section flex items-center" data-section="1">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-6">Moja droga</p>
+
+                    <h2 class="text-[42px] md:text-[56px] font-bold text-white leading-[1.1] tracking-[-0.02em] mb-8">
+                        15 lat budowania<br>biznesów online
+                    </h2>
+
+                    <p class="text-[18px] md:text-[20px] text-zinc-400 leading-[1.7] mb-12">
+                        Od <span class="text-emerald-400">sklepu internetowego</span> w dropshippingu założonego na studiach, przez budowę <span class="text-[#ffb400]">platformy SaaS</span> wycenionej na 25 mln zł i wdrożenie <span class="text-purple-400">tysięcy osób</span> w sprzedaż online po sprzedaż udziałów i nowy etap — inwestycję w ludzi i budowę dla nich e-biznesów.
+                    </p>
+
+                    <div class="flex items-center gap-4 text-[14px]">
+                        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span class="text-emerald-400">Sklep</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[#ffb400]/10 border border-[#ffb400]/20">
+                            <span class="w-2 h-2 rounded-full bg-[#ffb400]"></span>
+                            <span class="text-[#ffb400]">TakeDrop</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <span class="text-purple-400">Inkubator</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Sklep internetowy -->
+        <section class="fullpage-section track-section flex items-center" data-section="2" style="--accent-glow: rgba(16, 185, 129, 0.1)">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <div class="track-icon bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/20">
+                        <i class="ph ph-storefront text-emerald-400 text-5xl"></i>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="text-[13px] text-zinc-500 tracking-wider uppercase">2011 — 2021</span>
+                        <span class="w-10 h-px bg-zinc-700"></span>
+                    </div>
+
+                    <h2 class="text-[42px] md:text-[56px] font-bold text-white leading-[1.1] tracking-[-0.02em] mb-4">
+                        Sklep internetowy
+                    </h2>
+
+                    <p class="text-[28px] md:text-[36px] font-medium text-emerald-400 mb-8">
+                        Od zera do 40 MLN
+                    </p>
+
+                    <p class="text-[17px] md:text-[19px] text-zinc-400 leading-[1.8] mb-10">
+                        Zacząłem od dropshippingu na studiach. Po paru latach zbudowałem jeden z największych sklepów e-commerce w swojej niszy. Sprzedaż na poziomie 40 mln zł, zespół 30 osób, ogrom doświadczenia w e-handlu.
+                    </p>
+
+                    <div class="flex items-center gap-8 text-[15px] text-zinc-500">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-chart-line-up text-emerald-400 text-lg"></i>
+                            <span>40 mln zł przychodu</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-users text-emerald-400 text-lg"></i>
+                            <span>30 osób w zespole</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: TakeDrop -->
+        <section class="fullpage-section track-section flex items-center" data-section="3" style="--accent-glow: rgba(255, 180, 0, 0.1)">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <div class="track-icon bg-gradient-to-br from-[#ffb400]/20 to-[#ffb400]/5 border border-[#ffb400]/20">
+                        <i class="ph ph-package text-[#ffb400] text-5xl"></i>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="text-[13px] text-zinc-500 tracking-wider uppercase">2017 — 2025</span>
+                        <span class="w-10 h-px bg-zinc-700"></span>
+                    </div>
+
+                    <h2 class="text-[42px] md:text-[56px] font-bold text-white leading-[1.1] tracking-[-0.02em] mb-4">
+                        TakeDrop
+                    </h2>
+
+                    <p class="text-[28px] md:text-[36px] font-medium text-[#ffb400] mb-8">
+                        Platforma e-commerce i szkolenia
+                    </p>
+
+                    <p class="text-[17px] md:text-[19px] text-zinc-400 leading-[1.8] mb-10">
+                        Na bazie swoich doświadczeń, potrzeb i problemów stworzyłem platformę e-commerce. Najpierw dla siebie, potem dla innych, którzy chcieli robić to co ja. Dzisiaj korzysta z niej ponad 5 tysięcy sklepów online. W moich szkoleniach, kursach i mentoringach wzięło udział parę tysięcy osób.
+                    </p>
+
+                    <div class="flex items-center gap-8 text-[15px] text-zinc-500">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-code text-[#ffb400] text-lg"></i>
+                            <span>Platforma SaaS</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-graduation-cap text-[#ffb400] text-lg"></i>
+                            <span>Program szkoleniowy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Inkubator -->
+        <section class="fullpage-section track-section flex items-center" data-section="4" style="--accent-glow: rgba(168, 85, 247, 0.1)">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <div class="track-icon bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20">
+                        <i class="ph ph-graduation-cap text-purple-400 text-5xl"></i>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="text-[13px] text-zinc-500 tracking-wider uppercase">2024 — 2025</span>
+                        <span class="w-10 h-px bg-zinc-700"></span>
+                    </div>
+
+                    <h2 class="text-[42px] md:text-[56px] font-bold text-white leading-[1.1] tracking-[-0.02em] mb-4">
+                        Inkubator
+                    </h2>
+
+                    <p class="text-[28px] md:text-[36px] font-medium text-purple-400 mb-8">
+                        Tysiące osób z ułatwionym startem
+                    </p>
+
+                    <p class="text-[17px] md:text-[19px] text-zinc-400 leading-[1.8] mb-10">
+                        Pierwszy w Polsce zbudowałem system łączący prawo, podatki i technologię aby umożliwić osobom bez działalności legalne rozpoczęcie sprzedaży w ramach inkubatora TakeTrust. Bez limitu przychodu, bez ZUS z pełnym bezpieczeństwem.
+                    </p>
+
+                    <div class="flex items-center gap-6 text-[15px] text-zinc-500">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-minus text-purple-400 text-lg"></i>
+                            <span>Bez ZUS</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-minus text-purple-400 text-lg"></i>
+                            <span>Bez działalności</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-shield-check text-purple-400 text-lg"></i>
+                            <span>Pełne bezpieczeństwo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Motto -->
+        <section class="fullpage-section flex items-center" data-section="5">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <blockquote class="text-[28px] md:text-[36px] lg:text-[42px] font-medium text-white leading-[1.4] tracking-[-0.01em]">
+                        <span class="text-zinc-500">"</span>Budując biznes, rozwiązujemy problemy, za które klienci chcą płacić – <span class="text-emerald-400">dużo, często</span> i bez wahania. Pamiętaj: Im mocniej problem boli, tym łatwiej sprzedać na niego rozwiązanie.<span class="text-zinc-500">"</span>
+                    </blockquote>
+                    <p class="mt-8 text-[18px] text-zinc-500">— Tomasz Niedźwiecki</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Współpraca -->
+        <section class="fullpage-section flex items-center" data-section="6">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-5">Współpraca</p>
+                    <h2 class="text-[36px] md:text-[44px] font-bold text-white tracking-[-0.02em] leading-[1.2] mb-6">
+                        Sprawdzony model.<br>
+                        <span class="text-zinc-500">Nowa nisza. Twój biznes.</span>
+                    </h2>
+
+                    <p class="text-[17px] text-zinc-400 leading-relaxed mb-10">
+                        Zbuduję dla Ciebie biznes, wdrożę Cię w&nbsp;jego prowadzenie i&nbsp;przekażę stery — zostając Twoim wspólnikiem.
+                    </p>
+
+                    <div class="offer-cards">
+                        <div class="offer-card offer-card--emerald">
+                            <div class="offer-card__icon">
+                                <i class="ph-duotone ph-storefront"></i>
+                            </div>
+                            <div class="offer-card__content">
+                                <h3>Nowoczesny sklep e-commerce</h3>
+                                <p>Nie buduję sklepów — tworzę przyciągające marki</p>
+                            </div>
+                        </div>
+
+                        <div class="offer-card offer-card--amber">
+                            <div class="offer-card__icon">
+                                <i class="ph-duotone ph-code"></i>
+                            </div>
+                            <div class="offer-card__content">
+                                <h3>Aplikacje / Narzędzia / SaaS</h3>
+                                <p>Wdrażam rozwiązania, które stają się niezbędne</p>
+                            </div>
+                        </div>
+
+                        <div class="offer-card offer-card--purple">
+                            <div class="offer-card__icon">
+                                <i class="ph-duotone ph-video-camera"></i>
+                            </div>
+                            <div class="offer-card__content">
+                                <h3>Kursy online</h3>
+                                <p>Pokazuję jak sprzedawać wiedzę aby zarabiać i dawać realną wartość</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: CTA + Footer -->
+        <section class="fullpage-section track-section flex items-center" data-section="7" style="--accent-glow: rgba(52, 211, 153, 0.12)">
+            <div class="content-area px-6">
+                <div class="section-content">
+                    <h2 class="text-[42px] md:text-[56px] font-bold text-white tracking-[-0.02em] mb-10">
+                        Chcesz zrobić biznes?
+                    </h2>
+
+                    <a href="/zapisy"
+                       class="btn-primary inline-flex items-center justify-center gap-2.5 text-black h-14 px-10 rounded-xl text-[17px] font-medium transition-all duration-200 hover:scale-[1.02] mb-20">
+                        Wypełnij kwestionariusz
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+
+                    <!-- Footer -->
+                    <div class="border-t border-white/[0.06] pt-10">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[14px] text-zinc-600">
+                            <span>© 2025 Tomasz Niedźwiecki · NIP 6972240255</span>
+                            <div class="flex items-center gap-8">
+                                <a href="/regulamin" class="hover:text-zinc-400 transition-colors">Regulamin</a>
+                                <a href="/polityka-prywatnosci" class="hover:text-zinc-400 transition-colors">Prywatność</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Fullpage Scroll JavaScript -->
     <script>
-        // Email providers configuration
-        const emailProviders = {
-            // Polish providers
-            'wp.pl': { name: 'WP Poczta', url: 'https://poczta.wp.pl' },
-            'onet.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'onet.eu': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'o2.pl': { name: 'O2 Poczta', url: 'https://poczta.o2.pl' },
-            'interia.pl': { name: 'Interia Poczta', url: 'https://poczta.interia.pl' },
-            'interia.eu': { name: 'Interia Poczta', url: 'https://poczta.interia.pl' },
-            'tlen.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'gazeta.pl': { name: 'Gazeta Poczta', url: 'https://poczta.gazeta.pl' },
-            'op.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'poczta.fm': { name: 'Interia Poczta', url: 'https://poczta.interia.pl' },
-            'vp.pl': { name: 'Wirtualna Polska', url: 'https://poczta.wp.pl' },
-            'buziaczek.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'autograf.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'spoko.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
-            'poczta.onet.pl': { name: 'Onet Poczta', url: 'https://poczta.onet.pl' },
+        (function() {
+            const container = document.getElementById('fullpage');
+            const sections = container.querySelectorAll('.fullpage-section');
+            const dots = document.querySelectorAll('#dots-nav button');
+            let currentSection = 0;
+            let isScrolling = false;
+            let scrollTimeout;
 
-            // Google
-            'gmail.com': { name: 'Gmail', url: 'https://mail.google.com' },
-            'googlemail.com': { name: 'Gmail', url: 'https://mail.google.com' },
+            // Check if desktop
+            const isDesktop = () => window.innerWidth >= 768;
 
-            // Microsoft
-            'outlook.com': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'outlook.pl': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'hotmail.com': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'hotmail.pl': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'hotmail.co.uk': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'hotmail.fr': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'hotmail.de': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'live.com': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'live.pl': { name: 'Outlook', url: 'https://outlook.live.com' },
-            'msn.com': { name: 'Outlook', url: 'https://outlook.live.com' },
-
-            // Yahoo
-            'yahoo.com': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-            'yahoo.pl': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-            'yahoo.co.uk': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-            'yahoo.de': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-            'yahoo.fr': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-            'ymail.com': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-            'rocketmail.com': { name: 'Yahoo Mail', url: 'https://mail.yahoo.com' },
-
-            // Apple
-            'icloud.com': { name: 'iCloud Mail', url: 'https://www.icloud.com/mail' },
-            'me.com': { name: 'iCloud Mail', url: 'https://www.icloud.com/mail' },
-            'mac.com': { name: 'iCloud Mail', url: 'https://www.icloud.com/mail' },
-
-            // Proton
-            'protonmail.com': { name: 'Proton Mail', url: 'https://mail.proton.me' },
-            'protonmail.ch': { name: 'Proton Mail', url: 'https://mail.proton.me' },
-            'proton.me': { name: 'Proton Mail', url: 'https://mail.proton.me' },
-            'pm.me': { name: 'Proton Mail', url: 'https://mail.proton.me' },
-
-            // German providers
-            'gmx.de': { name: 'GMX', url: 'https://www.gmx.net' },
-            'gmx.net': { name: 'GMX', url: 'https://www.gmx.net' },
-            'gmx.at': { name: 'GMX', url: 'https://www.gmx.net' },
-            'gmx.ch': { name: 'GMX', url: 'https://www.gmx.net' },
-            'web.de': { name: 'WEB.DE', url: 'https://web.de' },
-            't-online.de': { name: 'T-Online', url: 'https://email.t-online.de' },
-            'freenet.de': { name: 'Freenet', url: 'https://email.freenet.de' },
-
-            // French providers
-            'orange.fr': { name: 'Orange', url: 'https://messagerie.orange.fr' },
-            'wanadoo.fr': { name: 'Orange', url: 'https://messagerie.orange.fr' },
-            'free.fr': { name: 'Free', url: 'https://webmail.free.fr' },
-            'laposte.net': { name: 'La Poste', url: 'https://www.laposte.net' },
-            'sfr.fr': { name: 'SFR', url: 'https://webmail.sfr.fr' },
-
-            // UK providers
-            'btinternet.com': { name: 'BT Mail', url: 'https://www.bt.com/email' },
-            'sky.com': { name: 'Sky', url: 'https://www.sky.com/signin/email' },
-            'virginmedia.com': { name: 'Virgin Media', url: 'https://www.virginmedia.com/email' },
-            'talktalk.net': { name: 'TalkTalk', url: 'https://www.talktalk.co.uk/mail' },
-
-            // Other international
-            'mail.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'email.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'fastmail.com': { name: 'Fastmail', url: 'https://www.fastmail.com' },
-            'fastmail.fm': { name: 'Fastmail', url: 'https://www.fastmail.com' },
-            'tutanota.com': { name: 'Tutanota', url: 'https://mail.tutanota.com' },
-            'tutamail.com': { name: 'Tutanota', url: 'https://mail.tutanota.com' },
-            'tuta.io': { name: 'Tutanota', url: 'https://mail.tutanota.com' },
-            'zoho.com': { name: 'Zoho Mail', url: 'https://mail.zoho.com' },
-            'zoho.eu': { name: 'Zoho Mail', url: 'https://mail.zoho.eu' },
-            'aol.com': { name: 'AOL Mail', url: 'https://mail.aol.com' },
-            'yandex.com': { name: 'Yandex Mail', url: 'https://mail.yandex.com' },
-            'yandex.ru': { name: 'Yandex Mail', url: 'https://mail.yandex.com' },
-            'ya.ru': { name: 'Yandex Mail', url: 'https://mail.yandex.com' },
-            'mail.ru': { name: 'Mail.ru', url: 'https://e.mail.ru' },
-            'inbox.ru': { name: 'Mail.ru', url: 'https://e.mail.ru' },
-            'list.ru': { name: 'Mail.ru', url: 'https://e.mail.ru' },
-            'bk.ru': { name: 'Mail.ru', url: 'https://e.mail.ru' },
-            'seznam.cz': { name: 'Seznam', url: 'https://email.seznam.cz' },
-            'hey.com': { name: 'HEY', url: 'https://app.hey.com' },
-            'inbox.com': { name: 'Inbox.com', url: 'https://www.inbox.com' },
-            'gmx.com': { name: 'GMX', url: 'https://www.gmx.com' },
-            'usa.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'myself.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'consultant.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'post.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'europe.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-            'asia.com': { name: 'Mail.com', url: 'https://www.mail.com' },
-        };
-
-        // Get email domain
-        function getEmailDomain(email) {
-            const parts = email.split('@');
-            return parts.length === 2 ? parts[1].toLowerCase() : null;
-        }
-
-        // Get provider info
-        function getProviderInfo(domain) {
-            return emailProviders[domain] || null;
-        }
-
-        // Set current time for messages
-        function updateTimes() {
-            const now = new Date();
-
-            const setTime = (id, minOffset) => {
-                const d = new Date(now.getTime() - minOffset * 60000);
-                const h = d.getHours().toString().padStart(2, '0');
-                const m = d.getMinutes().toString().padStart(2, '0');
-                document.getElementById(id).textContent = `${h}:${m}`;
+            // Update active dot
+            const updateDots = (index) => {
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
             };
 
-            setTime('time1', 3);
-            setTime('time2', 2);
-            setTime('time3', 1);
-            setTime('time4', 0);
-        }
+            // Scroll to section
+            const scrollToSection = (index) => {
+                if (!isDesktop() || index < 0 || index >= sections.length) return;
 
-        // Countdown function
-        function startCountdown(provider) {
-            const countdownEl = document.getElementById('countdown');
-            const countdownContainer = document.getElementById('countdown-container');
-            const providerLink = document.getElementById('provider-link');
-            const providerName = document.getElementById('provider-name');
-            const providerFallback = document.getElementById('provider-fallback');
+                isScrolling = true;
+                container.classList.add('is-scrolling');
+                currentSection = index;
+                updateDots(index);
 
-            let count = 5;
+                sections[index].scrollIntoView({ behavior: 'smooth' });
 
-            const interval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    countdownEl.textContent = count;
-                } else {
-                    clearInterval(interval);
-                    // Hide countdown, show button
-                    countdownContainer.classList.add('hidden');
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    container.classList.remove('is-scrolling');
+                }, 1000);
+            };
 
-                    if (provider) {
-                        providerName.textContent = `Otwórz ${provider.name}`;
-                        providerLink.href = provider.url;
-                        providerLink.classList.remove('hidden');
-                        providerLink.classList.add('inline-flex');
-                    } else {
-                        providerFallback.classList.remove('hidden');
-                    }
+            // Intersection Observer for section visibility
+            const createObserver = () => {
+                return new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const index = parseInt(entry.target.dataset.section);
+                            currentSection = index;
+                            updateDots(index);
+
+                            // Animate content (desktop only - mobile is always visible via CSS)
+                            const content = entry.target.querySelector('.section-content');
+                            if (content) content.classList.add('visible');
+                        }
+                    });
+                }, {
+                    root: container,
+                    threshold: 0.5
+                });
+            };
+
+            let observer = createObserver();
+            sections.forEach(section => observer.observe(section));
+
+            // Recreate observer on resize
+            window.addEventListener('resize', () => {
+                observer.disconnect();
+                observer = createObserver();
+                sections.forEach(section => observer.observe(section));
+            });
+
+            // Dot clicks
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const index = parseInt(dot.dataset.section);
+                    scrollToSection(index);
+                });
+            });
+
+            // Wheel event for controlled scrolling
+            container.addEventListener('wheel', (e) => {
+                if (!isDesktop() || isScrolling) {
+                    if (isScrolling) e.preventDefault();
+                    return;
                 }
-            }, 1000);
-        }
 
-        // Supabase configuration
-        const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bWF2d2t3bmZ1cGhqcWJlbHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NjQyNTUsImV4cCI6MjA4NDM0MDI1NX0.XeR0Fc7OFn6YbNJrOKTBEj36JtmLISZTM87y4ai9340';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const delta = e.deltaY;
+                if (Math.abs(delta) < 30) return;
 
-        // Lista parametrów do zbierania
-        const TRACKING_PARAMS = [
-            // Click IDs
-            'gclid', 'gbraid', 'wbraid', 'gad_source', 'fbclid', 'ttclid',
-            // UTM
-            'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id',
-            // Google Ads
-            'campaignid', 'adgroupid', 'creative', 'keyword', 'matchtype', 'device', 'network', 'placement', 'loc_physical_ms',
-            // Meta
-            'fb_campaign_id', 'fb_adset_id', 'fb_ad_id',
-            // TikTok
-            'tt_campaign_id', 'tt_adgroup_id', 'tt_ad_id'
-        ];
+                e.preventDefault();
 
-        // Zbierz parametry z URL i zapisz w sessionStorage
-        function captureTrackingParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+                if (delta > 0 && currentSection < sections.length - 1) {
+                    scrollToSection(currentSection + 1);
+                } else if (delta < 0 && currentSection > 0) {
+                    scrollToSection(currentSection - 1);
+                }
+            }, { passive: false });
 
-            TRACKING_PARAMS.forEach(param => {
-                const value = urlParams.get(param);
-                if (value) {
-                    stored[param] = value;
+            // Keyboard navigation (Page Up/Down only - arrows reserved for Tetris)
+            document.addEventListener('keydown', (e) => {
+                if (!isDesktop()) return;
+
+                if (e.code === 'PageDown') {
+                    e.preventDefault();
+                    scrollToSection(currentSection + 1);
+                } else if (e.code === 'PageUp') {
+                    e.preventDefault();
+                    scrollToSection(currentSection - 1);
                 }
             });
 
-            // Zapisz landing page tylko raz (pierwsza wizyta)
-            if (!stored.landing_page) {
-                stored.landing_page = window.location.href;
-            }
+            // Touch support
+            let touchStartY = 0;
+            container.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
 
-            // Zapisz referrer tylko raz
-            if (!stored.referrer && document.referrer) {
-                stored.referrer = document.referrer;
-            }
+            container.addEventListener('touchend', (e) => {
+                if (!isDesktop() || isScrolling) return;
 
-            sessionStorage.setItem('tracking_params', JSON.stringify(stored));
-            return stored;
-        }
+                const touchEndY = e.changedTouches[0].clientY;
+                const diff = touchStartY - touchEndY;
 
-        // Pobierz wszystkie zebrane parametry
-        function getTrackingData() {
-            const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
-            stored.user_agent = navigator.userAgent;
-            return stored;
-        }
-
-        // Zbierz parametry przy załadowaniu strony
-        captureTrackingParams();
-
-        // Handle form submission
-        document.getElementById('email-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email-input').value;
-            const domain = getEmailDomain(email);
-            const provider = getProviderInfo(domain);
-
-            // Save to Supabase - leads table (only email)
-            try {
-                const { data: leadResult, error: leadError } = await supabaseClient
-                    .from('leads')
-                    .insert([{ email: email }])
-                    .select('id')
-                    .single();
-
-                if (leadError) {
-                    console.error('Lead insert error:', leadError);
-                } else if (leadResult) {
-                    // Save tracking data to separate table
-                    const trackingData = getTrackingData();
-                    const { error: trackingError } = await supabaseClient
-                        .from('lead_tracking')
-                        .insert([{
-                            lead_id: leadResult.id,
-                            ...trackingData
-                        }]);
-
-                    if (trackingError) {
-                        console.error('Tracking insert error:', trackingError);
-                    }
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) scrollToSection(currentSection + 1);
+                    else scrollToSection(currentSection - 1);
                 }
-            } catch (err) {
-                console.error('Error saving lead:', err);
+            }, { passive: true });
+        })();
+    </script>
+
+    <!-- 3D Tetris Game -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // ==================== CONSTANTS ====================
+        const BOARD_W = 10, BOARD_H = 20;
+        const BLOCK = 0.52, GAP = 0.06, UNIT = BLOCK + GAP;
+
+        const COLORS = {
+            I: 0x34d399, O: 0xffb400, T: 0xa855f7,
+            S: 0x10b981, Z: 0xc084fc, J: 0x6366f1, L: 0xfbbf24
+        };
+
+        const PIECES = {
+            I: { shape: [[0,0],[1,0],[2,0],[3,0]], color: COLORS.I },
+            O: { shape: [[0,0],[1,0],[0,1],[1,1]], color: COLORS.O },
+            T: { shape: [[0,0],[1,0],[2,0],[1,1]], color: COLORS.T },
+            S: { shape: [[1,0],[2,0],[0,1],[1,1]], color: COLORS.S },
+            Z: { shape: [[0,0],[1,0],[1,1],[2,1]], color: COLORS.Z },
+            J: { shape: [[0,0],[0,1],[1,1],[2,1]], color: COLORS.J },
+            L: { shape: [[2,0],[0,1],[1,1],[2,1]], color: COLORS.L }
+        };
+        const TYPES = Object.keys(PIECES);
+
+        // ==================== GAME STATE ====================
+        let game = {
+            board: [], current: null, type: null, rot: 0, x: 0, y: 0, next: null,
+            playing: true, drop: 0, interval: 1800,
+            userActive: false, aiTarget: null
+        };
+
+        // ==================== THREE.JS ====================
+        const container = document.getElementById('tetris-canvas');
+
+        // Only initialize on desktop
+        const isMobileDevice = window.innerWidth < 768;
+
+        if (!isMobileDevice) {
+            // Wait for container to be visible
+            function waitForContainer(callback) {
+                if (container && container.offsetWidth > 0) {
+                    callback();
+                } else {
+                    requestAnimationFrame(() => waitForContainer(callback));
+                }
             }
+            waitForContainer(initTetris);
+        }
 
-            // Hide chat, show thank you
-            document.getElementById('chat-section').classList.add('hidden');
-            document.getElementById('thankyou-section').classList.remove('hidden');
+        function initTetris() {
+        const scene = new THREE.Scene();
+        // Board dimensions: 10 wide x 20 tall, UNIT = 0.58
+        // Board size: ~5.8 wide, ~11.6 tall
+        const boardCenterX = BOARD_W * UNIT / 2;
+        const boardCenterY = BOARD_H * UNIT / 2;
 
-            // Start countdown
-            startCountdown(provider);
+        // Camera positioned to center Tetris in visible area (right of gradient overlay)
+        // Offset X by +1.5 to compensate for left-side gradient
+        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(boardCenterX + 1.5, boardCenterY - 0.5, 14);
 
-            // Google Ads conversion tracking
-            gtag('event', 'conversion', {'send_to': 'AW-17886093904/8_ykCOCF9OcbENDE4NBC'});
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.4;
+        container.appendChild(renderer.domElement);
 
-            // Meta Pixel Lead event
-            fbq('track', 'Lead');
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        const bloom = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 0.75, 0.5, 0.8);
+        composer.addPass(bloom);
 
-            // TikTok Pixel Lead event
-            ttq.track('SubmitForm');
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.03;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.3;
+        controls.minPolarAngle = Math.PI * 0.42;
+        controls.maxPolarAngle = Math.PI * 0.48;
+        controls.minAzimuthAngle = -Math.PI * 0.08;
+        controls.maxAzimuthAngle = Math.PI * 0.08;
+        // Center on board (offset to match camera)
+        controls.target.set(boardCenterX + 1.5, boardCenterY - 0.5, 0);
+
+        // Environment - warm gradient with emerald/gold hints
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        const envScene = new THREE.Scene();
+        envScene.add(new THREE.Mesh(
+            new THREE.SphereGeometry(50, 32, 32),
+            new THREE.ShaderMaterial({
+                side: THREE.BackSide,
+                vertexShader: `varying vec3 vP; void main() { vP = (modelMatrix * vec4(position,1.0)).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+                fragmentShader: `varying vec3 vP; void main() { float h = normalize(vP).y; vec3 bottom = vec3(0.02, 0.04, 0.03); vec3 top = vec3(0.06, 0.08, 0.1); gl_FragColor = vec4(mix(bottom, top, h*0.5+0.5), 1.0); }`
+            })
+        ));
+        scene.environment = pmrem.fromScene(envScene).texture;
+
+        // Lighting - colors matching page palette
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const mainL = new THREE.DirectionalLight(0xffffff, 2.2);
+        mainL.position.set(8, 20, 12);
+        scene.add(mainL);
+        // Emerald fill light from left
+        const fillL = new THREE.DirectionalLight(0x34d399, 1.2);
+        fillL.position.set(-12, 10, -6);
+        scene.add(fillL);
+        // Gold accent from right
+        const goldL = new THREE.DirectionalLight(0xffb400, 0.8);
+        goldL.position.set(15, 5, 8);
+        scene.add(goldL);
+        // Purple back light
+        const backL = new THREE.DirectionalLight(0xa855f7, 0.7);
+        backL.position.set(0, -5, -10);
+        scene.add(backL);
+
+        // ==================== RENDERING ====================
+        const blockGeo = new RoundedBoxGeometry(BLOCK, BLOCK, BLOCK, 5, 0.06);
+        const matCache = {};
+
+        const getMat = (c, o=1) => {
+            const k = `${c}-${o}`;
+            if (!matCache[k]) {
+                matCache[k] = new THREE.MeshPhysicalMaterial({
+                    color: c, metalness: 0.12, roughness: 0.15,
+                    envMapIntensity: 2.2, clearcoat: 0.9, clearcoatRoughness: 0.1,
+                    transparent: o < 1, opacity: o,
+                    emissive: c, emissiveIntensity: o < 1 ? 0 : 0.12
+                });
+            }
+            return matCache[k];
+        };
+
+        const createBlock = (x, y, c, o=1) => {
+            const m = new THREE.Mesh(blockGeo, getMat(c, o));
+            m.position.set(x * UNIT, y * UNIT, 0);
+            if (o === 1) {
+                const e = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(blockGeo, 20),
+                    new THREE.LineBasicMaterial({ color: 0x6ee7b7, transparent: true, opacity: 0.2 })
+                );
+                e.position.copy(m.position);
+                const g = new THREE.Group();
+                g.add(m); g.add(e);
+                return g;
+            }
+            return m;
+        };
+
+        const boardGroup = new THREE.Group();
+        scene.add(boardGroup);
+
+        // Frame - subtle emerald tint
+        const frameMat = new THREE.MeshPhysicalMaterial({
+            color: 0x1a3a3a, metalness: 0.85, roughness: 0.25,
+            transparent: true, opacity: 0.4, envMapIntensity: 1.2
+        });
+        const frameH = BOARD_H * UNIT * 0.6;
+        const bottom = new THREE.Mesh(new RoundedBoxGeometry(BOARD_W * UNIT + 0.4, 0.12, 0.6, 4, 0.03), frameMat);
+        bottom.position.set(BOARD_W * UNIT / 2 - UNIT/2, -0.15, 0);
+        boardGroup.add(bottom);
+        const left = new THREE.Mesh(new RoundedBoxGeometry(0.12, frameH, 0.6, 4, 0.03), frameMat);
+        left.position.set(-0.2 - UNIT/2, frameH/2 - UNIT/2, 0);
+        boardGroup.add(left);
+        const right = new THREE.Mesh(new RoundedBoxGeometry(0.12, frameH, 0.6, 4, 0.03), frameMat);
+        right.position.set(BOARD_W * UNIT - UNIT/2 + 0.2, frameH/2 - UNIT/2, 0);
+        boardGroup.add(right);
+
+        let boardBlocks = [], pieceBlocks = [], ghostBlocks = [];
+        const clearArr = arr => { arr.forEach(b => boardGroup.remove(b)); arr.length = 0; };
+
+        const renderBoard = () => {
+            clearArr(boardBlocks);
+            for (let y = 0; y < BOARD_H; y++)
+                for (let x = 0; x < BOARD_W; x++)
+                    if (game.board[y]?.[x]) {
+                        const b = createBlock(x, y, game.board[y][x]);
+                        boardBlocks.push(b);
+                        boardGroup.add(b);
+                    }
+        };
+
+        const getRotated = () => {
+            const base = PIECES[game.type].shape;
+            let s = base.map(([x,y]) => [x,y]);
+            for (let r = 0; r < game.rot % 4; r++)
+                s = s.map(([x,y]) => [-y + 1, x]);
+            return s;
+        };
+
+        const renderPiece = () => {
+            clearArr(pieceBlocks);
+            clearArr(ghostBlocks);
+            if (!game.current) return;
+            const c = PIECES[game.type].color;
+            const shape = getRotated();
+            let gy = game.y;
+            while (valid(game.x, gy - 1, shape)) gy--;
+            shape.forEach(([bx, by]) => {
+                const g = createBlock(game.x + bx, gy + by, c, 0.15);
+                ghostBlocks.push(g);
+                boardGroup.add(g);
+            });
+            shape.forEach(([bx, by]) => {
+                const b = createBlock(game.x + bx, game.y + by, c);
+                pieceBlocks.push(b);
+                boardGroup.add(b);
+            });
+        };
+
+        // ==================== GAME LOGIC ====================
+        const initBoard = () => { game.board = []; for (let y = 0; y < BOARD_H; y++) game.board[y] = new Array(BOARD_W).fill(null); };
+
+        const valid = (nx, ny, shape) => {
+            for (const [bx, by] of shape) {
+                const x = nx + bx, y = ny + by;
+                if (x < 0 || x >= BOARD_W || y < 0) return false;
+                if (y < BOARD_H && game.board[y][x]) return false;
+            }
+            return true;
+        };
+
+        const spawn = () => {
+            game.type = game.next || TYPES[Math.floor(Math.random() * TYPES.length)];
+            game.next = TYPES[Math.floor(Math.random() * TYPES.length)];
+            game.rot = 0;
+            game.x = Math.floor(BOARD_W / 2) - 1;
+            game.y = 14;
+            game.current = PIECES[game.type];
+            game.aiTarget = null;
+            if (!valid(game.x, game.y, getRotated())) {
+                setTimeout(() => { game.userActive = false; restartGame(); }, 1000);
+            }
+        };
+
+        const move = (dx, dy) => {
+            if (!game.playing) return false;
+            const shape = getRotated();
+            if (valid(game.x + dx, game.y + dy, shape)) {
+                game.x += dx; game.y += dy;
+                renderPiece();
+                return true;
+            }
+            return false;
+        };
+
+        const rotate = () => {
+            if (!game.playing) return;
+            const oldRot = game.rot;
+            game.rot = (game.rot + 1) % 4;
+            const shape = getRotated();
+            const kicks = [0, -1, 1, -2, 2];
+            for (const k of kicks) {
+                if (valid(game.x + k, game.y, shape)) {
+                    game.x += k;
+                    renderPiece();
+                    return;
+                }
+            }
+            game.rot = oldRot;
+        };
+
+        const hardDrop = () => {
+            if (!game.playing) return;
+            while (move(0, -1)) {}
+            lock();
+        };
+
+        const lock = () => {
+            const shape = getRotated();
+            const c = PIECES[game.type].color;
+            shape.forEach(([bx, by]) => {
+                const x = game.x + bx, y = game.y + by;
+                if (y >= 0 && y < BOARD_H) game.board[y][x] = c;
+            });
+            for (let y = BOARD_H - 1; y >= 0; y--) {
+                if (game.board[y].every(c => c !== null)) {
+                    game.board.splice(y, 1);
+                    game.board.push(new Array(BOARD_W).fill(null));
+                    y++;
+                }
+            }
+            renderBoard();
+            spawn();
+            renderPiece();
+        };
+
+        // ==================== AI ====================
+        const evaluatePosition = (board, shape, x, y) => {
+            const testBoard = board.map(row => [...row]);
+            shape.forEach(([bx, by]) => {
+                const px = x + bx, py = y + by;
+                if (py >= 0 && py < BOARD_H && px >= 0 && px < BOARD_W) testBoard[py][px] = 1;
+            });
+            let score = 0;
+            let heights = [];
+            for (let col = 0; col < BOARD_W; col++) {
+                let h = 0;
+                for (let row = BOARD_H - 1; row >= 0; row--) {
+                    if (testBoard[row][col]) { h = row + 1; break; }
+                }
+                heights.push(h);
+            }
+            score -= heights.reduce((a, b) => a + b, 0) * 0.5;
+            let lines = 0;
+            for (let row = 0; row < BOARD_H; row++) {
+                if (testBoard[row].every(c => c !== null)) lines++;
+            }
+            score += lines * 10;
+            let holes = 0;
+            for (let col = 0; col < BOARD_W; col++) {
+                let blockFound = false;
+                for (let row = BOARD_H - 1; row >= 0; row--) {
+                    if (testBoard[row][col]) blockFound = true;
+                    else if (blockFound) holes++;
+                }
+            }
+            score -= holes * 3;
+            let bumpiness = 0;
+            for (let i = 0; i < heights.length - 1; i++) {
+                bumpiness += Math.abs(heights[i] - heights[i + 1]);
+            }
+            score -= bumpiness * 0.5;
+            return score;
+        };
+
+        const findBestMove = () => {
+            let best = { score: -Infinity, x: game.x, rot: 0 };
+            for (let rot = 0; rot < 4; rot++) {
+                let shape = PIECES[game.type].shape.map(([x, y]) => [x, y]);
+                for (let r = 0; r < rot; r++) shape = shape.map(([x, y]) => [-y + 1, x]);
+                for (let x = -2; x < BOARD_W + 2; x++) {
+                    if (!valid(x, game.y, shape)) continue;
+                    let y = game.y;
+                    while (valid(x, y - 1, shape)) y--;
+                    if (!valid(x, y, shape)) continue;
+                    const score = evaluatePosition(game.board, shape, x, y);
+                    if (score > best.score) best = { score, x, rot };
+                }
+            }
+            return best;
+        };
+
+        const aiStep = () => {
+            if (!game.playing || game.userActive) return;
+            if (!game.aiTarget) game.aiTarget = findBestMove();
+            if (game.rot !== game.aiTarget.rot) { rotate(); return; }
+            if (game.x < game.aiTarget.x) { move(1, 0); return; }
+            if (game.x > game.aiTarget.x) { move(-1, 0); return; }
+            hardDrop();
+        };
+
+        function restartGame() {
+            game = {
+                board: [], current: null, type: null, rot: 0, x: 0, y: 0, next: null,
+                playing: true, drop: performance.now(), interval: 1800,
+                userActive: false, aiTarget: null
+            };
+            initBoard();
+            clearArr(boardBlocks);
+            spawn();
+            renderBoard();
+            renderPiece();
+        }
+
+        // ==================== INPUT ====================
+        const handleKey = (key) => {
+            if (!game.playing) return;
+            game.userActive = true;
+            switch (key) {
+                case 'left': move(-1, 0); break;
+                case 'right': move(1, 0); break;
+                case 'down': move(0, -1); break;
+                case 'up': rotate(); break;
+                case 'space': hardDrop(); break;
+            }
+        };
+
+        document.addEventListener('keydown', e => {
+            const keyMap = {
+                'ArrowLeft': 'left', 'ArrowRight': 'right',
+                'ArrowDown': 'down', 'ArrowUp': 'up', 'Space': 'space'
+            };
+            if (keyMap[e.code]) {
+                e.preventDefault();
+                handleKey(keyMap[e.code]);
+                const btn = document.querySelector(`[data-key="${keyMap[e.code]}"]`);
+                if (btn) {
+                    btn.classList.add('active');
+                    setTimeout(() => btn.classList.remove('active'), 100);
+                }
+            }
         });
 
-        updateTimes();
+        document.querySelectorAll('#keyboard-controls button').forEach(btn => {
+            btn.addEventListener('click', () => handleKey(btn.dataset.key));
+        });
+
+        // ==================== LOOP ====================
+        let lastAiTime = 0;
+
+        function animate(t) {
+            requestAnimationFrame(animate);
+            controls.update();
+            if (game.playing) {
+                if (t - game.drop >= game.interval) {
+                    if (!move(0, -1)) lock();
+                    game.drop = t;
+                }
+                if (!game.userActive && t - lastAiTime > 500) {
+                    aiStep();
+                    lastAiTime = t;
+                }
+            }
+            composer.render();
+        }
+
+        window.addEventListener('resize', () => {
+            const w = container.clientWidth, h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            composer.setSize(w, h);
+        });
+
+        initBoard();
+        spawn();
+        renderBoard();
+        renderPiece();
+        game.drop = performance.now();
+        animate(0);
+        } // end initTetris
     </script>
 
 </body>
