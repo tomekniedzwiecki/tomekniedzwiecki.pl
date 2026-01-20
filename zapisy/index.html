@@ -313,7 +313,7 @@
             <p class="text-white font-medium text-lg mb-2">Masz doświadczenie w biznesach internetowych?</p>
             <p class="text-zinc-500 text-sm mb-5">Jeśli tak - jakie i jaka skala. Jeśli nie - dlaczego chcesz zacząć.</p>
 
-            <textarea id="q4-experience" rows="5" placeholder="Napisz tutaj..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-5"></textarea>
+            <textarea id="q4-experience" rows="8" placeholder="Napisz tutaj..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-5"></textarea>
 
             <button type="button" id="q4-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                 Dalej →
@@ -331,7 +331,7 @@
             <p class="text-white font-medium text-lg mb-2">Co jeszcze powinienem o Tobie wiedzieć?</p>
             <p class="text-zinc-500 text-sm mb-6">Twoja historia, sytuacja, pytania - cokolwiek uznasz za istotne.</p>
 
-            <textarea id="q5-open" rows="6" placeholder="Opcjonalnie — napisz cokolwiek uznasz za ważne..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-6"></textarea>
+            <textarea id="q5-open" rows="10" placeholder="Opcjonalnie — napisz cokolwiek uznasz za ważne..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-6"></textarea>
 
             <button type="button" id="q5-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors">
                 Dalej →
@@ -584,6 +584,38 @@
             }
         }
 
+        // Slack notification - fire and forget
+        async function sendSlackNotification(type, data) {
+            try {
+                await fetch(`${SUPABASE_URL}/functions/v1/slack-notify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({ type, data })
+                });
+            } catch (err) {
+                console.error('Slack notification error:', err);
+            }
+        }
+
+        // Determine traffic source from tracking params
+        function getTrafficSource() {
+            const tracking = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+
+            if (tracking.fbclid) return 'Facebook';
+            if (tracking.ttclid) return 'TikTok';
+            if (tracking.gclid || tracking.gbraid || tracking.wbraid || tracking.gad_source) return 'Google';
+            if (tracking.utm_source) {
+                const src = tracking.utm_source.toLowerCase();
+                if (src.includes('facebook') || src.includes('fb') || src.includes('meta')) return 'Facebook';
+                if (src.includes('tiktok') || src.includes('tt')) return 'TikTok';
+                if (src.includes('google') || src.includes('gads')) return 'Google';
+            }
+            return 'Direct';
+        }
+
         // STEP 0: Email form
         document.getElementById('email-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -690,12 +722,26 @@
 
         // STEP 7: Phone
         document.getElementById('q7-next').addEventListener('click', async function() {
-            const value = document.getElementById('q7-phone').value.trim();
-            saveData('phone', value);
+            const phone = document.getElementById('q7-phone').value.trim();
+            saveData('phone', phone);
             saveData('completed', true);
-            if (value) {
-                await updateLead({ phone: value });
+            if (phone) {
+                await updateLead({ phone: phone });
             }
+
+            // Send Slack notification with all form data
+            const savedData = loadSavedData();
+            sendSlackNotification('new_lead', {
+                email: savedData.email,
+                phone: phone,
+                traffic_source: getTrafficSource(),
+                direction: savedData.direction,
+                weekly_hours: savedData.weekly_hours,
+                target_income: savedData.target_income,
+                experience: savedData.experience,
+                open_question: savedData.open_question,
+                budget: savedData.budget
+            });
 
             gtag('event', 'form_complete', {'event_category': 'engagement'});
             fbq('track', 'CompleteRegistration');
