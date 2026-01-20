@@ -376,9 +376,10 @@
             <p class="text-white font-medium text-lg mb-2">Podaj numer telefonu</p>
             <p class="text-zinc-500 text-sm mb-6">Zadzwonimy, aby umówić krótką rozmowę.</p>
 
-            <input type="tel" id="q7-phone" placeholder="np. 600 123 456" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 placeholder:text-zinc-600 mb-6">
+            <input type="tel" id="q7-phone" placeholder="np. 600 123 456" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 placeholder:text-zinc-600">
+            <p id="q7-phone-error" class="text-red-400 text-sm mt-2 mb-4 hidden">Podaj poprawny numer telefonu (9 cyfr)</p>
 
-            <button type="button" id="q7-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors">
+            <button type="button" id="q7-next" disabled class="w-full py-4 bg-zinc-700 text-zinc-400 rounded-xl font-semibold text-[15px] transition-colors cursor-not-allowed">
                 Wyślij zgłoszenie
             </button>
         </div>
@@ -720,9 +721,42 @@
             });
         });
 
-        // STEP 7: Phone
+        // STEP 7: Phone validation
+        function validatePhone(phone) {
+            // Remove spaces, dashes, and +48/48 prefix
+            const cleaned = phone.replace(/[\s\-]/g, '').replace(/^(\+?48)/, '');
+            // Must be exactly 9 digits
+            return /^\d{9}$/.test(cleaned);
+        }
+
+        const phoneInput = document.getElementById('q7-phone');
+        const phoneError = document.getElementById('q7-phone-error');
+        const phoneSubmit = document.getElementById('q7-next');
+
+        phoneInput.addEventListener('input', function() {
+            const phone = this.value.trim();
+            const isValid = validatePhone(phone);
+
+            if (isValid) {
+                phoneError.classList.add('hidden');
+                phoneSubmit.disabled = false;
+                phoneSubmit.classList.remove('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
+                phoneSubmit.classList.add('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
+            } else {
+                if (phone.length > 0) {
+                    phoneError.classList.remove('hidden');
+                } else {
+                    phoneError.classList.add('hidden');
+                }
+                phoneSubmit.disabled = true;
+                phoneSubmit.classList.add('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
+                phoneSubmit.classList.remove('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
+            }
+        });
+
         document.getElementById('q7-next').addEventListener('click', async function() {
             const phone = document.getElementById('q7-phone').value.trim();
+            if (!validatePhone(phone)) return;
             saveData('phone', phone);
             saveData('completed', true);
             if (phone) {
