@@ -281,9 +281,10 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 50%;
+            right: 0;
             bottom: 0;
-            background: radial-gradient(ellipse at 30% 50%, var(--accent-glow, rgba(99,102,241,0.08)) 0%, transparent 70%);
+            /* Gradient fades smoothly from left to right - no hard edge */
+            background: radial-gradient(ellipse 80% 100% at 15% 50%, var(--accent-glow, rgba(99,102,241,0.08)) 0%, transparent 50%);
             pointer-events: none;
         }
         .track-icon {
