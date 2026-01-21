@@ -449,36 +449,15 @@
 
         /* ==================== OFFER CARD SVG ICONS ==================== */
         .offer-icon {
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
         }
-
-        /* Storefront icon - subtle door swing */
-        .offer-icon--store .store-door {
-            transform-origin: 18px 20px;
-            animation: doorSwing 4s ease-in-out infinite;
+        .offer-icon .icon-glow {
+            animation: iconPulse 3s ease-in-out infinite;
         }
-        @keyframes doorSwing {
-            0%, 100% { transform: scaleX(1); }
-            50% { transform: scaleX(0.85); }
-        }
-
-        /* Code icon - cursor blink */
-        .offer-icon--code .cursor {
-            animation: cursorBlink 1s step-end infinite;
-        }
-        @keyframes cursorBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Video icon - recording pulse */
-        .offer-icon--video .rec-dot {
-            animation: recPulse 2s ease-in-out infinite;
-        }
-        @keyframes recPulse {
-            0%, 100% { opacity: 0.6; r: 2; }
-            50% { opacity: 1; r: 2.5; }
+        @keyframes iconPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
         }
 
         /* ==================== MOBILE STYLES ==================== */
@@ -1048,18 +1027,10 @@
                     <div class="offer-cards">
                         <div class="offer-card offer-card--emerald">
                             <div class="offer-card__icon">
-                                <svg class="offer-icon offer-icon--store" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Awning -->
-                                    <path d="M4 12L6 6H26L28 12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
-                                    <path d="M4 12C4 12 6 15 10 15C14 15 14 12 14 12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
-                                    <path d="M14 12C14 12 14 15 18 15C22 15 22 12 22 12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
-                                    <path d="M22 12C22 12 22 15 26 15C28 15 28 12 28 12" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
-                                    <!-- Building -->
-                                    <path d="M6 15V26H26V15" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <!-- Door -->
-                                    <rect class="store-door" x="13" y="18" width="6" height="8" rx="1" fill="#34d399" fill-opacity="0.3" stroke="#34d399" stroke-width="1.5"/>
-                                    <!-- Window -->
-                                    <rect x="20" y="18" width="3" height="3" rx="0.5" fill="#34d399" fill-opacity="0.5"/>
+                                <svg class="offer-icon" viewBox="0 0 24 24" fill="none">
+                                    <circle class="icon-glow" cx="12" cy="12" r="10" fill="#34d399" fill-opacity="0.15"/>
+                                    <path d="M6 9L12 4L18 9V19C18 19.5523 17.5523 20 17 20H7C6.44772 20 6 19.5523 6 19V9Z" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M10 20V14H14V20" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </div>
                             <div class="offer-card__content">
@@ -1070,15 +1041,11 @@
 
                         <div class="offer-card offer-card--amber">
                             <div class="offer-card__icon">
-                                <svg class="offer-icon offer-icon--code" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Left bracket -->
-                                    <path d="M10 8L4 16L10 24" stroke="#ffb400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <!-- Right bracket -->
-                                    <path d="M22 8L28 16L22 24" stroke="#ffb400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <!-- Slash -->
-                                    <path d="M18 6L14 26" stroke="#ffb400" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-                                    <!-- Cursor -->
-                                    <rect class="cursor" x="15" y="14" width="2" height="5" rx="0.5" fill="#ffb400"/>
+                                <svg class="offer-icon" viewBox="0 0 24 24" fill="none">
+                                    <circle class="icon-glow" cx="12" cy="12" r="10" fill="#ffb400" fill-opacity="0.15"/>
+                                    <path d="M8 6L3 12L8 18" stroke="#ffb400" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M16 6L21 12L16 18" stroke="#ffb400" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 4L10 20" stroke="#ffb400" stroke-width="1.5" stroke-linecap="round"/>
                                 </svg>
                             </div>
                             <div class="offer-card__content">
@@ -1089,16 +1056,9 @@
 
                         <div class="offer-card offer-card--purple">
                             <div class="offer-card__icon">
-                                <svg class="offer-icon offer-icon--video" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Camera body -->
-                                    <rect x="3" y="9" width="18" height="14" rx="3" stroke="#c084fc" stroke-width="2" fill="#c084fc" fill-opacity="0.15"/>
-                                    <!-- Lens -->
-                                    <circle cx="12" cy="16" r="4" stroke="#c084fc" stroke-width="1.5" fill="#c084fc" fill-opacity="0.2"/>
-                                    <circle cx="12" cy="16" r="1.5" fill="#c084fc" fill-opacity="0.5"/>
-                                    <!-- Viewfinder/lens part -->
-                                    <path d="M21 12L28 8V24L21 20" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#c084fc" fill-opacity="0.1"/>
-                                    <!-- Recording indicator -->
-                                    <circle class="rec-dot" cx="7" cy="12" r="2" fill="#c084fc"/>
+                                <svg class="offer-icon" viewBox="0 0 24 24" fill="none">
+                                    <circle class="icon-glow" cx="12" cy="12" r="10" fill="#c084fc" fill-opacity="0.15"/>
+                                    <polygon points="10,8 16,12 10,16" fill="#c084fc" fill-opacity="0.3" stroke="#c084fc" stroke-width="1.5" stroke-linejoin="round"/>
                                 </svg>
                             </div>
                             <div class="offer-card__content">
