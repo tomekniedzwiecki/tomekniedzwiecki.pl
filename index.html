@@ -511,16 +511,53 @@
                 backdrop-filter: blur(16px);
                 border: 1px solid rgba(255,255,255,0.08);
                 border-radius: 16px;
+                padding: 12px 16px;
+                min-width: auto;
+                transition: all 0.3s ease;
+            }
+            #builder-controls.builder-expanded {
                 padding: 20px 24px;
                 min-width: 260px;
             }
         }
         .builder-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        #builder-controls.builder-expanded .builder-title {
+            font-size: 13px;
             color: rgba(255,255,255,0.9);
             margin-bottom: 16px;
+        }
+        .builder-collapsed-hint {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
             text-align: center;
+            margin-top: 4px;
+        }
+        #builder-controls.builder-expanded .builder-collapsed-hint {
+            display: none;
+        }
+        /* Hide controls until expanded */
+        #builder-controls .shape-selector,
+        #builder-controls .color-selector,
+        #builder-controls .builder-actions,
+        #builder-controls .builder-hint {
+            display: none;
+        }
+        #builder-controls.builder-expanded .shape-selector {
+            display: grid;
+        }
+        #builder-controls.builder-expanded .color-selector,
+        #builder-controls.builder-expanded .builder-actions {
+            display: flex;
+        }
+        #builder-controls.builder-expanded .builder-hint {
+            display: block;
         }
         .shape-selector {
             display: grid;
@@ -749,6 +786,7 @@
         <!-- Builder controls -->
         <div id="builder-controls">
             <div class="builder-title">Buduj w 3D</div>
+            <div class="builder-collapsed-hint">Kliknij klocek</div>
             <div class="shape-selector" id="shape-selector"></div>
             <div class="color-selector" id="color-selector"></div>
             <div class="builder-actions">
@@ -1704,10 +1742,11 @@
                 if (canPlaceShape(gx, gy)) {
                     const placementLevel = getShapePlacementLevel(gx, gy);
                     if (placementLevel < 10) {
-                        // User took control - stop auto-build
+                        // User took control - stop auto-build and expand controls
                         if (!userTookControl) {
                             userTookControl = true;
                             stopAutoBuild();
+                            document.getElementById('builder-controls').classList.add('builder-expanded');
                         }
                         const cells = getShapeCells(gx, gy);
                         cells.forEach(cell => {
@@ -1724,10 +1763,11 @@
                 // Remove the top block at this position
                 const topLevel = getTopLevel(gx, gy) - 1;
                 if (topLevel >= 0) {
-                    // User took control - stop auto-build
+                    // User took control - stop auto-build and expand controls
                     if (!userTookControl) {
                         userTookControl = true;
                         stopAutoBuild();
+                        document.getElementById('builder-controls').classList.add('builder-expanded');
                     }
                     const idx = blocks.findIndex(b => b.gx === gx && b.gy === gy && b.gz === topLevel);
                     if (idx >= 0) blocks.splice(idx, 1);
