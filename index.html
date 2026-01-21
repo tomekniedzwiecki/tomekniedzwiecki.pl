@@ -614,9 +614,121 @@
             line-height: 1.6;
             margin-top: 12px;
         }
+
+        /* ==================== HEADER ==================== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+            pointer-events: none;
+        }
+        .site-header > * {
+            pointer-events: auto;
+        }
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #fff;
+        }
+        .header-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .header-logo-text {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .header-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff;
+            color: #000;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .header-cta:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+        }
+        .header-cta svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Desktop header adjustments */
+        @media (min-width: 768px) {
+            .site-header {
+                padding: 20px 32px;
+                /* On desktop, header only spans content area */
+                right: 42%;
+            }
+            .header-logo-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 15px;
+            }
+            .header-logo-text {
+                font-size: 16px;
+            }
+            .header-cta {
+                font-size: 14px;
+                padding: 10px 20px;
+                border-radius: 10px;
+            }
+        }
+        @media (min-width: 1200px) {
+            .site-header {
+                padding: 24px 48px;
+            }
+        }
+        @media (min-width: 1600px) {
+            .site-header {
+                right: 40%;
+                padding: 24px 56px;
+            }
+        }
     </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="site-header">
+        <a href="/" class="header-logo">
+            <div class="header-logo-icon">TN</div>
+            <span class="header-logo-text">tomekniedzwiecki.pl</span>
+        </a>
+        <a href="/zapisy" class="header-cta">
+            Aplikuj
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </header>
 
     <!-- Dots Navigation -->
     <nav class="dots-nav" id="dots-nav">
