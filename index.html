@@ -612,10 +612,11 @@
                 padding-top: 1.5rem;
             }
 
-            /* Track section glow on mobile - full width, centered */
+            /* Track section glow on mobile - full width, centered, WIDOCZNY */
             .track-section::before {
                 right: 0;
-                background: radial-gradient(ellipse 100% 70% at 50% 35%, var(--accent-glow, rgba(99,102,241,0.25)) 0%, transparent 65%);
+                left: 0;
+                background: radial-gradient(ellipse 150% 100% at 50% 20%, var(--accent-glow, rgba(99,102,241,0.35)) 0%, rgba(99,102,241,0.1) 50%, transparent 80%);
             }
 
             /* Badge in hero - compact on mobile */
