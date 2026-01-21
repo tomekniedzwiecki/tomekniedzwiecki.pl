@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulamin - Tomasz Niedźwiecki AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::selection { background: white; color: black; }
+
+        .legal-content h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .legal-content h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #d4d4d4;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .legal-content p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+            color: #a1a1a1;
+        }
+        .legal-content ul, .legal-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #a1a1a1;
+        }
+        .legal-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        .legal-content ol {
+            list-style-type: decimal;
+        }
+        .legal-content ul {
+            list-style-type: disc;
+        }
+        .legal-content strong {
+            color: #d4d4d4;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="border-b border-white/10 bg-black/50 backdrop-blur-sm sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="text-white font-semibold text-lg hover:text-zinc-300 transition-colors">
+                <span id="header-company-name">Tomasz Niedźwiecki AI</span>
+            </a>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="/polityka-prywatnosci" class="text-zinc-400 hover:text-white transition-colors">Polityka Prywatności</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+        <div class="mb-10">
+            <h1 class="text-3xl font-bold text-white mb-3">Regulamin świadczenia usług</h1>
+            <p class="text-zinc-500">Ostatnia aktualizacja: 20 stycznia 2026 r.</p>
+        </div>
+
+        <div class="legal-content">
+            <h2>§1. Definicje</h2>
+            <p>Użyte w niniejszym Regulaminie pojęcia oznaczają:</p>
+            <ol>
+                <li><strong>Sprzedawca / Usługodawca</strong> – <span class="company-name">Tomasz Niedźwiecki</span> prowadzący działalność gospodarczą pod firmą <span class="company-name">Tomasz Niedźwiecki AI</span>, <span class="company-address">ul. Grawerska 30L, 51-180 Wrocław</span>, NIP: <span class="company-nip">6972240255</span>, e-mail: <span class="company-email">ceo@tomekniedzwiecki.pl</span></li>
+                <li><strong>Klient</strong> – osoba fizyczna, osoba prawna lub jednostka organizacyjna nieposiadająca osobowości prawnej, która korzysta z Usług oferowanych przez Sprzedawcę</li>
+                <li><strong>Konsument</strong> – osoba fizyczna dokonująca czynności prawnej niezwiązanej bezpośrednio z jej działalnością gospodarczą lub zawodową</li>
+                <li><strong>Przedsiębiorca na prawach konsumenta</strong> – osoba fizyczna zawierająca umowę bezpośrednio związaną z jej działalnością gospodarczą, gdy z treści tej umowy wynika, że nie posiada ona dla niej charakteru zawodowego</li>
+                <li><strong>Usługi</strong> – usługi świadczone przez Sprzedawcę drogą elektroniczną, w tym usługi cyfrowe oraz usługi B2B</li>
+                <li><strong>Usługi cyfrowe</strong> – treści cyfrowe dostarczane przez Sprzedawcę, w szczególności kursy online, e-booki, dostęp do platform edukacyjnych, oprogramowanie typu SaaS</li>
+                <li><strong>Usługi B2B</strong> – usługi świadczone na rzecz przedsiębiorców, w szczególności wdrożenia systemów, konsultacje, realizacja projektów informatycznych</li>
+                <li><strong>Umowa</strong> – umowa o świadczeniu Usług zawarta pomiędzy Sprzedawcą a Klientem</li>
+                <li><strong>Serwis</strong> – strona internetowa Sprzedawcy, za pośrednictwem której świadczone są Usługi</li>
+                <li><strong>Regulamin</strong> – niniejszy dokument określający zasady świadczenia Usług</li>
+            </ol>
+
+            <h2>§2. Postanowienia ogólne</h2>
+            <ol>
+                <li>Niniejszy Regulamin określa zasady korzystania z Usług świadczonych przez Sprzedawcę.</li>
+                <li>Regulamin jest udostępniany nieodpłatnie za pośrednictwem Serwisu w formie umożliwiającej jego pobranie, utrwalenie i wydrukowanie.</li>
+                <li>Korzystanie z Serwisu i Usług wymaga akceptacji niniejszego Regulaminu.</li>
+                <li>Sprzedawca świadczy Usługi zgodnie z Regulaminem oraz obowiązującymi przepisami prawa polskiego.</li>
+                <li>Do korzystania z Serwisu wymagane jest urządzenie z dostępem do Internetu oraz przeglądarka internetowa obsługująca JavaScript i cookies.</li>
+            </ol>
+
+            <h2>§3. Rodzaje i zakres usług</h2>
+            <h3>3.1. Usługi cyfrowe</h3>
+            <p>Sprzedawca oferuje następujące kategorie usług cyfrowych:</p>
+            <ul>
+                <li>Kursy online i szkolenia wideo</li>
+                <li>E-booki i materiały edukacyjne w formie elektronicznej</li>
+                <li>Dostęp do platform edukacyjnych i społecznościowych</li>
+                <li>Oprogramowanie typu SaaS (Software as a Service)</li>
+                <li>Inne treści cyfrowe określone w ofercie</li>
+            </ul>
+
+            <h3>3.2. Usługi B2B</h3>
+            <p>Dla klientów biznesowych Sprzedawca oferuje:</p>
+            <ul>
+                <li>Wdrożenia systemów informatycznych</li>
+                <li>Konsultacje i doradztwo technologiczne</li>
+                <li>Realizację dedykowanych projektów IT</li>
+                <li>Integracje systemów</li>
+                <li>Wsparcie techniczne i utrzymanie systemów</li>
+            </ul>
+            <p>Szczegółowy zakres usług B2B jest każdorazowo ustalany indywidualnie z Klientem i określany w odrębnej umowie lub zamówieniu.</p>
+
+            <h2>§4. Warunki zawierania umów</h2>
+            <ol>
+                <li>Informacje o Usługach zamieszczone w Serwisie stanowią zaproszenie do zawarcia umowy w rozumieniu art. 71 Kodeksu cywilnego.</li>
+                <li>W celu zawarcia Umowy Klient składa zamówienie poprzez:
+                    <ul>
+                        <li>formularz zamówienia dostępny w Serwisie,</li>
+                        <li>wiadomość e-mail przesłaną na adres Sprzedawcy,</li>
+                        <li>inne kanały komunikacji wskazane przez Sprzedawcę.</li>
+                    </ul>
+                </li>
+                <li>Złożenie zamówienia wymaga akceptacji niniejszego Regulaminu oraz Polityki Prywatności.</li>
+                <li>Umowa zostaje zawarta z chwilą potwierdzenia przyjęcia zamówienia przez Sprzedawcę.</li>
+                <li>Potwierdzenie przyjęcia zamówienia jest przesyłane na adres e-mail Klienta podany podczas składania zamówienia.</li>
+            </ol>
+
+            <h2>§5. Ceny i płatności</h2>
+            <ol>
+                <li>Wszystkie ceny podane w Serwisie są wyrażone w złotych polskich (PLN).</li>
+                <li>Ceny podane przy Usługach są cenami brutto (zawierają podatek VAT), chyba że wyraźnie zaznaczono inaczej.</li>
+                <li>Dla Klientów będących przedsiębiorcami ceny mogą być podawane jako ceny netto (bez VAT) – w takim przypadku zostanie to wyraźnie oznaczone.</li>
+                <li>Sprzedawca zastrzega sobie prawo do zmiany cen Usług. Zmiana cen nie dotyczy zamówień już złożonych.</li>
+                <li>Płatności realizowane są za pośrednictwem operatora płatności <strong>Tpay</strong> (Krajowy Integrator Płatności S.A., ul. Św. Marcin 73/6, 61-808 Poznań, KRS: 0000412357).</li>
+                <li>Dostępne metody płatności:
+                    <ul>
+                        <li>BLIK</li>
+                        <li>Szybki przelew bankowy</li>
+                        <li>Karta płatnicza (Visa, Mastercard)</li>
+                        <li>Przelew tradycyjny</li>
+                        <li>Płatności ratalne (jeśli dostępne)</li>
+                    </ul>
+                </li>
+                <li>Klient zobowiązany jest do dokonania płatności w terminie 7 dni od dnia złożenia zamówienia, chyba że strony ustaliły inny termin.</li>
+                <li>Za datę płatności uznaje się dzień zaksięgowania środków na rachunku Sprzedawcy lub otrzymania potwierdzenia płatności od operatora.</li>
+            </ol>
+
+            <h2>§6. Realizacja usług</h2>
+            <h3>6.1. Usługi cyfrowe</h3>
+            <ol>
+                <li>Dostęp do Usług cyfrowych jest udzielany niezwłocznie po zaksięgowaniu płatności, nie później niż w ciągu 24 godzin od momentu potwierdzenia płatności.</li>
+                <li>Dostęp do treści cyfrowych jest realizowany poprzez:
+                    <ul>
+                        <li>przesłanie linku dostępowego na adres e-mail Klienta,</li>
+                        <li>udostępnienie treści na koncie Klienta w Serwisie,</li>
+                        <li>inny sposób określony w opisie Usługi.</li>
+                    </ul>
+                </li>
+                <li>Czas dostępu do Usług cyfrowych jest określony w opisie danej Usługi. Jeśli nie wskazano inaczej, dostęp jest bezterminowy.</li>
+                <li>Klient zobowiązuje się do nieudostępniania treści cyfrowych osobom trzecim bez zgody Sprzedawcy.</li>
+            </ol>
+
+            <h3>6.2. Usługi B2B</h3>
+            <ol>
+                <li>Realizacja Usług B2B odbywa się na podstawie indywidualnych ustaleń z Klientem.</li>
+                <li>Termin realizacji Usług B2B jest określany w umowie lub zamówieniu i zależy od zakresu prac.</li>
+                <li>Sprzedawca zobowiązuje się do wykonania Usług z należytą starannością, zgodnie z najlepszą wiedzą i praktyką branżową.</li>
+                <li>Odbiór Usług B2B następuje na podstawie protokołu odbioru lub w inny sposób uzgodniony z Klientem.</li>
+            </ol>
+
+            <h2>§7. Prawo odstąpienia od umowy</h2>
+            <h3>7.1. Prawo odstąpienia dla Konsumentów</h3>
+            <ol>
+                <li>Konsument oraz Przedsiębiorca na prawach konsumenta ma prawo odstąpić od umowy w terminie 14 dni bez podania jakiejkolwiek przyczyny.</li>
+                <li>Termin do odstąpienia od umowy wygasa po upływie 14 dni od dnia zawarcia umowy.</li>
+                <li>Aby skorzystać z prawa odstąpienia od umowy, należy poinformować Sprzedawcę o swojej decyzji w drodze jednoznacznego oświadczenia (np. pismo wysłane pocztą lub pocztą elektroniczną na adres: <span class="company-email">ceo@tomekniedzwiecki.pl</span>).</li>
+                <li>Aby zachować termin do odstąpienia od umowy, wystarczy wysłać informację dotyczącą wykonania przysługującego prawa odstąpienia od umowy przed upływem terminu do odstąpienia od umowy.</li>
+            </ol>
+
+            <h3>7.2. Wyjątki od prawa odstąpienia</h3>
+            <p>Prawo odstąpienia od umowy nie przysługuje w odniesieniu do umów:</p>
+            <ul>
+                <li>o dostarczanie treści cyfrowych niedostarczanych na nośniku materialnym, jeżeli spełnianie świadczenia rozpoczęło się za wyraźną zgodą Konsumenta przed upływem terminu do odstąpienia od umowy i po poinformowaniu go przez Sprzedawcę o utracie prawa odstąpienia od umowy;</li>
+                <li>o świadczenie usług, jeżeli Sprzedawca wykonał w pełni usługę za wyraźną zgodą Konsumenta, który został poinformowany przed rozpoczęciem świadczenia, że po spełnieniu świadczenia przez Sprzedawcę utraci prawo odstąpienia od umowy.</li>
+            </ul>
+
+            <h3>7.3. Skutki odstąpienia od umowy</h3>
+            <ol>
+                <li>W przypadku odstąpienia od umowy Sprzedawca zwraca wszystkie otrzymane płatności niezwłocznie, nie później niż w terminie 14 dni od dnia otrzymania oświadczenia o odstąpieniu.</li>
+                <li>Zwrot płatności zostanie dokonany przy użyciu takich samych sposobów płatności, jakie zostały użyte w pierwotnej transakcji, chyba że Konsument wyraźnie zgodził się na inne rozwiązanie.</li>
+            </ol>
+
+            <h2>§8. Reklamacje</h2>
+            <ol>
+                <li>Klient ma prawo złożyć reklamację w przypadku niewykonania lub nienależytego wykonania Usługi.</li>
+                <li>Reklamacje należy zgłaszać drogą elektroniczną na adres: <span class="company-email">ceo@tomekniedzwiecki.pl</span> lub pisemnie na adres Sprzedawcy.</li>
+                <li>Reklamacja powinna zawierać:
+                    <ul>
+                        <li>dane Klienta (imię, nazwisko, adres e-mail),</li>
+                        <li>opis przedmiotu reklamacji,</li>
+                        <li>okoliczności uzasadniające reklamację,</li>
+                        <li>żądanie Klienta związane z reklamacją.</li>
+                    </ul>
+                </li>
+                <li>Sprzedawca rozpatruje reklamację w terminie 14 dni od dnia jej otrzymania.</li>
+                <li>Odpowiedź na reklamację jest przesyłana na adres e-mail Klienta lub w inny sposób wskazany przez Klienta.</li>
+            </ol>
+
+            <h2>§9. Odpowiedzialność</h2>
+            <h3>9.1. Odpowiedzialność wobec Konsumentów</h3>
+            <p>Sprzedawca ponosi odpowiedzialność za wady Usług zgodnie z przepisami Kodeksu cywilnego o rękojmi oraz ustawy o prawach konsumenta.</p>
+
+            <h3>9.2. Odpowiedzialność wobec przedsiębiorców (B2B)</h3>
+            <ol>
+                <li>W relacjach z Klientami niebędącymi Konsumentami ani Przedsiębiorcami na prawach konsumenta, odpowiedzialność Sprzedawcy z tytułu rękojmi jest wyłączona.</li>
+                <li>Odpowiedzialność Sprzedawcy wobec Klientów B2B jest ograniczona do wysokości wynagrodzenia otrzymanego za daną Usługę.</li>
+                <li>Sprzedawca nie ponosi odpowiedzialności za utracone korzyści.</li>
+            </ol>
+
+            <h2>§10. Własność intelektualna</h2>
+            <ol>
+                <li>Wszelkie treści dostępne w Serwisie, w tym teksty, grafiki, logotypy, zdjęcia, materiały wideo, oprogramowanie oraz treści cyfrowe, są chronione prawami autorskimi i stanowią własność Sprzedawcy lub podmiotów, z którymi Sprzedawca zawarł stosowne umowy.</li>
+                <li>Korzystanie z Usług nie oznacza nabycia przez Klienta jakichkolwiek praw własności intelektualnej do treści.</li>
+                <li>Klient otrzymuje licencję na korzystanie z treści cyfrowych wyłącznie do użytku osobistego (w przypadku Konsumentów) lub do użytku wewnętrznego w swojej organizacji (w przypadku Klientów B2B).</li>
+                <li>Zabrania się kopiowania, rozpowszechniania, modyfikowania lub publicznego udostępniania treści bez pisemnej zgody Sprzedawcy.</li>
+            </ol>
+
+            <h2>§11. Dane osobowe</h2>
+            <ol>
+                <li>Administratorem danych osobowych Klientów jest Sprzedawca.</li>
+                <li>Dane osobowe są przetwarzane zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 (RODO) oraz innymi obowiązującymi przepisami o ochronie danych osobowych.</li>
+                <li>Szczegółowe informacje dotyczące przetwarzania danych osobowych znajdują się w <a href="/polityka-prywatnosci" class="text-white underline hover:text-zinc-300">Polityce Prywatności</a>.</li>
+            </ol>
+
+            <h2>§12. Postanowienia końcowe</h2>
+            <ol>
+                <li>Sprzedawca zastrzega sobie prawo do zmiany Regulaminu z ważnych przyczyn, w szczególności w przypadku zmiany przepisów prawa, zmiany sposobów płatności lub zmiany zakresu oferowanych Usług.</li>
+                <li>O zmianie Regulaminu Sprzedawca poinformuje Klientów poprzez publikację nowego Regulaminu w Serwisie oraz, w miarę możliwości, poprzez wysłanie informacji na adresy e-mail Klientów.</li>
+                <li>Zmiany Regulaminu wchodzą w życie w terminie 14 dni od dnia ich publikacji.</li>
+                <li>Do umów zawartych przed zmianą Regulaminu stosuje się postanowienia Regulaminu obowiązującego w chwili zawarcia umowy.</li>
+                <li>W sprawach nieuregulowanych niniejszym Regulaminem zastosowanie mają przepisy prawa polskiego, w szczególności Kodeksu cywilnego, ustawy o prawach konsumenta oraz ustawy o świadczeniu usług drogą elektroniczną.</li>
+                <li>Ewentualne spory będą rozstrzygane przez sąd właściwy zgodnie z przepisami prawa polskiego. W przypadku Konsumentów właściwy jest sąd miejsca zamieszkania Konsumenta.</li>
+                <li>Konsument ma możliwość skorzystania z pozasądowych sposobów rozpatrywania reklamacji i dochodzenia roszczeń, w tym z platformy ODR dostępnej pod adresem: <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener" class="text-white underline hover:text-zinc-300">https://ec.europa.eu/consumers/odr</a></li>
+                <li>Regulamin wchodzi w życie z dniem 20 stycznia 2026 r.</li>
+            </ol>
+
+            <h2>§13. Dane kontaktowe</h2>
+            <p>W przypadku pytań lub wątpliwości dotyczących Regulaminu, prosimy o kontakt:</p>
+            <ul>
+                <li><strong class="company-name">Tomasz Niedźwiecki AI</strong></li>
+                <li class="company-address">ul. Grawerska 30L, 51-180 Wrocław</li>
+                <li>NIP: <span class="company-nip">6972240255</span></li>
+                <li>E-mail: <a href="mailto:ceo@tomekniedzwiecki.pl" class="text-white underline hover:text-zinc-300 company-email-link">ceo@tomekniedzwiecki.pl</a></li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 mt-16">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-zinc-500 text-sm">
+            <p>&copy; 2026 <span class="company-name">Tomasz Niedźwiecki AI</span>. Wszelkie prawa zastrzeżone.</p>
+            <div class="mt-3 flex justify-center gap-4">
+                <a href="/regulamin" class="hover:text-white transition-colors">Regulamin</a>
+                <span>|</span>
+                <a href="/polityka-prywatnosci" class="hover:text-white transition-colors">Polityka Prywatności</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bWF2d2t3bmZ1cGhqcWJlbHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NjQyNTUsImV4cCI6MjA4NDM0MDI1NX0.XeR0Fc7OFn6YbNJrOKTBEj36JtmLISZTM87y4ai9340';
+
+        const DEFAULT_DATA = {
+            company_name: 'Tomasz Niedźwiecki AI',
+            company_address: 'ul. Grawerska 30L, 51-180 Wrocław',
+            company_nip: '6972240255',
+            company_email: 'ceo@tomekniedzwiecki.pl'
+        };
+
+        async function loadContent() {
+            try {
+                const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                const { data, error } = await supabase.from('settings').select('*');
+
+                if (error) throw error;
+
+                const settings = {};
+                (data || []).forEach(s => {
+                    settings[s.key] = s.value;
+                });
+
+                // Check for custom content
+                if (settings.legal_content_regulamin) {
+                    document.querySelector('.legal-content').innerHTML = settings.legal_content_regulamin;
+                }
+
+                const companyName = settings.legal_company_name || DEFAULT_DATA.company_name;
+                const companyAddress = settings.legal_company_address || DEFAULT_DATA.company_address;
+                const companyNip = settings.legal_company_nip || DEFAULT_DATA.company_nip;
+                const companyEmail = settings.legal_company_email || DEFAULT_DATA.company_email;
+
+                // Update all company name elements
+                document.querySelectorAll('.company-name').forEach(el => {
+                    el.textContent = companyName;
+                });
+                document.getElementById('header-company-name').textContent = companyName;
+
+                // Update all address elements
+                document.querySelectorAll('.company-address').forEach(el => {
+                    el.textContent = companyAddress;
+                });
+
+                // Update all NIP elements
+                document.querySelectorAll('.company-nip').forEach(el => {
+                    el.textContent = companyNip;
+                });
+
+                // Update all email elements
+                document.querySelectorAll('.company-email').forEach(el => {
+                    el.textContent = companyEmail;
+                });
+
+                // Update email links
+                document.querySelectorAll('.company-email-link').forEach(el => {
+                    el.href = `mailto:${companyEmail}`;
+                    el.textContent = companyEmail;
+                });
+
+                // Update page title
+                document.title = `Regulamin - ${companyName}`;
+
+                // Update footer company name
+                const footerCompany = document.querySelector('footer .company-name');
+                if (footerCompany) footerCompany.textContent = companyName;
+
+            } catch (err) {
+                console.log('Using default content');
+            }
+        }
+
+        loadContent();
+    </script>
+</body>
+</html>
