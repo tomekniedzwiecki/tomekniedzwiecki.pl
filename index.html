@@ -8,15 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-    }
-    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -56,12 +47,12 @@
             position: relative;
         }
 
-        /* Tetris panel - DESKTOP ONLY */
-        #tetris-panel {
+        /* Builder panel - DESKTOP ONLY */
+        #builder-panel {
             display: none;
         }
         @media (min-width: 768px) {
-            #tetris-panel {
+            #builder-panel {
                 display: block;
                 position: fixed;
                 top: 0;
@@ -70,11 +61,12 @@
                 height: 100vh;
                 z-index: 1;
             }
-            #tetris-canvas {
+            #builder-canvas {
                 width: 100%;
                 height: 100%;
+                cursor: pointer;
             }
-            .tetris-overlay {
+            .builder-overlay {
                 position: absolute;
                 inset: 0;
                 background:
@@ -91,7 +83,7 @@
             }
         }
         @media (min-width: 1600px) {
-            #tetris-panel {
+            #builder-panel {
                 width: 58%;
             }
         }
@@ -142,7 +134,7 @@
             }
         }
 
-        /* Dots navigation - at the edge between content and tetris */
+        /* Dots navigation */
         .dots-nav {
             position: fixed;
             left: 45%;
@@ -206,44 +198,6 @@
         }
 
         /* ==================== EXISTING STYLES ==================== */
-        .card {
-            position: relative;
-            background: rgba(10,10,10,0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 16px;
-            padding: 1px;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-        }
-
-        .glow {
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.03),
-                0 8px 40px -12px rgba(0,0,0,0.8),
-                0 0 80px -40px rgba(99,102,241,0.3);
-        }
-
-        .noise::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.02;
-            pointer-events: none;
-            border-radius: inherit;
-        }
-
         .gradient-text {
             background: linear-gradient(to bottom, #fff 20%, #71717a);
             -webkit-background-clip: text;
@@ -262,16 +216,6 @@
             background: linear-gradient(to bottom, #f4f4f5, #d4d4d8);
         }
 
-        .stat-number {
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -0.03em;
-        }
-
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        }
-
         /* Track record section styles */
         .track-section {
             position: relative;
@@ -283,7 +227,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-            /* Gradient fades smoothly from left to right - no hard edge */
             background: radial-gradient(ellipse 50% 80% at 10% 50%, var(--accent-glow, rgba(99,102,241,0.08)) 0%, transparent 70%);
             pointer-events: none;
         }
@@ -333,13 +276,6 @@
             position: relative;
             z-index: 1;
         }
-        .offer-card__icon::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 14px;
-            opacity: 0.15;
-        }
         .offer-card__icon::after {
             content: '';
             position: absolute;
@@ -350,9 +286,6 @@
         }
         .offer-card:hover .offer-card__icon::after {
             opacity: 1;
-        }
-        .offer-card__icon {
-            transition: box-shadow 0.3s ease;
         }
         .offer-card__content h3 {
             font-size: 17px;
@@ -365,97 +298,70 @@
             color: #71717a;
             line-height: 1.5;
         }
-        /* Emerald variant - BARDZO MOCNY GLOW */
+        /* Emerald variant */
         .offer-card--emerald .offer-card__icon {
             background: rgba(16, 185, 129, 0.25);
             border: 1px solid rgba(16, 185, 129, 0.5);
             box-shadow:
                 0 0 15px rgba(16, 185, 129, 0.4),
                 0 0 30px rgba(16, 185, 129, 0.3),
-                0 0 45px rgba(16, 185, 129, 0.2),
-                0 0 60px rgba(16, 185, 129, 0.1);
+                0 0 45px rgba(16, 185, 129, 0.2);
         }
         .offer-card--emerald .offer-card__icon i {
             color: #34d399;
             filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
         }
         .offer-card--emerald .offer-card__icon::after {
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.6) 0%, rgba(16, 185, 129, 0.3) 30%, transparent 60%);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.6) 0%, transparent 60%);
         }
         .offer-card--emerald:hover {
             border-color: rgba(16, 185, 129, 0.4);
         }
-        .offer-card--emerald:hover .offer-card__icon {
-            box-shadow:
-                0 0 20px rgba(16, 185, 129, 0.5),
-                0 0 40px rgba(16, 185, 129, 0.4),
-                0 0 60px rgba(16, 185, 129, 0.3),
-                0 0 80px rgba(16, 185, 129, 0.2);
-        }
-        /* Amber variant - BARDZO MOCNY GLOW */
+        /* Amber variant */
         .offer-card--amber .offer-card__icon {
             background: rgba(255, 180, 0, 0.25);
             border: 1px solid rgba(255, 180, 0, 0.5);
             box-shadow:
                 0 0 15px rgba(255, 180, 0, 0.4),
                 0 0 30px rgba(255, 180, 0, 0.3),
-                0 0 45px rgba(255, 180, 0, 0.2),
-                0 0 60px rgba(255, 180, 0, 0.1);
+                0 0 45px rgba(255, 180, 0, 0.2);
         }
         .offer-card--amber .offer-card__icon i {
             color: #ffb400;
             filter: drop-shadow(0 0 8px rgba(255, 180, 0, 0.6));
         }
         .offer-card--amber .offer-card__icon::after {
-            background: radial-gradient(circle, rgba(255, 180, 0, 0.6) 0%, rgba(255, 180, 0, 0.3) 30%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 180, 0, 0.6) 0%, transparent 60%);
         }
         .offer-card--amber:hover {
             border-color: rgba(255, 180, 0, 0.4);
         }
-        .offer-card--amber:hover .offer-card__icon {
-            box-shadow:
-                0 0 20px rgba(255, 180, 0, 0.5),
-                0 0 40px rgba(255, 180, 0, 0.4),
-                0 0 60px rgba(255, 180, 0, 0.3),
-                0 0 80px rgba(255, 180, 0, 0.2);
-        }
-        /* Purple variant - BARDZO MOCNY GLOW */
+        /* Purple variant */
         .offer-card--purple .offer-card__icon {
             background: rgba(168, 85, 247, 0.25);
             border: 1px solid rgba(168, 85, 247, 0.5);
             box-shadow:
                 0 0 15px rgba(168, 85, 247, 0.4),
                 0 0 30px rgba(168, 85, 247, 0.3),
-                0 0 45px rgba(168, 85, 247, 0.2),
-                0 0 60px rgba(168, 85, 247, 0.1);
+                0 0 45px rgba(168, 85, 247, 0.2);
         }
         .offer-card--purple .offer-card__icon i {
             color: #c084fc;
             filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.6));
         }
         .offer-card--purple .offer-card__icon::after {
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, rgba(168, 85, 247, 0.3) 30%, transparent 60%);
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.6) 0%, transparent 60%);
         }
         .offer-card--purple:hover {
             border-color: rgba(168, 85, 247, 0.4);
         }
-        .offer-card--purple:hover .offer-card__icon {
-            box-shadow:
-                0 0 20px rgba(168, 85, 247, 0.5),
-                0 0 40px rgba(168, 85, 247, 0.4),
-                0 0 60px rgba(168, 85, 247, 0.3),
-                0 0 80px rgba(168, 85, 247, 0.2);
-        }
 
         /* ==================== MOBILE STYLES ==================== */
         @media (max-width: 767px) {
-            /* Section content always visible on mobile */
             .section-content {
                 opacity: 1;
                 transform: none;
             }
-
-            /* Hero adjustments */
             .fullpage-section[data-section="0"] h1 {
                 font-size: 32px;
                 line-height: 1.2;
@@ -464,8 +370,6 @@
                 width: 100%;
                 justify-content: center;
             }
-
-            /* Track icon smaller on mobile */
             .track-icon {
                 width: 72px;
                 height: 72px;
@@ -475,56 +379,38 @@
             .track-icon i {
                 font-size: 32px !important;
             }
-
-            /* Track record headings */
             .fullpage-section h2 {
                 font-size: 32px !important;
             }
-
-            /* Subtitle (colored text under heading) */
             .fullpage-section p[class*="text-emerald-400"],
             .fullpage-section p[class*="text-[#ffb400]"],
             .fullpage-section p[class*="text-purple-400"] {
                 font-size: 22px !important;
                 margin-bottom: 1.5rem !important;
             }
-
-            /* Stats/tags row - wrap and center */
             .fullpage-section .flex.items-center.gap-8,
             .fullpage-section .flex.items-center.gap-6 {
                 flex-wrap: wrap;
                 gap: 12px !important;
             }
-
-            /* Tags row (Sklep, TakeDrop, Inkubator) */
             .fullpage-section .flex.items-center.gap-4 {
                 flex-wrap: wrap;
                 gap: 8px !important;
             }
-
-            /* Paragraph text on mobile */
             .fullpage-section p.text-zinc-400 {
                 font-size: 15px !important;
                 line-height: 1.7;
             }
-
-            /* Motto quote smaller */
             .fullpage-section blockquote {
                 font-size: 20px !important;
                 line-height: 1.5;
             }
-
-            /* Droga section intro - text adjustments */
             .fullpage-section[data-section="1"] h2 {
                 font-size: 28px !important;
             }
-
-            /* Współpraca heading */
             .fullpage-section[data-section="6"] h2 {
                 font-size: 26px !important;
             }
-
-            /* Offer cards on mobile */
             .offer-cards {
                 gap: 10px;
             }
@@ -541,55 +427,9 @@
             .offer-card__icon i {
                 font-size: 22px;
             }
-            /* Glow always visible on mobile - MAKSYMALNY */
             .offer-card__icon::after {
                 opacity: 1;
                 inset: -30px;
-            }
-            .offer-card--emerald .offer-card__icon {
-                background: rgba(16, 185, 129, 0.3);
-                border-color: rgba(16, 185, 129, 0.6);
-                box-shadow:
-                    0 0 20px rgba(16, 185, 129, 0.5),
-                    0 0 40px rgba(16, 185, 129, 0.4),
-                    0 0 60px rgba(16, 185, 129, 0.3),
-                    0 0 80px rgba(16, 185, 129, 0.2);
-            }
-            .offer-card--emerald .offer-card__icon i {
-                filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.8));
-            }
-            .offer-card--emerald .offer-card__icon::after {
-                background: radial-gradient(circle, rgba(16, 185, 129, 0.7) 0%, rgba(16, 185, 129, 0.4) 30%, transparent 60%);
-            }
-            .offer-card--amber .offer-card__icon {
-                background: rgba(255, 180, 0, 0.3);
-                border-color: rgba(255, 180, 0, 0.6);
-                box-shadow:
-                    0 0 20px rgba(255, 180, 0, 0.5),
-                    0 0 40px rgba(255, 180, 0, 0.4),
-                    0 0 60px rgba(255, 180, 0, 0.3),
-                    0 0 80px rgba(255, 180, 0, 0.2);
-            }
-            .offer-card--amber .offer-card__icon i {
-                filter: drop-shadow(0 0 10px rgba(255, 180, 0, 0.8));
-            }
-            .offer-card--amber .offer-card__icon::after {
-                background: radial-gradient(circle, rgba(255, 180, 0, 0.7) 0%, rgba(255, 180, 0, 0.4) 30%, transparent 60%);
-            }
-            .offer-card--purple .offer-card__icon {
-                background: rgba(168, 85, 247, 0.3);
-                border-color: rgba(168, 85, 247, 0.6);
-                box-shadow:
-                    0 0 20px rgba(168, 85, 247, 0.5),
-                    0 0 40px rgba(168, 85, 247, 0.4),
-                    0 0 60px rgba(168, 85, 247, 0.3),
-                    0 0 80px rgba(168, 85, 247, 0.2);
-            }
-            .offer-card--purple .offer-card__icon i {
-                filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.8));
-            }
-            .offer-card--purple .offer-card__icon::after {
-                background: radial-gradient(circle, rgba(168, 85, 247, 0.7) 0%, rgba(168, 85, 247, 0.4) 30%, transparent 60%);
             }
             .offer-card__content h3 {
                 font-size: 15px;
@@ -598,8 +438,6 @@
             .offer-card__content p {
                 font-size: 13px;
             }
-
-            /* CTA section */
             .fullpage-section[data-section="7"] h2 {
                 font-size: 32px !important;
             }
@@ -607,20 +445,14 @@
                 width: 100%;
                 justify-content: center;
             }
-
-            /* Footer on mobile */
             .fullpage-section[data-section="7"] .border-t {
                 padding-top: 1.5rem;
             }
-
-            /* Track section glow on mobile - centered, smooth fade */
             .track-section::before {
                 right: 0;
                 left: 0;
-                background: radial-gradient(ellipse 80% 60% at 50% 30%, var(--accent-glow, rgba(99,102,241,0.25)) 0%, transparent 70%);
+                background: radial-gradient(ellipse 150% 120% at 50% 40%, var(--accent-glow, rgba(99,102,241,0.18)) 0%, transparent 100%);
             }
-
-            /* Badge in hero - compact on mobile */
             .fullpage-section[data-section="0"] .inline-flex {
                 padding: 8px 14px;
                 margin-bottom: 1.5rem;
@@ -664,12 +496,12 @@
             }
         }
 
-        /* Keyboard controls - redesigned */
-        #keyboard-controls {
+        /* Builder controls */
+        #builder-controls {
             display: none;
         }
         @media (min-width: 768px) {
-            #keyboard-controls {
+            #builder-controls {
                 display: block;
                 position: absolute;
                 bottom: 40px;
@@ -680,75 +512,107 @@
                 border: 1px solid rgba(255,255,255,0.08);
                 border-radius: 16px;
                 padding: 20px 24px;
+                min-width: 260px;
             }
         }
-        .controls-title {
+        .builder-title {
             font-size: 13px;
             font-weight: 600;
             color: rgba(255,255,255,0.9);
             margin-bottom: 16px;
             text-align: center;
-            letter-spacing: 0.05em;
         }
-        .controls-arrows {
+        .shape-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .shape-btn {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 10px;
-        }
-        .controls-row {
-            display: flex;
-            gap: 4px;
-        }
-        .key-hint {
-            display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
-            background: rgba(255,255,255,0.06);
+            transition: all 0.2s;
+        }
+        .shape-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .shape-btn.active {
+            background: rgba(52, 211, 153, 0.2);
+            border-color: rgba(52, 211, 153, 0.5);
+        }
+        .shape-btn canvas {
+            width: 28px;
+            height: 28px;
+        }
+        .color-selector {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .color-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .color-btn canvas {
+            width: 20px;
+            height: 20px;
+        }
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+        .color-btn.active {
+            border-color: #fff;
+            transform: scale(1.15);
+        }
+        .builder-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .builder-action {
+            flex: 1;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
-            font-size: 18px;
-            font-weight: 500;
             color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .key-hint:hover {
-            background: rgba(52, 211, 153, 0.15);
-            border-color: rgba(52, 211, 153, 0.3);
-            color: #34d399;
-            transform: translateY(-2px);
-        }
-        .key-hint:active, .key-hint.active {
-            background: rgba(52, 211, 153, 0.25);
-            border-color: rgba(52, 211, 153, 0.5);
-            color: #34d399;
-            transform: scale(0.95);
-        }
-        .key-hint.space-key {
-            grid-column: span 3;
-            width: 100%;
-            height: 40px;
-            font-size: 13px;
-            letter-spacing: 0.1em;
-        }
-        .key-label {
-            font-size: 10px;
-            color: rgba(255,255,255,0.4);
+            font-size: 12px;
             text-align: center;
-            margin-top: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .controls-hint {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
+        .builder-action:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .builder-action.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: rgba(239, 68, 68, 0.8);
+        }
+        .builder-action.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .builder-hint {
+            font-size: 11px;
             color: rgba(255,255,255,0.35);
+            text-align: center;
+            line-height: 1.6;
             margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.06);
         }
     </style>
 </head>
@@ -766,27 +630,22 @@
         <button data-section="7" data-label="Kontakt"></button>
     </nav>
 
-    <!-- Tetris Panel (Fixed on desktop) -->
-    <div id="tetris-panel">
-        <div id="tetris-canvas"></div>
-        <div class="tetris-overlay"></div>
+    <!-- Builder Panel (Fixed on desktop) -->
+    <div id="builder-panel">
+        <canvas id="builder-canvas"></canvas>
+        <div class="builder-overlay"></div>
 
-        <!-- Keyboard controls -->
-        <div id="keyboard-controls">
-            <div class="controls-title">Sterowanie</div>
-            <div class="controls-arrows">
-                <button data-key="up" class="key-hint" title="Obróć">↑</button>
-                <div class="controls-row">
-                    <button data-key="left" class="key-hint" title="Lewo">←</button>
-                    <button data-key="down" class="key-hint" title="W dół">↓</button>
-                    <button data-key="right" class="key-hint" title="Prawo">→</button>
-                </div>
+        <!-- Builder controls -->
+        <div id="builder-controls">
+            <div class="builder-title">Buduj w 3D</div>
+            <div class="shape-selector" id="shape-selector"></div>
+            <div class="color-selector" id="color-selector"></div>
+            <div class="builder-actions">
+                <button class="builder-action danger" id="clear-btn">Wyczyść</button>
             </div>
-            <button data-key="space" class="key-hint space-key" title="Upuść">SPACE</button>
-            <div class="controls-hint">
-                <span>← → Ruch</span>
-                <span>↑ Obróć</span>
-                <span>Space Upuść</span>
+            <div class="builder-hint">
+                Kliknij = postaw klocek<br>
+                Prawy przycisk = usuń klocek
             </div>
         </div>
     </div>
@@ -1088,17 +947,14 @@
             let isScrolling = false;
             let scrollTimeout;
 
-            // Check if desktop
             const isDesktop = () => window.innerWidth >= 768;
 
-            // Update active dot
             const updateDots = (index) => {
                 dots.forEach((dot, i) => {
                     dot.classList.toggle('active', i === index);
                 });
             };
 
-            // Scroll to section
             const scrollToSection = (index) => {
                 if (!isDesktop() || index < 0 || index >= sections.length) return;
 
@@ -1116,7 +972,18 @@
                 }, 1000);
             };
 
-            // Intersection Observer for section visibility
+            // Section to Builder palette mapping
+            const sectionPalettes = {
+                0: 'default',
+                1: 'default',
+                2: 'emerald',
+                3: 'amber',
+                4: 'purple',
+                5: 'default',
+                6: 'default',
+                7: 'emerald'
+            };
+
             const createObserver = () => {
                 return new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -1125,7 +992,10 @@
                             currentSection = index;
                             updateDots(index);
 
-                            // Animate content (desktop only - mobile is always visible via CSS)
+                            if (window.setBuilderPalette) {
+                                window.setBuilderPalette(sectionPalettes[index] || 'default');
+                            }
+
                             const content = entry.target.querySelector('.section-content');
                             if (content) content.classList.add('visible');
                         }
@@ -1139,14 +1009,12 @@
             let observer = createObserver();
             sections.forEach(section => observer.observe(section));
 
-            // Recreate observer on resize
             window.addEventListener('resize', () => {
                 observer.disconnect();
                 observer = createObserver();
                 sections.forEach(section => observer.observe(section));
             });
 
-            // Dot clicks
             dots.forEach(dot => {
                 dot.addEventListener('click', () => {
                     const index = parseInt(dot.dataset.section);
@@ -1154,7 +1022,6 @@
                 });
             });
 
-            // Wheel event for controlled scrolling
             container.addEventListener('wheel', (e) => {
                 if (!isDesktop() || isScrolling) {
                     if (isScrolling) e.preventDefault();
@@ -1173,7 +1040,6 @@
                 }
             }, { passive: false });
 
-            // Keyboard navigation (Page Up/Down only - arrows reserved for Tetris)
             document.addEventListener('keydown', (e) => {
                 if (!isDesktop()) return;
 
@@ -1186,7 +1052,6 @@
                 }
             });
 
-            // Touch support
             let touchStartY = 0;
             container.addEventListener('touchstart', (e) => {
                 touchStartY = e.touches[0].clientY;
@@ -1206,446 +1071,655 @@
         })();
     </script>
 
-    <!-- 3D Tetris Game -->
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    <!-- Isometric 3D Builder with Tetris Shapes -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('builder-canvas');
+            if (!canvas || window.innerWidth < 768) return;
 
-        // ==================== CONSTANTS ====================
-        const BOARD_W = 10, BOARD_H = 20;
-        const BLOCK = 0.52, GAP = 0.06, UNIT = BLOCK + GAP;
+            const ctx = canvas.getContext('2d');
+            let W, H;
 
-        const COLORS = {
-            I: 0x34d399, O: 0xffb400, T: 0xa855f7,
-            S: 0x10b981, Z: 0xc084fc, J: 0x6366f1, L: 0xfbbf24
-        };
+            const resize = () => {
+                W = canvas.width = canvas.offsetWidth;
+                H = canvas.height = canvas.offsetHeight;
+            };
+            resize();
+            window.addEventListener('resize', resize);
 
-        const PIECES = {
-            I: { shape: [[0,0],[1,0],[2,0],[3,0]], color: COLORS.I },
-            O: { shape: [[0,0],[1,0],[0,1],[1,1]], color: COLORS.O },
-            T: { shape: [[0,0],[1,0],[2,0],[1,1]], color: COLORS.T },
-            S: { shape: [[1,0],[2,0],[0,1],[1,1]], color: COLORS.S },
-            Z: { shape: [[0,0],[1,0],[1,1],[2,1]], color: COLORS.Z },
-            J: { shape: [[0,0],[0,1],[1,1],[2,1]], color: COLORS.J },
-            L: { shape: [[2,0],[0,1],[1,1],[2,1]], color: COLORS.L }
-        };
-        const TYPES = Object.keys(PIECES);
+            const PALETTES = {
+                default: ['#6366f1', '#818cf8', '#a855f7', '#c084fc'],
+                emerald: ['#34d399', '#10b981', '#6ee7b7', '#4ade80'],
+                amber: ['#ffb400', '#fbbf24', '#fcd34d', '#f59e0b'],
+                purple: ['#a855f7', '#c084fc', '#8b5cf6', '#d8b4fe']
+            };
+            let currentPalette = 'default';
+            window.setBuilderPalette = (p) => { if (PALETTES[p]) currentPalette = p; };
 
-        // ==================== GAME STATE ====================
-        let game = {
-            board: [], current: null, type: null, rot: 0, x: 0, y: 0, next: null,
-            playing: true, drop: 0, interval: 1800,
-            userActive: false, aiTarget: null
-        };
+            // Isometric settings
+            const TILE_W = 60;
+            const TILE_H = 30;
+            const BLOCK_H = 40;
+            const GRID = 10;
 
-        // ==================== THREE.JS ====================
-        const container = document.getElementById('tetris-canvas');
+            // 4 practical shapes for building
+            const SHAPES = [
+                [[0,0]],                       // Single block
+                [[0,0], [1,0]],                // Horizontal 2
+                [[0,0], [1,0], [0,1], [1,1]], // Square 2x2
+                [[0,0], [1,0], [2,0]],         // Horizontal 3
+            ];
 
-        // Only initialize on desktop
-        const isMobileDevice = window.innerWidth < 768;
+            const blocks = [];
+            let selectedColor = '#6366f1';
+            let selectedShape = 0; // Default single block
+            let hoverCell = null;
+            let userTookControl = false; // Track if user placed a block
 
-        if (!isMobileDevice) {
-            // Wait for container to be visible
-            function waitForContainer(callback) {
-                if (container && container.offsetWidth > 0) {
-                    callback();
-                } else {
-                    requestAnimationFrame(() => waitForContainer(callback));
-                }
-            }
-            waitForContainer(initTetris);
-        }
-
-        function initTetris() {
-        const scene = new THREE.Scene();
-        // Board dimensions: 10 wide x 20 tall, UNIT = 0.58
-        // Board size: ~5.8 wide, ~11.6 tall
-        const boardCenterX = BOARD_W * UNIT / 2;
-        const boardCenterY = BOARD_H * UNIT / 2;
-
-        // Camera positioned to center Tetris in visible area (right of gradient overlay)
-        // Offset X by +1.5 to compensate for left-side gradient
-        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(boardCenterX + 1.5, boardCenterY - 0.5, 14);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.4;
-        container.appendChild(renderer.domElement);
-
-        const composer = new EffectComposer(renderer);
-        composer.addPass(new RenderPass(scene, camera));
-        const bloom = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 0.75, 0.5, 0.8);
-        composer.addPass(bloom);
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.03;
-        controls.enableZoom = false;
-        controls.enablePan = false;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.3;
-        controls.minPolarAngle = Math.PI * 0.42;
-        controls.maxPolarAngle = Math.PI * 0.48;
-        controls.minAzimuthAngle = -Math.PI * 0.08;
-        controls.maxAzimuthAngle = Math.PI * 0.08;
-        // Center on board (offset to match camera)
-        controls.target.set(boardCenterX + 1.5, boardCenterY - 0.5, 0);
-
-        // Environment - warm gradient with emerald/gold hints
-        const pmrem = new THREE.PMREMGenerator(renderer);
-        const envScene = new THREE.Scene();
-        envScene.add(new THREE.Mesh(
-            new THREE.SphereGeometry(50, 32, 32),
-            new THREE.ShaderMaterial({
-                side: THREE.BackSide,
-                vertexShader: `varying vec3 vP; void main() { vP = (modelMatrix * vec4(position,1.0)).xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
-                fragmentShader: `varying vec3 vP; void main() { float h = normalize(vP).y; vec3 bottom = vec3(0.02, 0.04, 0.03); vec3 top = vec3(0.06, 0.08, 0.1); gl_FragColor = vec4(mix(bottom, top, h*0.5+0.5), 1.0); }`
-            })
-        ));
-        scene.environment = pmrem.fromScene(envScene).texture;
-
-        // Lighting - colors matching page palette
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-        const mainL = new THREE.DirectionalLight(0xffffff, 2.2);
-        mainL.position.set(8, 20, 12);
-        scene.add(mainL);
-        // Emerald fill light from left
-        const fillL = new THREE.DirectionalLight(0x34d399, 1.2);
-        fillL.position.set(-12, 10, -6);
-        scene.add(fillL);
-        // Gold accent from right
-        const goldL = new THREE.DirectionalLight(0xffb400, 0.8);
-        goldL.position.set(15, 5, 8);
-        scene.add(goldL);
-        // Purple back light
-        const backL = new THREE.DirectionalLight(0xa855f7, 0.7);
-        backL.position.set(0, -5, -10);
-        scene.add(backL);
-
-        // ==================== RENDERING ====================
-        const blockGeo = new RoundedBoxGeometry(BLOCK, BLOCK, BLOCK, 5, 0.06);
-        const matCache = {};
-
-        const getMat = (c, o=1) => {
-            const k = `${c}-${o}`;
-            if (!matCache[k]) {
-                matCache[k] = new THREE.MeshPhysicalMaterial({
-                    color: c, metalness: 0.12, roughness: 0.15,
-                    envMapIntensity: 2.2, clearcoat: 0.9, clearcoatRoughness: 0.1,
-                    transparent: o < 1, opacity: o,
-                    emissive: c, emissiveIntensity: o < 1 ? 0 : 0.12
+            // Get the top level at a given grid position
+            const getTopLevel = (gx, gy) => {
+                let maxZ = -1;
+                blocks.forEach(b => {
+                    if (b.gx === gx && b.gy === gy && b.gz > maxZ) maxZ = b.gz;
                 });
-            }
-            return matCache[k];
-        };
-
-        const createBlock = (x, y, c, o=1) => {
-            const m = new THREE.Mesh(blockGeo, getMat(c, o));
-            m.position.set(x * UNIT, y * UNIT, 0);
-            if (o === 1) {
-                const e = new THREE.LineSegments(
-                    new THREE.EdgesGeometry(blockGeo, 20),
-                    new THREE.LineBasicMaterial({ color: 0x6ee7b7, transparent: true, opacity: 0.2 })
-                );
-                e.position.copy(m.position);
-                const g = new THREE.Group();
-                g.add(m); g.add(e);
-                return g;
-            }
-            return m;
-        };
-
-        const boardGroup = new THREE.Group();
-        scene.add(boardGroup);
-
-        // Frame - subtle emerald tint
-        const frameMat = new THREE.MeshPhysicalMaterial({
-            color: 0x1a3a3a, metalness: 0.85, roughness: 0.25,
-            transparent: true, opacity: 0.4, envMapIntensity: 1.2
-        });
-        const frameH = BOARD_H * UNIT * 0.6;
-        const bottom = new THREE.Mesh(new RoundedBoxGeometry(BOARD_W * UNIT + 0.4, 0.12, 0.6, 4, 0.03), frameMat);
-        bottom.position.set(BOARD_W * UNIT / 2 - UNIT/2, -0.15, 0);
-        boardGroup.add(bottom);
-        const left = new THREE.Mesh(new RoundedBoxGeometry(0.12, frameH, 0.6, 4, 0.03), frameMat);
-        left.position.set(-0.2 - UNIT/2, frameH/2 - UNIT/2, 0);
-        boardGroup.add(left);
-        const right = new THREE.Mesh(new RoundedBoxGeometry(0.12, frameH, 0.6, 4, 0.03), frameMat);
-        right.position.set(BOARD_W * UNIT - UNIT/2 + 0.2, frameH/2 - UNIT/2, 0);
-        boardGroup.add(right);
-
-        let boardBlocks = [], pieceBlocks = [], ghostBlocks = [];
-        const clearArr = arr => { arr.forEach(b => boardGroup.remove(b)); arr.length = 0; };
-
-        const renderBoard = () => {
-            clearArr(boardBlocks);
-            for (let y = 0; y < BOARD_H; y++)
-                for (let x = 0; x < BOARD_W; x++)
-                    if (game.board[y]?.[x]) {
-                        const b = createBlock(x, y, game.board[y][x]);
-                        boardBlocks.push(b);
-                        boardGroup.add(b);
-                    }
-        };
-
-        const getRotated = () => {
-            const base = PIECES[game.type].shape;
-            let s = base.map(([x,y]) => [x,y]);
-            for (let r = 0; r < game.rot % 4; r++)
-                s = s.map(([x,y]) => [-y + 1, x]);
-            return s;
-        };
-
-        const renderPiece = () => {
-            clearArr(pieceBlocks);
-            clearArr(ghostBlocks);
-            if (!game.current) return;
-            const c = PIECES[game.type].color;
-            const shape = getRotated();
-            let gy = game.y;
-            while (valid(game.x, gy - 1, shape)) gy--;
-            shape.forEach(([bx, by]) => {
-                const g = createBlock(game.x + bx, gy + by, c, 0.15);
-                ghostBlocks.push(g);
-                boardGroup.add(g);
-            });
-            shape.forEach(([bx, by]) => {
-                const b = createBlock(game.x + bx, game.y + by, c);
-                pieceBlocks.push(b);
-                boardGroup.add(b);
-            });
-        };
-
-        // ==================== GAME LOGIC ====================
-        const initBoard = () => { game.board = []; for (let y = 0; y < BOARD_H; y++) game.board[y] = new Array(BOARD_W).fill(null); };
-
-        const valid = (nx, ny, shape) => {
-            for (const [bx, by] of shape) {
-                const x = nx + bx, y = ny + by;
-                if (x < 0 || x >= BOARD_W || y < 0) return false;
-                if (y < BOARD_H && game.board[y][x]) return false;
-            }
-            return true;
-        };
-
-        const spawn = () => {
-            game.type = game.next || TYPES[Math.floor(Math.random() * TYPES.length)];
-            game.next = TYPES[Math.floor(Math.random() * TYPES.length)];
-            game.rot = 0;
-            game.x = Math.floor(BOARD_W / 2) - 1;
-            game.y = 14;
-            game.current = PIECES[game.type];
-            game.aiTarget = null;
-            if (!valid(game.x, game.y, getRotated())) {
-                setTimeout(() => { game.userActive = false; restartGame(); }, 1000);
-            }
-        };
-
-        const move = (dx, dy) => {
-            if (!game.playing) return false;
-            const shape = getRotated();
-            if (valid(game.x + dx, game.y + dy, shape)) {
-                game.x += dx; game.y += dy;
-                renderPiece();
-                return true;
-            }
-            return false;
-        };
-
-        const rotate = () => {
-            if (!game.playing) return;
-            const oldRot = game.rot;
-            game.rot = (game.rot + 1) % 4;
-            const shape = getRotated();
-            const kicks = [0, -1, 1, -2, 2];
-            for (const k of kicks) {
-                if (valid(game.x + k, game.y, shape)) {
-                    game.x += k;
-                    renderPiece();
-                    return;
-                }
-            }
-            game.rot = oldRot;
-        };
-
-        const hardDrop = () => {
-            if (!game.playing) return;
-            while (move(0, -1)) {}
-            lock();
-        };
-
-        const lock = () => {
-            const shape = getRotated();
-            const c = PIECES[game.type].color;
-            shape.forEach(([bx, by]) => {
-                const x = game.x + bx, y = game.y + by;
-                if (y >= 0 && y < BOARD_H) game.board[y][x] = c;
-            });
-            for (let y = BOARD_H - 1; y >= 0; y--) {
-                if (game.board[y].every(c => c !== null)) {
-                    game.board.splice(y, 1);
-                    game.board.push(new Array(BOARD_W).fill(null));
-                    y++;
-                }
-            }
-            renderBoard();
-            spawn();
-            renderPiece();
-        };
-
-        // ==================== AI ====================
-        const evaluatePosition = (board, shape, x, y) => {
-            const testBoard = board.map(row => [...row]);
-            shape.forEach(([bx, by]) => {
-                const px = x + bx, py = y + by;
-                if (py >= 0 && py < BOARD_H && px >= 0 && px < BOARD_W) testBoard[py][px] = 1;
-            });
-            let score = 0;
-            let heights = [];
-            for (let col = 0; col < BOARD_W; col++) {
-                let h = 0;
-                for (let row = BOARD_H - 1; row >= 0; row--) {
-                    if (testBoard[row][col]) { h = row + 1; break; }
-                }
-                heights.push(h);
-            }
-            score -= heights.reduce((a, b) => a + b, 0) * 0.5;
-            let lines = 0;
-            for (let row = 0; row < BOARD_H; row++) {
-                if (testBoard[row].every(c => c !== null)) lines++;
-            }
-            score += lines * 10;
-            let holes = 0;
-            for (let col = 0; col < BOARD_W; col++) {
-                let blockFound = false;
-                for (let row = BOARD_H - 1; row >= 0; row--) {
-                    if (testBoard[row][col]) blockFound = true;
-                    else if (blockFound) holes++;
-                }
-            }
-            score -= holes * 3;
-            let bumpiness = 0;
-            for (let i = 0; i < heights.length - 1; i++) {
-                bumpiness += Math.abs(heights[i] - heights[i + 1]);
-            }
-            score -= bumpiness * 0.5;
-            return score;
-        };
-
-        const findBestMove = () => {
-            let best = { score: -Infinity, x: game.x, rot: 0 };
-            for (let rot = 0; rot < 4; rot++) {
-                let shape = PIECES[game.type].shape.map(([x, y]) => [x, y]);
-                for (let r = 0; r < rot; r++) shape = shape.map(([x, y]) => [-y + 1, x]);
-                for (let x = -2; x < BOARD_W + 2; x++) {
-                    if (!valid(x, game.y, shape)) continue;
-                    let y = game.y;
-                    while (valid(x, y - 1, shape)) y--;
-                    if (!valid(x, y, shape)) continue;
-                    const score = evaluatePosition(game.board, shape, x, y);
-                    if (score > best.score) best = { score, x, rot };
-                }
-            }
-            return best;
-        };
-
-        const aiStep = () => {
-            if (!game.playing || game.userActive) return;
-            if (!game.aiTarget) game.aiTarget = findBestMove();
-            if (game.rot !== game.aiTarget.rot) { rotate(); return; }
-            if (game.x < game.aiTarget.x) { move(1, 0); return; }
-            if (game.x > game.aiTarget.x) { move(-1, 0); return; }
-            hardDrop();
-        };
-
-        function restartGame() {
-            game = {
-                board: [], current: null, type: null, rot: 0, x: 0, y: 0, next: null,
-                playing: true, drop: performance.now(), interval: 1800,
-                userActive: false, aiTarget: null
+                return maxZ + 1;
             };
-            initBoard();
-            clearArr(boardBlocks);
-            spawn();
-            renderBoard();
-            renderPiece();
-        }
 
-        // ==================== INPUT ====================
-        const handleKey = (key) => {
-            if (!game.playing) return;
-            game.userActive = true;
-            switch (key) {
-                case 'left': move(-1, 0); break;
-                case 'right': move(1, 0); break;
-                case 'down': move(0, -1); break;
-                case 'up': rotate(); break;
-                case 'space': hardDrop(); break;
-            }
-        };
-
-        document.addEventListener('keydown', e => {
-            const keyMap = {
-                'ArrowLeft': 'left', 'ArrowRight': 'right',
-                'ArrowDown': 'down', 'ArrowUp': 'up', 'Space': 'space'
+            // Get the placement level for a shape (highest top level among all shape cells)
+            const getShapePlacementLevel = (baseX, baseY) => {
+                const cells = SHAPES[selectedShape].map(([dx, dy]) => ({
+                    gx: baseX + dx,
+                    gy: baseY + dy
+                }));
+                let maxLevel = 0;
+                cells.forEach(({ gx, gy }) => {
+                    const level = getTopLevel(gx, gy);
+                    if (level > maxLevel) maxLevel = level;
+                });
+                return maxLevel;
             };
-            if (keyMap[e.code]) {
-                e.preventDefault();
-                handleKey(keyMap[e.code]);
-                const btn = document.querySelector(`[data-key="${keyMap[e.code]}"]`);
-                if (btn) {
+
+            // Shape selector
+            const shapeSelector = document.getElementById('shape-selector');
+            SHAPES.forEach((shape, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'shape-btn' + (idx === 0 ? ' active' : '');
+                const miniCanvas = document.createElement('canvas');
+                miniCanvas.width = 28;
+                miniCanvas.height = 28;
+                const miniCtx = miniCanvas.getContext('2d');
+
+                // Draw mini shape
+                const minX = Math.min(...shape.map(c => c[0]));
+                const minY = Math.min(...shape.map(c => c[1]));
+                const maxX = Math.max(...shape.map(c => c[0]));
+                const maxY = Math.max(...shape.map(c => c[1]));
+                const shapeW = maxX - minX + 1;
+                const shapeH = maxY - minY + 1;
+                const cellSize = Math.min(24 / shapeW, 24 / shapeH);
+                const offsetX = (28 - shapeW * cellSize) / 2;
+                const offsetY = (28 - shapeH * cellSize) / 2;
+
+                miniCtx.fillStyle = '#6366f1';
+                shape.forEach(([x, y]) => {
+                    miniCtx.fillRect(
+                        offsetX + (x - minX) * cellSize + 1,
+                        offsetY + (y - minY) * cellSize + 1,
+                        cellSize - 2,
+                        cellSize - 2
+                    );
+                });
+
+                btn.appendChild(miniCanvas);
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    setTimeout(() => btn.classList.remove('active'), 100);
+                    selectedShape = idx;
+                });
+                shapeSelector.appendChild(btn);
+            });
+
+            // Color selector with icons
+            const colors = ['#6366f1', '#34d399', '#ffb400', '#a855f7', '#ef4444', '#06b6d4'];
+            const colorSelector = document.getElementById('color-selector');
+
+            // Helper for color adjustment (local copy for selector)
+            const adjustColorSel = (hex, amt) => {
+                const num = parseInt(hex.slice(1), 16);
+                const r = Math.max(0, Math.min(255, (num >> 16) + amt));
+                const g = Math.max(0, Math.min(255, ((num >> 8) & 0xFF) + amt));
+                const b = Math.max(0, Math.min(255, (num & 0xFF) + amt));
+                return `rgb(${r},${g},${b})`;
+            };
+
+            // Icon mapping for selector - data & growth theme
+            const SELECTOR_ICONS = {
+                '#6366f1': 'trending',
+                '#34d399': 'users',
+                '#ffb400': 'percent',
+                '#a855f7': 'bars',
+                '#06b6d4': 'eye',
+                '#ef4444': 'heart',
+            };
+            const getIconSel = (color) => SELECTOR_ICONS[color] || 'trending';
+
+            // Draw icon on small canvas for color selector
+            const drawSelectorIcon = (ctx, icon, color) => {
+                const w = 40, h = 40;
+                const x = w / 2, y = h / 2;
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = adjustColorSel(color, -80);
+                ctx.fillStyle = adjustColorSel(color, -60);
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                const s = 12;
+
+                switch(icon) {
+                    case 'trending': // Trending up line
+                        ctx.beginPath();
+                        ctx.moveTo(x - s * 0.8, y + s * 0.5);
+                        ctx.lineTo(x - s * 0.2, y);
+                        ctx.lineTo(x + s * 0.2, y + s * 0.3);
+                        ctx.lineTo(x + s * 0.8, y - s * 0.5);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(x + s * 0.8, y - s * 0.5);
+                        ctx.lineTo(x + s * 0.35, y - s * 0.45);
+                        ctx.moveTo(x + s * 0.8, y - s * 0.5);
+                        ctx.lineTo(x + s * 0.7, y - s * 0.05);
+                        ctx.stroke();
+                        break;
+
+                    case 'users': // Two people
+                        ctx.beginPath();
+                        ctx.arc(x - s * 0.25, y - s * 0.3, s * 0.28, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(x - s * 0.25, y + s * 0.4, s * 0.4, Math.PI, 0);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(x + s * 0.4, y - s * 0.35, s * 0.24, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(x + s * 0.4, y + s * 0.3, s * 0.35, Math.PI, 0);
+                        ctx.fill();
+                        break;
+
+                    case 'percent': // Percentage with arrow
+                        ctx.font = `bold ${s * 1.2}px Inter, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('%', x - s * 0.15, y + s * 0.1);
+                        ctx.beginPath();
+                        ctx.moveTo(x + s * 0.55, y + s * 0.2);
+                        ctx.lineTo(x + s * 0.55, y - s * 0.4);
+                        ctx.lineTo(x + s * 0.3, y - s * 0.15);
+                        ctx.moveTo(x + s * 0.55, y - s * 0.4);
+                        ctx.lineTo(x + s * 0.8, y - s * 0.15);
+                        ctx.stroke();
+                        break;
+
+                    case 'bars': // 3 rising bars
+                        const barW = s * 0.38;
+                        const gap = s * 0.12;
+                        ctx.fillRect(x - barW * 1.5 - gap, y + s * 0.1, barW, s * 0.7);
+                        ctx.fillRect(x - barW * 0.5, y - s * 0.25, barW, s * 1.05);
+                        ctx.fillRect(x + barW * 0.5 + gap, y - s * 0.6, barW, s * 1.4);
+                        break;
+
+                    case 'eye': // Eye icon
+                        ctx.beginPath();
+                        ctx.moveTo(x - s * 0.85, y);
+                        ctx.quadraticCurveTo(x, y - s * 0.6, x + s * 0.85, y);
+                        ctx.quadraticCurveTo(x, y + s * 0.6, x - s * 0.85, y);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(x, y, s * 0.32, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = adjustColorSel(color, 30);
+                        ctx.beginPath();
+                        ctx.arc(x, y, s * 0.14, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+
+                    case 'heart': // Heart
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + s * 0.65);
+                        ctx.bezierCurveTo(x - s * 0.95, y + s * 0.1, x - s * 0.95, y - s * 0.55, x, y - s * 0.2);
+                        ctx.bezierCurveTo(x + s * 0.95, y - s * 0.55, x + s * 0.95, y + s * 0.1, x, y + s * 0.65);
+                        ctx.fill();
+                        ctx.stroke();
+                        break;
                 }
-            }
-        });
+            };
 
-        document.querySelectorAll('#keyboard-controls button').forEach(btn => {
-            btn.addEventListener('click', () => handleKey(btn.dataset.key));
-        });
+            colors.forEach((color, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn' + (idx === 0 ? ' active' : '');
+                btn.style.background = color;
 
-        // ==================== LOOP ====================
-        let lastAiTime = 0;
+                // Add icon canvas
+                const iconCanvas = document.createElement('canvas');
+                iconCanvas.width = 40;
+                iconCanvas.height = 40;
+                const iconCtx = iconCanvas.getContext('2d');
+                drawSelectorIcon(iconCtx, getIconSel(color), color);
+                btn.appendChild(iconCanvas);
 
-        function animate(t) {
-            requestAnimationFrame(animate);
-            controls.update();
-            if (game.playing) {
-                if (t - game.drop >= game.interval) {
-                    if (!move(0, -1)) lock();
-                    game.drop = t;
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedColor = color;
+                });
+                colorSelector.appendChild(btn);
+            });
+
+            // Clear button
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                blocks.length = 0;
+                userTookControl = true; // User took action
+            });
+
+            // Grid to screen (isometric projection)
+            const toScreen = (gx, gy, gz) => {
+                const cx = W / 2;
+                const cy = H / 2 + 80;
+                const ox = gx - GRID / 2;
+                const oy = gy - GRID / 2;
+                return {
+                    x: cx + (ox - oy) * TILE_W / 2,
+                    y: cy + (ox + oy) * TILE_H / 2 - gz * BLOCK_H
+                };
+            };
+
+            // Screen to grid
+            const toGrid = (sx, sy) => {
+                const cx = W / 2;
+                const cy = H / 2 + 80;
+                const screenX = sx - cx;
+                const screenY = sy - cy;
+                const ox = (screenX / (TILE_W / 2) + screenY / (TILE_H / 2)) / 2;
+                const oy = (screenY / (TILE_H / 2) - screenX / (TILE_W / 2)) / 2;
+                const gx = Math.floor(ox + GRID / 2);
+                const gy = Math.floor(oy + GRID / 2);
+                return { gx, gy };
+            };
+
+            const blockAt = (gx, gy, gz) => blocks.find(b => b.gx === gx && b.gy === gy && b.gz === gz);
+
+            // Get current shape cells at position
+            const getShapeCells = (baseX, baseY) => {
+                return SHAPES[selectedShape].map(([dx, dy]) => ({
+                    gx: baseX + dx,
+                    gy: baseY + dy
+                }));
+            };
+
+            // Check if shape can be placed (within grid bounds)
+            const canPlaceShape = (baseX, baseY) => {
+                const cells = getShapeCells(baseX, baseY);
+                return cells.every(({ gx, gy }) =>
+                    gx >= 0 && gx < GRID && gy >= 0 && gy < GRID
+                );
+            };
+
+            const adjustColor = (hex, amt) => {
+                const num = parseInt(hex.slice(1), 16);
+                const r = Math.max(0, Math.min(255, (num >> 16) + amt));
+                const g = Math.max(0, Math.min(255, ((num >> 8) & 0xFF) + amt));
+                const b = Math.max(0, Math.min(255, (num & 0xFF) + amt));
+                return `rgb(${r},${g},${b})`;
+            };
+
+            // Business icons mapped to colors - data & growth theme
+            const COLOR_ICONS = {
+                '#6366f1': 'trending', // indigo = trending up
+                '#34d399': 'users',    // emerald = customers
+                '#ffb400': 'percent',  // amber = conversion
+                '#a855f7': 'bars',     // purple = revenue
+                '#06b6d4': 'eye',      // cyan = views/traffic
+                '#ef4444': 'heart',    // red = engagement
+            };
+            const getIconForColor = (color) => COLOR_ICONS[color] || 'trending';
+
+            // Draw isometric icon on top face
+            const drawIcon = (x, y, icon, color) => {
+                const topY = y - BLOCK_H + TILE_H / 2;
+                ctx.save();
+                ctx.globalAlpha = 0.75;
+                ctx.strokeStyle = adjustColor(color, -70);
+                ctx.fillStyle = adjustColor(color, -50);
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                const s = 9;
+
+                switch(icon) {
+                    case 'trending': // Trending up line with arrow
+                        ctx.beginPath();
+                        ctx.moveTo(x - s * 0.8, topY + s * 0.5);
+                        ctx.lineTo(x - s * 0.2, topY);
+                        ctx.lineTo(x + s * 0.2, topY + s * 0.3);
+                        ctx.lineTo(x + s * 0.8, topY - s * 0.5);
+                        ctx.stroke();
+                        // Arrow head
+                        ctx.beginPath();
+                        ctx.moveTo(x + s * 0.8, topY - s * 0.5);
+                        ctx.lineTo(x + s * 0.35, topY - s * 0.45);
+                        ctx.moveTo(x + s * 0.8, topY - s * 0.5);
+                        ctx.lineTo(x + s * 0.7, topY - s * 0.05);
+                        ctx.stroke();
+                        break;
+
+                    case 'users': // Two people silhouettes
+                        // Person 1 (front)
+                        ctx.beginPath();
+                        ctx.arc(x - s * 0.25, topY - s * 0.3, s * 0.25, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(x - s * 0.25, topY + s * 0.35, s * 0.35, Math.PI, 0);
+                        ctx.fill();
+                        // Person 2 (back)
+                        ctx.beginPath();
+                        ctx.arc(x + s * 0.35, topY - s * 0.35, s * 0.22, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(x + s * 0.35, topY + s * 0.25, s * 0.3, Math.PI, 0);
+                        ctx.fill();
+                        break;
+
+                    case 'percent': // Percentage with up arrow
+                        ctx.font = `bold ${s * 1.1}px Inter, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('%', x - s * 0.15, topY + s * 0.1);
+                        // Small up arrow
+                        ctx.beginPath();
+                        ctx.moveTo(x + s * 0.55, topY + s * 0.2);
+                        ctx.lineTo(x + s * 0.55, topY - s * 0.4);
+                        ctx.lineTo(x + s * 0.3, topY - s * 0.15);
+                        ctx.moveTo(x + s * 0.55, topY - s * 0.4);
+                        ctx.lineTo(x + s * 0.8, topY - s * 0.15);
+                        ctx.stroke();
+                        break;
+
+                    case 'bars': // 3 rising bars
+                        const barW = s * 0.35;
+                        const gap = s * 0.12;
+                        ctx.fillRect(x - barW * 1.5 - gap, topY + s * 0.1, barW, s * 0.7);
+                        ctx.fillRect(x - barW * 0.5, topY - s * 0.25, barW, s * 1.05);
+                        ctx.fillRect(x + barW * 0.5 + gap, topY - s * 0.6, barW, s * 1.4);
+                        break;
+
+                    case 'eye': // Eye icon (views/traffic)
+                        // Eye outline
+                        ctx.beginPath();
+                        ctx.moveTo(x - s * 0.85, topY);
+                        ctx.quadraticCurveTo(x, topY - s * 0.6, x + s * 0.85, topY);
+                        ctx.quadraticCurveTo(x, topY + s * 0.6, x - s * 0.85, topY);
+                        ctx.stroke();
+                        // Pupil
+                        ctx.beginPath();
+                        ctx.arc(x, topY, s * 0.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Inner dot
+                        ctx.fillStyle = adjustColor(color, 30);
+                        ctx.beginPath();
+                        ctx.arc(x, topY, s * 0.12, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+
+                    case 'heart': // Heart (engagement/likes)
+                        ctx.beginPath();
+                        ctx.moveTo(x, topY + s * 0.6);
+                        ctx.bezierCurveTo(x - s * 0.9, topY + s * 0.1, x - s * 0.9, topY - s * 0.5, x, topY - s * 0.2);
+                        ctx.bezierCurveTo(x + s * 0.9, topY - s * 0.5, x + s * 0.9, topY + s * 0.1, x, topY + s * 0.6);
+                        ctx.fill();
+                        ctx.stroke();
+                        break;
                 }
-                if (!game.userActive && t - lastAiTime > 500) {
-                    aiStep();
-                    lastAiTime = t;
+                ctx.restore();
+            };
+
+            const drawBlock = (gx, gy, gz, color, alpha = 1, icon = null) => {
+                const { x, y } = toScreen(gx, gy, gz);
+                ctx.globalAlpha = alpha;
+
+                // Top
+                ctx.fillStyle = adjustColor(color, 50);
+                ctx.beginPath();
+                ctx.moveTo(x, y - BLOCK_H);
+                ctx.lineTo(x + TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.lineTo(x, y - BLOCK_H + TILE_H);
+                ctx.lineTo(x - TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.closePath();
+                ctx.fill();
+
+                // Left
+                ctx.fillStyle = adjustColor(color, -30);
+                ctx.beginPath();
+                ctx.moveTo(x - TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.lineTo(x, y - BLOCK_H + TILE_H);
+                ctx.lineTo(x, y + TILE_H);
+                ctx.lineTo(x - TILE_W/2, y + TILE_H/2);
+                ctx.closePath();
+                ctx.fill();
+
+                // Right
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(x + TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.lineTo(x, y - BLOCK_H + TILE_H);
+                ctx.lineTo(x, y + TILE_H);
+                ctx.lineTo(x + TILE_W/2, y + TILE_H/2);
+                ctx.closePath();
+                ctx.fill();
+
+                // Edges
+                ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, y - BLOCK_H);
+                ctx.lineTo(x + TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.lineTo(x, y - BLOCK_H + TILE_H);
+                ctx.lineTo(x - TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.closePath();
+                ctx.moveTo(x - TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.lineTo(x - TILE_W/2, y + TILE_H/2);
+                ctx.moveTo(x, y - BLOCK_H + TILE_H);
+                ctx.lineTo(x, y + TILE_H);
+                ctx.moveTo(x + TILE_W/2, y - BLOCK_H + TILE_H/2);
+                ctx.lineTo(x + TILE_W/2, y + TILE_H/2);
+                ctx.stroke();
+
+                // Draw icon on top face
+                if (icon && alpha >= 1) {
+                    drawIcon(x, y, icon, color);
                 }
-            }
-            composer.render();
-        }
 
-        window.addEventListener('resize', () => {
-            const w = container.clientWidth, h = container.clientHeight;
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
-            composer.setSize(w, h);
-        });
+                ctx.globalAlpha = 1;
+            };
 
-        initBoard();
-        spawn();
-        renderBoard();
-        renderPiece();
-        game.drop = performance.now();
-        animate(0);
-        } // end initTetris
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const { gx, gy } = toGrid(e.clientX - rect.left, e.clientY - rect.top);
+                hoverCell = (gx >= -2 && gx < GRID + 2 && gy >= -2 && gy < GRID + 2) ? { gx, gy } : null;
+            });
+
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const { gx, gy } = toGrid(e.clientX - rect.left, e.clientY - rect.top);
+
+                if (canPlaceShape(gx, gy)) {
+                    const placementLevel = getShapePlacementLevel(gx, gy);
+                    if (placementLevel < 10) {
+                        // User took control - stop auto-build
+                        if (!userTookControl) {
+                            userTookControl = true;
+                            stopAutoBuild();
+                        }
+                        const cells = getShapeCells(gx, gy);
+                        cells.forEach(cell => {
+                            blocks.push({ gx: cell.gx, gy: cell.gy, gz: placementLevel, color: selectedColor });
+                        });
+                    }
+                }
+            });
+
+            canvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const { gx, gy } = toGrid(e.clientX - rect.left, e.clientY - rect.top);
+                // Remove the top block at this position
+                const topLevel = getTopLevel(gx, gy) - 1;
+                if (topLevel >= 0) {
+                    // User took control - stop auto-build
+                    if (!userTookControl) {
+                        userTookControl = true;
+                        stopAutoBuild();
+                    }
+                    const idx = blocks.findIndex(b => b.gx === gx && b.gy === gy && b.gz === topLevel);
+                    if (idx >= 0) blocks.splice(idx, 1);
+                }
+            });
+
+            // Minimalist initial structure - small corner
+            const initBlocks = [
+                {gx: 4, gy: 4, gz: 0, color: '#6366f1'},  // chart
+                {gx: 5, gy: 4, gz: 0, color: '#34d399'},  // coin
+                {gx: 4, gy: 5, gz: 0, color: '#06b6d4'},  // target
+                {gx: 4, gy: 4, gz: 1, color: '#a855f7'},  // rocket
+            ];
+            initBlocks.forEach(b => blocks.push(b));
+
+            // Auto-build system - builds an expanding city using all shapes
+            let autoBuildInterval = null;
+            const autoBuildColors = ['#6366f1', '#34d399', '#ffb400', '#a855f7', '#06b6d4'];
+
+            // Building zones - different areas for different building types
+            const buildingZones = [
+                { cx: 2, cy: 2, maxH: 4 },   // Corner tower
+                { cx: 7, cy: 2, maxH: 3 },   // Top right
+                { cx: 2, cy: 7, maxH: 3 },   // Bottom left
+                { cx: 7, cy: 7, maxH: 5 },   // Bottom right tall tower
+                { cx: 5, cy: 5, maxH: 6 },   // Center main tower
+            ];
+
+            let autoBuildPhase = 0;
+
+            // Check if a shape can be placed at position/level
+            const canPlaceShapeAt = (shape, baseX, baseY, level) => {
+                return shape.every(([dx, dy]) => {
+                    const gx = baseX + dx;
+                    const gy = baseY + dy;
+                    if (gx < 0 || gx >= GRID || gy < 0 || gy >= GRID) return false;
+                    // Check if position is free at this level
+                    const occupied = blocks.some(b => b.gx === gx && b.gy === gy && b.gz === level);
+                    if (occupied) return false;
+                    // Check if there's support below (level 0 always has support)
+                    if (level === 0) return true;
+                    const hasSupport = blocks.some(b => b.gx === gx && b.gy === gy && b.gz === level - 1);
+                    return hasSupport;
+                });
+            };
+
+            // Place a shape
+            const placeShapeAt = (shape, baseX, baseY, level, color) => {
+                shape.forEach(([dx, dy]) => {
+                    blocks.push({ gx: baseX + dx, gy: baseY + dy, gz: level, color });
+                });
+            };
+
+            const autoBuildStep = () => {
+                if (userTookControl) return;
+
+                // Pick a building zone based on phase
+                const zone = buildingZones[autoBuildPhase % buildingZones.length];
+
+                // Try to find a good placement in this zone
+                const searchRadius = 2;
+                const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                const color = autoBuildColors[Math.floor(Math.random() * autoBuildColors.length)];
+
+                // Try multiple positions around the zone center
+                let placed = false;
+                for (let attempt = 0; attempt < 10 && !placed; attempt++) {
+                    const offsetX = Math.floor(Math.random() * (searchRadius * 2 + 1)) - searchRadius;
+                    const offsetY = Math.floor(Math.random() * (searchRadius * 2 + 1)) - searchRadius;
+                    const baseX = zone.cx + offsetX;
+                    const baseY = zone.cy + offsetY;
+
+                    // Find the level to place at (stack on top)
+                    for (let level = 0; level <= zone.maxH && !placed; level++) {
+                        if (canPlaceShapeAt(shape, baseX, baseY, level)) {
+                            placeShapeAt(shape, baseX, baseY, level, color);
+                            placed = true;
+                        }
+                    }
+                }
+
+                // Move to next zone
+                autoBuildPhase++;
+            };
+
+            const startAutoBuild = () => {
+                if (autoBuildInterval) return;
+                autoBuildInterval = setInterval(autoBuildStep, 1200);
+            };
+
+            const stopAutoBuild = () => {
+                if (autoBuildInterval) {
+                    clearInterval(autoBuildInterval);
+                    autoBuildInterval = null;
+                }
+            };
+
+            // Start auto-building after a short delay
+            setTimeout(startAutoBuild, 1500);
+
+            const animate = () => {
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, W, H);
+
+                // Grid at level 0
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= GRID; i++) {
+                    let s = toScreen(i, 0, 0), e = toScreen(i, GRID, 0);
+                    ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(e.x, e.y); ctx.stroke();
+                    s = toScreen(0, i, 0); e = toScreen(GRID, i, 0);
+                    ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(e.x, e.y); ctx.stroke();
+                }
+
+                // Blocks sorted by depth (painter's algorithm)
+                [...blocks].sort((a, b) => {
+                    const depthA = a.gx + a.gy;
+                    const depthB = b.gx + b.gy;
+                    if (depthA !== depthB) return depthA - depthB;
+                    return a.gz - b.gz;
+                }).forEach(b => drawBlock(b.gx + 0.5, b.gy + 0.5, b.gz, b.color, 1, getIconForColor(b.color)));
+
+                // Hover preview for shape at the correct placement level
+                if (hoverCell) {
+                    const canPlace = canPlaceShape(hoverCell.gx, hoverCell.gy);
+                    const placementLevel = getShapePlacementLevel(hoverCell.gx, hoverCell.gy);
+
+                    if (canPlace && placementLevel < 10) {
+                        const cells = getShapeCells(hoverCell.gx, hoverCell.gy);
+                        cells.forEach(({ gx, gy }) => {
+                            if (gx >= 0 && gx < GRID && gy >= 0 && gy < GRID) {
+                                drawBlock(gx + 0.5, gy + 0.5, placementLevel, selectedColor, 0.4);
+                            }
+                        });
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            };
+            animate();
+        })();
     </script>
-
 </body>
 </html>
