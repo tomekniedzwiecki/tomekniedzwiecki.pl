@@ -283,8 +283,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            /* Gradient fades smoothly from left to right - no hard edge */
-            background: radial-gradient(ellipse 80% 100% at 15% 50%, var(--accent-glow, rgba(99,102,241,0.08)) 0%, transparent 50%);
+            /* Gradient extends across both content and Tetris - unified glow */
+            background: radial-gradient(ellipse 120% 100% at 25% 50%, var(--accent-glow, rgba(99,102,241,0.08)) 0%, transparent 80%);
             pointer-events: none;
         }
         .track-icon {
