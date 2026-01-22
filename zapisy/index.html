@@ -210,8 +210,48 @@
         </div>
     </main>
 
-    <!-- STEP 1: Direction -->
+    <!-- STEP 1: Phone -->
     <main id="step-1" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+        <div class="w-full max-w-md fade-in">
+            <div class="text-center mb-6">
+                <div class="relative inline-block">
+                    <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-16 h-16 rounded-full object-cover object-top avatar-glow">
+                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-zinc-950"></div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mb-6">
+                <div class="flex justify-start chat-bubble">
+                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
+                        <p class="text-[15px]">Super! 🎉 Zanim przejdziemy dalej...</p>
+                    </div>
+                </div>
+                <div class="flex justify-start chat-bubble">
+                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
+                        <p class="text-[15px]">Podaj numer telefonu, abym mógł do Ciebie zadzwonić po przeanalizowaniu Twojego zgłoszenia.</p>
+                    </div>
+                </div>
+                <div class="flex justify-start chat-bubble">
+                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
+                        <p class="text-[15px] text-zinc-400">Żadnego spamu — to jedyny kontakt telefoniczny. 🤝</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gradient-border chat-cta">
+                <div class="gradient-border-inner p-1.5 flex items-center gap-1.5">
+                    <input type="tel" id="phone-input" placeholder="np. 600 123 456" class="flex-1 px-4 py-3 bg-transparent text-white placeholder-zinc-500 text-[15px] focus:outline-none min-w-0" required>
+                    <button type="button" id="phone-submit" disabled class="px-5 py-2.5 bg-zinc-700 text-zinc-400 rounded-xl font-semibold text-[15px] transition-colors flex-shrink-0 cursor-not-allowed">
+                        Dalej
+                    </button>
+                </div>
+            </div>
+            <p id="phone-input-error" class="text-red-400 text-[12px] text-center mt-2 hidden">Podaj poprawny numer (9 cyfr)</p>
+        </div>
+    </main>
+
+    <!-- STEP 2: Direction -->
+    <main id="step-2" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-8">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -249,8 +289,8 @@
         </div>
     </main>
 
-    <!-- STEP 2: Weekly Hours -->
-    <main id="step-2" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+    <!-- STEP 3: Weekly Hours -->
+    <main id="step-3" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-6">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -276,8 +316,8 @@
         </div>
     </main>
 
-    <!-- STEP 3: Target Income -->
-    <main id="step-3" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+    <!-- STEP 4: Target Income -->
+    <main id="step-4" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-8">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -303,8 +343,8 @@
         </div>
     </main>
 
-    <!-- STEP 4: Experience -->
-    <main id="step-4" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+    <!-- STEP 5: Experience -->
+    <main id="step-5" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-8">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -321,8 +361,8 @@
         </div>
     </main>
 
-    <!-- STEP 5: Open Question -->
-    <main id="step-5" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+    <!-- STEP 6: Open Question -->
+    <main id="step-6" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-8">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -339,8 +379,8 @@
         </div>
     </main>
 
-    <!-- STEP 6: Budget -->
-    <main id="step-6" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
+    <!-- STEP 7: Budget -->
+    <main id="step-7" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-lg fade-in">
             <div class="text-center mb-8">
                 <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
@@ -363,25 +403,6 @@
                     Ponad 40 000 zł
                 </button>
             </div>
-        </div>
-    </main>
-
-    <!-- STEP 7: Phone -->
-    <main id="step-7" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-8">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Podaj numer telefonu</p>
-            <p class="text-zinc-500 text-sm mb-6">Zadzwonimy, aby umówić krótką rozmowę.</p>
-
-            <input type="tel" id="q7-phone" placeholder="np. 600 123 456" class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 placeholder:text-zinc-600">
-            <p id="q7-phone-error" class="text-red-400 text-sm mt-2 mb-4 hidden">Podaj poprawny numer telefonu (9 cyfr)</p>
-
-            <button type="button" id="q7-next" disabled class="w-full py-4 bg-zinc-700 text-zinc-400 rounded-xl font-semibold text-[15px] transition-colors cursor-not-allowed">
-                Wyślij zgłoszenie
-            </button>
         </div>
     </main>
 
@@ -493,6 +514,10 @@
                 document.getElementById('email-input').value = data.email;
             }
 
+            if (data.phone) {
+                document.getElementById('phone-input').value = data.phone;
+            }
+
             if (data.direction) {
                 const btn = document.querySelector(`#q1-options [data-value="${data.direction}"]`);
                 if (btn) btn.classList.add('selected');
@@ -522,31 +547,28 @@
                 if (btn) btn.classList.add('selected');
             }
 
-            if (data.phone) {
-                document.getElementById('q7-phone').value = data.phone;
-            }
-
             // Resume from where user left off
+            // New flow: 0-email, 1-phone, 2-direction, 3-weekly, 4-income, 5-experience, 6-open, 7-budget, 8-thanks
             if (data.lead_id) {
                 leadId = data.lead_id;
                 if (data.completed) {
                     goToStep(8);
-                } else if (data.phone) {
-                    goToStep(7);
                 } else if (data.budget) {
-                    goToStep(7);
+                    goToStep(8); // Budget was last step, show thanks
                 } else if (data.open_question !== undefined) {
-                    goToStep(5);
+                    goToStep(7); // Go to budget
                 } else if (data.experience) {
-                    goToStep(4);
+                    goToStep(6); // Go to open question
                 } else if (data.target_income) {
-                    goToStep(3);
+                    goToStep(5); // Go to experience
                 } else if (data.weekly_hours) {
-                    goToStep(2);
+                    goToStep(4); // Go to income
                 } else if (data.direction) {
-                    goToStep(1);
+                    goToStep(3); // Go to weekly
+                } else if (data.phone) {
+                    goToStep(2); // Go to direction
                 } else {
-                    goToStep(1);
+                    goToStep(1); // Go to phone
                 }
             }
         }
@@ -574,6 +596,14 @@
         }
 
         captureTrackingParams();
+
+        // Phone validation helper
+        function validatePhone(phone) {
+            // Remove spaces, dashes, and +48/48 prefix
+            const cleaned = phone.replace(/[\s\-]/g, '').replace(/^(\+?48)/, '');
+            // Must be exactly 9 digits
+            return /^\d{9}$/.test(cleaned);
+        }
 
         // Update lead in database
         async function updateLead(updates) {
@@ -670,7 +700,41 @@
             goToStep(1);
         });
 
-        // STEP 1: Direction
+        // STEP 1: Phone (collected early for high conversion)
+        const phoneInput1 = document.getElementById('phone-input');
+        const phoneError1 = document.getElementById('phone-input-error');
+        const phoneSubmit1 = document.getElementById('phone-submit');
+
+        phoneInput1.addEventListener('input', function() {
+            const phone = this.value.trim();
+            const isValid = validatePhone(phone);
+
+            if (isValid) {
+                phoneError1.classList.add('hidden');
+                phoneSubmit1.disabled = false;
+                phoneSubmit1.classList.remove('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
+                phoneSubmit1.classList.add('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
+            } else {
+                if (phone.length > 0) {
+                    phoneError1.classList.remove('hidden');
+                } else {
+                    phoneError1.classList.add('hidden');
+                }
+                phoneSubmit1.disabled = true;
+                phoneSubmit1.classList.add('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
+                phoneSubmit1.classList.remove('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
+            }
+        });
+
+        phoneSubmit1.addEventListener('click', async function() {
+            const phone = phoneInput1.value.trim();
+            if (!validatePhone(phone)) return;
+            saveData('phone', phone);
+            await updateLead({ phone: phone });
+            goToStep(2);
+        });
+
+        // STEP 2: Direction
         document.querySelectorAll('#q1-options .option-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#q1-options .option-btn').forEach(b => b.classList.remove('selected'));
@@ -678,11 +742,11 @@
                 const value = this.dataset.value;
                 saveData('direction', value);
                 updateLead({ direction: value });
-                setTimeout(() => goToStep(2), 300);
+                setTimeout(() => goToStep(3), 300);
             });
         });
 
-        // STEP 2: Weekly hours
+        // STEP 3: Weekly hours
         document.querySelectorAll('#q2-options .option-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#q2-options .option-btn').forEach(b => b.classList.remove('selected'));
@@ -690,11 +754,11 @@
                 const value = this.dataset.value;
                 saveData('weekly_hours', value);
                 updateLead({ weekly_hours: value });
-                setTimeout(() => goToStep(3), 300);
+                setTimeout(() => goToStep(4), 300);
             });
         });
 
-        // STEP 3: Target income
+        // STEP 4: Target income
         document.querySelectorAll('#q3-options .option-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#q3-options .option-btn').forEach(b => b.classList.remove('selected'));
@@ -702,11 +766,11 @@
                 const value = this.dataset.value;
                 saveData('target_income', value);
                 updateLead({ target_income: value });
-                setTimeout(() => goToStep(4), 300);
+                setTimeout(() => goToStep(5), 300);
             });
         });
 
-        // STEP 4: Experience
+        // STEP 5: Experience
         const expTextarea = document.getElementById('q4-experience');
         const expNextBtn = document.getElementById('q4-next');
 
@@ -718,93 +782,50 @@
             const value = expTextarea.value.trim();
             saveData('experience', value);
             updateLead({ experience: value });
-            goToStep(5);
+            goToStep(6);
         });
 
-        // STEP 5: Open question
+        // STEP 6: Open question
         document.getElementById('q5-next').addEventListener('click', function() {
             const value = document.getElementById('q5-open').value.trim();
             saveData('open_question', value || '');
             if (value) {
                 updateLead({ open_question: value });
             }
-            goToStep(6);
+            goToStep(7);
         });
 
-        // STEP 6: Budget
+        // STEP 7: Budget (final step - submits form)
         document.querySelectorAll('#q6-options .option-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
                 document.querySelectorAll('#q6-options .option-btn').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 const value = this.dataset.value;
                 saveData('budget', value);
+                saveData('completed', true);
                 await updateLead({ budget: value });
-                setTimeout(() => goToStep(7), 300);
+
+                // Send Slack notification with all form data
+                const savedData = loadSavedData();
+                sendSlackNotification('new_lead', {
+                    email: savedData.email,
+                    phone: savedData.phone,
+                    traffic_source: getTrafficSource(),
+                    direction: savedData.direction,
+                    weekly_hours: savedData.weekly_hours,
+                    target_income: savedData.target_income,
+                    experience: savedData.experience,
+                    open_question: savedData.open_question,
+                    budget: value
+                });
+
+                gtag('event', 'form_complete', {'event_category': 'engagement'});
+                fbq('track', 'CompleteRegistration');
+                ttq.track('CompleteRegistration');
+
+                clearData();
+                setTimeout(() => goToStep(8), 300);
             });
-        });
-
-        // STEP 7: Phone validation
-        function validatePhone(phone) {
-            // Remove spaces, dashes, and +48/48 prefix
-            const cleaned = phone.replace(/[\s\-]/g, '').replace(/^(\+?48)/, '');
-            // Must be exactly 9 digits
-            return /^\d{9}$/.test(cleaned);
-        }
-
-        const phoneInput = document.getElementById('q7-phone');
-        const phoneError = document.getElementById('q7-phone-error');
-        const phoneSubmit = document.getElementById('q7-next');
-
-        phoneInput.addEventListener('input', function() {
-            const phone = this.value.trim();
-            const isValid = validatePhone(phone);
-
-            if (isValid) {
-                phoneError.classList.add('hidden');
-                phoneSubmit.disabled = false;
-                phoneSubmit.classList.remove('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
-                phoneSubmit.classList.add('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
-            } else {
-                if (phone.length > 0) {
-                    phoneError.classList.remove('hidden');
-                } else {
-                    phoneError.classList.add('hidden');
-                }
-                phoneSubmit.disabled = true;
-                phoneSubmit.classList.add('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
-                phoneSubmit.classList.remove('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
-            }
-        });
-
-        document.getElementById('q7-next').addEventListener('click', async function() {
-            const phone = document.getElementById('q7-phone').value.trim();
-            if (!validatePhone(phone)) return;
-            saveData('phone', phone);
-            saveData('completed', true);
-            if (phone) {
-                await updateLead({ phone: phone });
-            }
-
-            // Send Slack notification with all form data
-            const savedData = loadSavedData();
-            sendSlackNotification('new_lead', {
-                email: savedData.email,
-                phone: phone,
-                traffic_source: getTrafficSource(),
-                direction: savedData.direction,
-                weekly_hours: savedData.weekly_hours,
-                target_income: savedData.target_income,
-                experience: savedData.experience,
-                open_question: savedData.open_question,
-                budget: savedData.budget
-            });
-
-            gtag('event', 'form_complete', {'event_category': 'engagement'});
-            fbq('track', 'CompleteRegistration');
-            ttq.track('CompleteRegistration');
-
-            clearData();
-            goToStep(8);
         });
 
         // Initialize
