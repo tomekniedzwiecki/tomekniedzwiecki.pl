@@ -562,6 +562,18 @@
             color: var(--accent-light);
         }
 
+        .footer__links {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .footer__sep {
+            color: var(--text-dim);
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
             .main {
@@ -761,6 +773,11 @@
         <p class="footer__text">
             &copy; 2025 <a href="/" class="footer__link">Tomek Niedzwiecki</a> &mdash; Budujemy i automatyzujemy biznesy online
         </p>
+        <div class="footer__links">
+            <a href="/regulamin.html" class="footer__link">Regulamin</a>
+            <span class="footer__sep">&middot;</span>
+            <a href="/polityka-prywatnosci.html" class="footer__link">Polityka prywatności</a>
+        </div>
     </footer>
 
     <!-- Supabase -->
