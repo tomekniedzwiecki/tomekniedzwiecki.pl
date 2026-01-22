@@ -7,6 +7,7 @@
     <meta name="description" content="Inwestuję w ludzi i buduję z nimi biznesy.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -356,6 +357,51 @@
             border-color: rgba(168, 85, 247, 0.4);
         }
 
+        /* Offer card buttons */
+        .offer-card__actions {
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .offer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .offer-btn--primary {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+        .offer-btn--primary:hover {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: rgba(16, 185, 129, 0.6);
+            transform: translateY(-1px);
+        }
+        .offer-btn--disabled {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #52525b;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            .offer-card__actions {
+                margin-left: 0;
+                margin-top: 12px;
+                width: 100%;
+            }
+            .offer-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         /* ==================== MOBILE STYLES ==================== */
         @media (max-width: 767px) {
             .section-content {
@@ -437,6 +483,19 @@
             }
             .offer-card__content p {
                 font-size: 13px;
+            }
+            .offer-card {
+                flex-wrap: wrap;
+            }
+            .offer-card__actions {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 10px;
+                padding-left: 68px;
+            }
+            .offer-btn {
+                font-size: 12px;
+                padding: 6px 12px;
             }
             .fullpage-section[data-section="7"] h2 {
                 font-size: 32px !important;
@@ -1020,13 +1079,19 @@
                     </p>
 
                     <div class="offer-cards">
-                        <div class="offer-card offer-card--emerald">
+                        <div class="offer-card offer-card--emerald" id="offer-ecommerce">
                             <div class="offer-card__icon">
                                 <i class="ph-duotone ph-shopping-bag"></i>
                             </div>
                             <div class="offer-card__content">
                                 <h3>Nowoczesny sklep e-commerce</h3>
                                 <p>Nie buduję sklepów — tworzę przyciągające marki</p>
+                            </div>
+                            <div class="offer-card__actions">
+                                <a href="/oferta/sklep-ecommerce/" class="offer-btn offer-btn--primary">
+                                    <i class="ph ph-arrow-right"></i>
+                                    Szczegóły oferty
+                                </a>
                             </div>
                         </div>
 
@@ -1038,6 +1103,12 @@
                                 <h3>Aplikacje / Narzędzia / SaaS</h3>
                                 <p>Wdrażam rozwiązania, które stają się niezbędne</p>
                             </div>
+                            <div class="offer-card__actions">
+                                <span class="offer-btn offer-btn--disabled">
+                                    <i class="ph ph-clock"></i>
+                                    Wkrótce
+                                </span>
+                            </div>
                         </div>
 
                         <div class="offer-card offer-card--purple">
@@ -1047,6 +1118,12 @@
                             <div class="offer-card__content">
                                 <h3>Kursy online</h3>
                                 <p>Pokazuję jak sprzedawać wiedzę aby zarabiać i dawać realną wartość</p>
+                            </div>
+                            <div class="offer-card__actions">
+                                <span class="offer-btn offer-btn--disabled">
+                                    <i class="ph ph-clock"></i>
+                                    Wkrótce
+                                </span>
                             </div>
                         </div>
                     </div>

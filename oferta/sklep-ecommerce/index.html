@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nowoczesny sklep e-commerce | Tomek Niedzwiecki</title>
+    <meta name="description" content="Profesjonalny sklep internetowy z automatyzacją i systemami AI. Kompleksowa realizacja od projektu do wdrożenia.">
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/duotone/style.css">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: rgba(255, 255, 255, 0.02);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --text-dim: #52525b;
+            --emerald-500: #10b981;
+            --emerald-400: #34d399;
+            --emerald-600: #059669;
+            --violet-500: #8b5cf6;
+            --violet-400: #a78bfa;
+            --cyan-400: #22d3ee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav__container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav__back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav__back:hover {
+            color: var(--text-primary);
+        }
+
+        .nav__back i {
+            font-size: 18px;
+        }
+
+        .nav__logo {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Main content */
+        .main {
+            padding: 100px 24px 60px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 16px;
+        }
+
+        .loading__spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--emerald-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading__text {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Error state */
+        .error {
+            text-align: center;
+            padding: 60px 24px;
+        }
+
+        .error__icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .error__icon i {
+            font-size: 28px;
+            color: #ef4444;
+        }
+
+        .error__title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .error__message {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .error__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .error__btn:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        /* Product content (hidden until loaded) */
+        .product {
+            display: none;
+        }
+
+        .product.loaded {
+            display: block;
+        }
+
+        /* Hero header */
+        .hero {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .hero__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--emerald-400);
+            margin-bottom: 20px;
+        }
+
+        .hero__badge i {
+            font-size: 14px;
+        }
+
+        .hero__title {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero__subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Stats grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat__value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat__label {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Description card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 32px;
+        }
+
+        .card__title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card__title i {
+            font-size: 16px;
+            color: var(--emerald-400);
+        }
+
+        .card__content {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .card__content p {
+            margin-bottom: 16px;
+        }
+
+        .card__content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 8px;
+            bottom: 32px;
+            width: 2px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0.6), rgba(16, 185, 129, 0.2), transparent);
+            border-radius: 2px;
+        }
+
+        .timeline__item {
+            position: relative;
+            padding-bottom: 28px;
+        }
+
+        .timeline__item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline__dot {
+            position: absolute;
+            left: -32px;
+            top: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid var(--emerald-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timeline__dot span {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--emerald-400);
+        }
+
+        .timeline__header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .timeline__title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .timeline__meta {
+            font-size: 12px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline__description {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .timeline__tasks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .timeline__task {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .timeline__task--team {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.25);
+            color: var(--violet-400);
+        }
+
+        .timeline__task--client {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: rgba(34, 211, 238, 0.25);
+            color: var(--cyan-400);
+        }
+
+        /* CTA section */
+        .cta {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 24px;
+            padding: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .cta__info {
+            flex: 1;
+        }
+
+        .cta__label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+
+        .cta__price {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .cta__price span {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .cta__note {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .cta__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 24px rgba(16, 185, 129, 0.35);
+            white-space: nowrap;
+        }
+
+        .cta__btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(16, 185, 129, 0.45);
+        }
+
+        .cta__btn i {
+            font-size: 20px;
+        }
+
+        /* Features list */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .feature i {
+            font-size: 18px;
+            color: var(--emerald-400);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 60px;
+        }
+
+        .footer__text {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .footer__link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer__link:hover {
+            color: var(--emerald-400);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero__title {
+                font-size: 28px;
+            }
+
+            .hero__subtitle {
+                font-size: 16px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .stat {
+                padding: 14px 10px;
+            }
+
+            .stat__value {
+                font-size: 22px;
+            }
+
+            .stat__label {
+                font-size: 10px;
+            }
+
+            .cta {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .cta__info {
+                text-align: center;
+            }
+
+            .cta__btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav__container">
+            <a href="/" class="nav__back">
+                <i class="ph ph-arrow-left"></i>
+                Powrót na stronę główną
+            </a>
+            <span class="nav__logo">tomekniedzwiecki.pl</span>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main">
+        <!-- Loading state -->
+        <div class="loading" id="loadingState">
+            <div class="loading__spinner"></div>
+            <p class="loading__text">Ładowanie oferty...</p>
+        </div>
+
+        <!-- Error state -->
+        <div class="error" id="errorState" style="display: none;">
+            <div class="error__icon">
+                <i class="ph-duotone ph-warning-circle"></i>
+            </div>
+            <h2 class="error__title">Nie udało się załadować oferty</h2>
+            <p class="error__message" id="errorMessage">Sprawdź połączenie z internetem i spróbuj ponownie.</p>
+            <a href="/" class="error__btn">
+                <i class="ph ph-arrow-left"></i>
+                Wróć na stronę główną
+            </a>
+        </div>
+
+        <!-- Product content -->
+        <div class="product" id="productContent">
+            <!-- Hero -->
+            <header class="hero">
+                <span class="hero__badge">
+                    <i class="ph-duotone ph-shopping-bag"></i>
+                    E-commerce
+                </span>
+                <h1 class="hero__title" id="offerTitle">Nowoczesny sklep e-commerce</h1>
+                <p class="hero__subtitle" id="offerSubtitle">Nie buduję sklepów — tworzę przyciągające marki i systemy, które sprzedają za Ciebie.</p>
+            </header>
+
+            <!-- Stats -->
+            <div class="stats" id="statsGrid">
+                <div class="stat">
+                    <div class="stat__value" id="statMilestones">-</div>
+                    <div class="stat__label">Etapów</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value" id="statDuration">-</div>
+                    <div class="stat__label">Dni realizacji</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value" id="statTasks">-</div>
+                    <div class="stat__label">Zadań</div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <section class="card" id="descriptionCard">
+                <h2 class="card__title">
+                    <i class="ph-duotone ph-text-align-left"></i>
+                    Opis oferty
+                </h2>
+                <div class="card__content" id="offerDescription">
+                    <p>Ładowanie opisu...</p>
+                </div>
+            </section>
+
+            <!-- Timeline -->
+            <section class="card">
+                <h2 class="card__title">
+                    <i class="ph-duotone ph-list-checks"></i>
+                    Harmonogram realizacji
+                </h2>
+                <div class="timeline" id="timeline">
+                    <!-- Timeline items will be rendered here -->
+                </div>
+            </section>
+
+            <!-- CTA -->
+            <section class="cta">
+                <div class="cta__info">
+                    <div class="cta__label">Cena projektu</div>
+                    <div class="cta__price" id="offerPrice">--- <span>PLN</span></div>
+                    <div class="cta__note" id="offerPriceNote">Płatność jednorazowa lub w ratach</div>
+                </div>
+                <a href="#" class="cta__btn" id="ctaButton">
+                    <i class="ph-duotone ph-credit-card"></i>
+                    Zamów teraz
+                </a>
+            </section>
+
+            <!-- Features -->
+            <div class="features">
+                <div class="feature">
+                    <i class="ph-duotone ph-check-circle"></i>
+                    Wsparcie po wdrożeniu
+                </div>
+                <div class="feature">
+                    <i class="ph-duotone ph-check-circle"></i>
+                    Szkolenie z obsługi
+                </div>
+                <div class="feature">
+                    <i class="ph-duotone ph-check-circle"></i>
+                    Dokumentacja projektu
+                </div>
+                <div class="feature">
+                    <i class="ph-duotone ph-check-circle"></i>
+                    Gwarancja jakości
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer__text">
+            &copy; 2025 <a href="/" class="footer__link">tomekniedzwiecki.pl</a> — Budujemy i automatyzujemy biznesy online
+        </p>
+    </footer>
+
+    <!-- Supabase - loaded at end of body -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration - same as client-offer.html
+        const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bWF2d2t3bmZ1cGhqcWJlbHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NjQyNTUsImV4cCI6MjA4NDM0MDI1NX0.XeR0Fc7OFn6YbNJrOKTBEj36JtmLISZTM87y4ai9340';
+
+        // DOM elements
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+        const productContent = document.getElementById('productContent');
+
+        // Show error
+        function showError(message) {
+            console.error('Offer error:', message);
+            loadingState.style.display = 'none';
+            errorMessage.textContent = message;
+            errorState.style.display = 'block';
+        }
+
+        // Format price
+        function formatPrice(amount) {
+            return new Intl.NumberFormat('pl-PL', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Parse description - convert newlines to paragraphs
+        function parseDescription(text) {
+            if (!text) return '<p>Brak opisu.</p>';
+
+            return text
+                .split('\n\n')
+                .filter(p => p.trim())
+                .map(p => `<p>${escapeHtml(p.trim())}</p>`)
+                .join('');
+        }
+
+        // Render timeline - using correct property names from database
+        function renderTimeline(milestones) {
+            const container = document.getElementById('timeline');
+
+            if (!milestones || milestones.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">Brak harmonogramu.</p>';
+                return;
+            }
+
+            container.innerHTML = milestones.map((milestone, index) => {
+                // Support both property name formats (title/name)
+                const title = milestone.title || milestone.name || 'Etap ' + (index + 1);
+                const tasks = milestone.tasks || [];
+
+                const tasksHtml = tasks.map(task => {
+                    // Support both formats: responsible/category, title/name
+                    const responsible = task.responsible || task.category || 'team';
+                    const taskTitle = task.title || task.name || '';
+
+                    const categoryClass = responsible === 'team' ? 'timeline__task--team' :
+                                         responsible === 'client' ? 'timeline__task--client' : '';
+                    return `<span class="timeline__task ${categoryClass}">${escapeHtml(taskTitle)}</span>`;
+                }).join('');
+
+                const durationText = milestone.duration_days ?
+                    `${milestone.duration_days} ${milestone.duration_days === 1 ? 'dzień' : 'dni'}` : '';
+
+                return `
+                    <div class="timeline__item">
+                        <div class="timeline__dot"><span>${index + 1}</span></div>
+                        <div class="timeline__header">
+                            <h3 class="timeline__title">${escapeHtml(title)}</h3>
+                            ${durationText ? `<span class="timeline__meta"><i class="ph ph-clock"></i> ${durationText}</span>` : ''}
+                        </div>
+                        ${milestone.description ? `<p class="timeline__description">${escapeHtml(milestone.description)}</p>` : ''}
+                        ${tasksHtml ? `<div class="timeline__tasks">${tasksHtml}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load offer data
+        async function loadOffer() {
+            console.log('Starting to load offer...');
+
+            try {
+                // Wait for Supabase to be available
+                if (typeof window.supabase === 'undefined') {
+                    console.error('Supabase not loaded');
+                    showError('Błąd ładowania biblioteki. Odśwież stronę.');
+                    return;
+                }
+
+                console.log('Creating Supabase client...');
+                const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase client created');
+
+                // Fetch e-commerce offer from database
+                // Try multiple search patterns to find the offer
+                console.log('Fetching offer...');
+
+                let offer = null;
+                let fetchError = null;
+
+                // First try: exact match with "e-commerce" anywhere in name
+                const { data: data1, error: error1 } = await supabaseClient
+                    .from('offers')
+                    .select('*')
+                    .ilike('name', '%e-commerce%')
+                    .limit(1)
+                    .maybeSingle();
+
+                console.log('Query 1 result:', { data: data1, error: error1 });
+
+                if (data1) {
+                    offer = data1;
+                } else {
+                    // Second try: search for "sklep" in name
+                    const { data: data2, error: error2 } = await supabaseClient
+                        .from('offers')
+                        .select('*')
+                        .ilike('name', '%sklep%')
+                        .limit(1)
+                        .maybeSingle();
+
+                    console.log('Query 2 result:', { data: data2, error: error2 });
+
+                    if (data2) {
+                        offer = data2;
+                    } else {
+                        // Third try: get all offers and log them
+                        const { data: allOffers, error: allError } = await supabaseClient
+                            .from('offers')
+                            .select('id, name')
+                            .limit(10);
+
+                        console.log('All offers:', allOffers);
+                        console.log('All offers error:', allError);
+
+                        fetchError = error1 || error2 || allError;
+                    }
+                }
+
+                if (!offer) {
+                    throw new Error(fetchError?.message || 'Oferta e-commerce nie została znaleziona w bazie danych');
+                }
+
+                console.log('Offer loaded:', offer);
+
+                // Update page content
+                document.getElementById('offerTitle').textContent = offer.name || 'Nowoczesny sklep e-commerce';
+                document.getElementById('offerSubtitle').textContent = offer.short_description || 'Profesjonalny sklep internetowy z automatyzacją';
+
+                // Description
+                document.getElementById('offerDescription').innerHTML = parseDescription(offer.description);
+
+                // Price
+                const price = offer.price || 0;
+                document.getElementById('offerPrice').innerHTML = `${formatPrice(price)} <span>PLN</span>`;
+
+                // Stats
+                const milestones = offer.milestones || [];
+                const totalDays = milestones.reduce((sum, m) => sum + (m.duration_days || 0), 0);
+                const totalTasks = milestones.reduce((sum, m) => sum + (m.tasks?.length || 0), 0);
+
+                document.getElementById('statMilestones').textContent = milestones.length || '-';
+                document.getElementById('statDuration').textContent = totalDays || '-';
+                document.getElementById('statTasks').textContent = totalTasks || '-';
+
+                // Timeline
+                renderTimeline(milestones);
+
+                // CTA button - link to checkout
+                const ctaButton = document.getElementById('ctaButton');
+                const checkoutUrl = offer.checkout_url || `https://crm.tomekniedzwiecki.pl/checkout/?offer=${offer.id}`;
+                ctaButton.href = checkoutUrl;
+
+                // Show content
+                loadingState.style.display = 'none';
+                productContent.classList.add('loaded');
+                console.log('Offer displayed successfully');
+
+            } catch (err) {
+                console.error('Error loading offer:', err);
+                showError(err.message || 'Wystąpił nieoczekiwany błąd.');
+            }
+        }
+
+        // Initialize when DOM and Supabase are ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadOffer);
+        } else {
+            // DOM already loaded, wait a bit for Supabase script
+            setTimeout(loadOffer, 100);
+        }
+    </script>
+</body>
+</html>
