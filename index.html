@@ -862,7 +862,7 @@
     <div class="fullpage-container" id="fullpage">
 
         <!-- Section 1: Hero -->
-        <section class="fullpage-section track-section flex items-center" data-section="0" style="--accent-glow: rgba(99, 102, 241, 0.25)">
+        <section class="fullpage-section track-section flex items-center" data-section="0" id="start" style="--accent-glow: rgba(99, 102, 241, 0.25)">
             <!-- Mobile scroll indicator -->
             <div class="scroll-indicator">
                 <span>PRZEWIŃ</span>
@@ -900,7 +900,7 @@
         </section>
 
         <!-- Section 2: Track Record Intro -->
-        <section class="fullpage-section flex items-center" data-section="1">
+        <section class="fullpage-section flex items-center" data-section="1" id="droga">
             <div class="content-area px-6">
                 <div class="section-content">
                     <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-6">Moja droga</p>
@@ -932,7 +932,7 @@
         </section>
 
         <!-- Section 3: Sklep internetowy -->
-        <section class="fullpage-section track-section flex items-center" data-section="2" style="--accent-glow: rgba(16, 185, 129, 0.25)">
+        <section class="fullpage-section track-section flex items-center" data-section="2" id="sklep" style="--accent-glow: rgba(16, 185, 129, 0.25)">
             <div class="content-area px-6">
                 <div class="section-content">
                     <div class="track-icon bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/20">
@@ -971,7 +971,7 @@
         </section>
 
         <!-- Section 4: TakeDrop -->
-        <section class="fullpage-section track-section flex items-center" data-section="3" style="--accent-glow: rgba(255, 180, 0, 0.25)">
+        <section class="fullpage-section track-section flex items-center" data-section="3" id="takedrop" style="--accent-glow: rgba(255, 180, 0, 0.25)">
             <div class="content-area px-6">
                 <div class="section-content">
                     <div class="track-icon bg-gradient-to-br from-[#ffb400]/20 to-[#ffb400]/5 border border-[#ffb400]/20">
@@ -1010,7 +1010,7 @@
         </section>
 
         <!-- Section 5: Inkubator -->
-        <section class="fullpage-section track-section flex items-center" data-section="4" style="--accent-glow: rgba(168, 85, 247, 0.25)">
+        <section class="fullpage-section track-section flex items-center" data-section="4" id="inkubator" style="--accent-glow: rgba(168, 85, 247, 0.25)">
             <div class="content-area px-6">
                 <div class="section-content">
                     <div class="track-icon bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20">
@@ -1053,7 +1053,7 @@
         </section>
 
         <!-- Section 6: Motto -->
-        <section class="fullpage-section flex items-center" data-section="5">
+        <section class="fullpage-section flex items-center" data-section="5" id="motto">
             <div class="content-area px-6">
                 <div class="section-content">
                     <blockquote class="text-[28px] md:text-[36px] lg:text-[42px] font-medium text-white leading-[1.4] tracking-[-0.01em]">
@@ -1065,7 +1065,7 @@
         </section>
 
         <!-- Section 7: Współpraca -->
-        <section class="fullpage-section flex items-center" data-section="6">
+        <section class="fullpage-section flex items-center" data-section="6" id="oferta">
             <div class="content-area px-6">
                 <div class="section-content">
                     <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-5">Współpraca</p>
@@ -1132,7 +1132,7 @@
         </section>
 
         <!-- Section 8: CTA + Footer -->
-        <section class="fullpage-section track-section flex items-center" data-section="7" style="--accent-glow: rgba(52, 211, 153, 0.22)">
+        <section class="fullpage-section track-section flex items-center" data-section="7" id="kontakt" style="--accent-glow: rgba(52, 211, 153, 0.22)">
             <div class="content-area px-6">
                 <div class="section-content">
                     <h2 class="text-[48px] md:text-[64px] font-bold text-white tracking-[-0.03em] mb-4">
@@ -1332,6 +1332,23 @@
                     else scrollToSection(currentSection - 1);
                 }
             }, { passive: true });
+
+            // Handle URL hash navigation on page load
+            const handleHashNavigation = () => {
+                const hash = window.location.hash.substring(1);
+                if (!hash) return;
+
+                const targetSection = document.getElementById(hash);
+                if (targetSection && targetSection.dataset.section !== undefined) {
+                    const index = parseInt(targetSection.dataset.section);
+                    if (!isNaN(index)) {
+                        setTimeout(() => scrollToSection(index), 100);
+                    }
+                }
+            };
+
+            handleHashNavigation();
+            window.addEventListener('hashchange', handleHashNavigation);
         })();
     </script>
 
