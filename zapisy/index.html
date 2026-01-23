@@ -2,8 +2,10 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tomasz Niedźwiecki | Inwestuję w ambitnych</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Aplikuj | Tomasz Niedźwiecki</title>
+    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+    <meta name="description" content="Zgłoś się do współpracy z Tomaszem Niedźwieckim. Zbuduję dla Ciebie biznes online.">
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17886093904"></script>
@@ -30,7 +32,6 @@
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1571065357430677&ev=PageView&noscript=1"
     /></noscript>
-    <!-- End Meta Pixel Code -->
 
     <!-- TikTok Pixel Code -->
     <script>
@@ -42,18 +43,18 @@
       ttq.page();
     }(window, document, 'ttq');
     </script>
-    <!-- End TikTok Pixel Code -->
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     }
                 }
             }
@@ -61,519 +62,997 @@
     </script>
 
     <style>
-        body { background-color: #09090b; }
-
-        .avatar-glow {
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(168, 85, 247, 0.2);
+        body {
+            background: #000;
+            color: #ededed;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
-        .gradient-border {
-            padding: 2px;
-            border-radius: 1rem;
-            background: linear-gradient(90deg, #9333ea, #ec4899, #f97316, #ec4899, #9333ea);
-            background-size: 200% 100%;
-            animation: flow-wave 4s ease-in-out infinite;
-        }
-        .gradient-border-inner {
-            background: #18181b;
-            border-radius: calc(1rem - 2px);
-        }
-        @keyframes flow-wave {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        ::selection {
+            background: #10b981;
+            color: #000;
         }
 
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        textarea:-webkit-autofill {
-            -webkit-text-fill-color: white;
-            -webkit-box-shadow: 0 0 0px 1000px #27272a inset;
+        /* Gradient text like main page */
+        .gradient-text {
+            background: linear-gradient(to bottom, #fff 20%, #71717a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .step { display: none; }
-        .step.active { display: flex; }
+        /* Primary button like main page */
+        .btn-primary {
+            background: linear-gradient(to bottom, #fff, #d4d4d8);
+            box-shadow:
+                0 1px 2px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                0 0 0 1px rgba(0,0,0,0.1);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to bottom, #f4f4f5, #d4d4d8);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-        .fade-in {
+        /* Progress bar */
+        .progress-bar {
+            background: rgba(255,255,255,0.06);
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Step container */
+        .step-container {
+            display: none;
+            opacity: 0;
+        }
+        .step-container.active {
+            display: flex;
             animation: fadeIn 0.4s ease-out forwards;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .chat-bubble {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: bubbleIn 0.3s ease-out forwards;
+        /* Form card */
+        .form-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
         }
-        @keyframes bubbleIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .chat-bubble:nth-child(1) { animation-delay: 0.1s; }
-        .chat-bubble:nth-child(2) { animation-delay: 0.3s; }
-        .chat-bubble:nth-child(3) { animation-delay: 0.5s; }
-        .chat-bubble:nth-child(4) { animation-delay: 0.7s; }
-        .chat-cta { opacity: 0; animation: bubbleIn 0.3s ease-out 0.9s forwards; }
 
-        .option-btn {
-            transition: all 0.2s;
+        /* Input styles */
+        .form-input {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 18px 20px;
+            font-size: 16px;
+            color: #fff;
+            width: 100%;
+            transition: all 0.2s ease;
+            scroll-margin-bottom: 120px;
         }
-        .option-btn:hover {
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(255,255,255,0.06);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        .form-input::placeholder {
+            color: #52525b;
+        }
+
+        /* Textarea */
+        .form-textarea {
+            min-height: 140px;
+            resize: none;
+        }
+        .form-textarea::-webkit-scrollbar { width: 6px; }
+        .form-textarea::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+        .form-textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+        /* Option cards */
+        .option-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .option-card:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.15);
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .option-btn.selected {
-            border-color: rgba(168, 85, 247, 0.5);
-            background: rgba(168, 85, 247, 0.1);
+        .option-card.selected {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        .option-card.selected .option-icon {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+        .option-card.selected .option-icon i {
+            color: #34d399;
         }
 
-        .success-icon {
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
         }
-        @keyframes popIn {
+        .option-icon i {
+            font-size: 22px;
+            color: #a1a1aa;
+            transition: color 0.25s ease;
+        }
+
+        /* Avatar glow */
+        .avatar-container {
+            position: relative;
+        }
+        .avatar-container::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            opacity: 0.4;
+            filter: blur(8px);
+        }
+        .avatar-container img {
+            position: relative;
+            border-radius: 50%;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* Step indicator dots */
+        .step-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transition: all 0.3s ease;
+        }
+        .step-dot.active {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+        .step-dot.completed {
+            background: rgba(16, 185, 129, 0.4);
+        }
+
+        /* Background glow effect */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-glow::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+        }
+
+        /* Success animation */
+        .success-icon {
+            animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes successPop {
             0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
             100% { transform: scale(1); opacity: 1; }
         }
-        .success-checkmark {
+        .success-check {
             stroke-dasharray: 30;
             stroke-dashoffset: 30;
-            animation: drawCheck 0.4s ease-out 0.3s forwards;
+            animation: drawCheck 0.5s ease-out 0.3s forwards;
         }
         @keyframes drawCheck {
             to { stroke-dashoffset: 0; }
         }
 
-        textarea::-webkit-scrollbar { width: 6px; }
-        textarea::-webkit-scrollbar-track { background: #27272a; border-radius: 3px; }
-        textarea::-webkit-scrollbar-thumb { background: #52525b; border-radius: 3px; }
+        /* Timeline */
+        .timeline-item {
+            opacity: 0;
+            transform: translateX(-10px);
+            animation: slideIn 0.4s ease-out forwards;
+        }
+        .timeline-item:nth-child(1) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
 
-        .gradient-underline {
-            background: linear-gradient(120deg, rgba(147, 51, 234, 0.45) 0%, rgba(236, 72, 153, 0.45) 100%);
-            border-radius: 3px;
+        /* Autofill fix */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff;
+            -webkit-box-shadow: 0 0 0px 1000px rgba(255,255,255,0.04) inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Error message */
+        .error-message {
+            color: #f87171;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        .error-message.visible {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Back button */
+        .back-btn {
+            color: #71717a;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .back-btn:hover {
+            color: #a1a1aa;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 640px) {
+            body {
+                min-height: 100dvh;
+            }
+
+            main {
+                align-items: flex-start !important;
+                padding-top: 24px !important;
+                padding-bottom: 32px !important;
+            }
+
+            .form-card {
+                border-radius: 20px;
+                padding: 24px 20px;
+                border: 1px solid rgba(255,255,255,0.06);
+                background: rgba(255,255,255,0.02);
+            }
+
+            .option-card {
+                padding: 14px 16px;
+                gap: 12px;
+                border-radius: 14px;
+            }
+
+            .option-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+            }
+
+            .option-icon i {
+                font-size: 18px;
+            }
+
+            .step-dots {
+                gap: 8px;
+                margin-bottom: 20px !important;
+            }
+
+            .step-dot {
+                width: 7px;
+                height: 7px;
+            }
+
+            .back-btn {
+                margin-bottom: 16px !important;
+                font-size: 13px;
+            }
+
+            h2 {
+                font-size: 22px !important;
+                margin-bottom: 6px !important;
+            }
+
+            .form-card > p {
+                font-size: 15px !important;
+                margin-bottom: 20px !important;
+            }
+
+            .form-input {
+                padding: 16px 18px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+
+            .form-textarea {
+                min-height: 130px;
+            }
+
+            .btn-primary {
+                height: 54px !important;
+                border-radius: 14px !important;
+                font-size: 15px !important;
+                margin-top: 20px !important;
+            }
+
+            .space-y-3 > * + * {
+                margin-top: 12px !important;
+            }
+
+            /* Step 0 mobile */
+            #step-0 .avatar-container {
+                width: 56px !important;
+                height: 56px !important;
+                margin-bottom: 12px !important;
+            }
+
+            #step-0 .avatar-container img {
+                width: 56px !important;
+                height: 56px !important;
+            }
+
+            #step-0 h1 {
+                font-size: 24px !important;
+                line-height: 1.2 !important;
+                margin-bottom: 6px !important;
+            }
+
+            #step-0 .text-lg {
+                font-size: 14px !important;
+                line-height: 1.5 !important;
+            }
+
+            #step-0 > .text-center {
+                margin-bottom: 16px !important;
+            }
+
+            /* Hide desktop extras on mobile */
+            #step-0 .flex.items-center.justify-center.gap-6 {
+                display: none !important;
+            }
+
+            /* Hide descriptions under direction options on small screens */
+            #direction-options .text-sm.text-zinc-500 {
+                display: none;
+            }
+
+            /* Thank you page mobile */
+            #step-8 h1 {
+                font-size: 26px !important;
+            }
+
+            #step-8 .text-lg {
+                font-size: 15px !important;
+            }
+
+            #step-8 .success-icon > div:last-child {
+                width: 80px !important;
+                height: 80px !important;
+            }
+
+            #step-8 .success-icon svg {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            .timeline-item {
+                gap: 12px !important;
+            }
+
+            .timeline-item > div:first-child {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 10px !important;
+            }
+        }
+
+        /* Simple options (hours, income, budget) - compact on mobile */
+        @media (max-width: 640px) {
+            #hours-options,
+            #income-options,
+            #budget-options {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px !important;
+            }
+
+            #hours-options > *,
+            #income-options > *,
+            #budget-options > * {
+                margin-top: 0 !important;
+            }
+
+            #hours-options .option-card,
+            #income-options .option-card,
+            #budget-options .option-card {
+                justify-content: center;
+                text-align: center;
+                padding: 18px 12px !important;
+                min-height: 56px;
+            }
+
+            #hours-options .option-icon,
+            #income-options .option-icon,
+            #budget-options .option-icon {
+                display: none !important;
+            }
+
+            #hours-options .font-semibold,
+            #income-options .font-semibold,
+            #budget-options .font-semibold {
+                font-size: 14px;
+            }
+        }
+
+        /* Extra small screens (iPhone SE) */
+        @media (max-width: 375px) {
+            main {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+            }
+
+            .form-card {
+                padding: 16px 14px;
+            }
+
+            h2 {
+                font-size: 20px !important;
+            }
+
+            #step-0 h1 {
+                font-size: 24px !important;
+            }
+
+            .option-card {
+                padding: 12px 14px;
+            }
+
+            #hours-options .option-card,
+            #income-options .option-card,
+            #budget-options .option-card {
+                padding: 14px 10px !important;
+            }
+
+            #hours-options .font-semibold,
+            #income-options .font-semibold,
+            #budget-options .font-semibold {
+                font-size: 13px;
+            }
         }
     </style>
 </head>
-<body class="text-white min-h-screen">
+<body class="font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- Progress Bar -->
-    <div id="progress-bar" class="fixed top-0 left-0 right-0 h-1 bg-zinc-900 z-50 hidden">
-        <div id="progress-fill" class="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 transition-all duration-500" style="width: 0%"></div>
+    <!-- Background glow -->
+    <div class="bg-glow"></div>
+
+    <!-- Progress bar -->
+    <div id="progress-bar" class="fixed top-0 left-0 right-0 h-1 progress-bar z-50 opacity-0 transition-opacity duration-300">
+        <div id="progress-fill" class="h-full progress-fill" style="width: 0%"></div>
     </div>
 
-    <!-- STEP 0: Email -->
-    <main id="step-0" class="step active min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-md fade-in">
-            <div class="text-center mb-6">
-                <div class="relative inline-block">
-                    <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-16 h-16 rounded-full object-cover object-top avatar-glow">
-                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-zinc-950"></div>
-                </div>
-                <div class="text-white font-semibold mt-2">Tomasz Niedźwiecki</div>
-                <div class="text-zinc-500 text-xs">Twórca TakeDrop</div>
-            </div>
+    <!-- Main content -->
+    <main class="relative z-10 flex-1 flex items-start md:items-center justify-center px-4 pt-6 pb-8 md:py-12">
+        <div class="w-full max-w-lg">
 
-            <div class="space-y-2 mb-6">
-                <div class="flex justify-start chat-bubble">
-                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
-                        <p class="text-[15px]">Hej! 👋 Zbudowałem firmę wycenioną na <span class="font-semibold">25 mln zł</span> i sprzedałem udziały.</p>
+            <!-- STEP 0: Email -->
+            <div id="step-0" class="step-container active flex-col items-center">
+                <div class="text-center mb-8">
+                    <div class="avatar-container w-20 h-20 mx-auto mb-5">
+                        <img src="/img/tn_kwadrat.png" alt="Tomasz Niedźwiecki" class="w-20 h-20 object-cover">
                     </div>
+                    <h1 class="text-3xl md:text-4xl font-bold gradient-text mb-3">
+                        Zbudujmy razem Twój biznes
+                    </h1>
+                    <p class="text-zinc-400 text-lg">
+                        Odpowiedz na kilka pytań, abym mógł ocenić potencjał współpracy.
+                    </p>
                 </div>
-                <div class="flex justify-start chat-bubble">
-                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
-                        <p class="text-[15px]">Teraz zainwestuję w parę osób, którym zbuduję biznes online.</p>
-                    </div>
-                </div>
-                <div class="flex justify-end chat-bubble">
-                    <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-2xl rounded-br-sm px-4 py-2.5">
-                        <p class="text-[15px]">Jak się zgłosić?</p>
-                    </div>
-                </div>
-                <div class="flex justify-start chat-bubble">
-                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
-                        <p class="text-[15px]">Odpowiedz na parę pytań 👇</p>
-                    </div>
-                </div>
-            </div>
 
-            <div class="gradient-border chat-cta">
-                <form id="email-form" class="gradient-border-inner p-1.5 flex items-center gap-1.5">
-                    <input type="email" id="email-input" placeholder="Twój e-mail" class="flex-1 px-4 py-3 bg-transparent text-white placeholder-zinc-500 text-[15px] focus:outline-none min-w-0" required>
-                    <button type="submit" class="px-5 py-2.5 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors flex-shrink-0">
-                        Start
-                    </button>
-                </form>
-            </div>
-            <p class="text-zinc-600 text-[11px] text-center mt-3 chat-cta">
-                Wysyłając akceptujesz <a href="/dokumenty/regulamin.html" target="_blank" class="underline hover:text-zinc-400">regulamin</a>
-            </p>
-        </div>
-    </main>
+                <div class="form-card p-6 md:p-8 w-full">
+                    <form id="email-form">
+                        <label class="block text-sm font-medium text-zinc-300 mb-2">Twój adres e-mail</label>
+                        <input type="email" id="email-input" class="form-input" placeholder="jan@example.com" required autocomplete="email">
+                        <p id="email-error" class="error-message">Podaj poprawny adres e-mail</p>
 
-    <!-- STEP 1: Phone -->
-    <main id="step-1" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-md fade-in">
-            <div class="text-center mb-6">
-                <div class="relative inline-block">
-                    <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-16 h-16 rounded-full object-cover object-top avatar-glow">
-                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-zinc-950"></div>
-                </div>
-            </div>
+                        <button type="submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
+                            Rozpocznij
+                            <i class="ph ph-arrow-right text-lg"></i>
+                        </button>
+                    </form>
 
-            <div class="space-y-2 mb-6">
-                <div class="flex justify-start chat-bubble">
-                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
-                        <p class="text-[15px]">Super! 🎉 Zanim przejdziemy dalej...</p>
-                    </div>
+                    <p class="text-zinc-600 text-xs text-center mt-4">
+                        Wysyłając akceptujesz <a href="/dokumenty/regulamin.html" class="underline hover:text-zinc-400">regulamin</a>
+                    </p>
                 </div>
-                <div class="flex justify-start chat-bubble">
-                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
-                        <p class="text-[15px]">Podaj numer telefonu, abym mógł do Ciebie zadzwonić po przeanalizowaniu Twojego zgłoszenia.</p>
+
+                <div class="flex items-center justify-center gap-6 mt-8 text-sm text-zinc-500">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-clock text-emerald-500"></i>
+                        <span>2 min</span>
                     </div>
-                </div>
-                <div class="flex justify-start chat-bubble">
-                    <div class="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-2.5 max-w-[85%]">
-                        <p class="text-[15px] text-zinc-400">Żadnego spamu — to jedyny kontakt telefoniczny. 🤝</p>
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-lock-simple text-emerald-500"></i>
+                        <span>Bezpieczne</span>
                     </div>
                 </div>
             </div>
 
-            <div class="gradient-border chat-cta">
-                <div class="gradient-border-inner p-1.5 flex items-center gap-1.5">
-                    <input type="tel" id="phone-input" placeholder="np. 600 123 456" class="flex-1 px-4 py-3 bg-transparent text-white placeholder-zinc-500 text-[15px] focus:outline-none min-w-0" required>
-                    <button type="button" id="phone-submit" disabled class="px-5 py-2.5 bg-zinc-700 text-zinc-400 rounded-xl font-semibold text-[15px] transition-colors flex-shrink-0 cursor-not-allowed">
+            <!-- STEP 1: Phone -->
+            <div id="step-1" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(0)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Numer telefonu</h2>
+                    <p class="text-zinc-400 mb-6">Zadzwonię do Ciebie po przeanalizowaniu zgłoszenia.</p>
+
+                    <label class="block text-sm font-medium text-zinc-300 mb-2">Telefon</label>
+                    <input type="tel" id="phone-input" class="form-input" placeholder="600 123 456" autocomplete="tel">
+                    <p id="phone-error" class="error-message">Podaj poprawny numer (9 cyfr)</p>
+
+                    <button type="button" id="phone-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" disabled>
                         Dalej
+                        <i class="ph ph-arrow-right text-lg"></i>
                     </button>
                 </div>
             </div>
-            <p id="phone-input-error" class="text-red-400 text-[12px] text-center mt-2 hidden">Podaj poprawny numer (9 cyfr)</p>
-        </div>
-    </main>
 
-    <!-- STEP 2: Direction -->
-    <main id="step-2" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-8">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Który <span class="gradient-underline">e-biznes</span> Cię bardziej interesuje?</p>
-            <p class="text-zinc-500 text-sm mb-5">Każdy z nich jest dobry. Wybierz ten, który pasuje do Ciebie.</p>
-
-            <div class="space-y-3" id="q1-options">
-                <button type="button" data-value="sklep" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
-                    <span>Nowoczesny sklep internetowy</span>
+            <!-- STEP 2: Direction -->
+            <div id="step-2" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(1)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
                 </button>
-                <button type="button" data-value="aplikacja" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-                    </svg>
-                    <span>Aplikacja / Narzędzie / SaaS</span>
-                </button>
-                <button type="button" data-value="produkt_cyfrowy" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-pink-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
-                    </svg>
-                    <span>Kurs online / Produkt cyfrowy</span>
-                </button>
-                <button type="button" data-value="nie_wiem" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-zinc-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-                    </svg>
-                    <span>Nie jestem pewien, chcę abyś mi doradził</span>
-                </button>
-            </div>
-        </div>
-    </main>
 
-    <!-- STEP 3: Weekly Hours -->
-    <main id="step-3" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-6">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Ile czasu <span class="gradient-underline">tygodniowo</span> możesz poświęcić na spotkania?</p>
-            <p class="text-zinc-500 text-sm mb-5">Na początek będę przekazywał Ci wiedzę i umiejętności.</p>
-
-            <div class="space-y-3" id="q2-options">
-                <button type="button" data-value="1-2h" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    1-2 godziny
-                </button>
-                <button type="button" data-value="3-5h" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    3-5 godzin
-                </button>
-                <button type="button" data-value="6-10h" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    6-10 godzin
-                </button>
-                <button type="button" data-value="fulltime" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    Full-time
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- STEP 4: Target Income -->
-    <main id="step-4" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-8">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Jaki dochód chcesz osiągnąć <span class="gradient-underline">po roku</span> współpracy?</p>
-            <p class="text-zinc-500 text-sm mb-5">Miesięcznie, na czysto.</p>
-
-            <div class="space-y-3" id="q3-options">
-                <button type="button" data-value="5-10k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    5 000 - 10 000 zł
-                </button>
-                <button type="button" data-value="10-20k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    10 000 - 20 000 zł
-                </button>
-                <button type="button" data-value="20-50k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    20 000 - 50 000 zł
-                </button>
-                <button type="button" data-value="50k+" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    Ponad 50 000 zł
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- STEP 5: Experience -->
-    <main id="step-5" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-8">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Masz doświadczenie w biznesach internetowych?</p>
-            <p class="text-zinc-500 text-sm mb-5">Jeśli tak - jakie i jaka skala. Jeśli nie - dlaczego chcesz zacząć.</p>
-
-            <textarea id="q4-experience" rows="8" placeholder="Napisz tutaj..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-5"></textarea>
-
-            <button type="button" id="q4-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                Dalej →
-            </button>
-        </div>
-    </main>
-
-    <!-- STEP 6: Open Question -->
-    <main id="step-6" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-8">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Co jeszcze powinienem o Tobie wiedzieć?</p>
-            <p class="text-zinc-500 text-sm mb-6">Twoja historia, sytuacja, pytania - cokolwiek uznasz za istotne.</p>
-
-            <textarea id="q5-open" rows="10" placeholder="Opcjonalnie — napisz cokolwiek uznasz za ważne..." class="w-full bg-zinc-900 border border-zinc-800 text-white rounded-xl px-5 py-4 text-[15px] focus:outline-none focus:border-zinc-600 resize-none placeholder:text-zinc-600 mb-6"></textarea>
-
-            <button type="button" id="q5-next" class="w-full py-4 bg-white text-zinc-900 rounded-xl font-semibold text-[15px] hover:bg-zinc-100 transition-colors">
-                Dalej →
-            </button>
-        </div>
-    </main>
-
-    <!-- STEP 7: Budget -->
-    <main id="step-7" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-lg fade-in">
-            <div class="text-center mb-8">
-                <img src="https://www.tomekniedzwiecki.pl/photos/old_tomek_cale.jpg" alt="Tomasz" class="w-12 h-12 rounded-full object-cover object-top mx-auto avatar-glow">
-            </div>
-
-            <p class="text-white font-medium text-lg mb-2">Jaki budżet możesz zainwestować?</p>
-            <p class="text-zinc-500 text-sm mb-5">Na reklamę, towar, narzędzia.</p>
-
-            <div class="space-y-3" id="q6-options">
-                <button type="button" data-value="5-10k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    5 000 - 10 000 zł
-                </button>
-                <button type="button" data-value="10-20k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    10 000 - 20 000 zł
-                </button>
-                <button type="button" data-value="20-40k" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    20 000 - 40 000 zł
-                </button>
-                <button type="button" data-value="40k+" class="option-btn w-full text-left px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-[15px] hover:border-zinc-600">
-                    Ponad 40 000 zł
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- STEP 8: Thank You -->
-    <main id="step-8" class="step min-h-screen flex-col items-center justify-center px-4 py-8">
-        <div class="w-full max-w-md text-center fade-in">
-            <!-- Success Icon with glow -->
-            <div class="mb-8 relative">
-                <div class="absolute inset-0 w-24 h-24 mx-auto bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 rounded-full blur-xl opacity-50"></div>
-                <div class="relative w-24 h-24 mx-auto bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-full flex items-center justify-center success-icon shadow-2xl">
-                    <svg class="w-12 h-12 text-white drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path class="success-checkmark" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Title with gradient -->
-            <h1 class="text-3xl font-bold mb-3 bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Dzięki!</h1>
-            <p class="text-zinc-400 text-lg mb-10">Mój asystent <span class="text-white font-semibold">Maciej</span> przeanalizuje Twoje zgłoszenie.</p>
-
-            <!-- Timeline -->
-            <div class="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-6 text-left backdrop-blur-sm">
-                <h3 class="text-white font-semibold mb-5 text-center text-sm uppercase tracking-wider">Co dalej?</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform">1</div>
-                        <div class="flex-1">
-                            <p class="text-white font-medium">Maciej przegląda zgłoszenia</p>
-                            <p class="text-zinc-500 text-xs">Analizuje każde zgłoszenie indywidualnie</p>
-                        </div>
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
                     </div>
-                    <div class="flex items-center gap-4 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-pink-500/20 group-hover:scale-110 transition-transform">2</div>
-                        <div class="flex-1">
-                            <p class="text-white font-medium">Krótka rozmowa</p>
-                            <p class="text-zinc-500 text-xs">Jeśli widzi potencjał współpracy</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 group">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-orange-500/20 group-hover:scale-110 transition-transform">3</div>
-                        <div class="flex-1">
-                            <p class="text-white font-medium">Spotkanie online ze mną</p>
-                            <p class="text-zinc-500 text-xs">Przed ostateczną decyzją o współpracy</p>
-                        </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Jaki e-biznes Cię interesuje?</h2>
+                    <p class="text-zinc-400 mb-6">Wybierz kierunek, który najbardziej do Ciebie pasuje.</p>
+
+                    <div class="space-y-3" id="direction-options">
+                        <button type="button" data-value="sklep" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-storefront"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Sklep internetowy</div>
+                                <div class="text-sm text-zinc-500">E-commerce, dropshipping, własna marka</div>
+                            </div>
+                        </button>
+                        <button type="button" data-value="aplikacja" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-code"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Aplikacja / SaaS</div>
+                                <div class="text-sm text-zinc-500">Narzędzie, platforma, subskrypcja</div>
+                            </div>
+                        </button>
+                        <button type="button" data-value="produkt_cyfrowy" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-graduation-cap"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Kurs / Produkt cyfrowy</div>
+                                <div class="text-sm text-zinc-500">Sprzedaż wiedzy i umiejętności</div>
+                            </div>
+                        </button>
+                        <button type="button" data-value="nie_wiem" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-question"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Nie jestem pewien</div>
+                                <div class="text-sm text-zinc-500">Chcę, żebyś mi doradził</div>
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- STEP 3: Weekly hours -->
+            <div id="step-3" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(2)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Ile czasu tygodniowo możesz poświęcić?</h2>
+                    <p class="text-zinc-400 mb-6">Na spotkania, naukę i pracę nad biznesem.</p>
+
+                    <div class="space-y-3" id="hours-options">
+                        <button type="button" data-value="1-2h" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-clock"></i>
+                            </div>
+                            <div class="font-semibold text-white">1-2 godziny</div>
+                        </button>
+                        <button type="button" data-value="3-5h" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-clock"></i>
+                            </div>
+                            <div class="font-semibold text-white">3-5 godzin</div>
+                        </button>
+                        <button type="button" data-value="6-10h" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-clock"></i>
+                            </div>
+                            <div class="font-semibold text-white">6-10 godzin</div>
+                        </button>
+                        <button type="button" data-value="fulltime" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-clock"></i>
+                            </div>
+                            <div class="font-semibold text-white">Full-time</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4: Target income -->
+            <div id="step-4" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(3)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Jaki dochód chcesz osiągnąć po roku?</h2>
+                    <p class="text-zinc-400 mb-6">Miesięcznie, na czysto.</p>
+
+                    <div class="space-y-3" id="income-options">
+                        <button type="button" data-value="5-10k" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-chart-line-up"></i>
+                            </div>
+                            <div class="font-semibold text-white">5-10 tys. zł</div>
+                        </button>
+                        <button type="button" data-value="10-20k" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-chart-line-up"></i>
+                            </div>
+                            <div class="font-semibold text-white">10-20 tys. zł</div>
+                        </button>
+                        <button type="button" data-value="20-50k" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-chart-line-up"></i>
+                            </div>
+                            <div class="font-semibold text-white">20-50 tys. zł</div>
+                        </button>
+                        <button type="button" data-value="50k+" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-rocket-launch"></i>
+                            </div>
+                            <div class="font-semibold text-white">50+ tys. zł</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: Experience -->
+            <div id="step-5" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(4)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Twoje doświadczenie</h2>
+                    <p class="text-zinc-400 mb-6">Opowiedz o swoim doświadczeniu w biznesie online. Jeśli nie masz — napisz, dlaczego chcesz zacząć.</p>
+
+                    <textarea id="experience-input" class="form-input form-textarea" placeholder="Np. Prowadzę sklep na Allegro od 2 lat, obroty ok. 50 tys. miesięcznie. Szukam możliwości skalowania..."></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <p id="experience-error" class="error-message">Napisz minimum 20 znaków</p>
+                        <span id="experience-counter" class="text-xs text-zinc-600">0 / 20</span>
+                    </div>
+
+                    <button type="button" id="experience-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" disabled>
+                        Dalej
+                        <i class="ph ph-arrow-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 6: Open question -->
+            <div id="step-6" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(5)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Coś jeszcze?</h2>
+                    <p class="text-zinc-400 mb-6">Twoja historia, sytuacja, pytania — cokolwiek uznasz za istotne. <span class="text-zinc-500">(opcjonalne)</span></p>
+
+                    <textarea id="open-input" class="form-input form-textarea" placeholder="Możesz pominąć to pole lub dodać cokolwiek, co pomoże mi lepiej Cię poznać..."></textarea>
+
+                    <button type="button" id="open-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
+                        Dalej
+                        <i class="ph ph-arrow-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 7: Budget -->
+            <div id="step-7" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(6)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot completed"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Ostatnie pytanie</h2>
+                    <p class="text-zinc-400 mb-6">Jaki budżet możesz zainwestować na start? (reklama, towar, narzędzia)</p>
+
+                    <div class="space-y-3" id="budget-options">
+                        <button type="button" data-value="5-10k" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-wallet"></i>
+                            </div>
+                            <div class="font-semibold text-white">5-10 tys. zł</div>
+                        </button>
+                        <button type="button" data-value="10-20k" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-wallet"></i>
+                            </div>
+                            <div class="font-semibold text-white">10-20 tys. zł</div>
+                        </button>
+                        <button type="button" data-value="20-40k" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-wallet"></i>
+                            </div>
+                            <div class="font-semibold text-white">20-40 tys. zł</div>
+                        </button>
+                        <button type="button" data-value="40k+" class="option-card w-full text-left">
+                            <div class="option-icon">
+                                <i class="ph ph-treasure-chest"></i>
+                            </div>
+                            <div class="font-semibold text-white">40+ tys. zł</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 8: Thank you -->
+            <div id="step-8" class="step-container flex-col items-center text-center">
+                <div class="mb-8">
+                    <div class="relative inline-block success-icon">
+                        <div class="absolute inset-0 w-24 h-24 bg-emerald-500 rounded-full blur-xl opacity-30"></div>
+                        <div class="relative w-24 h-24 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-2xl">
+                            <svg class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path class="success-check" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-3">Dzięki za zgłoszenie!</h1>
+                <p class="text-zinc-400 text-lg mb-10">Mój zespół przeanalizuje Twoje odpowiedzi.</p>
+
+                <div class="form-card p-6 md:p-8 w-full text-left">
+                    <h3 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-6 text-center">Co dalej?</h3>
+
+                    <div class="space-y-5">
+                        <div class="timeline-item flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                                <span class="text-emerald-400 font-bold text-sm">1</span>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Analiza zgłoszenia</div>
+                                <div class="text-sm text-zinc-500">Maciej przegląda każde zgłoszenie indywidualnie</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                                <span class="text-emerald-400 font-bold text-sm">2</span>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Krótka rozmowa</div>
+                                <div class="text-sm text-zinc-500">Zadzwonimy, jeśli widzimy potencjał współpracy</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center flex-shrink-0">
+                                <span class="text-emerald-400 font-bold text-sm">3</span>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-white">Spotkanie z Tomkiem</div>
+                                <div class="text-sm text-zinc-500">Ostateczna rozmowa przed decyzją o współpracy</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/" class="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mt-8">
+                    <i class="ph ph-arrow-left"></i>
+                    Wróć na stronę główną
+                </a>
+            </div>
+
         </div>
     </main>
 
     <script>
-        // Supabase
+        // ==================== SUPABASE ====================
         const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bWF2d2t3bmZ1cGhqcWJlbHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NjQyNTUsImV4cCI6MjA4NDM0MDI1NX0.XeR0Fc7OFn6YbNJrOKTBEj36JtmLISZTM87y4ai9340';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // State
+        // ==================== STATE ====================
         let currentStep = 0;
         let leadId = null;
         const STORAGE_KEY = 'tn_zapisy_data';
+        const TOTAL_STEPS = 7;
 
-        // Load saved data
+        // ==================== HELPERS ====================
         function loadSavedData() {
             const saved = localStorage.getItem(STORAGE_KEY);
             return saved ? JSON.parse(saved) : {};
         }
 
-        // Save data
         function saveData(key, value) {
             const data = loadSavedData();
             data[key] = value;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
-        // Clear data
         function clearData() {
             localStorage.removeItem(STORAGE_KEY);
         }
 
-        // Update progress bar
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePhone(phone) {
+            const cleaned = phone.replace(/[\s\-]/g, '').replace(/^(\+?48)/, '');
+            return /^\d{9}$/.test(cleaned);
+        }
+
+        // ==================== PROGRESS ====================
         function updateProgress() {
-            const progress = document.getElementById('progress-fill');
-            const bar = document.getElementById('progress-bar');
+            const progressBar = document.getElementById('progress-bar');
+            const progressFill = document.getElementById('progress-fill');
+
             if (currentStep === 0 || currentStep === 8) {
-                bar.classList.add('hidden');
+                progressBar.style.opacity = '0';
             } else {
-                bar.classList.remove('hidden');
-                progress.style.width = ((currentStep) / 7 * 100) + '%';
+                progressBar.style.opacity = '1';
+                const percent = (currentStep / TOTAL_STEPS) * 100;
+                progressFill.style.width = percent + '%';
             }
         }
 
-        // Go to step
+        // ==================== NAVIGATION ====================
         function goToStep(step) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            const targetStep = document.getElementById('step-' + step);
-            if (targetStep) {
-                targetStep.classList.add('active');
+            document.querySelectorAll('.step-container').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('step-' + step);
+            if (target) {
+                target.classList.add('active');
                 currentStep = step;
                 updateProgress();
-                window.scrollTo(0, 0);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
+        // Expose globally for onclick handlers
+        window.goToStep = goToStep;
 
-        // Restore selections from localStorage
-        function restoreSelections() {
-            const data = loadSavedData();
-
-            if (data.email) {
-                document.getElementById('email-input').value = data.email;
-            }
-
-            if (data.phone) {
-                document.getElementById('phone-input').value = data.phone;
-            }
-
-            if (data.direction) {
-                const btn = document.querySelector(`#q1-options [data-value="${data.direction}"]`);
-                if (btn) btn.classList.add('selected');
-            }
-
-            if (data.weekly_hours) {
-                const btn = document.querySelector(`#q2-options [data-value="${data.weekly_hours}"]`);
-                if (btn) btn.classList.add('selected');
-            }
-
-            if (data.target_income) {
-                const btn = document.querySelector(`#q3-options [data-value="${data.target_income}"]`);
-                if (btn) btn.classList.add('selected');
-            }
-
-            if (data.experience) {
-                document.getElementById('q4-experience').value = data.experience;
-                document.getElementById('q4-next').disabled = false;
-            }
-
-            if (data.open_question) {
-                document.getElementById('q5-open').value = data.open_question;
-            }
-
-            if (data.budget) {
-                const btn = document.querySelector(`#q6-options [data-value="${data.budget}"]`);
-                if (btn) btn.classList.add('selected');
-            }
-
-            // Resume from where user left off
-            // New flow: 0-email, 1-phone, 2-direction, 3-weekly, 4-income, 5-experience, 6-open, 7-budget, 8-thanks
-            if (data.lead_id) {
-                leadId = data.lead_id;
-                if (data.completed) {
-                    goToStep(8);
-                } else if (data.budget) {
-                    goToStep(8); // Budget was last step, show thanks
-                } else if (data.open_question !== undefined) {
-                    goToStep(7); // Go to budget
-                } else if (data.experience) {
-                    goToStep(6); // Go to open question
-                } else if (data.target_income) {
-                    goToStep(5); // Go to experience
-                } else if (data.weekly_hours) {
-                    goToStep(4); // Go to income
-                } else if (data.direction) {
-                    goToStep(3); // Go to weekly
-                } else if (data.phone) {
-                    goToStep(2); // Go to direction
-                } else {
-                    goToStep(1); // Go to phone
-                }
-            }
-        }
-
-        // Tracking params
+        // ==================== TRACKING ====================
         const TRACKING_PARAMS = ['gclid', 'gbraid', 'wbraid', 'gad_source', 'fbclid', 'ttclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id'];
 
         function captureTrackingParams() {
@@ -595,17 +1074,23 @@
             return stored;
         }
 
-        captureTrackingParams();
-
-        // Phone validation helper
-        function validatePhone(phone) {
-            // Remove spaces, dashes, and +48/48 prefix
-            const cleaned = phone.replace(/[\s\-]/g, '').replace(/^(\+?48)/, '');
-            // Must be exactly 9 digits
-            return /^\d{9}$/.test(cleaned);
+        function getTrafficSource() {
+            const tracking = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+            if (tracking.fbclid) return 'Facebook';
+            if (tracking.ttclid) return 'TikTok';
+            if (tracking.gclid || tracking.gbraid || tracking.wbraid || tracking.gad_source) return 'Google';
+            if (tracking.utm_source) {
+                const src = tracking.utm_source.toLowerCase();
+                if (src.includes('facebook') || src.includes('fb') || src.includes('meta')) return 'Facebook';
+                if (src.includes('tiktok') || src.includes('tt')) return 'TikTok';
+                if (src.includes('google') || src.includes('gads')) return 'Google';
+            }
+            return 'Direct';
         }
 
-        // Update lead in database
+        captureTrackingParams();
+
+        // ==================== DATABASE ====================
         async function updateLead(updates) {
             if (!leadId) return;
             try {
@@ -615,7 +1100,6 @@
             }
         }
 
-        // Slack notification - fire and forget
         async function sendSlackNotification(type, data) {
             try {
                 await fetch(`${SUPABASE_URL}/functions/v1/slack-notify`, {
@@ -631,7 +1115,6 @@
             }
         }
 
-        // Email confirmation - fire and forget
         async function sendConfirmationEmail(email) {
             try {
                 await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
@@ -650,26 +1133,68 @@
             }
         }
 
-        // Determine traffic source from tracking params
-        function getTrafficSource() {
-            const tracking = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+        // ==================== RESTORE STATE ====================
+        function restoreSelections() {
+            const data = loadSavedData();
 
-            if (tracking.fbclid) return 'Facebook';
-            if (tracking.ttclid) return 'TikTok';
-            if (tracking.gclid || tracking.gbraid || tracking.wbraid || tracking.gad_source) return 'Google';
-            if (tracking.utm_source) {
-                const src = tracking.utm_source.toLowerCase();
-                if (src.includes('facebook') || src.includes('fb') || src.includes('meta')) return 'Facebook';
-                if (src.includes('tiktok') || src.includes('tt')) return 'TikTok';
-                if (src.includes('google') || src.includes('gads')) return 'Google';
+            if (data.email) document.getElementById('email-input').value = data.email;
+            if (data.phone) {
+                document.getElementById('phone-input').value = data.phone;
+                validatePhoneInput();
             }
-            return 'Direct';
+            if (data.direction) selectOption('direction-options', data.direction);
+            if (data.weekly_hours) selectOption('hours-options', data.weekly_hours);
+            if (data.target_income) selectOption('income-options', data.target_income);
+            if (data.experience) {
+                document.getElementById('experience-input').value = data.experience;
+                validateExperience();
+            }
+            if (data.open_question) document.getElementById('open-input').value = data.open_question;
+            if (data.budget) selectOption('budget-options', data.budget);
+
+            // Resume from last step
+            if (data.lead_id) {
+                leadId = data.lead_id;
+                if (data.completed) {
+                    goToStep(8);
+                } else if (data.budget) {
+                    goToStep(8);
+                } else if (data.open_question !== undefined) {
+                    goToStep(7);
+                } else if (data.experience) {
+                    goToStep(6);
+                } else if (data.target_income) {
+                    goToStep(5);
+                } else if (data.weekly_hours) {
+                    goToStep(4);
+                } else if (data.direction) {
+                    goToStep(3);
+                } else if (data.phone) {
+                    goToStep(2);
+                } else {
+                    goToStep(1);
+                }
+            }
         }
 
-        // STEP 0: Email form
+        function selectOption(containerId, value) {
+            const btn = document.querySelector(`#${containerId} [data-value="${value}"]`);
+            if (btn) btn.classList.add('selected');
+        }
+
+        // ==================== STEP HANDLERS ====================
+
+        // Step 0: Email
         document.getElementById('email-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email-input').value;
+            const email = document.getElementById('email-input').value.trim();
+            const errorEl = document.getElementById('email-error');
+
+            if (!validateEmail(email)) {
+                errorEl.classList.add('visible');
+                return;
+            }
+            errorEl.classList.remove('visible');
             saveData('email', email);
 
             try {
@@ -682,12 +1207,10 @@
                 if (!leadError && leadResult) {
                     leadId = leadResult.id;
                     saveData('lead_id', leadId);
-
                     const trackingData = getTrackingData();
                     await supabaseClient.from('lead_tracking').insert([{ lead_id: leadId, ...trackingData }]);
                 }
 
-                // Send confirmation email immediately after email submission
                 sendConfirmationEmail(email);
             } catch (err) {
                 console.error('Error:', err);
@@ -700,112 +1223,124 @@
             goToStep(1);
         });
 
-        // STEP 1: Phone (collected early for high conversion)
-        const phoneInput1 = document.getElementById('phone-input');
-        const phoneError1 = document.getElementById('phone-input-error');
-        const phoneSubmit1 = document.getElementById('phone-submit');
+        // Step 1: Phone
+        const phoneInput = document.getElementById('phone-input');
+        const phoneSubmit = document.getElementById('phone-submit');
+        const phoneError = document.getElementById('phone-error');
 
-        phoneInput1.addEventListener('input', function() {
-            const phone = this.value.trim();
+        function validatePhoneInput() {
+            const phone = phoneInput.value.trim();
             const isValid = validatePhone(phone);
 
             if (isValid) {
-                phoneError1.classList.add('hidden');
-                phoneSubmit1.disabled = false;
-                phoneSubmit1.classList.remove('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
-                phoneSubmit1.classList.add('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
+                phoneError.classList.remove('visible');
+                phoneSubmit.disabled = false;
             } else {
-                if (phone.length > 0) {
-                    phoneError1.classList.remove('hidden');
-                } else {
-                    phoneError1.classList.add('hidden');
-                }
-                phoneSubmit1.disabled = true;
-                phoneSubmit1.classList.add('bg-zinc-700', 'text-zinc-400', 'cursor-not-allowed');
-                phoneSubmit1.classList.remove('bg-white', 'text-zinc-900', 'hover:bg-zinc-100');
+                if (phone.length > 0) phoneError.classList.add('visible');
+                else phoneError.classList.remove('visible');
+                phoneSubmit.disabled = true;
             }
-        });
+        }
 
-        phoneSubmit1.addEventListener('click', async function() {
-            const phone = phoneInput1.value.trim();
+        phoneInput.addEventListener('input', validatePhoneInput);
+
+        phoneSubmit.addEventListener('click', async function() {
+            const phone = phoneInput.value.trim();
             if (!validatePhone(phone)) return;
             saveData('phone', phone);
             await updateLead({ phone: phone });
             goToStep(2);
         });
 
-        // STEP 2: Direction
-        document.querySelectorAll('#q1-options .option-btn').forEach(btn => {
+        // Step 2: Direction
+        document.querySelectorAll('#direction-options .option-card').forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('#q1-options .option-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('#direction-options .option-card').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 const value = this.dataset.value;
                 saveData('direction', value);
                 updateLead({ direction: value });
-                setTimeout(() => goToStep(3), 300);
+                setTimeout(() => goToStep(3), 250);
             });
         });
 
-        // STEP 3: Weekly hours
-        document.querySelectorAll('#q2-options .option-btn').forEach(btn => {
+        // Step 3: Weekly hours
+        document.querySelectorAll('#hours-options .option-card').forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('#q2-options .option-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('#hours-options .option-card').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 const value = this.dataset.value;
                 saveData('weekly_hours', value);
                 updateLead({ weekly_hours: value });
-                setTimeout(() => goToStep(4), 300);
+                setTimeout(() => goToStep(4), 250);
             });
         });
 
-        // STEP 4: Target income
-        document.querySelectorAll('#q3-options .option-btn').forEach(btn => {
+        // Step 4: Income
+        document.querySelectorAll('#income-options .option-card').forEach(btn => {
             btn.addEventListener('click', function() {
-                document.querySelectorAll('#q3-options .option-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('#income-options .option-card').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 const value = this.dataset.value;
                 saveData('target_income', value);
                 updateLead({ target_income: value });
-                setTimeout(() => goToStep(5), 300);
+                setTimeout(() => goToStep(5), 250);
             });
         });
 
-        // STEP 5: Experience
-        const expTextarea = document.getElementById('q4-experience');
-        const expNextBtn = document.getElementById('q4-next');
+        // Step 5: Experience
+        const experienceInput = document.getElementById('experience-input');
+        const experienceSubmit = document.getElementById('experience-submit');
+        const experienceError = document.getElementById('experience-error');
+        const experienceCounter = document.getElementById('experience-counter');
 
-        expTextarea.addEventListener('input', function() {
-            expNextBtn.disabled = this.value.trim().length < 10;
-        });
+        function validateExperience() {
+            const text = experienceInput.value.trim();
+            const len = text.length;
+            experienceCounter.textContent = `${len} / 20`;
 
-        expNextBtn.addEventListener('click', function() {
-            const value = expTextarea.value.trim();
+            if (len >= 20) {
+                experienceError.classList.remove('visible');
+                experienceSubmit.disabled = false;
+                experienceCounter.classList.remove('text-red-400');
+                experienceCounter.classList.add('text-zinc-600');
+            } else {
+                experienceSubmit.disabled = true;
+                if (len > 0) {
+                    experienceCounter.classList.add('text-red-400');
+                    experienceCounter.classList.remove('text-zinc-600');
+                }
+            }
+        }
+
+        experienceInput.addEventListener('input', validateExperience);
+
+        experienceSubmit.addEventListener('click', function() {
+            const value = experienceInput.value.trim();
+            if (value.length < 20) return;
             saveData('experience', value);
             updateLead({ experience: value });
             goToStep(6);
         });
 
-        // STEP 6: Open question
-        document.getElementById('q5-next').addEventListener('click', function() {
-            const value = document.getElementById('q5-open').value.trim();
+        // Step 6: Open question
+        document.getElementById('open-submit').addEventListener('click', function() {
+            const value = document.getElementById('open-input').value.trim();
             saveData('open_question', value || '');
-            if (value) {
-                updateLead({ open_question: value });
-            }
+            if (value) updateLead({ open_question: value });
             goToStep(7);
         });
 
-        // STEP 7: Budget (final step - submits form)
-        document.querySelectorAll('#q6-options .option-btn').forEach(btn => {
+        // Step 7: Budget
+        document.querySelectorAll('#budget-options .option-card').forEach(btn => {
             btn.addEventListener('click', async function() {
-                document.querySelectorAll('#q6-options .option-btn').forEach(b => b.classList.remove('selected'));
+                document.querySelectorAll('#budget-options .option-card').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 const value = this.dataset.value;
                 saveData('budget', value);
                 saveData('completed', true);
                 await updateLead({ budget: value });
 
-                // Send Slack notification with all form data
                 const savedData = loadSavedData();
                 sendSlackNotification('new_lead', {
                     email: savedData.email,
@@ -824,12 +1359,13 @@
                 ttq.track('CompleteRegistration');
 
                 clearData();
-                setTimeout(() => goToStep(8), 300);
+                setTimeout(() => goToStep(8), 250);
             });
         });
 
-        // Initialize
+        // ==================== INIT ====================
         restoreSelections();
+        updateProgress();
     </script>
 
 </body>
