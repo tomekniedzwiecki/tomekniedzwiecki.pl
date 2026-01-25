@@ -1330,7 +1330,7 @@
 
             gtag('event', 'conversion', {'send_to': 'AW-17886093904/8_ykCOCF9OcbENDE4NBC'});
             fbq('track', 'Lead');
-            ttq.track('SubmitForm');
+            if (typeof ttq !== 'undefined') ttq.track('SubmitForm');
 
             goToStep(1);
         });
@@ -1468,7 +1468,7 @@
 
                 gtag('event', 'form_complete', {'event_category': 'engagement'});
                 fbq('track', 'CompleteRegistration');
-                ttq.track('CompleteRegistration');
+                if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
 
                 clearData();
                 setTimeout(() => goToStep(8), 250);
