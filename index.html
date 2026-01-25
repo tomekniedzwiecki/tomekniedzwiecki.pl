@@ -598,52 +598,62 @@
 
             /* ===== SECTION 6: OFERTA ===== */
             .fullpage-section[data-section="6"] .text-\[14px\] {
-                font-size: clamp(11px, 3vw, 14px) !important;
-                margin-bottom: clamp(12px, 2.5vh, 20px);
+                font-size: clamp(10px, 2.5vw, 12px) !important;
+                margin-bottom: clamp(6px, 1.5vh, 10px);
             }
             .fullpage-section[data-section="6"] h2 {
-                font-size: clamp(26px, 7vw, 42px) !important;
-                margin-bottom: clamp(12px, 2.5vh, 20px);
+                font-size: clamp(22px, 6vw, 36px) !important;
+                margin-bottom: clamp(6px, 1.5vh, 12px);
             }
             .fullpage-section[data-section="6"] > .content-area > .section-content > p.text-\[17px\] {
-                font-size: clamp(14px, 3.8vw, 18px) !important;
-                margin-bottom: clamp(20px, 4vh, 32px) !important;
+                font-size: clamp(12px, 3.2vw, 15px) !important;
+                margin-bottom: clamp(12px, 3vh, 20px) !important;
             }
             .offer-cards {
-                gap: clamp(10px, 2.5vw, 16px);
+                gap: clamp(8px, 2vw, 12px);
             }
             .offer-card {
-                padding: clamp(12px, 3vw, 18px) clamp(14px, 3.5vw, 22px);
-                gap: clamp(12px, 3vw, 18px);
+                padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px);
+                gap: clamp(10px, 2.5vw, 14px);
                 background: rgba(255,255,255,0.03);
             }
             .offer-card__icon {
-                width: clamp(44px, 12vw, 60px);
-                height: clamp(44px, 12vw, 60px);
-                border-radius: clamp(12px, 3vw, 18px);
+                width: clamp(40px, 10vw, 52px);
+                height: clamp(40px, 10vw, 52px);
+                border-radius: clamp(10px, 2.5vw, 14px);
                 flex-shrink: 0;
             }
             .offer-card__icon i {
-                font-size: clamp(20px, 5.5vw, 30px);
+                font-size: clamp(18px, 5vw, 26px);
             }
             .offer-card__icon::after {
                 display: none;
             }
+            .offer-card__content {
+                flex: 1;
+                min-width: 0;
+            }
             .offer-card__content h3 {
-                font-size: clamp(14px, 3.8vw, 18px);
-                margin-bottom: 3px;
+                font-size: clamp(13px, 3.5vw, 16px);
+                margin-bottom: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .offer-card__content p {
-                font-size: clamp(12px, 3.2vw, 15px);
-                line-height: 1.45;
+                display: none;
             }
             .offer-card__actions {
                 display: flex;
                 margin-left: auto;
+                flex-shrink: 0;
             }
             .offer-card__actions .offer-btn {
-                font-size: clamp(11px, 2.8vw, 13px);
-                padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px);
+                font-size: clamp(10px, 2.5vw, 12px);
+                padding: clamp(5px, 1.2vw, 7px) clamp(8px, 2vw, 12px);
+            }
+            .offer-card__actions .offer-btn:last-child {
+                display: none;
             }
 
             /* ===== SECTION 7: CTA + FOOTER ===== */
