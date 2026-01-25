@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Tomasz Niedźwiecki</title>
     <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
     <meta name="description" content="Inwestuję w ludzi i buduję z nimi biznesy.">
@@ -63,20 +63,34 @@
         /* Mobile: Onepage scroll with snap */
         @media (max-width: 767px) {
             .fullpage-container {
+                /* Scroll snap with webkit prefix for older iOS */
+                -webkit-scroll-snap-type: y mandatory;
                 scroll-snap-type: y mandatory;
+                /* Height fallback: vh -> dvh */
+                height: 100vh;
                 height: 100dvh;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                /* Prevent iOS overscroll bounce */
+                overscroll-behavior: none;
             }
             .fullpage-container.is-scrolling {
+                -webkit-scroll-snap-type: none;
                 scroll-snap-type: none;
             }
             .fullpage-section {
+                /* Height fallback: vh -> dvh */
+                min-height: 100vh;
                 min-height: 100dvh;
+                height: 100vh;
                 height: 100dvh;
+                -webkit-scroll-snap-align: start;
                 scroll-snap-align: start;
                 scroll-snap-stop: always;
                 padding: 0;
+                /* iOS safe areas */
+                padding-left: env(safe-area-inset-left, 0);
+                padding-right: env(safe-area-inset-right, 0);
                 display: flex;
                 flex-direction: column;
             }
@@ -85,6 +99,8 @@
                 align-items: center;
                 justify-content: center;
                 flex: 1;
+                /* Safe area for bottom (home indicator) */
+                padding-bottom: env(safe-area-inset-bottom, 0);
             }
             .fullpage-section .content-area > .section-content {
                 width: 100%;
@@ -468,9 +484,10 @@
 
             /* ===== GLOBAL SECTION LAYOUT ===== */
             .fullpage-section .content-area {
-                padding: 0 7vw !important;
+                padding: 0 max(7vw, env(safe-area-inset-right, 7vw)) !important;
+                padding-left: max(7vw, env(safe-area-inset-left, 7vw)) !important;
                 padding-top: max(80px, 12vh) !important;
-                padding-bottom: max(40px, 6vh) !important;
+                padding-bottom: max(40px, 6vh, env(safe-area-inset-bottom, 0)) !important;
             }
             .fullpage-section .section-content {
                 justify-content: center !important;
@@ -598,33 +615,35 @@
 
             /* ===== SECTION 6: OFERTA ===== */
             .fullpage-section[data-section="6"] .text-\[14px\] {
-                font-size: clamp(10px, 2.5vw, 12px) !important;
-                margin-bottom: clamp(6px, 1.5vh, 10px);
+                font-size: clamp(10px, 2.8vw, 13px) !important;
+                margin-bottom: clamp(4px, 1vh, 8px);
             }
             .fullpage-section[data-section="6"] h2 {
-                font-size: clamp(22px, 6vw, 36px) !important;
-                margin-bottom: clamp(6px, 1.5vh, 12px);
+                font-size: clamp(24px, 6.5vw, 38px) !important;
+                margin-bottom: clamp(4px, 1vh, 10px);
             }
             .fullpage-section[data-section="6"] > .content-area > .section-content > p.text-\[17px\] {
-                font-size: clamp(12px, 3.2vw, 15px) !important;
-                margin-bottom: clamp(12px, 3vh, 20px) !important;
+                font-size: clamp(13px, 3.5vw, 16px) !important;
+                margin-bottom: clamp(12px, 2.5vh, 20px) !important;
             }
             .offer-cards {
-                gap: clamp(8px, 2vw, 12px);
+                gap: clamp(8px, 2vw, 14px);
             }
             .offer-card {
-                padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px);
-                gap: clamp(10px, 2.5vw, 14px);
+                padding: clamp(12px, 3vw, 16px);
+                gap: clamp(12px, 3vw, 16px);
                 background: rgba(255,255,255,0.03);
+                flex-direction: row;
+                align-items: center;
             }
             .offer-card__icon {
-                width: clamp(40px, 10vw, 52px);
-                height: clamp(40px, 10vw, 52px);
+                width: clamp(44px, 11vw, 56px);
+                height: clamp(44px, 11vw, 56px);
                 border-radius: clamp(10px, 2.5vw, 14px);
                 flex-shrink: 0;
             }
             .offer-card__icon i {
-                font-size: clamp(18px, 5vw, 26px);
+                font-size: clamp(20px, 5.5vw, 28px);
             }
             .offer-card__icon::after {
                 display: none;
@@ -634,25 +653,15 @@
                 min-width: 0;
             }
             .offer-card__content h3 {
-                font-size: clamp(13px, 3.5vw, 16px);
-                margin-bottom: 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                font-size: clamp(14px, 3.8vw, 17px);
+                margin-bottom: 2px;
             }
             .offer-card__content p {
-                display: none;
+                font-size: clamp(11px, 3vw, 14px);
+                line-height: 1.35;
+                color: #a1a1aa;
             }
             .offer-card__actions {
-                display: flex;
-                margin-left: auto;
-                flex-shrink: 0;
-            }
-            .offer-card__actions .offer-btn {
-                font-size: clamp(10px, 2.5vw, 12px);
-                padding: clamp(5px, 1.2vw, 7px) clamp(8px, 2vw, 12px);
-            }
-            .offer-card__actions .offer-btn:last-child {
                 display: none;
             }
 
@@ -897,7 +906,11 @@
             left: 0;
             right: 0;
             z-index: 100;
+            /* iOS safe areas for notched devices */
             padding: 12px 16px;
+            padding-top: max(12px, env(safe-area-inset-top, 12px));
+            padding-left: max(16px, env(safe-area-inset-left, 16px));
+            padding-right: max(16px, env(safe-area-inset-right, 16px));
             display: flex;
             align-items: center;
             justify-content: space-between;
