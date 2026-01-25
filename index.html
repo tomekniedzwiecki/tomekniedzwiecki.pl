@@ -60,25 +60,37 @@
                 height: 100dvh;
             }
         }
-        /* Mobile: disable scroll snap, natural scroll */
+        /* Mobile: Onepage scroll with snap */
         @media (max-width: 767px) {
             .fullpage-container {
+                scroll-snap-type: y mandatory;
+                height: 100dvh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .fullpage-container.is-scrolling {
                 scroll-snap-type: none;
-                height: auto;
-                overflow-y: visible;
             }
             .fullpage-section {
-                min-height: auto;
-                height: auto;
-                scroll-snap-align: none;
-                scroll-snap-stop: normal;
-                padding: 60px 0;
-            }
-            .fullpage-section:first-child {
-                min-height: 100vh;
                 min-height: 100dvh;
-                padding-top: 80px;
-                padding-bottom: 40px;
+                height: 100dvh;
+                scroll-snap-align: start;
+                scroll-snap-stop: always;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+            }
+            .fullpage-section .content-area {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 1;
+            }
+            .fullpage-section .content-area > .section-content {
+                width: 100%;
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
             }
         }
 
@@ -136,14 +148,6 @@
             padding: 0 1.5rem;
             flex: 1;
         }
-        @media (max-width: 767px) {
-            .content-area {
-                padding-top: 0;
-                padding-bottom: 0;
-                align-items: center;
-                min-height: auto;
-            }
-        }
         .content-area > .section-content {
             width: 100%;
             max-width: 420px;
@@ -197,7 +201,9 @@
             }
         }
         @media (max-width: 767px) {
-            .dots-nav { display: none; }
+            .dots-nav {
+                display: none;
+            }
         }
         .dots-nav button {
             width: 14px;
@@ -447,150 +453,243 @@
             }
         }
 
-        /* ==================== MOBILE STYLES ==================== */
+        /* ==================== MOBILE STYLES - PROFESSIONAL ONEPAGE ==================== */
         @media (max-width: 767px) {
+            /* Base resets */
             .section-content {
                 opacity: 1;
                 transform: none;
             }
-            /* Hero section - full viewport */
-            .fullpage-section[data-section="0"] {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
+
+            /* Track section glow */
+            .track-section::before {
+                background: radial-gradient(ellipse 100% 60% at 50% 20%, var(--accent-glow, rgba(99,102,241,0.12)) 0%, transparent 70%);
             }
-            .fullpage-section[data-section="0"] .content-area {
-                flex: 1;
-                display: flex;
-                align-items: center;
+
+            /* ===== GLOBAL SECTION LAYOUT ===== */
+            .fullpage-section .content-area {
+                padding: 0 7vw !important;
+                padding-top: max(80px, 12vh) !important;
+                padding-bottom: max(40px, 6vh) !important;
+            }
+            .fullpage-section .section-content {
+                justify-content: center !important;
+                gap: 0;
+            }
+
+            /* ===== SECTION 0: HERO ===== */
+            .fullpage-section[data-section="0"] .section-content > .flex.items-center.gap-3 {
+                margin-bottom: clamp(24px, 5vh, 40px);
+            }
+            .fullpage-section[data-section="0"] .flex.items-center.gap-3 img {
+                width: clamp(48px, 14vw, 64px);
+                height: clamp(48px, 14vw, 64px);
+            }
+            .fullpage-section[data-section="0"] .flex.items-center.gap-3 .text-white {
+                font-size: clamp(15px, 4vw, 18px);
+            }
+            .fullpage-section[data-section="0"] .flex.items-center.gap-3 .text-zinc-500 {
+                font-size: clamp(13px, 3.5vw, 16px);
             }
             .fullpage-section[data-section="0"] h1 {
-                font-size: 34px;
-                line-height: 1.15;
-                margin-bottom: 1.25rem;
+                font-size: clamp(32px, 9vw, 52px);
+                line-height: 1.12;
+                margin-bottom: clamp(16px, 4vh, 28px);
             }
             .fullpage-section[data-section="0"] p.text-zinc-400 {
-                font-size: 16px !important;
-                margin-bottom: 2rem;
+                font-size: clamp(15px, 4.2vw, 20px) !important;
+                line-height: 1.7;
+                margin-bottom: clamp(24px, 5vh, 40px) !important;
             }
             .fullpage-section[data-section="0"] .btn-primary {
                 width: 100%;
                 justify-content: center;
+                height: clamp(52px, 8vh, 64px);
+                font-size: clamp(15px, 4vw, 18px);
+                border-radius: 14px;
             }
-            .fullpage-section[data-section="0"] .flex.items-center.gap-3 {
-                margin-bottom: 1.5rem;
+
+            /* ===== SECTION 1: DROGA ===== */
+            .fullpage-section[data-section="1"] .text-\[14px\] {
+                font-size: clamp(11px, 3vw, 14px);
+                margin-bottom: clamp(16px, 3vh, 28px);
             }
-            /* Track sections */
+            .fullpage-section[data-section="1"] h2 {
+                font-size: clamp(30px, 8vw, 48px) !important;
+                line-height: 1.15;
+                margin-bottom: clamp(20px, 4vh, 32px);
+            }
+            .fullpage-section[data-section="1"] p.text-zinc-400 {
+                font-size: clamp(15px, 4vw, 19px) !important;
+                line-height: 1.7;
+                margin-bottom: clamp(24px, 5vh, 40px) !important;
+            }
+            .fullpage-section[data-section="1"] .flex.items-center.gap-4 {
+                gap: clamp(8px, 2vw, 12px) !important;
+                flex-wrap: wrap;
+            }
+            .fullpage-section[data-section="1"] .flex.items-center.gap-4 > div {
+                padding: clamp(6px, 1.5vw, 10px) clamp(12px, 3vw, 18px);
+                font-size: clamp(12px, 3.2vw, 15px);
+            }
+
+            /* ===== SECTIONS 2,3,4: TRACK RECORD ===== */
             .track-icon {
-                width: 64px;
-                height: 64px;
-                border-radius: 18px;
-                margin-bottom: 1.25rem;
+                width: clamp(64px, 18vw, 96px);
+                height: clamp(64px, 18vw, 96px);
+                border-radius: clamp(18px, 5vw, 28px);
+                margin-bottom: clamp(16px, 3vh, 28px);
             }
             .track-icon i {
-                font-size: 28px !important;
+                font-size: clamp(28px, 8vw, 48px) !important;
             }
-            .fullpage-section h2 {
-                font-size: 30px !important;
-                margin-bottom: 1rem;
+            .fullpage-section[data-section="2"] .flex.items-center.gap-3,
+            .fullpage-section[data-section="3"] .flex.items-center.gap-3,
+            .fullpage-section[data-section="4"] .flex.items-center.gap-3 {
+                margin-bottom: clamp(8px, 2vh, 16px) !important;
+            }
+            .fullpage-section[data-section="2"] .flex.items-center.gap-3 .text-\[13px\],
+            .fullpage-section[data-section="3"] .flex.items-center.gap-3 .text-\[13px\],
+            .fullpage-section[data-section="4"] .flex.items-center.gap-3 .text-\[13px\] {
+                font-size: clamp(11px, 3vw, 14px);
+            }
+            .fullpage-section[data-section="2"] h2,
+            .fullpage-section[data-section="3"] h2,
+            .fullpage-section[data-section="4"] h2 {
+                font-size: clamp(30px, 8vw, 48px) !important;
+                margin-bottom: clamp(8px, 2vh, 16px);
             }
             .fullpage-section p[class*="text-emerald-400"],
             .fullpage-section p[class*="text-[#ffb400]"],
             .fullpage-section p[class*="text-purple-400"] {
-                font-size: 20px !important;
-                margin-bottom: 1rem !important;
+                font-size: clamp(18px, 5vw, 28px) !important;
+                margin-bottom: clamp(16px, 3vh, 28px) !important;
             }
-            .fullpage-section .flex.items-center.gap-8,
-            .fullpage-section .flex.items-center.gap-6 {
+            .fullpage-section[data-section="2"] p.text-zinc-400,
+            .fullpage-section[data-section="3"] p.text-zinc-400,
+            .fullpage-section[data-section="4"] p.text-zinc-400 {
+                font-size: clamp(14px, 4vw, 18px) !important;
+                line-height: 1.7;
+                margin-bottom: clamp(20px, 4vh, 32px) !important;
+            }
+            .fullpage-section[data-section="2"] > .content-area > .section-content > .flex.items-center.gap-8,
+            .fullpage-section[data-section="3"] > .content-area > .section-content > .flex.items-center.gap-8,
+            .fullpage-section[data-section="4"] > .content-area > .section-content > .flex.items-center.gap-6 {
+                gap: clamp(16px, 5vw, 32px) !important;
                 flex-wrap: wrap;
-                gap: 10px !important;
             }
-            .fullpage-section .flex.items-center.gap-4 {
-                flex-wrap: wrap;
-                gap: 8px !important;
+            .fullpage-section[data-section="2"] .flex.items-center.gap-8 .flex.items-center.gap-2,
+            .fullpage-section[data-section="3"] .flex.items-center.gap-8 .flex.items-center.gap-2,
+            .fullpage-section[data-section="4"] .flex.items-center.gap-6 .flex.items-center.gap-2 {
+                font-size: clamp(13px, 3.5vw, 16px);
             }
-            .fullpage-section p.text-zinc-400 {
-                font-size: 15px !important;
-                line-height: 1.65;
+
+            /* ===== SECTION 5: MOTTO ===== */
+            .fullpage-section[data-section="5"] blockquote {
+                font-size: clamp(22px, 6vw, 38px) !important;
+                line-height: 1.45;
+                padding-left: clamp(20px, 5vw, 32px);
+                border-left: 3px solid rgba(255,255,255,0.15);
             }
-            .fullpage-section blockquote {
-                font-size: 18px !important;
-                line-height: 1.5;
+            .fullpage-section[data-section="5"] p.mt-8 {
+                margin-top: clamp(24px, 5vh, 40px);
+                font-size: clamp(15px, 4vw, 19px) !important;
             }
-            .fullpage-section[data-section="1"] h2 {
-                font-size: 26px !important;
+
+            /* ===== SECTION 6: OFERTA ===== */
+            .fullpage-section[data-section="6"] .text-\[14px\] {
+                font-size: clamp(11px, 3vw, 14px) !important;
+                margin-bottom: clamp(12px, 2.5vh, 20px);
             }
             .fullpage-section[data-section="6"] h2 {
-                font-size: 24px !important;
+                font-size: clamp(26px, 7vw, 42px) !important;
+                margin-bottom: clamp(12px, 2.5vh, 20px);
+            }
+            .fullpage-section[data-section="6"] > .content-area > .section-content > p.text-\[17px\] {
+                font-size: clamp(14px, 3.8vw, 18px) !important;
+                margin-bottom: clamp(20px, 4vh, 32px) !important;
             }
             .offer-cards {
-                gap: 10px;
+                gap: clamp(10px, 2.5vw, 16px);
             }
             .offer-card {
-                padding: 14px 16px;
-                gap: 14px;
+                padding: clamp(12px, 3vw, 18px) clamp(14px, 3.5vw, 22px);
+                gap: clamp(12px, 3vw, 18px);
                 background: rgba(255,255,255,0.03);
             }
             .offer-card__icon {
-                width: 44px;
-                height: 44px;
-                border-radius: 12px;
+                width: clamp(44px, 12vw, 60px);
+                height: clamp(44px, 12vw, 60px);
+                border-radius: clamp(12px, 3vw, 18px);
+                flex-shrink: 0;
             }
             .offer-card__icon i {
-                font-size: 22px;
+                font-size: clamp(20px, 5.5vw, 30px);
             }
             .offer-card__icon::after {
-                opacity: 1;
-                inset: -30px;
+                display: none;
             }
             .offer-card__content h3 {
-                font-size: 15px;
-                margin-bottom: 2px;
+                font-size: clamp(14px, 3.8vw, 18px);
+                margin-bottom: 3px;
             }
             .offer-card__content p {
-                font-size: 13px;
-            }
-            .offer-card {
-                flex-wrap: wrap;
+                font-size: clamp(12px, 3.2vw, 15px);
+                line-height: 1.45;
             }
             .offer-card__actions {
-                width: 100%;
-                margin-left: 0;
-                margin-top: 10px;
-                padding-left: 68px;
+                display: flex;
+                margin-left: auto;
             }
-            .offer-btn {
-                font-size: 12px;
-                padding: 6px 12px;
+            .offer-card__actions .offer-btn {
+                font-size: clamp(11px, 2.8vw, 13px);
+                padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 14px);
             }
+
+            /* ===== SECTION 7: CTA + FOOTER ===== */
             .fullpage-section[data-section="7"] h2 {
-                font-size: 28px !important;
+                font-size: clamp(32px, 9vw, 56px) !important;
+                margin-bottom: clamp(12px, 2.5vh, 20px);
+            }
+            .fullpage-section[data-section="7"] > .content-area > .section-content > p.text-zinc-400 {
+                font-size: clamp(15px, 4vw, 20px) !important;
+                margin-bottom: clamp(24px, 5vh, 40px) !important;
             }
             .fullpage-section[data-section="7"] .btn-primary {
                 width: 100%;
                 justify-content: center;
+                height: clamp(52px, 8vh, 64px);
+                font-size: clamp(15px, 4vw, 18px);
+                margin-bottom: clamp(32px, 6vh, 48px) !important;
             }
             .fullpage-section[data-section="7"] .border-t {
-                padding-top: 1.5rem;
-                margin-top: 2rem;
+                padding-top: clamp(20px, 4vh, 32px);
+                margin-top: 0;
             }
-            .fullpage-section[data-section="7"] {
-                padding-bottom: 0;
+            .fullpage-section[data-section="7"] .border-t > .mb-10 {
+                margin-bottom: clamp(16px, 3vh, 24px) !important;
             }
-            .track-section::before {
-                right: 0;
-                left: 0;
-                background: radial-gradient(ellipse 150% 120% at 50% 40%, var(--accent-glow, rgba(99,102,241,0.18)) 0%, transparent 100%);
+            .fullpage-section[data-section="7"] .border-t .flex.items-center.gap-4 {
+                gap: clamp(12px, 3vw, 18px);
+                margin-bottom: clamp(12px, 2.5vh, 20px);
             }
-            .fullpage-section[data-section="0"] .inline-flex {
-                padding: 8px 14px;
-                margin-bottom: 1.5rem;
+            .fullpage-section[data-section="7"] .border-t .flex.items-center.gap-4 img {
+                width: clamp(44px, 12vw, 60px);
+                height: clamp(44px, 12vw, 60px);
             }
-            .fullpage-section[data-section="0"] .inline-flex .text-\[14px\] {
-                font-size: 11px;
+            .fullpage-section[data-section="7"] .border-t .flex.items-center.gap-3 {
+                gap: clamp(10px, 2.5vw, 16px);
             }
-            .fullpage-section[data-section="0"] .inline-flex .text-white {
-                font-size: 12px;
+            .fullpage-section[data-section="7"] .border-t .flex.items-center.gap-3 a {
+                width: clamp(38px, 10vw, 48px);
+                height: clamp(38px, 10vw, 48px);
+            }
+            .fullpage-section[data-section="7"] .border-t .flex.items-center.gap-3 a svg {
+                width: clamp(16px, 4.5vw, 22px);
+                height: clamp(16px, 4.5vw, 22px);
+            }
+            .fullpage-section[data-section="7"] .text-\[13px\] {
+                font-size: clamp(11px, 3vw, 14px) !important;
             }
         }
 
@@ -602,22 +701,22 @@
             .scroll-indicator {
                 display: flex;
                 position: absolute;
-                bottom: 24px;
+                bottom: max(20px, 3vh);
                 left: 50%;
                 transform: translateX(-50%);
                 flex-direction: column;
                 align-items: center;
                 gap: 6px;
-                color: rgba(255,255,255,0.4);
-                font-size: 9px;
+                color: rgba(255,255,255,0.35);
+                font-size: clamp(8px, 2.2vw, 10px);
                 font-weight: 500;
                 letter-spacing: 0.15em;
                 z-index: 20;
                 animation: bounce 2s ease-in-out infinite;
             }
             .scroll-indicator svg {
-                width: 18px;
-                height: 18px;
+                width: clamp(16px, 4.5vw, 22px);
+                height: clamp(16px, 4.5vw, 22px);
             }
             @keyframes bounce {
                 0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -1294,7 +1393,7 @@
             };
 
             const scrollToSection = (index) => {
-                if (!isDesktop() || index < 0 || index >= sections.length) return;
+                if (index < 0 || index >= sections.length) return;
 
                 isScrolling = true;
                 container.classList.add('is-scrolling');
