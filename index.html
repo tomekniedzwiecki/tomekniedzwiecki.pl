@@ -170,55 +170,66 @@
         }
 
         /* Desktop: Content on left, Tetris on right */
-        /* Key: content must NEVER reach the dots (at 53%) */
+        /* Small screens: less padding to fit content */
+        /* Large screens: more padding for aesthetics */
         @media (min-width: 768px) {
             .content-area {
-                /* Take full left side but content is constrained inside */
                 width: 100%;
                 max-width: 100%;
                 padding: 0;
-                padding-left: max(1.5rem, 3vw);
+                padding-left: 1.5rem;
                 justify-content: flex-start;
             }
             .content-area > .section-content {
-                /* Content max = 50% of viewport minus left padding */
-                /* This ensures it never reaches dots at 53% */
-                max-width: min(580px, calc(50vw - 4rem));
+                max-width: min(520px, calc(50vw - 3rem));
             }
         }
-        @media (min-width: 1400px) {
+        @media (min-width: 1200px) {
             .content-area {
-                padding-left: max(2rem, 4vw);
+                padding-left: 2.5rem;
             }
             .content-area > .section-content {
-                max-width: min(620px, calc(50vw - 5rem));
+                max-width: min(580px, calc(52vw - 4rem));
             }
         }
-        @media (min-width: 1800px) {
+        @media (min-width: 1600px) {
             .content-area {
-                padding-left: max(3rem, 5vw);
+                padding-left: 5rem;
             }
             .content-area > .section-content {
-                max-width: min(680px, calc(52vw - 6rem));
+                max-width: 620px;
+            }
+        }
+        @media (min-width: 2000px) {
+            .content-area {
+                padding-left: 8rem;
+            }
+            .content-area > .section-content {
+                max-width: 680px;
             }
         }
 
-        /* Hero h1 - scales with content width */
+        /* Hero h1 - scales with viewport */
         @media (min-width: 768px) {
             .fullpage-section[data-section="0"] h1 {
-                font-size: clamp(28px, 4vw, 48px) !important;
+                font-size: clamp(28px, 4vw, 42px) !important;
+            }
+        }
+        @media (min-width: 1200px) {
+            .fullpage-section[data-section="0"] h1 {
+                font-size: clamp(32px, 3.5vw, 48px) !important;
             }
         }
         @media (min-width: 1600px) {
             .fullpage-section[data-section="0"] h1 {
-                font-size: clamp(36px, 3vw, 56px) !important;
+                font-size: clamp(38px, 3vw, 56px) !important;
             }
         }
 
-        /* Dots navigation - fixed at 53% from left */
+        /* Dots navigation - positioned based on screen size */
         .dots-nav {
             position: fixed;
-            left: 53%;
+            left: 52%;
             top: 50%;
             transform: translateY(-50%);
             z-index: 40;
@@ -226,12 +237,17 @@
             flex-direction: column;
             gap: 18px;
         }
-        @media (min-width: 1400px) {
+        @media (min-width: 1200px) {
             .dots-nav {
-                left: 54%;
+                left: 55%;
             }
         }
-        @media (min-width: 1800px) {
+        @media (min-width: 1600px) {
+            .dots-nav {
+                left: 57%;
+            }
+        }
+        @media (min-width: 2000px) {
             .dots-nav {
                 left: 58%;
             }
