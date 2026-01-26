@@ -169,34 +169,36 @@
             max-width: 420px;
         }
 
-        /* Desktop: LEFT side only */
+        /* Desktop: LEFT side only - leave space for dots navigation */
         @media (min-width: 768px) {
             .content-area {
-                width: 58% !important;
-                max-width: 58% !important;
-                padding: 0 3rem;
+                width: 52% !important;
+                max-width: 52% !important;
+                padding: 0 2rem 0 3rem;
                 justify-content: flex-start;
             }
             .content-area > .section-content {
-                max-width: 560px;
+                max-width: 520px;
             }
         }
         @media (min-width: 1200px) {
             .content-area {
-                padding: 0 4rem;
+                width: 54% !important;
+                max-width: 54% !important;
+                padding: 0 2.5rem 0 4rem;
             }
             .content-area > .section-content {
-                max-width: 620px;
+                max-width: 580px;
             }
         }
         @media (min-width: 1600px) {
             .content-area {
-                width: 60% !important;
-                max-width: 60% !important;
-                padding: 0 5rem;
+                width: 56% !important;
+                max-width: 56% !important;
+                padding: 0 3rem 0 5rem;
             }
             .content-area > .section-content {
-                max-width: 680px;
+                max-width: 640px;
             }
         }
 
@@ -213,22 +215,10 @@
             }
         }
 
-        /* Responsive padding - less padding on medium screens */
-        @media (min-width: 768px) and (max-width: 1199px) {
-            .content-area {
-                padding: 0 1.5rem !important;
-            }
-        }
-        @media (min-width: 1200px) and (max-width: 1599px) {
-            .content-area {
-                padding: 0 2.5rem !important;
-            }
-        }
-
-        /* Dots navigation */
+        /* Dots navigation - positioned after content area */
         .dots-nav {
             position: fixed;
-            left: 58%;
+            left: 54%;
             top: 50%;
             transform: translateY(-50%);
             z-index: 40;
@@ -236,9 +226,14 @@
             flex-direction: column;
             gap: 18px;
         }
+        @media (min-width: 1200px) {
+            .dots-nav {
+                left: 56%;
+            }
+        }
         @media (min-width: 1600px) {
             .dots-nav {
-                left: 60%;
+                left: 58%;
             }
         }
         @media (max-width: 767px) {
