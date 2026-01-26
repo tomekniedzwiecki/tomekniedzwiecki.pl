@@ -1500,7 +1500,8 @@
                 });
             });
 
-            container.addEventListener('wheel', (e) => {
+            // Wheel scroll handler - shared between container and builder panel
+            const handleWheelScroll = (e) => {
                 if (!isDesktop() || isScrolling) {
                     if (isScrolling) e.preventDefault();
                     return;
@@ -1516,7 +1517,15 @@
                 } else if (delta < 0 && currentSection > 0) {
                     scrollToSection(currentSection - 1);
                 }
-            }, { passive: false });
+            };
+
+            container.addEventListener('wheel', handleWheelScroll, { passive: false });
+
+            // Also handle scroll on builder panel (right side)
+            const builderPanel = document.getElementById('builder-panel');
+            if (builderPanel) {
+                builderPanel.addEventListener('wheel', handleWheelScroll, { passive: false });
+            }
 
             document.addEventListener('keydown', (e) => {
                 if (!isDesktop()) return;
