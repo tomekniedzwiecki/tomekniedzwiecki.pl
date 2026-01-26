@@ -200,15 +200,28 @@
             }
         }
 
-        /* Hero h1 responsive sizing for medium screens */
-        @media (min-width: 768px) and (max-width: 1199px) {
+        /* Hero h1 responsive sizing - scale based on content width */
+        @media (min-width: 768px) {
             .fullpage-section[data-section="0"] h1 {
-                font-size: clamp(32px, 4vw, 44px) !important;
+                /* Use calc to scale font relative to content area (58% of viewport) */
+                font-size: clamp(28px, calc(0.058 * 100vw * 0.085), 48px) !important;
             }
         }
-        @media (min-width: 1200px) and (max-width: 1399px) {
+        @media (min-width: 1600px) {
             .fullpage-section[data-section="0"] h1 {
-                font-size: clamp(36px, 3.5vw, 48px) !important;
+                font-size: clamp(32px, calc(0.06 * 100vw * 0.075), 52px) !important;
+            }
+        }
+
+        /* Responsive padding - less padding on medium screens */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .content-area {
+                padding: 0 1.5rem !important;
+            }
+        }
+        @media (min-width: 1200px) and (max-width: 1599px) {
+            .content-area {
+                padding: 0 2.5rem !important;
             }
         }
 
