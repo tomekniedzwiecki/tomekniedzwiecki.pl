@@ -68,12 +68,11 @@
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
-    <!-- Critical: Tailwind (needed for initial render) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (built, minified) -->
+    <link rel="stylesheet" href="/css/tailwind.min.css">
 
     <!-- Deferred: Non-critical scripts -->
     <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -81,17 +80,6 @@
     <!-- Fonts: Load async with swap -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
             background: #000;
