@@ -61,10 +61,20 @@
     src="https://www.facebook.com/tr?id=1571065357430677&ev=PageView&noscript=1"
     /></noscript>
 
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+
+    <!-- Critical: Tailwind (needed for initial render) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Deferred: Non-critical scripts -->
+    <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Fonts: Load async with swap -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <script>
         tailwind.config = {
             theme: {
@@ -1222,7 +1232,7 @@
             <div class="content-area">
                 <div class="section-content visible">
                     <div class="flex items-center gap-3 mb-8">
-                        <img src="img/tn_kwadrat.png" alt="Tomek Niedźwiecki"
+                        <img src="img/tn_kwadrat.png" alt="Tomek Niedźwiecki" width="56" height="56" decoding="async"
                              class="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover ring-2 ring-white/10">
                         <div>
                             <div class="text-white font-medium text-[15px] mb-0.5">Tomek Niedźwiecki</div>
@@ -1508,7 +1518,7 @@
                         <!-- Author card -->
                         <div class="mb-10">
                             <div class="flex items-center gap-4 mb-4">
-                                <img src="img/tn_kwadrat.png" alt="Tomek Niedźwiecki"
+                                <img src="img/tn_kwadrat.png" alt="Tomek Niedźwiecki" width="64" height="64" loading="lazy" decoding="async"
                                      class="w-14 h-14 md:w-16 md:h-16 rounded-2xl object-cover ring-2 ring-white/10">
                                 <div>
                                     <div class="text-white font-medium text-[15px] mb-0.5">Tomek Niedźwiecki</div>
