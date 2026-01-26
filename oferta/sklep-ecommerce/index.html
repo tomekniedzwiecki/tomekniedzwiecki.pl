@@ -760,7 +760,7 @@
                 <div class="cta__inner">
                     <div class="cta__content">
                         <div class="cta__eyebrow">Inwestycja</div>
-                        <div class="cta__price" id="offerPrice">--- <span>PLN netto</span></div>
+                        <div class="cta__price" id="offerPrice">--- <span>PLN brutto</span></div>
                         <p class="cta__note">Możliwość rozłożenia na raty</p>
                     </div>
                     <a href="#" class="cta__btn" id="ctaButton">
@@ -903,7 +903,7 @@
                 document.getElementById('offerDescription').innerHTML = parseDescription(offer.description);
 
                 const price = offer.price || 0;
-                document.getElementById('offerPrice').innerHTML = `${formatPrice(price)} <span>PLN netto</span>`;
+                document.getElementById('offerPrice').innerHTML = `${formatPrice(price)} <span>PLN brutto</span>`;
 
                 renderTimeline(offer.milestones || []);
 
