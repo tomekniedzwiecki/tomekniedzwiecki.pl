@@ -200,6 +200,18 @@
             }
         }
 
+        /* Hero h1 responsive sizing for medium screens */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .fullpage-section[data-section="0"] h1 {
+                font-size: clamp(32px, 4vw, 44px) !important;
+            }
+        }
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .fullpage-section[data-section="0"] h1 {
+                font-size: clamp(36px, 3.5vw, 48px) !important;
+            }
+        }
+
         /* Dots navigation */
         .dots-nav {
             position: fixed;
