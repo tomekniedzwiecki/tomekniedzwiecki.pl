@@ -226,13 +226,35 @@
         }
 
         .form-textarea {
-            min-height: 280px;
+            min-height: 140px;
+            max-height: 400px;
             resize: none;
+            overflow-y: hidden;
+            transition: height 0.15s ease, box-shadow 0.2s ease;
+        }
+
+        .form-textarea:focus {
+            box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.3), 0 0 20px rgba(52, 211, 153, 0.1);
         }
 
         .form-textarea::-webkit-scrollbar { width: 6px; }
         .form-textarea::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
         .form-textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+        /* Character counter styles */
+        .char-counter {
+            font-size: 12px;
+            transition: color 0.2s ease;
+        }
+        .char-counter.counting {
+            color: #a1a1aa;
+        }
+        .char-counter.valid {
+            color: #34d399;
+        }
+        .char-counter.warning {
+            color: #fbbf24;
+        }
 
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
@@ -553,7 +575,8 @@
             }
 
             .form-textarea {
-                min-height: 220px !important;
+                min-height: 120px !important;
+                max-height: 300px !important;
             }
 
             /* Buttons */
@@ -978,9 +1001,8 @@
                     <p class="text-zinc-400 mb-6">Opowiedz o swoim doświadczeniu w biznesie online. Jeśli nie masz — napisz, dlaczego chcesz zacząć.</p>
 
                     <textarea id="experience-input" class="form-input form-textarea" placeholder="Np. Prowadzę sklep na Allegro od 2 lat, obroty ok. 50 tys. miesięcznie. Szukam możliwości skalowania..."></textarea>
-                    <div class="flex justify-between items-center mt-2">
-                        <p id="experience-error" class="error-message">Napisz minimum 20 znaków</p>
-                        <span id="experience-counter" class="text-xs text-zinc-600">0 / 20</span>
+                    <div class="flex justify-end items-center mt-2">
+                        <span id="experience-counter" class="char-counter">Jeszcze 20 znaków...</span>
                     </div>
 
                     <button type="button" id="experience-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" disabled>
@@ -1414,25 +1436,40 @@
         // Step 5: Experience
         const experienceInput = document.getElementById('experience-input');
         const experienceSubmit = document.getElementById('experience-submit');
-        const experienceError = document.getElementById('experience-error');
         const experienceCounter = document.getElementById('experience-counter');
+
+        // Auto-expand textarea
+        function autoExpand(textarea) {
+            textarea.style.height = 'auto';
+            const newHeight = Math.min(textarea.scrollHeight, parseInt(getComputedStyle(textarea).maxHeight));
+            textarea.style.height = newHeight + 'px';
+            // Show scrollbar only when at max height
+            textarea.style.overflowY = textarea.scrollHeight > newHeight ? 'auto' : 'hidden';
+        }
 
         function validateExperience() {
             const text = experienceInput.value.trim();
             const len = text.length;
-            experienceCounter.textContent = `${len} / 20`;
+            const remaining = 20 - len;
 
-            if (len >= 20) {
-                experienceError.classList.remove('visible');
-                experienceSubmit.disabled = false;
-                experienceCounter.classList.remove('text-red-400');
-                experienceCounter.classList.add('text-zinc-600');
-            } else {
+            // Auto-expand
+            autoExpand(experienceInput);
+
+            // Update counter
+            experienceCounter.classList.remove('counting', 'valid', 'warning');
+
+            if (len === 0) {
+                experienceCounter.textContent = 'Jeszcze 20 znaków...';
+                experienceCounter.classList.add('counting');
                 experienceSubmit.disabled = true;
-                if (len > 0) {
-                    experienceCounter.classList.add('text-red-400');
-                    experienceCounter.classList.remove('text-zinc-600');
-                }
+            } else if (remaining > 0) {
+                experienceCounter.textContent = `Jeszcze ${remaining} znaków...`;
+                experienceCounter.classList.add('warning');
+                experienceSubmit.disabled = true;
+            } else {
+                experienceCounter.textContent = `${len} znaków`;
+                experienceCounter.classList.add('valid');
+                experienceSubmit.disabled = false;
             }
         }
 
@@ -1447,8 +1484,13 @@
         });
 
         // Step 6: Open question
+        const openInput = document.getElementById('open-input');
+        openInput.addEventListener('input', function() {
+            autoExpand(openInput);
+        });
+
         document.getElementById('open-submit').addEventListener('click', function() {
-            const value = document.getElementById('open-input').value.trim();
+            const value = openInput.value.trim();
             saveData('open_question', value || '');
             if (value) updateLead({ open_question: value });
             goToStep(7);
