@@ -176,8 +176,8 @@
             .content-area {
                 width: 100%;
                 max-width: 100%;
-                padding: 0;
-                padding-left: 1.5rem;
+                padding: 0 !important;
+                padding-left: 1.5rem !important;
                 justify-content: flex-start;
             }
             .content-area > .section-content {
@@ -186,7 +186,7 @@
         }
         @media (min-width: 1200px) {
             .content-area {
-                padding-left: 3rem;
+                padding-left: 3rem !important;
             }
             .content-area > .section-content {
                 max-width: min(580px, calc(50vw - 4rem));
@@ -195,7 +195,7 @@
         /* Large screens: use percentage for padding */
         @media (min-width: 1600px) {
             .content-area {
-                padding-left: 8vw;
+                padding-left: 8vw !important;
             }
             .content-area > .section-content {
                 max-width: 620px;
@@ -203,7 +203,7 @@
         }
         @media (min-width: 2200px) {
             .content-area {
-                padding-left: 12vw;
+                padding-left: 15vw !important;
             }
             .content-area > .section-content {
                 max-width: 700px;
@@ -1100,7 +1100,7 @@
                 </svg>
             </div>
 
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content visible">
                     <div class="flex items-center gap-3 mb-8">
                         <img src="img/tn_kwadrat.png" alt="Tomek Niedźwiecki"
@@ -1134,7 +1134,7 @@
 
         <!-- Section 2: Track Record Intro -->
         <section class="fullpage-section flex items-center" data-section="1" id="droga">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-6">Moja droga</p>
 
@@ -1166,7 +1166,7 @@
 
         <!-- Section 3: Sklep internetowy -->
         <section class="fullpage-section track-section flex items-center" data-section="2" id="sklep" style="--accent-glow: rgba(16, 185, 129, 0.25)">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <div class="track-icon bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-emerald-500/20">
                         <i class="ph ph-storefront text-emerald-400 text-5xl"></i>
@@ -1205,7 +1205,7 @@
 
         <!-- Section 4: TakeDrop -->
         <section class="fullpage-section track-section flex items-center" data-section="3" id="takedrop" style="--accent-glow: rgba(255, 180, 0, 0.25)">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <div class="track-icon bg-gradient-to-br from-[#ffb400]/20 to-[#ffb400]/5 border border-[#ffb400]/20">
                         <i class="ph ph-package text-[#ffb400] text-5xl"></i>
@@ -1244,7 +1244,7 @@
 
         <!-- Section 5: Inkubator -->
         <section class="fullpage-section track-section flex items-center" data-section="4" id="inkubator" style="--accent-glow: rgba(168, 85, 247, 0.25)">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <div class="track-icon bg-gradient-to-br from-purple-500/20 to-purple-500/5 border border-purple-500/20">
                         <i class="ph ph-graduation-cap text-purple-400 text-5xl"></i>
@@ -1287,7 +1287,7 @@
 
         <!-- Section 6: Motto -->
         <section class="fullpage-section flex items-center" data-section="5" id="motto">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <blockquote class="text-[28px] md:text-[36px] lg:text-[42px] font-medium text-white leading-[1.4] tracking-[-0.01em]">
                         <span class="text-zinc-500">"</span>Budując biznes, rozwiązujemy problemy, za które klienci chcą płacić – <span class="text-emerald-400">dużo, często</span> i bez wahania. Pamiętaj: Im mocniej problem boli, tym łatwiej sprzedać na niego rozwiązanie.<span class="text-zinc-500">"</span>
@@ -1299,7 +1299,7 @@
 
         <!-- Section 7: Współpraca -->
         <section class="fullpage-section flex items-center" data-section="6" id="oferta">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-5">Współpraca</p>
                     <h2 class="text-[36px] md:text-[44px] font-bold text-white tracking-[-0.02em] leading-[1.2] mb-6">
@@ -1366,7 +1366,7 @@
 
         <!-- Section 8: CTA + Footer -->
         <section class="fullpage-section track-section flex items-center" data-section="7" id="kontakt" style="--accent-glow: rgba(52, 211, 153, 0.22)">
-            <div class="content-area px-6">
+            <div class="content-area">
                 <div class="section-content">
                     <h2 class="text-[48px] md:text-[64px] font-bold text-white tracking-[-0.03em] mb-4">
                         Chcesz taki biznes?
