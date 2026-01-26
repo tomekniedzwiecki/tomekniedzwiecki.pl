@@ -7,11 +7,21 @@
     <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
     <meta name="description" content="Zgłoś się do współpracy z Tomaszem Niedźwieckim. Zbuduję dla Ciebie biznes online.">
 
-    <!-- Google tag (gtag.js) - GA4 + Google Ads -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC"></script>
+    <!-- Google Consent Mode v2 -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+    </script>
+
+    <!-- Google tag (gtag.js) - GA4 + Google Ads -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC"></script>
+    <script>
         gtag('js', new Date());
         gtag('config', 'G-W8CLDSHVFC');
         gtag('config', 'AW-17886093904');

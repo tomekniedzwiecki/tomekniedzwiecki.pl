@@ -24,11 +24,21 @@
     <meta name="twitter:description" content="Zbudowałem 3 firmy o łącznych przychodach ponad 70 mln zł. Inwestuję w ambitne osoby i buduję z nimi e-biznesy.">
     <meta name="twitter:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
 
-    <!-- Google tag (gtag.js) - GA4 + Google Ads -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC"></script>
+    <!-- Google Consent Mode v2 -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+    </script>
+
+    <!-- Google tag (gtag.js) - GA4 + Google Ads -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC"></script>
+    <script>
         gtag('js', new Date());
         gtag('config', 'G-W8CLDSHVFC');
         gtag('config', 'AW-17886093904');
@@ -1540,6 +1550,7 @@
                             <div class="flex items-center gap-6">
                                 <a href="/dokumenty/regulamin.html" class="hover:text-zinc-400 transition-colors">Regulamin</a>
                                 <a href="/dokumenty/polityka-prywatnosci.html" class="hover:text-zinc-400 transition-colors">Prywatność</a>
+                                <a href="/dokumenty/polityka-prywatnosci.html#cookies" class="hover:text-zinc-400 transition-colors">Cookies</a>
                             </div>
                         </div>
                     </div>
