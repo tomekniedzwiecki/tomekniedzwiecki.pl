@@ -169,56 +169,56 @@
             max-width: 420px;
         }
 
-        /* Desktop: LEFT side only - leave space for dots navigation */
+        /* Desktop: Content on left, Tetris on right */
+        /* Key: content must NEVER reach the dots (at 53%) */
         @media (min-width: 768px) {
             .content-area {
-                width: 52% !important;
-                max-width: 52% !important;
-                padding: 0 2rem 0 1.5rem;
+                /* Take full left side but content is constrained inside */
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                padding-left: max(1.5rem, 3vw);
                 justify-content: flex-start;
             }
             .content-area > .section-content {
-                max-width: 520px;
+                /* Content max = 50% of viewport minus left padding */
+                /* This ensures it never reaches dots at 53% */
+                max-width: min(580px, calc(50vw - 4rem));
             }
         }
-        @media (min-width: 1200px) {
+        @media (min-width: 1400px) {
             .content-area {
-                width: 54% !important;
-                max-width: 54% !important;
-                padding: 0 2.5rem 0 2rem;
+                padding-left: max(2rem, 4vw);
             }
             .content-area > .section-content {
-                max-width: 580px;
+                max-width: min(620px, calc(50vw - 5rem));
             }
         }
-        @media (min-width: 1600px) {
+        @media (min-width: 1800px) {
             .content-area {
-                width: 56% !important;
-                max-width: 56% !important;
-                padding: 0 3rem 0 3rem;
+                padding-left: max(3rem, 5vw);
             }
             .content-area > .section-content {
-                max-width: 640px;
+                max-width: min(680px, calc(52vw - 6rem));
             }
         }
 
-        /* Hero h1 responsive sizing - scale based on content width */
+        /* Hero h1 - scales with content width */
         @media (min-width: 768px) {
             .fullpage-section[data-section="0"] h1 {
-                /* Use calc to scale font relative to content area (58% of viewport) */
-                font-size: clamp(28px, calc(0.058 * 100vw * 0.085), 48px) !important;
+                font-size: clamp(28px, 4vw, 48px) !important;
             }
         }
         @media (min-width: 1600px) {
             .fullpage-section[data-section="0"] h1 {
-                font-size: clamp(32px, calc(0.06 * 100vw * 0.075), 52px) !important;
+                font-size: clamp(36px, 3vw, 56px) !important;
             }
         }
 
-        /* Dots navigation - positioned after content area */
+        /* Dots navigation - fixed at 53% from left */
         .dots-nav {
             position: fixed;
-            left: 54%;
+            left: 53%;
             top: 50%;
             transform: translateY(-50%);
             z-index: 40;
@@ -226,12 +226,12 @@
             flex-direction: column;
             gap: 18px;
         }
-        @media (min-width: 1200px) {
+        @media (min-width: 1400px) {
             .dots-nav {
-                left: 56%;
+                left: 54%;
             }
         }
-        @media (min-width: 1600px) {
+        @media (min-width: 1800px) {
             .dots-nav {
                 left: 58%;
             }
