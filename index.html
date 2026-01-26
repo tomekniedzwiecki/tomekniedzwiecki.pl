@@ -24,64 +24,13 @@
     <meta name="twitter:description" content="Zbudowałem 3 firmy o łącznych przychodach ponad 70 mln zł. Inwestuję w ambitne osoby i buduję z nimi e-biznesy.">
     <meta name="twitter:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
 
-    <!-- Google Consent Mode v2 -->
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('consent', 'default', {
-            'ad_storage': 'granted',
-            'ad_user_data': 'granted',
-            'ad_personalization': 'granted',
-            'analytics_storage': 'granted'
-        });
-    </script>
-
-    <!-- Google tag (gtag.js) - GA4 + Google Ads -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC"></script>
-    <script>
-        gtag('js', new Date());
-        gtag('config', 'G-W8CLDSHVFC');
-        gtag('config', 'AW-17886093904');
-    </script>
-
-    <!-- Meta Pixel Code (deferred to not block render) -->
-    <script>
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1571065357430677');
-            fbq('track', 'PageView');
-        }, 100);
-    });
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1571065357430677&ev=PageView&noscript=1"
-    /></noscript>
-
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-
     <!-- Tailwind CSS (built, minified) -->
     <link rel="stylesheet" href="/css/tailwind.min.css">
 
-    <!-- Deferred: Non-critical scripts -->
-    <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Fonts: Load async with swap -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <style>
+        /* System font stack - no external font loading for faster FCP */
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             background: #000;
             color: #ededed;
         }
@@ -1900,7 +1849,7 @@
                         break;
 
                     case 'percent': // Percentage with arrow
-                        ctx.font = `bold ${s * 1.2}px Inter, sans-serif`;
+                        ctx.font = `bold ${s * 1.2}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText('%', x - s * 0.15, y + s * 0.1);
@@ -2086,7 +2035,7 @@
                         break;
 
                     case 'percent': // Percentage with up arrow
-                        ctx.font = `bold ${s * 1.1}px Inter, sans-serif`;
+                        ctx.font = `bold ${s * 1.1}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText('%', x - s * 0.15, topY + s * 0.1);
@@ -2393,5 +2342,57 @@
             </svg>
         </a>
     </div>
+
+    <!-- Phosphor Icons (loaded after page content) -->
+    <script>
+    requestIdleCallback(function() {
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/@phosphor-icons/web';
+        document.body.appendChild(s);
+    }, {timeout: 2000});
+    </script>
+
+    <!-- Analytics (loaded after page is interactive) -->
+    <script>
+    window.addEventListener('load', function() {
+        // Google Consent Mode v2
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+
+        // Load Google Tag Manager
+        var gs = document.createElement('script');
+        gs.async = true;
+        gs.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
+        gs.onload = function() {
+            gtag('js', new Date());
+            gtag('config', 'G-W8CLDSHVFC');
+            gtag('config', 'AW-17886093904');
+        };
+        document.head.appendChild(gs);
+
+        // Load Facebook Pixel (delayed)
+        setTimeout(function() {
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '1571065357430677');
+            fbq('track', 'PageView');
+        }, 500);
+    });
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1571065357430677&ev=PageView&noscript=1"
+    /></noscript>
 </body>
 </html>
