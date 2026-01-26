@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator reklam - Tomek Niedźwiecki</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #111;
+            color: white;
+            padding: 40px;
+        }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #10b981; }
+        p.info { color: #666; margin-bottom: 40px; font-size: 14px; }
+        .ad-container { margin-bottom: 80px; }
+        .ad-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+        .ad-label { font-size: 14px; color: #555; }
+        .download-btn {
+            padding: 8px 16px;
+            background: #10b981;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .download-btn:hover { background: #059669; }
+        .download-btn:disabled { background: #333; color: #666; cursor: wait; }
+
+        /* ============== SQUARE 1080x1080 ============== */
+        .ad-square {
+            width: 1080px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #0f0f0f 0%, #000 100%);
+        }
+        /* Noise texture overlay */
+        .ad-square::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .ad-square .glow {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            right: -200px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        /* Rim light behind photo */
+        .ad-square .photo-glow {
+            position: absolute;
+            right: 80px;
+            bottom: 50px;
+            width: 500px;
+            height: 900px;
+            background: radial-gradient(ellipse at center, rgba(16,185,129,0.25) 0%, transparent 60%);
+            z-index: 0;
+            filter: blur(40px);
+        }
+        .ad-square .accent-line {
+            position: absolute;
+            left: 0;
+            top: 80px;
+            bottom: 80px;
+            width: 6px;
+            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 0 20px rgba(16,185,129,0.5);
+        }
+        .ad-square .content {
+            position: absolute;
+            left: 70px;
+            top: 140px;
+            width: 480px;
+            z-index: 2;
+        }
+        /* Topline as badge */
+        .ad-square .topline {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #10b981;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            padding: 10px 18px;
+            border: 2px solid rgba(16,185,129,0.4);
+            border-radius: 50px;
+            background: rgba(16,185,129,0.08);
+        }
+        .ad-square .headline {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            margin-bottom: 28px;
+        }
+        .ad-square .headline span { color: #10b981; }
+        .ad-square .desc {
+            font-size: 17px;
+            color: #9ca3af;
+            line-height: 1.55;
+            margin-bottom: 40px;
+        }
+        /* Stats with colored dot indicators */
+        .ad-square .stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .ad-square .stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .ad-square .stat::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .ad-square .stat:nth-child(1)::before { background: #10b981; }
+        .ad-square .stat:nth-child(2)::before { background: #06b6d4; }
+        .ad-square .stat:nth-child(3)::before { background: #a855f7; }
+        .ad-square .stat-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+        }
+        .ad-square .stat-label {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        /* CTA with gradient and shadow */
+        .ad-square .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #000;
+            font-weight: 700;
+            font-size: 18px;
+            padding: 18px 36px;
+            border-radius: 12px;
+            text-decoration: none;
+            box-shadow: 0 8px 32px rgba(16,185,129,0.35), 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .ad-square .photo {
+            position: absolute;
+            right: -60px;
+            bottom: 0;
+            height: 85%;
+            width: auto;
+            z-index: 1;
+        }
+        .ad-square .author {
+            position: absolute;
+            left: 60px;
+            bottom: 80px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ad-square .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: #000;
+        }
+        .ad-square .author-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+        }
+        .ad-square .author-title {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        /* ============== LINK AD 1200x628 ============== */
+        .ad-link {
+            width: 1200px;
+            height: 628px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #000 100%);
+        }
+        .ad-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .ad-link .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            right: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 60%);
+        }
+        .ad-link .photo-glow {
+            position: absolute;
+            right: 150px;
+            bottom: 0;
+            width: 400px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(16,185,129,0.2) 0%, transparent 60%);
+            z-index: 0;
+            filter: blur(30px);
+        }
+        .ad-link .content {
+            position: absolute;
+            left: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 550px;
+            z-index: 2;
+        }
+        .ad-link .topline {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #10b981;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            padding: 10px 18px;
+            border: 2px solid rgba(16,185,129,0.4);
+            border-radius: 50px;
+            background: rgba(16,185,129,0.08);
+        }
+        .ad-link .headline {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+        .ad-link .headline span { color: #10b981; }
+        .ad-link .desc {
+            font-size: 18px;
+            color: #9ca3af;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+        .ad-link .stats {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .ad-link .stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .ad-link .stat::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .ad-link .stat:nth-child(1)::before { background: #10b981; }
+        .ad-link .stat:nth-child(2)::before { background: #06b6d4; }
+        .ad-link .stat:nth-child(3)::before { background: #a855f7; }
+        .ad-link .stat-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+        }
+        .ad-link .stat-label {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        .ad-link .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #000;
+            font-weight: 700;
+            font-size: 18px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(16,185,129,0.3), 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .ad-link .accent-line {
+            position: absolute;
+            left: 0;
+            top: 60px;
+            bottom: 60px;
+            width: 5px;
+            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 0 20px rgba(16,185,129,0.5);
+        }
+        .ad-link .photo {
+            position: absolute;
+            right: 20px;
+            bottom: 0;
+            height: 100%;
+            width: auto;
+            z-index: 1;
+        }
+        .ad-link .author {
+            position: absolute;
+            right: 60px;
+            bottom: 30px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ad-link .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            color: #000;
+        }
+        .ad-link .author-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+        }
+        .ad-link .author-title {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 1px;
+        }
+
+        /* ============== STORIES 1080x1920 ============== */
+        .ad-stories {
+            width: 1080px;
+            height: 1920px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 50%, #0a0a0a 100%);
+        }
+        .ad-stories::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .ad-stories .glow {
+            position: absolute;
+            width: 1000px;
+            height: 1000px;
+            left: 50%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 50%);
+        }
+        .ad-stories .photo-glow {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 300px;
+            width: 600px;
+            height: 800px;
+            background: radial-gradient(ellipse at center, rgba(16,185,129,0.25) 0%, transparent 55%);
+            z-index: 0;
+            filter: blur(50px);
+        }
+        .ad-stories .content {
+            position: absolute;
+            left: 80px;
+            right: 80px;
+            top: 120px;
+            z-index: 2;
+        }
+        .ad-stories .topline {
+            display: block;
+            width: fit-content;
+            margin: 0 auto 40px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #10b981;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 16px 32px;
+            border: 2px solid rgba(16,185,129,0.4);
+            border-radius: 50px;
+            background: rgba(16,185,129,0.08);
+        }
+        .ad-stories .headline {
+            font-size: 86px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+        .ad-stories .headline span { color: #10b981; }
+        .ad-stories .desc {
+            font-size: 32px;
+            color: #9ca3af;
+            line-height: 1.45;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 60px;
+        }
+        .ad-stories .stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .ad-stories .stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 28px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .ad-stories .stat::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .ad-stories .stat:nth-child(1)::before { background: #10b981; }
+        .ad-stories .stat:nth-child(2)::before { background: #06b6d4; }
+        .ad-stories .stat:nth-child(3)::before { background: #a855f7; }
+        .ad-stories .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: white;
+        }
+        .ad-stories .stat-label {
+            font-size: 20px;
+            color: #9ca3af;
+        }
+        .ad-stories .photo {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            height: 55%;
+            width: auto;
+            z-index: 1;
+        }
+        .ad-stories .cta {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #000;
+            font-weight: 700;
+            font-size: 22px;
+            padding: 22px 56px;
+            border-radius: 14px;
+            text-decoration: none;
+            z-index: 2;
+            box-shadow: 0 10px 40px rgba(16,185,129,0.4), 0 4px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>Generator reklam FB</h1>
+    <p class="info">DevTools (F12) → Select element → Prawy klik na div.ad-* → "Capture node screenshot"</p>
+
+    <!-- ==================== SQUARE 1080x1080 ==================== -->
+    <div class="ad-container">
+        <div class="ad-header">
+            <div class="ad-label">Square — 1080 × 1080</div>
+            <button class="download-btn" onclick="downloadAd('ad-square-1', 'reklama-square-1080x1080.png')">Pobierz PNG</button>
+        </div>
+        <div class="ad-square" id="ad-square-1">
+            <div class="glow"></div>
+            <div class="photo-glow"></div>
+            <div class="accent-line"></div>
+            <div class="content">
+                <div class="topline">Inwestuję w ludzi</div>
+                <h2 class="headline">Zbuduję Ci<br>e-biznes.<br><span>Ty przejmiesz stery.</span></h2>
+                <p class="desc">Buduję e-biznes, inwestuję w Ciebie, wdrażam w prowadzenie i przekazuję stery — zostając Twoim wspólnikiem.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-value">70 mln</span>
+                        <span class="stat-label">przychodu</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">firmy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">15 lat</span>
+                        <span class="stat-label">doświadczenia</span>
+                    </div>
+                </div>
+                <a href="#" class="cta">Aplikuj teraz →</a>
+            </div>
+            <div class="author">
+                <div class="author-avatar">TN</div>
+                <div>
+                    <div class="author-name">Tomek Niedźwiecki</div>
+                    <div class="author-title">Przedsiębiorca, inwestor, twórca</div>
+                </div>
+            </div>
+            <img src="prostokat_transpa.png" alt="" class="photo">
+        </div>
+    </div>
+
+    <!-- ==================== LINK AD 1200x628 ==================== -->
+    <div class="ad-container">
+        <div class="ad-header">
+            <div class="ad-label">Link Ad — 1200 × 628</div>
+            <button class="download-btn" onclick="downloadAd('ad-link-1', 'reklama-link-1200x628.png')">Pobierz PNG</button>
+        </div>
+        <div class="ad-link" id="ad-link-1">
+            <div class="glow"></div>
+            <div class="photo-glow"></div>
+            <div class="accent-line"></div>
+            <div class="content">
+                <div class="topline">Inwestuję w ludzi</div>
+                <h2 class="headline">Zbuduję Ci<br>e-biznes.<br><span>Ty przejmiesz stery.</span></h2>
+                <p class="desc">Buduję e-biznes, inwestuję w Ciebie, wdrażam w prowadzenie i przekazuję stery — zostając Twoim wspólnikiem.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-value">70 mln</span>
+                        <span class="stat-label">przychodu</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">firmy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">15 lat</span>
+                        <span class="stat-label">doświadczenia</span>
+                    </div>
+                </div>
+                <a href="#" class="cta">Aplikuj →</a>
+            </div>
+            <div class="author">
+                <div class="author-avatar">TN</div>
+                <div>
+                    <div class="author-name">Tomek Niedźwiecki</div>
+                    <div class="author-title">Przedsiębiorca, inwestor, twórca</div>
+                </div>
+            </div>
+            <img src="prostokat_transpa.png" alt="" class="photo">
+        </div>
+    </div>
+
+    <!-- ==================== STORIES 1080x1920 ==================== -->
+    <div class="ad-container">
+        <div class="ad-header">
+            <div class="ad-label">Stories — 1080 × 1920</div>
+            <button class="download-btn" onclick="downloadAd('ad-stories-1', 'reklama-stories-1080x1920.png')">Pobierz PNG</button>
+        </div>
+        <div class="ad-stories" id="ad-stories-1">
+            <div class="glow"></div>
+            <div class="photo-glow"></div>
+            <div class="content">
+                <div class="topline">Inwestuję w ludzi</div>
+                <h2 class="headline">Zbuduję Ci<br>e-biznes.<br><span>Ty przejmiesz stery.</span></h2>
+                <p class="desc">Buduję e-biznes, inwestuję w Ciebie, wdrażam w prowadzenie i przekazuję stery — zostając Twoim wspólnikiem.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-value">70 mln</span>
+                        <span class="stat-label">przychodu</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">firmy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">15 lat</span>
+                        <span class="stat-label">doświadczenia</span>
+                    </div>
+                </div>
+            </div>
+            <img src="prostokat_transpa.png" alt="" class="photo">
+        </div>
+    </div>
+
+    <script>
+        async function downloadAd(elementId, filename) {
+            const element = document.getElementById(elementId);
+            const button = event.target;
+
+            button.disabled = true;
+            button.textContent = 'Generuję...';
+
+            try {
+                const canvas = await html2canvas(element, {
+                    scale: 1,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null
+                });
+
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                console.error('Błąd:', error);
+                alert('Błąd podczas generowania PNG');
+            }
+
+            button.disabled = false;
+            button.textContent = 'Pobierz PNG';
+        }
+    </script>
+</body>
+</html>
