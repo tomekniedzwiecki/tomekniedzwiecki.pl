@@ -244,7 +244,7 @@
         /* Character counter styles */
         .char-counter {
             font-size: 12px;
-            transition: color 0.2s ease;
+            transition: color 0.2s ease, opacity 0.3s ease;
         }
         .char-counter.counting {
             color: #a1a1aa;
@@ -1002,7 +1002,7 @@
 
                     <textarea id="experience-input" class="form-input form-textarea" placeholder="Np. Prowadzę sklep na Allegro od 2 lat, obroty ok. 50 tys. miesięcznie. Szukam możliwości skalowania..."></textarea>
                     <div class="flex justify-end items-center mt-2">
-                        <span id="experience-counter" class="char-counter">Jeszcze 20 znaków...</span>
+                        <span id="experience-counter" class="char-counter counting">0 / 20</span>
                     </div>
 
                     <button type="button" id="experience-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" disabled>
@@ -1450,7 +1450,6 @@
         function validateExperience() {
             const text = experienceInput.value.trim();
             const len = text.length;
-            const remaining = 20 - len;
 
             // Auto-expand
             autoExpand(experienceInput);
@@ -1458,17 +1457,13 @@
             // Update counter
             experienceCounter.classList.remove('counting', 'valid', 'warning');
 
-            if (len === 0) {
-                experienceCounter.textContent = 'Jeszcze 20 znaków...';
-                experienceCounter.classList.add('counting');
-                experienceSubmit.disabled = true;
-            } else if (remaining > 0) {
-                experienceCounter.textContent = `Jeszcze ${remaining} znaków...`;
-                experienceCounter.classList.add('warning');
+            if (len < 20) {
+                experienceCounter.textContent = `${len} / 20`;
+                experienceCounter.classList.add(len === 0 ? 'counting' : 'warning');
+                experienceCounter.style.opacity = '1';
                 experienceSubmit.disabled = true;
             } else {
-                experienceCounter.textContent = `${len} znaków`;
-                experienceCounter.classList.add('valid');
+                experienceCounter.style.opacity = '0';
                 experienceSubmit.disabled = false;
             }
         }
