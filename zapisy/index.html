@@ -1343,17 +1343,45 @@
             saveData('email', email);
 
             try {
-                const { data: leadResult, error: leadError } = await supabaseClient
+                // Check if lead with this email already exists
+                const { data: existingLead } = await supabaseClient
                     .from('leads')
-                    .insert([{ email: email }])
                     .select('id')
+                    .eq('email', email)
                     .single();
 
-                if (!leadError && leadResult) {
-                    leadId = leadResult.id;
+                if (existingLead) {
+                    // Use existing lead, reset created_at to now (fresh start)
+                    leadId = existingLead.id;
                     saveData('lead_id', leadId);
-                    const trackingData = getTrackingData();
-                    await supabaseClient.from('lead_tracking').insert([{ lead_id: leadId, ...trackingData }]);
+                    await supabaseClient
+                        .from('leads')
+                        .update({
+                            created_at: new Date().toISOString(),
+                            // Clear old survey data for fresh submission
+                            direction: null,
+                            weekly_hours: null,
+                            target_income: null,
+                            budget: null,
+                            experience: null,
+                            open_question: null
+                        })
+                        .eq('id', leadId);
+                    console.log('Using existing lead:', leadId);
+                } else {
+                    // Create new lead
+                    const { data: leadResult, error: leadError } = await supabaseClient
+                        .from('leads')
+                        .insert([{ email: email }])
+                        .select('id')
+                        .single();
+
+                    if (!leadError && leadResult) {
+                        leadId = leadResult.id;
+                        saveData('lead_id', leadId);
+                        const trackingData = getTrackingData();
+                        await supabaseClient.from('lead_tracking').insert([{ lead_id: leadId, ...trackingData }]);
+                    }
                 }
 
                 sendConfirmationEmail(email);
