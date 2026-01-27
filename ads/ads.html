@@ -64,10 +64,10 @@
         /* Rim light behind photo */
         .ad-square .photo-glow {
             position: absolute;
-            right: 80px;
+            right: 20px;
             bottom: 50px;
-            width: 500px;
-            height: 900px;
+            width: 550px;
+            height: 950px;
             background: radial-gradient(ellipse at center, rgba(16,185,129,0.25) 0%, transparent 60%);
             z-index: 0;
             filter: blur(40px);
@@ -84,37 +84,37 @@
         .ad-square .content {
             position: absolute;
             left: 70px;
-            top: 140px;
-            width: 480px;
+            top: 90px;
+            width: 520px;
             z-index: 2;
         }
         /* Topline as badge */
         .ad-square .topline {
             display: inline-block;
-            font-size: 11px;
+            font-size: 18px;
             font-weight: 700;
             color: #10b981;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            margin-bottom: 32px;
-            padding: 10px 18px;
+            margin-bottom: 36px;
+            padding: 16px 32px;
             border: 2px solid rgba(16,185,129,0.4);
             border-radius: 50px;
             background: rgba(16,185,129,0.08);
         }
         .ad-square .headline {
-            font-size: 52px;
+            font-size: 78px;
             font-weight: 900;
-            line-height: 1.08;
+            line-height: 1.05;
             letter-spacing: -0.03em;
-            margin-bottom: 28px;
+            margin-bottom: 32px;
         }
         .ad-square .headline span { color: #10b981; }
         .ad-square .desc {
-            font-size: 17px;
+            font-size: 24px;
             color: #9ca3af;
-            line-height: 1.55;
-            margin-bottom: 40px;
+            line-height: 1.45;
+            margin-bottom: 44px;
         }
         /* Stats with colored dot indicators */
         .ad-square .stats {
@@ -126,28 +126,28 @@
         .ad-square .stat {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
+            gap: 10px;
+            padding: 16px 26px;
             border-radius: 50px;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.1);
         }
         .ad-square .stat::before {
             content: '';
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
         }
         .ad-square .stat:nth-child(1)::before { background: #10b981; }
         .ad-square .stat:nth-child(2)::before { background: #06b6d4; }
         .ad-square .stat:nth-child(3)::before { background: #a855f7; }
         .ad-square .stat-value {
-            font-size: 15px;
+            font-size: 20px;
             font-weight: 700;
             color: white;
         }
         .ad-square .stat-label {
-            font-size: 13px;
+            font-size: 17px;
             color: #9ca3af;
         }
         /* CTA with gradient and shadow */
@@ -158,17 +158,17 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #000;
             font-weight: 700;
-            font-size: 18px;
-            padding: 18px 36px;
-            border-radius: 12px;
+            font-size: 22px;
+            padding: 22px 44px;
+            border-radius: 14px;
             text-decoration: none;
             box-shadow: 0 8px 32px rgba(16,185,129,0.35), 0 2px 8px rgba(0,0,0,0.3);
         }
         .ad-square .photo {
             position: absolute;
-            right: -60px;
+            right: -120px;
             bottom: 0;
-            height: 85%;
+            height: 95%;
             width: auto;
             z-index: 1;
         }
@@ -182,24 +182,24 @@
             gap: 12px;
         }
         .ad-square .author-avatar {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: linear-gradient(135deg, #10b981, #059669);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 18px;
+            font-size: 20px;
             color: #000;
         }
         .ad-square .author-name {
             font-weight: 700;
-            font-size: 16px;
+            font-size: 20px;
             color: white;
         }
         .ad-square .author-title {
-            font-size: 14px;
+            font-size: 16px;
             color: #6b7280;
             margin-top: 2px;
         }
@@ -250,30 +250,30 @@
         }
         .ad-link .topline {
             display: inline-block;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             color: #10b981;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            margin-bottom: 24px;
-            padding: 10px 18px;
+            margin-bottom: 20px;
+            padding: 12px 22px;
             border: 2px solid rgba(16,185,129,0.4);
             border-radius: 50px;
             background: rgba(16,185,129,0.08);
         }
         .ad-link .headline {
-            font-size: 48px;
+            font-size: 54px;
             font-weight: 900;
-            line-height: 1.08;
+            line-height: 1.05;
             letter-spacing: -0.02em;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .ad-link .headline span { color: #10b981; }
         .ad-link .desc {
-            font-size: 18px;
+            font-size: 20px;
             color: #9ca3af;
-            line-height: 1.5;
-            margin-bottom: 28px;
+            line-height: 1.45;
+            margin-bottom: 24px;
         }
         .ad-link .stats {
             display: flex;
@@ -285,27 +285,27 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 16px;
+            padding: 12px 18px;
             border-radius: 50px;
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.1);
         }
         .ad-link .stat::before {
             content: '';
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
         }
         .ad-link .stat:nth-child(1)::before { background: #10b981; }
         .ad-link .stat:nth-child(2)::before { background: #06b6d4; }
         .ad-link .stat:nth-child(3)::before { background: #a855f7; }
         .ad-link .stat-value {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: white;
         }
         .ad-link .stat-label {
-            font-size: 13px;
+            font-size: 14px;
             color: #9ca3af;
         }
         .ad-link .cta {
@@ -332,7 +332,7 @@
         }
         .ad-link .photo {
             position: absolute;
-            right: 20px;
+            right: -30px;
             bottom: 0;
             height: 100%;
             width: auto;
@@ -539,7 +539,6 @@
                         <span class="stat-label">doświadczenia</span>
                     </div>
                 </div>
-                <a href="#" class="cta">Aplikuj teraz →</a>
             </div>
             <div class="author">
                 <div class="author-avatar">TN</div>
@@ -579,14 +578,6 @@
                         <span class="stat-value">15 lat</span>
                         <span class="stat-label">doświadczenia</span>
                     </div>
-                </div>
-                <a href="#" class="cta">Aplikuj →</a>
-            </div>
-            <div class="author">
-                <div class="author-avatar">TN</div>
-                <div>
-                    <div class="author-name">Tomek Niedźwiecki</div>
-                    <div class="author-title">Przedsiębiorca, inwestor, twórca</div>
                 </div>
             </div>
             <img src="prostokat_transpa.png" alt="" class="photo">
