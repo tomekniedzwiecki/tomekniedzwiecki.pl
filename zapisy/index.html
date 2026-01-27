@@ -1390,7 +1390,10 @@
             }
 
             gtag('event', 'conversion', {'send_to': 'AW-17886093904/8_ykCOCF9OcbENDE4NBC'});
-            fbq('track', 'Lead');
+            fbq('track', 'Lead', {
+                content_name: 'Formularz zapisy',
+                content_category: 'lead_form'
+            });
             if (typeof ttq !== 'undefined') ttq.track('SubmitForm');
 
             goToStep(1);
