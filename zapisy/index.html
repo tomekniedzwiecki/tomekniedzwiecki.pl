@@ -1329,7 +1329,7 @@
         }
 
         // ==================== RESTORE STATE ====================
-        function restoreSelections() {
+        async function restoreSelections() {
             const data = loadSavedData();
 
             if (data.email) document.getElementById('email-input').value = data.email;
@@ -1350,6 +1350,22 @@
 
             // Resume from last step
             if (data.lead_id) {
+                // Verify lead still exists in database (may have been deleted)
+                const { data: existingLead } = await supabaseClient
+                    .from('leads')
+                    .select('id')
+                    .eq('id', data.lead_id)
+                    .single();
+
+                if (!existingLead) {
+                    // Lead was deleted - clear saved state and start fresh
+                    clearData();
+                    if (data.email) {
+                        document.getElementById('email-input').value = data.email;
+                    }
+                    return;
+                }
+
                 leadId = data.lead_id;
                 if (data.completed) {
                     goToStep(9);
