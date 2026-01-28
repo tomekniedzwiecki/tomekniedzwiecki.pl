@@ -2394,5 +2394,29 @@
     <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1"
     /></noscript>
+
+    <!-- Preserve UTM/tracking parameters when navigating to /zapisy -->
+    <script>
+    (function() {
+        var trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid', 'msclkid', 'ref'];
+        var currentParams = new URLSearchParams(window.location.search);
+        var paramsToPass = new URLSearchParams();
+
+        trackingParams.forEach(function(param) {
+            if (currentParams.has(param)) {
+                paramsToPass.set(param, currentParams.get(param));
+            }
+        });
+
+        if (paramsToPass.toString()) {
+            document.querySelectorAll('a[href="/zapisy"], a[href="/zapisy/"]').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/zapisy/?' + paramsToPass.toString();
+                });
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
