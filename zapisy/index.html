@@ -791,7 +791,7 @@
                 </div>
             </div>
 
-            <!-- STEP 1: Phone -->
+            <!-- STEP 1: Name -->
             <div id="step-1" class="step-container flex-col">
                 <button type="button" class="back-btn mb-6" onclick="goToStep(0)">
                     <i class="ph ph-arrow-left"></i>
@@ -800,6 +800,43 @@
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
+                        <div class="step-dot active"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                        <div class="step-dot"></div>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white mb-2">Jak masz na imię?</h2>
+                    <p class="text-zinc-400 mb-6">Chętnie poznam Cię bliżej.</p>
+
+                    <label class="block text-sm font-medium text-zinc-300 mb-2">Imię i nazwisko</label>
+                    <input type="text" id="name-input" class="form-input" placeholder="Jan Kowalski" autocomplete="name">
+
+                    <button type="button" id="name-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
+                        Dalej
+                        <i class="ph ph-arrow-right text-lg"></i>
+                    </button>
+
+                    <button type="button" id="name-skip" class="w-full h-12 text-zinc-500 hover:text-white text-sm transition-colors mt-3">
+                        Pomiń ten krok
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Phone -->
+            <div id="step-2" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(1)">
+                    <i class="ph ph-arrow-left"></i>
+                    Wstecz
+                </button>
+
+                <div class="form-card p-6 md:p-8">
+                    <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot active"></div>
                         <div class="step-dot"></div>
@@ -823,15 +860,16 @@
                 </div>
             </div>
 
-            <!-- STEP 2: Direction -->
-            <div id="step-2" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(1)">
+            <!-- STEP 3: Direction -->
+            <div id="step-3" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(2)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot active"></div>
@@ -879,15 +917,16 @@
                 </div>
             </div>
 
-            <!-- STEP 3: Weekly hours -->
-            <div id="step-3" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(2)">
+            <!-- STEP 4: Weekly hours -->
+            <div id="step-4" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(3)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
@@ -929,15 +968,16 @@
                 </div>
             </div>
 
-            <!-- STEP 4: Target income -->
-            <div id="step-4" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(3)">
+            <!-- STEP 5: Target income -->
+            <div id="step-5" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(4)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
@@ -979,15 +1019,16 @@
                 </div>
             </div>
 
-            <!-- STEP 5: Experience -->
-            <div id="step-5" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(4)">
+            <!-- STEP 6: Experience -->
+            <div id="step-6" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(5)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
@@ -1012,15 +1053,16 @@
                 </div>
             </div>
 
-            <!-- STEP 6: Open question -->
-            <div id="step-6" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(5)">
+            <!-- STEP 7: Open question -->
+            <div id="step-7" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(6)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
@@ -1042,15 +1084,16 @@
                 </div>
             </div>
 
-            <!-- STEP 7: Budget -->
-            <div id="step-7" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(6)">
+            <!-- STEP 8: Budget -->
+            <div id="step-8" class="step-container flex-col">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(7)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
 
                 <div class="form-card p-6 md:p-8">
                     <div class="step-dots mb-6">
+                        <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
                         <div class="step-dot completed"></div>
@@ -1092,8 +1135,8 @@
                 </div>
             </div>
 
-            <!-- STEP 8: Thank you -->
-            <div id="step-8" class="step-container flex-col items-center text-center">
+            <!-- STEP 9: Thank you -->
+            <div id="step-9" class="step-container flex-col items-center text-center">
                 <div class="mb-8">
                     <div class="relative inline-block success-icon">
                         <div class="absolute inset-0 w-24 h-24 bg-emerald-500 rounded-full blur-xl opacity-30"></div>
@@ -1142,7 +1185,7 @@
         let currentStep = 0;
         let leadId = null;
         const STORAGE_KEY = 'tn_zapisy_data';
-        const TOTAL_STEPS = 7;
+        const TOTAL_STEPS = 8;
 
         // ==================== HELPERS ====================
         function loadSavedData() {
@@ -1174,7 +1217,7 @@
             const progressBar = document.getElementById('progress-bar');
             const progressFill = document.getElementById('progress-fill');
 
-            if (currentStep === 0 || currentStep === 8) {
+            if (currentStep === 0 || currentStep === 9) {
                 progressBar.style.opacity = '0';
             } else {
                 progressBar.style.opacity = '1';
@@ -1283,6 +1326,7 @@
             const data = loadSavedData();
 
             if (data.email) document.getElementById('email-input').value = data.email;
+            if (data.name) document.getElementById('name-input').value = data.name;
             if (data.phone) {
                 document.getElementById('phone-input').value = data.phone;
                 validatePhoneInput();
@@ -1301,20 +1345,22 @@
             if (data.lead_id) {
                 leadId = data.lead_id;
                 if (data.completed) {
-                    goToStep(8);
+                    goToStep(9);
                 } else if (data.budget) {
-                    goToStep(8);
+                    goToStep(9);
                 } else if (data.open_question !== undefined) {
-                    goToStep(7);
+                    goToStep(8);
                 } else if (data.experience) {
-                    goToStep(6);
+                    goToStep(7);
                 } else if (data.target_income) {
-                    goToStep(5);
+                    goToStep(6);
                 } else if (data.weekly_hours) {
-                    goToStep(4);
+                    goToStep(5);
                 } else if (data.direction) {
-                    goToStep(3);
+                    goToStep(4);
                 } else if (data.phone) {
+                    goToStep(3);
+                } else if (data.name !== undefined) {
                     goToStep(2);
                 } else {
                     goToStep(1);
@@ -1359,6 +1405,7 @@
                         .update({
                             created_at: new Date().toISOString(),
                             // Clear old survey data for fresh submission
+                            name: null,
                             direction: null,
                             weekly_hours: null,
                             target_income: null,
@@ -1399,7 +1446,25 @@
             goToStep(1);
         });
 
-        // Step 1: Phone
+        // Step 1: Name
+        const nameInput = document.getElementById('name-input');
+        const nameSubmit = document.getElementById('name-submit');
+        const nameSkip = document.getElementById('name-skip');
+
+        nameSubmit.addEventListener('click', async function() {
+            const name = nameInput.value.trim();
+            if (name) {
+                saveData('name', name);
+                await updateLead({ name: name });
+            }
+            goToStep(2);
+        });
+
+        nameSkip.addEventListener('click', function() {
+            goToStep(2);
+        });
+
+        // Step 2: Phone
         const phoneInput = document.getElementById('phone-input');
         const phoneSubmit = document.getElementById('phone-submit');
         const phoneError = document.getElementById('phone-error');
@@ -1425,10 +1490,10 @@
             if (!validatePhone(phone)) return;
             saveData('phone', phone);
             await updateLead({ phone: phone });
-            goToStep(2);
+            goToStep(3);
         });
 
-        // Step 2: Direction
+        // Step 3: Direction
         document.querySelectorAll('#direction-options .option-card').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#direction-options .option-card').forEach(b => b.classList.remove('selected'));
@@ -1436,11 +1501,11 @@
                 const value = this.dataset.value;
                 saveData('direction', value);
                 updateLead({ direction: value });
-                setTimeout(() => goToStep(3), 250);
+                setTimeout(() => goToStep(4), 250);
             });
         });
 
-        // Step 3: Weekly hours
+        // Step 4: Weekly hours
         document.querySelectorAll('#hours-options .option-card').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#hours-options .option-card').forEach(b => b.classList.remove('selected'));
@@ -1448,11 +1513,11 @@
                 const value = this.dataset.value;
                 saveData('weekly_hours', value);
                 updateLead({ weekly_hours: value });
-                setTimeout(() => goToStep(4), 250);
+                setTimeout(() => goToStep(5), 250);
             });
         });
 
-        // Step 4: Income
+        // Step 5: Income
         document.querySelectorAll('#income-options .option-card').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('#income-options .option-card').forEach(b => b.classList.remove('selected'));
@@ -1460,11 +1525,11 @@
                 const value = this.dataset.value;
                 saveData('target_income', value);
                 updateLead({ target_income: value });
-                setTimeout(() => goToStep(5), 250);
+                setTimeout(() => goToStep(6), 250);
             });
         });
 
-        // Step 5: Experience
+        // Step 6: Experience
         const experienceInput = document.getElementById('experience-input');
         const experienceSubmit = document.getElementById('experience-submit');
         const experienceCounter = document.getElementById('experience-counter');
@@ -1506,10 +1571,10 @@
             if (value.length < 20) return;
             saveData('experience', value);
             updateLead({ experience: value });
-            goToStep(6);
+            goToStep(7);
         });
 
-        // Step 6: Open question
+        // Step 7: Open question
         const openInput = document.getElementById('open-input');
         openInput.addEventListener('input', function() {
             autoExpand(openInput);
@@ -1519,10 +1584,10 @@
             const value = openInput.value.trim();
             saveData('open_question', value || '');
             if (value) updateLead({ open_question: value });
-            goToStep(7);
+            goToStep(8);
         });
 
-        // Step 7: Budget
+        // Step 8: Budget
         document.querySelectorAll('#budget-options .option-card').forEach(btn => {
             btn.addEventListener('click', async function() {
                 document.querySelectorAll('#budget-options .option-card').forEach(b => b.classList.remove('selected'));
@@ -1535,6 +1600,7 @@
                 const savedData = loadSavedData();
                 sendSlackNotification('new_lead', {
                     email: savedData.email,
+                    name: savedData.name,
                     phone: savedData.phone,
                     traffic_source: getTrafficSource(),
                     direction: savedData.direction,
@@ -1550,7 +1616,7 @@
                 if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
 
                 clearData();
-                setTimeout(() => goToStep(8), 250);
+                setTimeout(() => goToStep(9), 250);
             });
         });
 
