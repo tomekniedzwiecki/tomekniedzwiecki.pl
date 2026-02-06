@@ -662,21 +662,21 @@
                 display: none !important;
             }
 
-            /* Step 8 - Thank you */
-            #step-8 h1 {
+            /* Step 9 - Thank you */
+            #step-9 h1 {
                 font-size: 26px !important;
             }
 
-            #step-8 .text-lg {
+            #step-9 .text-lg {
                 font-size: 15px !important;
             }
 
-            #step-8 .success-icon > div:last-child {
+            #step-9 .success-icon > div:last-child {
                 width: 80px !important;
                 height: 80px !important;
             }
 
-            #step-8 .success-icon svg {
+            #step-9 .success-icon svg {
                 width: 40px !important;
                 height: 40px !important;
             }
@@ -1029,57 +1029,6 @@
                 </div>
             </div>
 
-            <!-- STEP 8: Budget -->
-            <div id="step-8" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(7)">
-                    <i class="ph ph-arrow-left"></i>
-                    Wstecz
-                </button>
-
-                <div class="form-card p-6 md:p-8">
-                    <div class="step-dots mb-6">
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                    </div>
-
-                    <h2 class="text-2xl font-bold text-white mb-2">Ostatnie pytanie</h2>
-                    <p class="text-zinc-400 mb-6">Jaki budżet możesz zainwestować na start?</p>
-
-                    <div class="space-y-3" id="budget-options">
-                        <button type="button" data-value="5-10k" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-wallet"></i>
-                            </div>
-                            <div class="font-semibold text-white">5-10 tys. zł</div>
-                        </button>
-                        <button type="button" data-value="10-20k" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-wallet"></i>
-                            </div>
-                            <div class="font-semibold text-white">10-20 tys. zł</div>
-                        </button>
-                        <button type="button" data-value="20-40k" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-wallet"></i>
-                            </div>
-                            <div class="font-semibold text-white">20-40 tys. zł</div>
-                        </button>
-                        <button type="button" data-value="40k+" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-treasure-chest"></i>
-                            </div>
-                            <div class="font-semibold text-white">40+ tys. zł</div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- STEP 9: Thank you -->
             <div id="step-9" class="step-container flex-col items-center text-center">
                 <div class="mb-8">
@@ -1283,7 +1232,6 @@
                 validateExperience();
             }
             if (data.open_question) document.getElementById('open-input').value = data.open_question;
-            if (data.budget) selectOption('budget-options', data.budget);
 
             // Resume from last step
             if (data.lead_id) {
@@ -1306,10 +1254,8 @@
                 leadId = data.lead_id;
                 if (data.completed) {
                     goToStep(9);
-                } else if (data.budget) {
-                    goToStep(9);
                 } else if (data.open_question !== undefined) {
-                    goToStep(8);
+                    goToStep(7);
                 } else if (data.experience) {
                     goToStep(7);
                 } else if (data.target_income) {
@@ -1366,7 +1312,6 @@
                             name: null,
                             weekly_hours: null,
                             target_income: null,
-                            budget: null,
                             experience: null,
                             open_question: null
                         })
@@ -1525,43 +1470,30 @@
             autoExpand(openInput);
         });
 
-        document.getElementById('open-submit').addEventListener('click', function() {
+        document.getElementById('open-submit').addEventListener('click', async function() {
             const value = openInput.value.trim();
             saveData('open_question', value || '');
-            if (value) updateLead({ open_question: value });
-            goToStep(8);
-        });
+            saveData('completed', true);
+            if (value) await updateLead({ open_question: value });
 
-        // Step 8: Budget
-        document.querySelectorAll('#budget-options .option-card').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                document.querySelectorAll('#budget-options .option-card').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                const value = this.dataset.value;
-                saveData('budget', value);
-                saveData('completed', true);
-                await updateLead({ budget: value });
-
-                const savedData = loadSavedData();
-                sendSlackNotification('new_lead', {
-                    email: savedData.email,
-                    name: savedData.name,
-                    phone: savedData.phone,
-                    traffic_source: getTrafficSource(),
-                    weekly_hours: savedData.weekly_hours,
-                    target_income: savedData.target_income,
-                    experience: savedData.experience,
-                    open_question: savedData.open_question,
-                    budget: value
-                });
-
-                gtag('event', 'form_complete', {'event_category': 'engagement'});
-                fbq('track', 'CompleteRegistration');
-                if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
-
-                clearData();
-                setTimeout(() => goToStep(9), 250);
+            const savedData = loadSavedData();
+            sendSlackNotification('new_lead', {
+                email: savedData.email,
+                name: savedData.name,
+                phone: savedData.phone,
+                traffic_source: getTrafficSource(),
+                weekly_hours: savedData.weekly_hours,
+                target_income: savedData.target_income,
+                experience: savedData.experience,
+                open_question: value || ''
             });
+
+            gtag('event', 'form_complete', {'event_category': 'engagement'});
+            fbq('track', 'CompleteRegistration');
+            if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
+
+            clearData();
+            setTimeout(() => goToStep(9), 250);
         });
 
         // ==================== INIT ====================
