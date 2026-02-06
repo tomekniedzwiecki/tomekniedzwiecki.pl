@@ -1485,7 +1485,8 @@
                 weekly_hours: savedData.weekly_hours,
                 target_income: savedData.target_income,
                 experience: savedData.experience,
-                open_question: value || ''
+                open_question: savedData.open_question,
+                budget: null
             });
 
             gtag('event', 'form_complete', {'event_category': 'engagement'});
