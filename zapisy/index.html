@@ -662,11 +662,6 @@
                 display: none !important;
             }
 
-            /* Hide direction descriptions */
-            #direction-options .text-sm.text-zinc-500 {
-                display: none !important;
-            }
-
             /* Step 8 - Thank you */
             #step-8 h1 {
                 font-size: 26px !important;
@@ -867,66 +862,9 @@
                 </div>
             </div>
 
-            <!-- STEP 3: Direction -->
-            <div id="step-3" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(2)">
-                    <i class="ph ph-arrow-left"></i>
-                    Wstecz
-                </button>
-
-                <div class="form-card p-6 md:p-8">
-                    <div class="step-dots mb-6">
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot completed"></div>
-                        <div class="step-dot active"></div>
-                        <div class="step-dot"></div>
-                        <div class="step-dot"></div>
-                        <div class="step-dot"></div>
-                        <div class="step-dot"></div>
-                    </div>
-
-                    <h2 class="text-2xl font-bold text-white mb-2">Jaki e-biznes Cię interesuje?</h2>
-                    <p class="text-zinc-400 mb-6">Wybierz kierunek, który najbardziej do Ciebie pasuje.</p>
-
-                    <div class="space-y-3" id="direction-options">
-                        <button type="button" data-value="sklep" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-storefront"></i>
-                            </div>
-                            <div class="font-semibold text-white">Nowoczesny sklep internetowy</div>
-                        </button>
-                        <button type="button" data-value="produkt_cyfrowy" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-package"></i>
-                            </div>
-                            <div class="font-semibold text-white">Produkt cyfrowy</div>
-                        </button>
-                        <button type="button" data-value="kurs" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-graduation-cap"></i>
-                            </div>
-                            <div class="font-semibold text-white">Kurs online</div>
-                        </button>
-                        <button type="button" data-value="aplikacja" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-code"></i>
-                            </div>
-                            <div class="font-semibold text-white">Aplikacja</div>
-                        </button>
-                        <button type="button" data-value="nie_wiem" class="option-card w-full text-left">
-                            <div class="option-icon">
-                                <i class="ph ph-question"></i>
-                            </div>
-                            <div class="font-semibold text-white">Nie jestem pewien, podpowiedz mi</div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
             <!-- STEP 4: Weekly hours -->
             <div id="step-4" class="step-container flex-col">
-                <button type="button" class="back-btn mb-6" onclick="goToStep(3)">
+                <button type="button" class="back-btn mb-6" onclick="goToStep(2)">
                     <i class="ph ph-arrow-left"></i>
                     Wstecz
                 </button>
@@ -1338,7 +1276,6 @@
                 document.getElementById('phone-input').value = data.phone;
                 validatePhoneInput();
             }
-            if (data.direction) selectOption('direction-options', data.direction);
             if (data.weekly_hours) selectOption('hours-options', data.weekly_hours);
             if (data.target_income) selectOption('income-options', data.target_income);
             if (data.experience) {
@@ -1379,10 +1316,8 @@
                     goToStep(6);
                 } else if (data.weekly_hours) {
                     goToStep(5);
-                } else if (data.direction) {
-                    goToStep(4);
                 } else if (data.phone) {
-                    goToStep(3);
+                    goToStep(4);
                 } else if (data.name !== undefined) {
                     goToStep(2);
                 } else {
@@ -1429,7 +1364,6 @@
                             created_at: new Date().toISOString(),
                             // Clear old survey data for fresh submission
                             name: null,
-                            direction: null,
                             weekly_hours: null,
                             target_income: null,
                             budget: null,
@@ -1513,19 +1447,7 @@
             if (!validatePhone(phone)) return;
             saveData('phone', phone);
             await updateLead({ phone: phone });
-            goToStep(3);
-        });
-
-        // Step 3: Direction
-        document.querySelectorAll('#direction-options .option-card').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('#direction-options .option-card').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                const value = this.dataset.value;
-                saveData('direction', value);
-                updateLead({ direction: value });
-                setTimeout(() => goToStep(4), 250);
-            });
+            goToStep(4);
         });
 
         // Step 4: Weekly hours
@@ -1626,7 +1548,6 @@
                     name: savedData.name,
                     phone: savedData.phone,
                     traffic_source: getTrafficSource(),
-                    direction: savedData.direction,
                     weekly_hours: savedData.weekly_hours,
                     target_income: savedData.target_income,
                     experience: savedData.experience,
