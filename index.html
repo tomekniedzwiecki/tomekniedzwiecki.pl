@@ -118,7 +118,7 @@
             }
         }
 
-        /* OLD Builder panel - commented out
+        /* Builder panel - DESKTOP ONLY */
         #builder-panel {
             display: none;
         }
@@ -135,31 +135,30 @@
                 user-select: none;
                 -webkit-user-select: none;
             }
-        }
-        */
-        /* Premium Globe Container */
-        #globe-container {
-            display: none;
-        }
-        @media (min-width: 1024px) {
-            #globe-container {
-                display: block;
-                position: fixed;
-                top: 0;
-                right: 0;
-                width: 42%;
-                height: 100vh;
-                height: 100dvh;
-                z-index: 15;
-                pointer-events: none;
-            }
-            #globe-container canvas {
+            #builder-canvas {
                 width: 100%;
                 height: 100%;
+                cursor: pointer;
+                touch-action: none;
+            }
+            .builder-overlay {
+                position: absolute;
+                inset: 0;
+                background:
+                    linear-gradient(to right,
+                        rgba(0,0,0,1) 0%,
+                        rgba(0,0,0,0.85) 10%,
+                        rgba(0,0,0,0.4) 25%,
+                        rgba(0,0,0,0.1) 45%,
+                        transparent 60%),
+                    radial-gradient(ellipse at 70% 50%,
+                        transparent 40%,
+                        rgba(0,0,0,0.3) 100%);
+                pointer-events: none;
             }
         }
         @media (min-width: 1600px) {
-            #globe-container {
+            #builder-panel {
                 width: 40%;
             }
         }
@@ -1192,8 +1191,24 @@
         <button data-section="7" data-label="Kontakt"></button>
     </nav>
 
-    <!-- Premium Globe Panel -->
-    <div id="globe-container"></div>
+    <!-- Builder Panel (Fixed on desktop) -->
+    <div id="builder-panel">
+        <canvas id="builder-canvas"></canvas>
+        <div class="builder-overlay"></div>
+
+        <!-- Builder controls - right sidebar -->
+        <div id="builder-controls">
+            <div class="color-selector" id="color-selector"></div>
+            <div class="controls-divider"></div>
+            <div class="shape-selector" id="shape-selector"></div>
+            <div class="controls-divider"></div>
+            <button class="clear-btn" id="clear-btn" title="Wyczyść">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
     <!-- Fullpage Container -->
     <div class="fullpage-container" id="fullpage">
@@ -2429,18 +2444,5 @@
         }
     })();
     </script>
-
-    <!-- Three.js for Premium Globe -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
-        }
-    }
-    </script>
-
-    <!-- Premium Globe Visualization -->
-    <script type="module" src="/js/globe.js"></script>
-
 </body>
 </html>
