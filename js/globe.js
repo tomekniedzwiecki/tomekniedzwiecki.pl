@@ -4,16 +4,19 @@ import * as THREE from 'three';
 const CONFIG = {
     globe: {
         radius: 1.2,
-        segments: 64,
-        wireframe: true,
+        segments: 128, // High detail for smooth surface
+        wireframe: false,
         color: 0x10b981, // emerald-500
         emissive: 0x10b981,
-        emissiveIntensity: 0.2
+        emissiveIntensity: 0.15,
+        // Earth texture from CDN
+        textureUrl: 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+        bumpUrl: 'https://unpkg.com/three-globe/example/img/earth-topology.png'
     },
     particles: {
-        count: 1000,
-        size: 0.02,
-        spread: 3
+        count: 1500,
+        size: 0.015,
+        spread: 2.5
     },
     camera: {
         fov: 45,
@@ -22,7 +25,7 @@ const CONFIG = {
         position: { x: 0, y: 0, z: 4 }
     },
     animations: {
-        rotationSpeed: 0.001,
+        rotationSpeed: 0.0008,
         transitionDuration: 1.5
     }
 };
@@ -83,40 +86,79 @@ class GlobeScene {
     }
 
     createGlobe() {
-        // Low-poly sphere geometry
-        const geometry = new THREE.IcosahedronGeometry(
+        // High-detail sphere geometry for smooth Earth
+        const geometry = new THREE.SphereGeometry(
             CONFIG.globe.radius,
-            3 // Low detail for low-poly look
+            CONFIG.globe.segments,
+            CONFIG.globe.segments
         );
 
-        // Wireframe material
+        // Texture loader
+        const textureLoader = new THREE.TextureLoader();
+
+        // Load Earth texture and bump map
+        const earthTexture = textureLoader.load(CONFIG.globe.textureUrl);
+        const bumpTexture = textureLoader.load(CONFIG.globe.bumpUrl);
+
+        // Realistic Earth material
         const material = new THREE.MeshStandardMaterial({
-            color: CONFIG.globe.color,
+            map: earthTexture,
+            bumpMap: bumpTexture,
+            bumpScale: 0.015,
             emissive: CONFIG.globe.emissive,
             emissiveIntensity: CONFIG.globe.emissiveIntensity,
-            wireframe: CONFIG.globe.wireframe,
-            metalness: 0.3,
-            roughness: 0.7,
-            transparent: true,
-            opacity: 0.8
+            metalness: 0.1,
+            roughness: 0.9
         });
 
         this.globe = new THREE.Mesh(geometry, material);
         this.scene.add(this.globe);
 
-        // Add subtle glow
-        const glowGeometry = new THREE.IcosahedronGeometry(
-            CONFIG.globe.radius * 1.05,
-            3
+        // Add atmosphere glow
+        const atmosphereGeometry = new THREE.SphereGeometry(
+            CONFIG.globe.radius * 1.08,
+            64,
+            64
         );
-        const glowMaterial = new THREE.MeshBasicMaterial({
-            color: CONFIG.globe.color,
-            transparent: true,
-            opacity: 0.1,
-            side: THREE.BackSide
+        const atmosphereMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                color: { value: new THREE.Color(0x10b981) }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 color;
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    gl_FragColor = vec4(color, 1.0) * intensity;
+                }
+            `,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
         });
-        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-        this.globe.add(glow);
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        this.scene.add(atmosphere);
+
+        // Add thin wireframe overlay for tech feel (optional)
+        const wireframeGeometry = new THREE.IcosahedronGeometry(
+            CONFIG.globe.radius * 1.002,
+            2
+        );
+        const wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x10b981,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.15
+        });
+        const wireframeOverlay = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+        this.globe.add(wireframeOverlay);
     }
 
     createParticles() {
@@ -165,18 +207,28 @@ class GlobeScene {
     }
 
     addLights() {
-        // Ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+        // Ambient light for overall illumination
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         this.scene.add(ambientLight);
 
-        // Point lights for dramatic effect
-        const light1 = new THREE.PointLight(0x10b981, 1, 10);
-        light1.position.set(2, 2, 2);
-        this.scene.add(light1);
+        // Main directional light (like the sun)
+        const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        sunLight.position.set(5, 3, 5);
+        this.scene.add(sunLight);
 
-        const light2 = new THREE.PointLight(0xa855f7, 0.5, 10);
-        light2.position.set(-2, -1, -2);
-        this.scene.add(light2);
+        // Point lights for accent and atmosphere
+        const accentLight1 = new THREE.PointLight(0x10b981, 0.6, 12);
+        accentLight1.position.set(3, 2, 3);
+        this.scene.add(accentLight1);
+
+        const accentLight2 = new THREE.PointLight(0x3b82f6, 0.4, 12);
+        accentLight2.position.set(-3, -1, -2);
+        this.scene.add(accentLight2);
+
+        // Back light for rim lighting effect
+        const rimLight = new THREE.PointLight(0xa855f7, 0.3, 15);
+        rimLight.position.set(0, 0, -5);
+        this.scene.add(rimLight);
     }
 
     addMarker(lat, lon, color = 0x10b981) {
