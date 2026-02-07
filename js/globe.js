@@ -1,540 +1,233 @@
-import * as THREE from 'three';
+import createGlobe from 'https://cdn.jsdelivr.net/npm/cobe@0.6.3/dist/index.esm.js';
 
 // ==================== GLOBE CONFIGURATION ====================
 const CONFIG = {
-    globe: {
-        radius: 1.2,
-        segments: 128,
-        dotsCount: 15000, // Dots pattern instead of texture
-        color: 0x1a1a2e, // Very dark blue-gray
-        glowColor: 0x6366f1, // Subtle purple glow
-        emissiveIntensity: 0.08,
-        opacity: 0.4 // Very subtle
-    },
-    particles: {
-        count: 800, // Fewer, more subtle
-        size: 0.01,
-        spread: 2.0,
-        opacity: 0.3
-    },
-    camera: {
-        fov: 45,
-        near: 0.1,
-        far: 1000,
-        position: { x: 0, y: 0, z: 4 }
-    },
-    animations: {
-        rotationSpeed: 0.0005,
-        transitionDuration: 1.5
-    }
+    // Visual settings
+    devicePixelRatio: 2,
+    width: 1000,
+    height: 1000,
+    phi: 0, // Rotation
+    theta: 0.3, // Vertical tilt
+
+    // Colors (RGB 0-1 format)
+    dark: [0.1, 0.1, 0.15], // Dark blue base
+    glowColor: [0.2, 0.2, 0.4], // Blue glow
+    markerColor: [0.6, 0.2, 1], // Purple markers
+
+    // Performance
+    mapSamples: 16000, // High resolution
+    mapBrightness: 6.0, // Glow intensity
+
+    // Animation
+    rotationSpeed: 0.003,
+    transitionDuration: 1500, // milliseconds
+
+    // Markers (cities)
+    markers: [
+        { location: [52.2297, 21.0122], size: 0.08 }, // Warsaw (larger)
+        { location: [50.0647, 19.9450], size: 0.05 }, // Krakow
+        { location: [51.7592, 19.4560], size: 0.05 }, // Lodz
+        { location: [51.1079, 17.0385], size: 0.05 }, // Wroclaw
+        { location: [54.3520, 18.6466], size: 0.05 }, // Gdansk
+    ]
 };
 
-// ==================== SCENE SETUP ====================
+// ==================== GLOBE SCENE ====================
 class GlobeScene {
     constructor(container) {
         this.container = container;
-        this.scene = null;
-        this.camera = null;
-        this.renderer = null;
+        this.canvas = null;
         this.globe = null;
-        this.particles = null;
-        this.markers = [];
         this.currentSection = 0;
+        this.targetPhi = 0;
+        this.targetTheta = 0.3;
+        this.activeMarkers = [...CONFIG.markers];
 
         this.init();
-        this.setupEventListeners();
-        this.animate();
     }
 
     init() {
-        // Scene
-        this.scene = new THREE.Scene();
-        this.scene.fog = new THREE.Fog(0x000000, 5, 15);
+        // Create canvas
+        this.canvas = document.createElement('canvas');
+        this.canvas.style.width = '100%';
+        this.canvas.style.height = '100%';
+        this.container.appendChild(this.canvas);
 
-        // Camera
-        this.camera = new THREE.PerspectiveCamera(
-            CONFIG.camera.fov,
-            this.container.offsetWidth / this.container.offsetHeight,
-            CONFIG.camera.near,
-            CONFIG.camera.far
-        );
-        this.camera.position.set(
-            CONFIG.camera.position.x,
-            CONFIG.camera.position.y,
-            CONFIG.camera.position.z
-        );
+        // Initialize COBE globe
+        this.globe = createGlobe(this.canvas, {
+            devicePixelRatio: CONFIG.devicePixelRatio,
+            width: CONFIG.width,
+            height: CONFIG.height,
+            phi: CONFIG.phi,
+            theta: CONFIG.theta,
+            dark: 1,
+            diffuse: 1.2,
+            mapSamples: CONFIG.mapSamples,
+            mapBrightness: CONFIG.mapBrightness,
+            baseColor: CONFIG.dark,
+            markerColor: CONFIG.markerColor,
+            glowColor: CONFIG.glowColor,
+            markers: this.activeMarkers,
+            onRender: (state) => {
+                // Smooth rotation
+                state.phi = this.targetPhi;
+                this.targetPhi += CONFIG.rotationSpeed;
 
-        // Renderer
-        this.renderer = new THREE.WebGLRenderer({
-            antialias: true,
-            alpha: true
+                // Smooth camera transitions
+                state.theta = state.theta * 0.95 + this.targetTheta * 0.05;
+
+                // Update markers
+                state.markers = this.activeMarkers;
+            }
         });
-        this.renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        this.renderer.setClearColor(0x000000, 0);
-        this.container.appendChild(this.renderer.domElement);
 
-        // Create starfield background
-        this.createStarfield();
+        // Setup scroll detection
+        this.setupScrollDetection();
 
-        // Create globe
-        this.createGlobe();
-
-        // Create particles
-        this.createParticles();
-
-        // Add lights
-        this.addLights();
+        // Resize handler
+        this.setupResizeHandler();
     }
 
-    createStarfield() {
-        // Create thousands of stars in the background
-        const starGeometry = new THREE.BufferGeometry();
-        const starPositions = [];
-        const starSizes = [];
-        const starColors = [];
-
-        const starCount = 3000;
-        const radius = 20; // Far from globe
-
-        for (let i = 0; i < starCount; i++) {
-            // Random position in sphere
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-            const r = radius + Math.random() * 10;
-
-            const x = r * Math.sin(phi) * Math.cos(theta);
-            const y = r * Math.sin(phi) * Math.sin(theta);
-            const z = r * Math.cos(phi);
-
-            starPositions.push(x, y, z);
-
-            // Random size for star twinkle effect
-            starSizes.push(Math.random() * 2 + 0.5);
-
-            // White to slightly blue-ish stars
-            const intensity = 0.7 + Math.random() * 0.3;
-            starColors.push(intensity, intensity, intensity * 1.1);
-        }
-
-        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
-        starGeometry.setAttribute('size', new THREE.Float32BufferAttribute(starSizes, 1));
-        starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-
-        const starMaterial = new THREE.PointsMaterial({
-            size: 0.05,
-            sizeAttenuation: true,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
-
-        this.starfield = new THREE.Points(starGeometry, starMaterial);
-        this.scene.add(this.starfield);
-    }
-
-    createGlobe() {
-        // Create dots pattern for subtle globe
-        const dotsGeometry = new THREE.BufferGeometry();
-        const positions = [];
-        const sizes = [];
-
-        // Generate dots on sphere surface
-        for (let i = 0; i < CONFIG.globe.dotsCount; i++) {
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-
-            const x = CONFIG.globe.radius * Math.sin(phi) * Math.cos(theta);
-            const y = CONFIG.globe.radius * Math.sin(phi) * Math.sin(theta);
-            const z = CONFIG.globe.radius * Math.cos(phi);
-
-            positions.push(x, y, z);
-            sizes.push(Math.random() * 1.5 + 0.5);
-        }
-
-        dotsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        dotsGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
-
-        const dotsMaterial = new THREE.PointsMaterial({
-            color: CONFIG.globe.color,
-            size: 0.008,
-            sizeAttenuation: true,
-            transparent: true,
-            opacity: CONFIG.globe.opacity,
-            blending: THREE.AdditiveBlending
-        });
-
-        this.globe = new THREE.Points(dotsGeometry, dotsMaterial);
-        this.scene.add(this.globe);
-
-        // Subtle atmosphere glow (purple)
-        const atmosphereGeometry = new THREE.SphereGeometry(
-            CONFIG.globe.radius * 1.15,
-            64,
-            64
-        );
-        const atmosphereMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                color: { value: new THREE.Color(CONFIG.globe.glowColor) }
-            },
-            vertexShader: `
-                varying vec3 vNormal;
-                void main() {
-                    vNormal = normalize(normalMatrix * normal);
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                uniform vec3 color;
-                varying vec3 vNormal;
-                void main() {
-                    float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
-                    gl_FragColor = vec4(color, 1.0) * intensity * 0.3;
-                }
-            `,
-            side: THREE.BackSide,
-            blending: THREE.AdditiveBlending,
-            transparent: true
-        });
-        this.atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-        this.scene.add(this.atmosphere);
-    }
-
-    createParticles() {
-        const geometry = new THREE.BufferGeometry();
-        const positions = [];
-        const colors = [];
-
-        // Color palette matching subtle purple theme
-        const colorPalette = [
-            new THREE.Color(0x6366f1), // purple
-            new THREE.Color(0x8b5cf6), // light purple
-            new THREE.Color(0x7c3aed), // violet
-            new THREE.Color(0x4338ca)  // indigo
+    setupScrollDetection() {
+        const sections = [
+            { id: 'hero', index: 0 },
+            { id: 'droga', index: 1 },
+            { id: 'sklep', index: 2 },
+            { id: 'takedrop', index: 3 },
+            { id: 'inkubator', index: 4 },
+            { id: 'motto', index: 5 },
+            { id: 'wspolpraca', index: 6 },
+            { id: 'cta', index: 7 }
         ];
 
-        for (let i = 0; i < CONFIG.particles.count; i++) {
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-            const radius = CONFIG.globe.radius + Math.random() * CONFIG.particles.spread;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const section = sections.find(s => entry.target.id === s.id);
+                        if (section) {
+                            this.animateToSection(section.index);
+                        }
+                    }
+                });
+            },
+            { threshold: 0.3 }
+        );
 
-            const x = radius * Math.sin(phi) * Math.cos(theta);
-            const y = radius * Math.sin(phi) * Math.sin(theta);
-            const z = radius * Math.cos(phi);
-
-            positions.push(x, y, z);
-
-            // Random color from palette
-            const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-            colors.push(color.r, color.g, color.b);
-        }
-
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-        const material = new THREE.PointsMaterial({
-            size: CONFIG.particles.size,
-            vertexColors: true,
-            transparent: true,
-            opacity: CONFIG.particles.opacity,
-            sizeAttenuation: true,
-            blending: THREE.AdditiveBlending
+        sections.forEach(({ id }) => {
+            const element = document.getElementById(id);
+            if (element) observer.observe(element);
         });
-
-        this.particles = new THREE.Points(geometry, material);
-        this.scene.add(this.particles);
     }
 
-    addLights() {
-        // Very subtle ambient light
-        const ambientLight = new THREE.AmbientLight(0x1a1a2e, 0.2);
-        this.scene.add(ambientLight);
-
-        // Subtle purple accent lights
-        const accentLight1 = new THREE.PointLight(0x6366f1, 0.3, 10);
-        accentLight1.position.set(3, 2, 3);
-        this.scene.add(accentLight1);
-
-        const accentLight2 = new THREE.PointLight(0x8b5cf6, 0.2, 10);
-        accentLight2.position.set(-3, -1, -2);
-        this.scene.add(accentLight2);
-
-        // Very subtle back light
-        const rimLight = new THREE.PointLight(0x4338ca, 0.15, 12);
-        rimLight.position.set(0, 0, -5);
-        this.scene.add(rimLight);
-    }
-
-    addMarker(lat, lon, color = 0x6366f1) {
-        // Convert lat/lon to 3D coordinates
-        const phi = (90 - lat) * (Math.PI / 180);
-        const theta = (lon + 180) * (Math.PI / 180);
-
-        const x = -(CONFIG.globe.radius * Math.sin(phi) * Math.cos(theta));
-        const y = CONFIG.globe.radius * Math.cos(phi);
-        const z = CONFIG.globe.radius * Math.sin(phi) * Math.sin(theta);
-
-        // Create marker
-        const geometry = new THREE.SphereGeometry(0.02, 16, 16);
-        const material = new THREE.MeshBasicMaterial({
-            color: color,
-            transparent: true,
-            opacity: 0.9
+    setupResizeHandler() {
+        window.addEventListener('resize', () => {
+            // COBE handles resize automatically
         });
-        const marker = new THREE.Mesh(geometry, material);
-        marker.position.set(x, y, z);
-
-        // Add pulsing glow
-        const glowGeometry = new THREE.SphereGeometry(0.04, 16, 16);
-        const glowMaterial = new THREE.MeshBasicMaterial({
-            color: color,
-            transparent: true,
-            opacity: 0.3
-        });
-        const markerGlow = new THREE.Mesh(glowGeometry, glowMaterial);
-        marker.add(markerGlow);
-
-        this.globe.add(marker);
-        this.markers.push({ mesh: marker, glow: markerGlow });
-
-        return marker;
-    }
-
-    clearMarkers() {
-        this.markers.forEach(({ mesh }) => {
-            this.globe.remove(mesh);
-        });
-        this.markers = [];
     }
 
     // ==================== SECTION ANIMATIONS ====================
     animateToSection(sectionIndex) {
         this.currentSection = sectionIndex;
-        this.clearMarkers();
 
         switch(sectionIndex) {
-            case 0: // Hero - general view
+            case 0: // Hero
                 this.animateHero();
                 break;
-            case 1: // Droga - timeline path
+            case 1: // Droga
                 this.animateDroga();
                 break;
-            case 2: // Sklep - Poland marker
+            case 2: // Sklep
                 this.animateSklep();
                 break;
-            case 3: // TakeDrop - network connections
+            case 3: // TakeDrop
                 this.animateTakeDrop();
                 break;
-            case 4: // Inkubator - spreading effect
+            case 4: // Inkubator
                 this.animateInkubator();
                 break;
-            case 5: // Motto - calm view
+            case 5: // Motto
                 this.animateMotto();
                 break;
-            case 6: // Współpraca - timeline orbits
+            case 6: // Współpraca
                 this.animateWspolpraca();
                 break;
-            case 7: // CTA - zoom to Europe
+            case 7: // CTA
                 this.animateCTA();
                 break;
         }
     }
 
     animateHero() {
-        gsap.to(this.camera.position, {
-            x: 0,
-            y: 0,
-            z: 4,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
-
-        gsap.to(this.globe.rotation, {
-            y: 0,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        this.targetTheta = 0.3;
+        this.activeMarkers = [];
     }
 
     animateDroga() {
-        gsap.to(this.camera.position, {
-            x: 0.5,
-            y: 0.3,
-            z: 3.5,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        this.targetTheta = 0.5;
+        this.activeMarkers = [];
     }
 
     animateSklep() {
-        // Poland coordinates
-        this.addMarker(52.2297, 21.0122, 0x6366f1); // Warsaw
-
-        gsap.to(this.camera.position, {
-            x: -0.5,
-            y: 0.8,
-            z: 3,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
-
-        gsap.to(this.globe.rotation, {
-            y: -0.4,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        // Show Warsaw marker
+        this.targetTheta = 0.8;
+        this.activeMarkers = [
+            { location: [52.2297, 21.0122], size: 0.08 }
+        ];
     }
 
     animateTakeDrop() {
-        // Multiple markers for 5000 shops
-        const cities = [
-            [52.2297, 21.0122], // Warsaw
-            [50.0647, 19.9450], // Krakow
-            [51.7592, 19.4560], // Lodz
-            [51.1079, 17.0385], // Wroclaw
-            [54.3520, 18.6466]  // Gdansk
+        // Show all Polish cities
+        this.targetTheta = 0.7;
+        this.activeMarkers = [
+            { location: [52.2297, 21.0122], size: 0.07 }, // Warsaw
+            { location: [50.0647, 19.9450], size: 0.06 }, // Krakow
+            { location: [51.7592, 19.4560], size: 0.06 }, // Lodz
+            { location: [51.1079, 17.0385], size: 0.06 }, // Wroclaw
+            { location: [54.3520, 18.6466], size: 0.06 }  // Gdansk
         ];
-
-        cities.forEach(([lat, lon]) => {
-            this.addMarker(lat, lon, 0x8b5cf6);
-        });
-
-        gsap.to(this.camera.position, {
-            x: 0,
-            y: 1,
-            z: 3.2,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
     }
 
     animateInkubator() {
-        gsap.to(this.camera.position, {
-            x: -0.3,
-            y: -0.5,
-            z: 3.8,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
-
-        gsap.to(this.globe.material, {
-            opacity: 0.6,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        this.targetTheta = 0.4;
+        this.activeMarkers = [
+            { location: [52.2297, 21.0122], size: 0.05 }
+        ];
     }
 
     animateMotto() {
-        gsap.to(this.camera.position, {
-            x: 0,
-            y: 0,
-            z: 4.5,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
-
-        gsap.to(this.globe.material, {
-            opacity: 0.3,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        this.targetTheta = 0.2;
+        this.activeMarkers = [];
     }
 
     animateWspolpraca() {
-        gsap.to(this.camera.position, {
-            x: 0.3,
-            y: -0.2,
-            z: 3.5,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        this.targetTheta = 0.6;
+        this.activeMarkers = [
+            { location: [52.2297, 21.0122], size: 0.06 }
+        ];
     }
 
     animateCTA() {
-        gsap.to(this.camera.position, {
-            x: -0.5,
-            y: 0.5,
-            z: 2.8,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
-
-        gsap.to(this.globe.rotation, {
-            y: -0.3,
-            duration: CONFIG.animations.transitionDuration,
-            ease: 'power2.inOut'
-        });
+        this.targetTheta = 0.8;
+        this.activeMarkers = [
+            { location: [52.2297, 21.0122], size: 0.08 }
+        ];
     }
 
-    // ==================== ANIMATION LOOP ====================
-    animate() {
-        requestAnimationFrame(() => this.animate());
-
-        // Slow rotating starfield
-        if (this.starfield) {
-            this.starfield.rotation.y += CONFIG.animations.rotationSpeed * 0.05;
-            this.starfield.rotation.x += CONFIG.animations.rotationSpeed * 0.02;
+    destroy() {
+        if (this.globe) {
+            this.globe.destroy();
         }
-
-        // Slow auto-rotation
-        this.globe.rotation.y += CONFIG.animations.rotationSpeed;
-
-        // Rotate particles slower
-        if (this.particles) {
-            this.particles.rotation.y += CONFIG.animations.rotationSpeed * 0.5;
-        }
-
-        // Pulse markers
-        this.markers.forEach(({ glow }, i) => {
-            const scale = 1 + Math.sin(Date.now() * 0.002 + i) * 0.2;
-            glow.scale.set(scale, scale, scale);
-        });
-
-        this.renderer.render(this.scene, this.camera);
-    }
-
-    // ==================== EVENT LISTENERS ====================
-    setupEventListeners() {
-        // Resize handler
-        window.addEventListener('resize', () => this.handleResize());
-
-        // Section change observer
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const sectionIndex = parseInt(entry.target.dataset.section);
-                        this.animateToSection(sectionIndex);
-                    }
-                });
-            },
-            { threshold: 0.5 }
-        );
-
-        // Observe all sections
-        document.querySelectorAll('.fullpage-section').forEach(section => {
-            observer.observe(section);
-        });
-    }
-
-    handleResize() {
-        const width = this.container.offsetWidth;
-        const height = this.container.offsetHeight;
-
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
-
-        this.renderer.setSize(width, height);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     }
 }
 
 // ==================== INITIALIZATION ====================
-// Wait for DOM and check if we're on desktop
-if (window.innerWidth >= 768) { // Only on desktop
+document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('globe-container');
     if (container) {
-        new GlobeScene(container);
+        // Only initialize on desktop
+        if (window.innerWidth >= 1024) {
+            new GlobeScene(container);
+        }
     }
-}
+});
