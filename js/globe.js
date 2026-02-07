@@ -75,6 +75,9 @@ class GlobeScene {
         this.renderer.setClearColor(0x000000, 0);
         this.container.appendChild(this.renderer.domElement);
 
+        // Create starfield background
+        this.createStarfield();
+
         // Create globe
         this.createGlobe();
 
@@ -83,6 +86,53 @@ class GlobeScene {
 
         // Add lights
         this.addLights();
+    }
+
+    createStarfield() {
+        // Create thousands of stars in the background
+        const starGeometry = new THREE.BufferGeometry();
+        const starPositions = [];
+        const starSizes = [];
+        const starColors = [];
+
+        const starCount = 3000;
+        const radius = 20; // Far from globe
+
+        for (let i = 0; i < starCount; i++) {
+            // Random position in sphere
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const r = radius + Math.random() * 10;
+
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
+
+            starPositions.push(x, y, z);
+
+            // Random size for star twinkle effect
+            starSizes.push(Math.random() * 2 + 0.5);
+
+            // White to slightly blue-ish stars
+            const intensity = 0.7 + Math.random() * 0.3;
+            starColors.push(intensity, intensity, intensity * 1.1);
+        }
+
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+        starGeometry.setAttribute('size', new THREE.Float32BufferAttribute(starSizes, 1));
+        starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
+
+        const starMaterial = new THREE.PointsMaterial({
+            size: 0.05,
+            sizeAttenuation: true,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        this.starfield = new THREE.Points(starGeometry, starMaterial);
+        this.scene.add(this.starfield);
     }
 
     createGlobe() {
@@ -435,6 +485,12 @@ class GlobeScene {
     // ==================== ANIMATION LOOP ====================
     animate() {
         requestAnimationFrame(() => this.animate());
+
+        // Slow rotating starfield
+        if (this.starfield) {
+            this.starfield.rotation.y += CONFIG.animations.rotationSpeed * 0.05;
+            this.starfield.rotation.x += CONFIG.animations.rotationSpeed * 0.02;
+        }
 
         // Slow auto-rotation
         this.globe.rotation.y += CONFIG.animations.rotationSpeed;
