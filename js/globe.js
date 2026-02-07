@@ -4,19 +4,18 @@ import * as THREE from 'three';
 const CONFIG = {
     globe: {
         radius: 1.2,
-        segments: 128, // High detail for smooth surface
-        wireframe: false,
-        color: 0x10b981, // emerald-500
-        emissive: 0x10b981,
-        emissiveIntensity: 0.15,
-        // Earth texture from CDN
-        textureUrl: 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-        bumpUrl: 'https://unpkg.com/three-globe/example/img/earth-topology.png'
+        segments: 128,
+        dotsCount: 15000, // Dots pattern instead of texture
+        color: 0x1a1a2e, // Very dark blue-gray
+        glowColor: 0x6366f1, // Subtle purple glow
+        emissiveIntensity: 0.08,
+        opacity: 0.4 // Very subtle
     },
     particles: {
-        count: 1500,
-        size: 0.015,
-        spread: 2.5
+        count: 800, // Fewer, more subtle
+        size: 0.01,
+        spread: 2.0,
+        opacity: 0.3
     },
     camera: {
         fov: 45,
@@ -25,7 +24,7 @@ const CONFIG = {
         position: { x: 0, y: 0, z: 4 }
     },
     animations: {
-        rotationSpeed: 0.0008,
+        rotationSpeed: 0.0005,
         transitionDuration: 1.5
     }
 };
@@ -136,43 +135,48 @@ class GlobeScene {
     }
 
     createGlobe() {
-        // High-detail sphere geometry for smooth Earth
-        const geometry = new THREE.SphereGeometry(
-            CONFIG.globe.radius,
-            CONFIG.globe.segments,
-            CONFIG.globe.segments
-        );
+        // Create dots pattern for subtle globe
+        const dotsGeometry = new THREE.BufferGeometry();
+        const positions = [];
+        const sizes = [];
 
-        // Texture loader
-        const textureLoader = new THREE.TextureLoader();
+        // Generate dots on sphere surface
+        for (let i = 0; i < CONFIG.globe.dotsCount; i++) {
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
 
-        // Load Earth texture and bump map
-        const earthTexture = textureLoader.load(CONFIG.globe.textureUrl);
-        const bumpTexture = textureLoader.load(CONFIG.globe.bumpUrl);
+            const x = CONFIG.globe.radius * Math.sin(phi) * Math.cos(theta);
+            const y = CONFIG.globe.radius * Math.sin(phi) * Math.sin(theta);
+            const z = CONFIG.globe.radius * Math.cos(phi);
 
-        // Realistic Earth material
-        const material = new THREE.MeshStandardMaterial({
-            map: earthTexture,
-            bumpMap: bumpTexture,
-            bumpScale: 0.015,
-            emissive: CONFIG.globe.emissive,
-            emissiveIntensity: CONFIG.globe.emissiveIntensity,
-            metalness: 0.1,
-            roughness: 0.9
+            positions.push(x, y, z);
+            sizes.push(Math.random() * 1.5 + 0.5);
+        }
+
+        dotsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        dotsGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+
+        const dotsMaterial = new THREE.PointsMaterial({
+            color: CONFIG.globe.color,
+            size: 0.008,
+            sizeAttenuation: true,
+            transparent: true,
+            opacity: CONFIG.globe.opacity,
+            blending: THREE.AdditiveBlending
         });
 
-        this.globe = new THREE.Mesh(geometry, material);
+        this.globe = new THREE.Points(dotsGeometry, dotsMaterial);
         this.scene.add(this.globe);
 
-        // Add atmosphere glow
+        // Subtle atmosphere glow (purple)
         const atmosphereGeometry = new THREE.SphereGeometry(
-            CONFIG.globe.radius * 1.08,
+            CONFIG.globe.radius * 1.15,
             64,
             64
         );
         const atmosphereMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                color: { value: new THREE.Color(0x10b981) }
+                color: { value: new THREE.Color(CONFIG.globe.glowColor) }
             },
             vertexShader: `
                 varying vec3 vNormal;
@@ -185,30 +189,16 @@ class GlobeScene {
                 uniform vec3 color;
                 varying vec3 vNormal;
                 void main() {
-                    float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-                    gl_FragColor = vec4(color, 1.0) * intensity;
+                    float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
+                    gl_FragColor = vec4(color, 1.0) * intensity * 0.3;
                 }
             `,
             side: THREE.BackSide,
             blending: THREE.AdditiveBlending,
             transparent: true
         });
-        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-        this.scene.add(atmosphere);
-
-        // Add thin wireframe overlay for tech feel (optional)
-        const wireframeGeometry = new THREE.IcosahedronGeometry(
-            CONFIG.globe.radius * 1.002,
-            2
-        );
-        const wireframeMaterial = new THREE.MeshBasicMaterial({
-            color: 0x10b981,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15
-        });
-        const wireframeOverlay = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
-        this.globe.add(wireframeOverlay);
+        this.atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        this.scene.add(this.atmosphere);
     }
 
     createParticles() {
@@ -216,12 +206,12 @@ class GlobeScene {
         const positions = [];
         const colors = [];
 
-        // Color palette matching site theme
+        // Color palette matching subtle purple theme
         const colorPalette = [
-            new THREE.Color(0x10b981), // emerald
-            new THREE.Color(0xffb400), // amber
-            new THREE.Color(0x3b82f6), // blue
-            new THREE.Color(0xa855f7)  // purple
+            new THREE.Color(0x6366f1), // purple
+            new THREE.Color(0x8b5cf6), // light purple
+            new THREE.Color(0x7c3aed), // violet
+            new THREE.Color(0x4338ca)  // indigo
         ];
 
         for (let i = 0; i < CONFIG.particles.count; i++) {
@@ -247,7 +237,7 @@ class GlobeScene {
             size: CONFIG.particles.size,
             vertexColors: true,
             transparent: true,
-            opacity: 0.6,
+            opacity: CONFIG.particles.opacity,
             sizeAttenuation: true,
             blending: THREE.AdditiveBlending
         });
@@ -257,31 +247,26 @@ class GlobeScene {
     }
 
     addLights() {
-        // Ambient light for overall illumination
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        // Very subtle ambient light
+        const ambientLight = new THREE.AmbientLight(0x1a1a2e, 0.2);
         this.scene.add(ambientLight);
 
-        // Main directional light (like the sun)
-        const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        sunLight.position.set(5, 3, 5);
-        this.scene.add(sunLight);
-
-        // Point lights for accent and atmosphere
-        const accentLight1 = new THREE.PointLight(0x10b981, 0.6, 12);
+        // Subtle purple accent lights
+        const accentLight1 = new THREE.PointLight(0x6366f1, 0.3, 10);
         accentLight1.position.set(3, 2, 3);
         this.scene.add(accentLight1);
 
-        const accentLight2 = new THREE.PointLight(0x3b82f6, 0.4, 12);
+        const accentLight2 = new THREE.PointLight(0x8b5cf6, 0.2, 10);
         accentLight2.position.set(-3, -1, -2);
         this.scene.add(accentLight2);
 
-        // Back light for rim lighting effect
-        const rimLight = new THREE.PointLight(0xa855f7, 0.3, 15);
+        // Very subtle back light
+        const rimLight = new THREE.PointLight(0x4338ca, 0.15, 12);
         rimLight.position.set(0, 0, -5);
         this.scene.add(rimLight);
     }
 
-    addMarker(lat, lon, color = 0x10b981) {
+    addMarker(lat, lon, color = 0x6366f1) {
         // Convert lat/lon to 3D coordinates
         const phi = (90 - lat) * (Math.PI / 180);
         const theta = (lon + 180) * (Math.PI / 180);
@@ -384,7 +369,7 @@ class GlobeScene {
 
     animateSklep() {
         // Poland coordinates
-        this.addMarker(52.2297, 21.0122, 0x10b981); // Warsaw
+        this.addMarker(52.2297, 21.0122, 0x6366f1); // Warsaw
 
         gsap.to(this.camera.position, {
             x: -0.5,
@@ -412,7 +397,7 @@ class GlobeScene {
         ];
 
         cities.forEach(([lat, lon]) => {
-            this.addMarker(lat, lon, 0xffb400);
+            this.addMarker(lat, lon, 0x8b5cf6);
         });
 
         gsap.to(this.camera.position, {
@@ -434,7 +419,7 @@ class GlobeScene {
         });
 
         gsap.to(this.globe.material, {
-            emissiveIntensity: 0.4,
+            opacity: 0.6,
             duration: CONFIG.animations.transitionDuration,
             ease: 'power2.inOut'
         });
@@ -450,7 +435,7 @@ class GlobeScene {
         });
 
         gsap.to(this.globe.material, {
-            emissiveIntensity: 0.15,
+            opacity: 0.3,
             duration: CONFIG.animations.transitionDuration,
             ease: 'power2.inOut'
         });
