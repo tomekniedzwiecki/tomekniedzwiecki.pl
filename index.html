@@ -187,11 +187,12 @@
             .content-area {
                 width: 100%;
                 max-width: 100%;
-                padding: 0 3rem !important;
+                padding: 0 4rem !important;
                 justify-content: center;
             }
             .content-area > .section-content {
-                max-width: 640px;
+                max-width: 900px;
+                width: 100%;
             }
         }
         @media (min-width: 1200px) {
@@ -199,24 +200,24 @@
                 padding: 0 6rem !important;
             }
             .content-area > .section-content {
-                max-width: 720px;
+                max-width: 1000px;
             }
         }
-        /* Large screens: centered content with comfortable reading width */
+        /* Large screens: centered content with wide comfortable reading */
         @media (min-width: 1600px) {
             .content-area {
-                padding: 0 10vw !important;
+                padding: 0 8rem !important;
             }
             .content-area > .section-content {
-                max-width: 800px;
+                max-width: 1100px;
             }
         }
         @media (min-width: 2200px) {
             .content-area {
-                padding: 0 15vw !important;
+                padding: 0 12rem !important;
             }
             .content-area > .section-content {
-                max-width: 900px;
+                max-width: 1200px;
             }
         }
 
@@ -240,7 +241,7 @@
         /* Dots navigation */
         .dots-nav {
             position: fixed;
-            left: 50%;
+            right: 3rem;
             top: 50%;
             transform: translateY(-50%);
             z-index: 40;
@@ -250,17 +251,17 @@
         }
         @media (min-width: 1200px) {
             .dots-nav {
-                left: 53%;
+                right: 4rem;
             }
         }
         @media (min-width: 1600px) {
             .dots-nav {
-                left: 56%;
+                right: 5rem;
             }
         }
         @media (min-width: 2200px) {
             .dots-nav {
-                left: 58%;
+                right: 6rem;
             }
         }
         @media (max-width: 767px) {
