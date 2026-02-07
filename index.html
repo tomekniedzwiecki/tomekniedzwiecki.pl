@@ -137,12 +137,11 @@
             }
         }
         */
-
-        /* Globe Container - DESKTOP ONLY */
+        /* Premium Globe Container */
         #globe-container {
             display: none;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             #globe-container {
                 display: block;
                 position: fixed;
@@ -151,27 +150,12 @@
                 width: 42%;
                 height: 100vh;
                 height: 100dvh;
-                z-index: 20;
+                z-index: 15;
                 pointer-events: none;
-                overflow: hidden;
             }
             #globe-container canvas {
                 width: 100%;
                 height: 100%;
-            }
-            #globe-container::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background:
-                    linear-gradient(to right,
-                        rgba(0,0,0,1) 0%,
-                        rgba(0,0,0,0.85) 8%,
-                        rgba(0,0,0,0.4) 20%,
-                        rgba(0,0,0,0.1) 40%,
-                        transparent 55%);
-                pointer-events: none;
-                z-index: 1;
             }
         }
         @media (min-width: 1600px) {
@@ -1208,25 +1192,7 @@
         <button data-section="7" data-label="Kontakt"></button>
     </nav>
 
-    <!-- OLD: Builder Panel (commented out - can be restored later)
-    <div id="builder-panel">
-        <canvas id="builder-canvas"></canvas>
-        <div class="builder-overlay"></div>
-        <div id="builder-controls">
-            <div class="color-selector" id="color-selector"></div>
-            <div class="controls-divider"></div>
-            <div class="shape-selector" id="shape-selector"></div>
-            <div class="controls-divider"></div>
-            <button class="clear-btn" id="clear-btn" title="Wyczyść">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-    -->
-
-    <!-- Globe Panel (Three.js 3D Globe) -->
+    <!-- Premium Globe Panel -->
     <div id="globe-container"></div>
 
     <!-- Fullpage Container -->
@@ -2464,10 +2430,17 @@
     })();
     </script>
 
-    <!-- COBE for 3D Globe -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/cobe@0.6.3/dist/index.esm.js"></script>
+    <!-- Three.js for Premium Globe -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+        }
+    }
+    </script>
 
-    <!-- Globe visualization -->
+    <!-- Premium Globe Visualization -->
     <script type="module" src="/js/globe.js"></script>
+
 </body>
 </html>
