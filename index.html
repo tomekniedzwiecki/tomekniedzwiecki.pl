@@ -118,9 +118,9 @@
             }
         }
 
-        /* Builder panel - DESKTOP ONLY */
+        /* Builder panel - HIDDEN (can be restored from git: 63e8750) */
         #builder-panel {
-            display: none;
+            display: none !important;
         }
         @media (min-width: 768px) {
             #builder-panel {
@@ -187,37 +187,36 @@
             .content-area {
                 width: 100%;
                 max-width: 100%;
-                padding: 0 !important;
-                padding-left: 1.5rem !important;
-                justify-content: flex-start;
+                padding: 0 3rem !important;
+                justify-content: center;
             }
             .content-area > .section-content {
-                max-width: min(520px, calc(48vw - 2rem));
+                max-width: 640px;
             }
         }
         @media (min-width: 1200px) {
             .content-area {
-                padding-left: 3rem !important;
+                padding: 0 6rem !important;
             }
             .content-area > .section-content {
-                max-width: min(580px, calc(50vw - 4rem));
+                max-width: 720px;
             }
         }
-        /* Large screens: use percentage for padding */
+        /* Large screens: centered content with comfortable reading width */
         @media (min-width: 1600px) {
             .content-area {
-                padding-left: 8vw !important;
+                padding: 0 10vw !important;
             }
             .content-area > .section-content {
-                max-width: 620px;
+                max-width: 800px;
             }
         }
         @media (min-width: 2200px) {
             .content-area {
-                padding-left: 15vw !important;
+                padding: 0 15vw !important;
             }
             .content-area > .section-content {
-                max-width: 700px;
+                max-width: 900px;
             }
         }
 
@@ -798,9 +797,9 @@
             }
         }
 
-        /* Builder controls - right sidebar */
+        /* Builder controls - HIDDEN (can be restored from git: 63e8750) */
         #builder-controls {
-            display: none;
+            display: none !important;
         }
         @media (min-width: 768px) {
             #builder-controls {
@@ -1191,12 +1190,10 @@
         <button data-section="7" data-label="Kontakt"></button>
     </nav>
 
-    <!-- Builder Panel (Fixed on desktop) -->
+    <!-- Builder Panel - COMMENTED OUT (can be restored from git: 63e8750)
     <div id="builder-panel">
         <canvas id="builder-canvas"></canvas>
         <div class="builder-overlay"></div>
-
-        <!-- Builder controls - right sidebar -->
         <div id="builder-controls">
             <div class="color-selector" id="color-selector"></div>
             <div class="controls-divider"></div>
@@ -1209,6 +1206,7 @@
             </button>
         </div>
     </div>
+    -->
 
     <!-- Fullpage Container -->
     <div class="fullpage-container" id="fullpage">
@@ -1574,18 +1572,6 @@
                 }, 1000);
             };
 
-            // Section to Builder palette mapping
-            const sectionPalettes = {
-                0: 'default',
-                1: 'default',
-                2: 'emerald',
-                3: 'amber',
-                4: 'purple',
-                5: 'default',
-                6: 'default',
-                7: 'emerald'
-            };
-
             const createObserver = () => {
                 return new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -1593,10 +1579,6 @@
                             const index = parseInt(entry.target.dataset.section);
                             currentSection = index;
                             updateDots(index);
-
-                            if (window.setBuilderPalette) {
-                                window.setBuilderPalette(sectionPalettes[index] || 'default');
-                            }
 
                             const content = entry.target.querySelector('.section-content');
                             if (content) content.classList.add('visible');
@@ -1624,7 +1606,7 @@
                 });
             });
 
-            // Wheel scroll handler - shared between container and builder panel
+            // Wheel scroll handler
             const handleWheelScroll = (e) => {
                 if (!isDesktop() || isScrolling) {
                     if (isScrolling) e.preventDefault();
@@ -1644,12 +1626,6 @@
             };
 
             container.addEventListener('wheel', handleWheelScroll, { passive: false });
-
-            // Also handle scroll on builder panel (right side)
-            const builderPanel = document.getElementById('builder-panel');
-            if (builderPanel) {
-                builderPanel.addEventListener('wheel', handleWheelScroll, { passive: false });
-            }
 
             document.addEventListener('keydown', (e) => {
                 if (!isDesktop()) return;
@@ -1699,7 +1675,7 @@
         })();
     </script>
 
-    <!-- Isometric 3D Builder with Tetris Shapes -->
+    <!-- Isometric 3D Builder - COMMENTED OUT (can be restored from git: 63e8750)
     <script>
         (function() {
             const canvas = document.getElementById('builder-canvas');
@@ -2359,6 +2335,7 @@
             animate();
         })();
     </script>
+    -->
 
     <!-- WhatsApp Widget -->
     <div class="whatsapp-widget">
