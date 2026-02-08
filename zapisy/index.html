@@ -6,13 +6,11 @@
     <title>Aplikuj | Tomasz Niedźwiecki</title>
 
     <!-- Preconnect for external resources -->
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://connect.facebook.net">
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,24 +58,19 @@
     src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1"
     /></noscript>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (built, minified) -->
+    <link rel="stylesheet" href="/zapisy/css/zapisy.min.css">
+
+    <!-- Phosphor Icons -->
     <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Supabase Client -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <!-- Google Fonts - Inter (optimized loading) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
         /* ================================================
