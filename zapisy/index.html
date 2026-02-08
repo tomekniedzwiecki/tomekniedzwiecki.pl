@@ -127,6 +127,30 @@
             transition: all 0.3s ease;
         }
 
+        /* Button loading state */
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .btn-loading .btn-text { display: none; }
+        .btn-loading .btn-spinner { display: flex; }
+        .btn-spinner {
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* === TYPOGRAPHY === */
         .gradient-text {
             background: linear-gradient(to bottom, #fff 20%, #71717a 90%);
@@ -807,9 +831,9 @@
                         <input type="email" id="email-input" class="form-input" placeholder="jan@example.com" required autocomplete="email">
                         <p id="email-error" class="error-message">Podaj poprawny adres e-mail</p>
 
-                        <button type="submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
-                            Rozpocznij
-                            <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>
+                        <button type="submit" id="email-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
+                            <span class="btn-text flex items-center gap-2">Rozpocznij <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+                            <span class="btn-spinner"><span class="spinner"></span></span>
                         </button>
                     </form>
 
@@ -853,8 +877,8 @@
                     <input type="text" id="name-input" class="form-input" placeholder="Jan Kowalski" autocomplete="name">
 
                     <button type="button" id="name-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
-                        Dalej
-                        <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>
+                        <span class="btn-text flex items-center gap-2">Dalej <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+                        <span class="btn-spinner"><span class="spinner"></span></span>
                     </button>
 
                     <button type="button" id="name-skip" class="w-full h-12 text-zinc-500 hover:text-white text-sm transition-colors mt-3">
@@ -892,8 +916,8 @@
                     <p id="phone-error" class="error-message">Podaj poprawny numer (9 cyfr)</p>
 
                     <button type="button" id="phone-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" disabled>
-                        Dalej
-                        <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>
+                        <span class="btn-text flex items-center gap-2">Dalej <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+                        <span class="btn-spinner"><span class="spinner"></span></span>
                     </button>
                 </div>
             </div>
@@ -1028,8 +1052,8 @@
                     </div>
 
                     <button type="button" id="experience-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]" disabled>
-                        Dalej
-                        <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>
+                        <span class="btn-text flex items-center gap-2">Dalej <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+                        <span class="btn-spinner"><span class="spinner"></span></span>
                     </button>
                 </div>
             </div>
@@ -1059,8 +1083,8 @@
                     <textarea id="open-input" class="form-input form-textarea" placeholder="Możesz pominąć to pole lub dodać cokolwiek, co pomoże mi lepiej Cię poznać..."></textarea>
 
                     <button type="button" id="open-submit" class="btn-primary w-full h-14 rounded-xl text-black font-semibold text-base mt-6 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
-                        Dalej
-                        <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>
+                        <span class="btn-text flex items-center gap-2">Dalej <svg class="icon-svg" style="width:1.125em;height:1.125em" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+                        <span class="btn-spinner"><span class="spinner"></span></span>
                     </button>
                 </div>
             </div>
@@ -1140,6 +1164,14 @@
         function validatePhone(phone) {
             const cleaned = phone.replace(/[\s\-]/g, '').replace(/^(\+?48)/, '');
             return /^\d{9}$/.test(cleaned);
+        }
+
+        function setLoading(btn, loading) {
+            if (loading) {
+                btn.classList.add('btn-loading');
+            } else {
+                btn.classList.remove('btn-loading');
+            }
         }
 
         // ==================== PROGRESS ====================
@@ -1335,6 +1367,7 @@
             e.preventDefault();
             const email = document.getElementById('email-input').value.trim();
             const errorEl = document.getElementById('email-error');
+            const submitBtn = document.getElementById('email-submit');
 
             if (!validateEmail(email)) {
                 errorEl.classList.add('visible');
@@ -1343,6 +1376,7 @@
             errorEl.classList.remove('visible');
             saveData('email', email);
 
+            setLoading(submitBtn, true);
             try {
                 // Use edge function for upsert - creates new or updates existing lead
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/lead-upsert`, {
@@ -1377,6 +1411,7 @@
             });
             if (typeof ttq !== 'undefined') ttq.track('SubmitForm');
 
+            setLoading(submitBtn, false);
             goToStep(1);
         });
 
@@ -1388,8 +1423,10 @@
         nameSubmit.addEventListener('click', async function() {
             const name = nameInput.value.trim();
             if (name) {
+                setLoading(nameSubmit, true);
                 saveData('name', name);
                 await updateLead({ name: name });
+                setLoading(nameSubmit, false);
             }
             goToStep(2);
         });
@@ -1422,8 +1459,10 @@
         phoneSubmit.addEventListener('click', async function() {
             const phone = phoneInput.value.trim();
             if (!validatePhone(phone)) return;
+            setLoading(phoneSubmit, true);
             saveData('phone', phone);
             await updateLead({ phone: phone });
+            setLoading(phoneSubmit, false);
             goToStep(4);
         });
 
@@ -1488,11 +1527,13 @@
 
         experienceInput.addEventListener('input', validateExperience);
 
-        experienceSubmit.addEventListener('click', function() {
+        experienceSubmit.addEventListener('click', async function() {
             const value = experienceInput.value.trim();
             if (value.length < 20) return;
+            setLoading(experienceSubmit, true);
             saveData('experience', value);
-            updateLead({ experience: value });
+            await updateLead({ experience: value });
+            setLoading(experienceSubmit, false);
             goToStep(7);
         });
 
@@ -1502,14 +1543,16 @@
             autoExpand(openInput);
         });
 
-        document.getElementById('open-submit').addEventListener('click', async function() {
+        const openSubmit = document.getElementById('open-submit');
+        openSubmit.addEventListener('click', async function() {
             const value = openInput.value.trim();
+            setLoading(openSubmit, true);
             saveData('open_question', value || '');
             saveData('completed', true);
             if (value) await updateLead({ open_question: value });
 
             const savedData = loadSavedData();
-            sendSlackNotification('new_lead', {
+            await sendSlackNotification('new_lead', {
                 email: savedData.email,
                 name: savedData.name,
                 phone: savedData.phone,
@@ -1525,6 +1568,7 @@
             gtag('event', 'form_complete', {'event_category': 'engagement'});
             fbq('track', 'CompleteRegistration');
             if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
+            setLoading(openSubmit, false);
 
             clearData();
             setTimeout(() => goToStep(9), 250);
