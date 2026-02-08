@@ -29,8 +29,9 @@
     <meta name="twitter:description" content="Zbudowałem 3 firmy o łącznych przychodach ponad 70 mln zł. Inwestuję w ambitne osoby i buduję z nimi e-biznesy.">
     <meta name="twitter:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
 
-    <!-- Preload critical CSS for faster LCP -->
+    <!-- Preload critical resources for faster LCP -->
     <link rel="preload" href="/css/tailwind.min.css" as="style">
+    <link rel="preload" href="/img/tn_kwadrat.webp" as="image" type="image/webp">
 
     <!-- Tailwind CSS (built, minified) -->
     <link rel="stylesheet" href="/css/tailwind.min.css">
@@ -1233,7 +1234,7 @@
             <div class="content-area">
                 <div class="section-content visible">
                     <div class="flex items-center gap-3 md:gap-4 mb-8">
-                        <img src="img/tn_kwadrat.webp" alt="Tomek Niedźwiecki" width="56" height="56" decoding="async"
+                        <img src="img/tn_kwadrat.webp" alt="Tomek Niedźwiecki" width="56" height="56" decoding="async" fetchpriority="high"
                              class="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-2xl object-cover ring-2 ring-white/10">
                         <div>
                             <div class="text-white font-medium text-[15px] md:text-[16px] mb-0.5">Tomek Niedźwiecki</div>
