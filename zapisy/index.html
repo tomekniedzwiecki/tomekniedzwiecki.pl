@@ -1174,9 +1174,24 @@
 
         // ==================== DATABASE ====================
         async function updateLead(updates) {
-            if (!leadId) return;
+            const email = loadSavedData().email;
+            if (!email) {
+                console.warn('updateLead: No email in saved data');
+                return;
+            }
             try {
-                await supabaseClient.from('leads').update(updates).eq('id', leadId);
+                console.log('updateLead: Sending update for', email, updates);
+                // Use edge function for upsert - bypasses RLS time limit
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/lead-upsert`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, ...updates })
+                });
+                const result = await response.json();
+                console.log('updateLead: Response', result);
+                if (!result.success) {
+                    console.error('updateLead: Failed', result.error);
+                }
             } catch (err) {
                 console.error('Error updating lead:', err);
             }
@@ -1293,44 +1308,25 @@
             saveData('email', email);
 
             try {
-                // Check if lead with this email already exists
-                const { data: existingLead } = await supabaseClient
-                    .from('leads')
-                    .select('id')
-                    .eq('email', email)
-                    .single();
+                // Use edge function for upsert - creates new or updates existing lead
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/lead-upsert`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const result = await response.json();
 
-                if (existingLead) {
-                    // Use existing lead, reset created_at to now (fresh start)
-                    leadId = existingLead.id;
+                if (result.success && result.lead_id) {
+                    leadId = result.lead_id;
                     saveData('lead_id', leadId);
-                    await supabaseClient
-                        .from('leads')
-                        .update({
-                            created_at: new Date().toISOString(),
-                            // Clear old survey data for fresh submission
-                            name: null,
-                            weekly_hours: null,
-                            target_income: null,
-                            experience: null,
-                            open_question: null
-                        })
-                        .eq('id', leadId);
-                    console.log('Using existing lead:', leadId);
-                } else {
-                    // Create new lead
-                    const { data: leadResult, error: leadError } = await supabaseClient
-                        .from('leads')
-                        .insert([{ email: email }])
-                        .select('id')
-                        .single();
 
-                    if (!leadError && leadResult) {
-                        leadId = leadResult.id;
-                        saveData('lead_id', leadId);
+                    // Add tracking data for new leads
+                    if (result.is_new) {
                         const trackingData = getTrackingData();
                         await supabaseClient.from('lead_tracking').insert([{ lead_id: leadId, ...trackingData }]);
                     }
+
+                    console.log(result.is_new ? 'Created new lead:' : 'Updating existing lead:', leadId);
                 }
 
                 sendConfirmationEmail(email);
