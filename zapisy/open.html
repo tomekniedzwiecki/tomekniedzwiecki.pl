@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oferta startowa - Tomek Niedzwiecki</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #000; color: #ededed; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::selection { background: white; color: black; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-enter { animation: fadeIn 0.5s ease-out forwards; }
+
+        .glass-card {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Hero gradient */
+        .hero-gradient {
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.15), transparent);
+        }
+
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 3.5rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0.875rem;
+            top: 2.25rem;
+            bottom: -2rem;
+            width: 2px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.08), transparent);
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        @media (max-width: 640px) {
+            .timeline-item {
+                padding-left: 2.5rem;
+            }
+            .timeline-item::before {
+                left: 0.625rem;
+            }
+            .timeline-dot {
+                width: 1.5rem;
+                height: 1.5rem;
+                font-size: 0.625rem;
+                top: 0.625rem;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        /* Fade in on scroll */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Details expansion */
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+        }
+        .details-content.expanded {
+            max-height: 2000px;
+            opacity: 1;
+        }
+        .details-toggle {
+            transition: transform 0.3s ease;
+        }
+        .details-toggle.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* Glow effect */
+        .glow {
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Sticky Header */
+        .sticky-header {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .sticky-header.visible {
+            transform: translateY(0);
+        }
+
+        /* WhatsApp Widget */
+        .whatsapp-widget {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 1000;
+        }
+        .whatsapp-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .whatsapp-btn:hover {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
+        }
+        .whatsapp-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+        }
+        @media (max-width: 640px) {
+            .whatsapp-widget {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans text-sm tracking-tight antialiased">
+
+    <!-- Offer Screen -->
+    <div class="min-h-screen pb-20 sm:pb-8">
+
+        <!-- Hero Section -->
+        <div class="hero-gradient border-b border-white/5">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+                <div class="grid md:grid-cols-[1.5fr,1fr] gap-8 md:gap-12 items-center">
+
+                    <!-- Left: Content -->
+                    <div class="animate-enter">
+                        <div class="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-medium mb-6 border border-emerald-500/20">
+                            <i class="ph ph-storefront text-sm"></i>
+                            <span>Pakiet Start</span>
+                        </div>
+
+                        <h1 class="text-2xl sm:text-3xl font-bold text-white mb-3 leading-snug">
+                            Nowoczesny sklep internetowy<br>
+                            <span class="text-zinc-400 font-normal text-xl sm:text-2xl">od Tomka Niedźwieckiego</span>
+                        </h1>
+
+                        <div class="flex flex-wrap items-center gap-3 text-sm sm:text-xs text-zinc-500 mb-6">
+                            <span class="flex items-center gap-1">
+                                <i class="ph ph-buildings text-emerald-400"></i>
+                                3 firmy
+                            </span>
+                            <span class="text-zinc-700">•</span>
+                            <span class="flex items-center gap-1">
+                                <i class="ph ph-chart-line text-emerald-400"></i>
+                                70 mln obrotu
+                            </span>
+                            <span class="text-zinc-700">•</span>
+                            <span class="flex items-center gap-1">
+                                <i class="ph ph-clock text-emerald-400"></i>
+                                15 lat
+                            </span>
+                        </div>
+
+                        <div class="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 sm:px-4 py-2.5 sm:py-2">
+                            <i class="ph ph-fire text-red-400 text-xs sm:text-sm"></i>
+                            <span class="text-red-400 font-medium text-xs sm:text-sm">Ostatnie wolne miejsce!</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Price Card -->
+                    <div class="card p-6 sm:p-8 animate-enter" style="animation-delay: 0.1s">
+                        <div class="text-center mb-6">
+                            <div class="flex items-baseline justify-center gap-2 mb-1">
+                                <span class="text-4xl sm:text-5xl font-bold text-white font-mono">1 990</span>
+                                <span class="text-zinc-500">PLN</span>
+                            </div>
+                            <p class="text-xs text-zinc-500 mb-4">
+                                lub <span class="text-emerald-400 font-semibold">199</span> PLN/msc × 10 rat 0%
+                            </p>
+                            <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6"></div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <a href="https://crm.tomekniedzwiecki.pl/checkout?offer=6ee10c3a-f8c7-409e-8570-8eff29e2b759"
+                                    class="w-full bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3.5 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 glow">
+                                <i class="ph ph-credit-card"></i>
+                                Zamawiam teraz
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Header (shows on scroll) -->
+        <div class="sticky-header" id="sticky-header">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+                <!-- Desktop version -->
+                <div class="hidden md:flex items-center justify-between gap-6">
+                    <div class="flex items-center gap-5">
+                        <div class="flex items-center gap-3">
+                            <div class="text-sm text-zinc-400 font-medium">Pakiet Start</div>
+                            <div class="w-px h-6 bg-white/10"></div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-2xl font-bold text-white font-mono">1 990</span>
+                                <span class="text-zinc-500 text-sm">PLN</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3.5 py-1.5">
+                            <i class="ph ph-credit-card text-emerald-400 text-xs"></i>
+                            <span class="text-xs text-zinc-400">lub</span>
+                            <span class="text-emerald-400 font-bold font-mono">199</span>
+                            <span class="text-xs text-zinc-400">PLN/msc × 10 rat 0%</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="https://crm.tomekniedzwiecki.pl/checkout?offer=6ee10c3a-f8c7-409e-8570-8eff29e2b759"
+                                class="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-2.5 rounded-lg font-semibold transition-all flex items-center gap-2 text-sm">
+                            <i class="ph ph-credit-card"></i>
+                            Zamawiam teraz
+                        </a>
+                    </div>
+                </div>
+                <!-- Mobile version -->
+                <div class="md:hidden flex items-center justify-between gap-3">
+                    <div class="flex flex-col gap-1.5">
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-lg font-bold text-white font-mono">1 990</span>
+                            <span class="text-xs text-zinc-500">PLN</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2.5 py-1 w-fit">
+                            <i class="ph ph-credit-card text-emerald-400" style="font-size: 10px;"></i>
+                            <span class="text-emerald-400 font-semibold" style="font-size: 10px;">199 PLN × 10 rat 0%</span>
+                        </div>
+                    </div>
+                    <a href="https://crm.tomekniedzwiecki.pl/checkout?offer=6ee10c3a-f8c7-409e-8570-8eff29e2b759"
+                            class="bg-emerald-500 hover:bg-emerald-400 text-white px-5 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 text-sm whitespace-nowrap flex-shrink-0">
+                        <i class="ph ph-credit-card"></i>
+                        Zamawiam
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+
+            <!-- What Tomek will do -->
+            <section class="py-12 sm:py-16 fade-in">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Co Tomek dla Ciebie zrobi</h2>
+                </div>
+
+                <div class="space-y-8">
+                    <!-- Step 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot bg-gradient-to-br from-amber-500 to-orange-500 text-white">1</div>
+                        <div class="card p-4 sm:p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="hidden sm:flex w-12 h-12 rounded-xl bg-amber-500/10 items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-magnifying-glass text-2xl text-amber-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-white mb-2">Znajdzie dla Ciebie niszę i produkty</h3>
+                                    <p class="text-zinc-400 leading-relaxed mb-3">
+                                        <span class="text-white font-medium">Tomek przeanalizuje rynek</span> i wybierze dla Ciebie <span class="text-white font-medium">produkty</span>
+                                        z rosnącym trendem i dużym potencjałem sprzedażowym.
+                                    </p>
+
+                                    <!-- Co otrzymasz - zawsze widoczne -->
+                                    <div class="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4 mb-3">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <i class="ph-fill ph-package text-amber-400 text-lg"></i>
+                                            <h4 class="text-white font-semibold text-sm">Co otrzymasz</h4>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                            <div class="flex items-center gap-2 text-amber-300">
+                                                <i class="ph ph-check text-amber-400"></i>
+                                                <span>Wybrane produkty z potencjałem</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-amber-300">
+                                                <i class="ph ph-check text-amber-400"></i>
+                                                <span>Raport analizy konkurencji</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-amber-300">
+                                                <i class="ph ph-check text-amber-400"></i>
+                                                <span>Lista zweryfikowanych dostawców</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-amber-300">
+                                                <i class="ph ph-check text-amber-400"></i>
+                                                <span>Kalkulacja marży i rentowności</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button onclick="toggleDetails('step1')" class="text-amber-400 hover:text-amber-300 text-sm font-medium flex items-center gap-1.5 transition-colors">
+                                        <span>Zobacz szczegóły</span>
+                                        <i class="ph ph-caret-down details-toggle" id="step1-icon"></i>
+                                    </button>
+
+                                    <div id="step1-details" class="details-content mt-4">
+                                        <!-- Zadania Tomka -->
+                                        <div class="mb-4">
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user text-amber-400 text-xs"></i>
+                                                    <span class="text-white font-semibold text-xs">ZADANIA TOMKA</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-white/5"></div>
+                                            </div>
+                                            <div class="grid grid-cols-1 gap-2 text-xs">
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Ręczny research trendów i mediów społecznościowych</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Wybór produktów z rosnącą popularnością</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Analiza konkurencji i weryfikacja miejsca na rynku</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Kalkulacja marży i rentowności</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Sprawdzenie dostępności u dostawców</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Analiza setek opinii klientów</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Selekcja pod kątem łatwej wysyłki</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-amber-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Ocena potencjału na rozwój kategorii</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Twoje zadania -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user-circle text-amber-400 text-xs"></i>
+                                                    <span class="text-amber-400 font-semibold text-xs">TWOJE ZADANIE</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-amber-500/20"></div>
+                                            </div>
+                                            <div class="bg-amber-500/5 border border-amber-500/20 rounded-lg p-3.5">
+                                                <div class="flex items-start gap-2.5">
+                                                    <i class="ph-fill ph-clipboard-text text-amber-400 flex-shrink-0 text-lg mt-0.5"></i>
+                                                    <div>
+                                                        <div class="text-white font-semibold text-sm mb-1">Akceptacja wybranego produktu/niszy</div>
+                                                        <p class="text-zinc-400 text-xs leading-relaxed">Przegląd propozycji produktów i zatwierdzenie ostatecznego wyboru, który będzie bazą Twojego sklepu.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot bg-gradient-to-br from-violet-500 to-purple-500 text-white">2</div>
+                        <div class="card p-4 sm:p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="hidden sm:flex w-12 h-12 rounded-xl bg-violet-500/10 items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-chart-line-up text-2xl text-violet-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-white mb-2">Przygotuje strategię i raporty</h3>
+                                    <p class="text-zinc-400 leading-relaxed mb-3">
+                                        <span class="text-white font-medium">Dostaniesz szczegółowe raporty</span> — analiza produktu,
+                                        rynku, potencjału i gotowy plan na budowę marki.
+                                    </p>
+
+                                    <!-- Co otrzymasz - zawsze widoczne -->
+                                    <div class="bg-violet-500/5 border border-violet-500/20 rounded-lg p-4 mb-3">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <i class="ph-fill ph-package text-violet-400 text-lg"></i>
+                                            <h4 class="text-white font-semibold text-sm">Co otrzymasz</h4>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                            <div class="flex items-center gap-2 text-violet-300">
+                                                <i class="ph ph-check text-violet-400"></i>
+                                                <span>Szczegółowe raporty strategiczne</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-violet-300">
+                                                <i class="ph ph-check text-violet-400"></i>
+                                                <span>Profil idealnego klienta</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-violet-300">
+                                                <i class="ph ph-check text-violet-400"></i>
+                                                <span>Plan komunikacji marketingowej</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-violet-300">
+                                                <i class="ph ph-check text-violet-400"></i>
+                                                <span>Sugerowana polityka cenowa</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button onclick="toggleDetails('step2')" class="text-violet-400 hover:text-violet-300 text-sm font-medium flex items-center gap-1.5 transition-colors">
+                                        <span>Zobacz szczegóły</span>
+                                        <i class="ph ph-caret-down details-toggle" id="step2-icon"></i>
+                                    </button>
+
+                                    <div id="step2-details" class="details-content mt-4">
+                                        <!-- Zadania Tomka -->
+                                        <div class="mb-4">
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user text-violet-400 text-xs"></i>
+                                                    <span class="text-white font-semibold text-xs">TOMEK</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-white/5"></div>
+                                            </div>
+                                            <div class="grid grid-cols-1 gap-2 text-xs">
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Stworzenie profilu idealnego klienta</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Opracowanie planu komunikacji marketingowej</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Przygotowanie gotowego planu startu krok po kroku</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Zaproponowanie optymalnej polityki cenowej</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Lista wyróżników i USP (unique selling points)</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Analiza mocnych stron i przewag konkurencyjnych</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Szczegółowy raport o produkcie</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-violet-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Strategia rozwoju i pomysły na ekspansję</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Twoje zadania -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-violet-500/10 border border-violet-500/30 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user-circle text-violet-400 text-xs"></i>
+                                                    <span class="text-violet-400 font-semibold text-xs">TWOJE ZADANIE</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-violet-500/20"></div>
+                                            </div>
+                                            <div class="bg-violet-500/5 border border-violet-500/20 rounded-lg p-3.5">
+                                                <div class="flex items-start gap-2.5">
+                                                    <i class="ph-fill ph-clipboard-text text-violet-400 flex-shrink-0 text-lg mt-0.5"></i>
+                                                    <div>
+                                                        <div class="text-white font-semibold text-sm mb-1">Zapoznanie się z raportami i akceptacja strategii</div>
+                                                        <p class="text-zinc-400 text-xs leading-relaxed">Przeczytanie wszystkich materiałów strategicznych i zatwierdzenie planu działania dla Twojej marki.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot bg-gradient-to-br from-cyan-500 to-blue-500 text-white">3</div>
+                        <div class="card p-4 sm:p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="hidden sm:flex w-12 h-12 rounded-xl bg-cyan-500/10 items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-palette text-2xl text-cyan-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-white mb-2">Zaprojektuje Twoją markę od podstaw</h3>
+                                    <p class="text-zinc-400 leading-relaxed mb-3">
+                                        <span class="text-white font-medium">Tomek stworzy kompletny branding</span> — logo, wizualizacje produktów,
+                                        kolory, typografię i styl komunikacji. Wszystko gotowe do użycia.
+                                    </p>
+
+                                    <!-- Co otrzymasz - zawsze widoczne -->
+                                    <div class="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-4 mb-3">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <i class="ph-fill ph-package text-cyan-400 text-lg"></i>
+                                            <h4 class="text-white font-semibold text-sm">Co otrzymasz</h4>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                            <div class="flex items-center gap-2 text-cyan-300">
+                                                <i class="ph ph-check text-cyan-400"></i>
+                                                <span>Profesjonalne logo (3 wersje)</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-cyan-300">
+                                                <i class="ph ph-check text-cyan-400"></i>
+                                                <span>Identyfikacja wizualna marki</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-cyan-300">
+                                                <i class="ph ph-check text-cyan-400"></i>
+                                                <span>Paleta kolorów i typografia</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-cyan-300">
+                                                <i class="ph ph-check text-cyan-400"></i>
+                                                <span>Materiały brandingowe do wykorzystania</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button onclick="toggleDetails('step3')" class="text-cyan-400 hover:text-cyan-300 text-sm font-medium flex items-center gap-1.5 transition-colors">
+                                        <span>Zobacz szczegóły</span>
+                                        <i class="ph ph-caret-down details-toggle" id="step3-icon"></i>
+                                    </button>
+
+                                    <div id="step3-details" class="details-content mt-4">
+                                        <!-- Zadania Tomka -->
+                                        <div class="mb-4">
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user text-cyan-400 text-xs"></i>
+                                                    <span class="text-white font-semibold text-xs">TOMEK</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-white/5"></div>
+                                            </div>
+                                            <div class="grid grid-cols-1 gap-2 text-xs">
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Projekt profesjonalnego logo (3 warianty)</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Opracowanie palety kolorów marki</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Dobór typografii i czcionek</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Przygotowanie wizualizacji produktów</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Projektowanie elementów graficznych UI</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Stworzenie brandbooku (książki marki)</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-cyan-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Kompletna identyfikacja wizualna</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Twoje zadania -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user-circle text-cyan-400 text-xs"></i>
+                                                    <span class="text-cyan-400 font-semibold text-xs">TWOJE ZADANIE</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-cyan-500/20"></div>
+                                            </div>
+                                            <div class="bg-cyan-500/5 border border-cyan-500/20 rounded-lg p-3.5">
+                                                <div class="flex items-start gap-2.5">
+                                                    <i class="ph-fill ph-clipboard-text text-cyan-400 flex-shrink-0 text-lg mt-0.5"></i>
+                                                    <div>
+                                                        <div class="text-white font-semibold text-sm mb-1">Akceptacja projektu logo i identyfikacji</div>
+                                                        <p class="text-zinc-400 text-xs leading-relaxed">Przegląd wszystkich materiałów i zatwierdzenie ostatecznej wersji brandingu do wdrożenia.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="timeline-item">
+                        <div class="timeline-dot bg-gradient-to-br from-emerald-500 to-green-500 text-white">4</div>
+                        <div class="card p-4 sm:p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="hidden sm:flex w-12 h-12 rounded-xl bg-emerald-500/10 items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-browser text-2xl text-emerald-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-white mb-2">Zbuduje stronę sprzedażową</h3>
+                                    <p class="text-zinc-400 leading-relaxed mb-3">
+                                        <span class="text-white font-medium">Otrzymasz gotową stronę</span> wysokiej jakości,
+                                        zoptymalizowaną pod sprzedaż — możesz od razu zacząć zarabiać.
+                                    </p>
+
+                                    <!-- Co otrzymasz - zawsze widoczne -->
+                                    <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-4 mb-3">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <i class="ph-fill ph-package text-emerald-400 text-lg"></i>
+                                            <h4 class="text-white font-semibold text-sm">Co otrzymasz</h4>
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                            <div class="flex items-center gap-2 text-emerald-300">
+                                                <i class="ph ph-check text-emerald-400"></i>
+                                                <span>Gotowa strona sprzedażowa</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-emerald-300">
+                                                <i class="ph ph-check text-emerald-400"></i>
+                                                <span>Responsywny design (mobile + desktop)</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-emerald-300">
+                                                <i class="ph ph-check text-emerald-400"></i>
+                                                <span>Optymalizacja pod konwersję</span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-emerald-300">
+                                                <i class="ph ph-check text-emerald-400"></i>
+                                                <span>Możliwość natychmiastowego startu</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button onclick="toggleDetails('step4')" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1.5 transition-colors">
+                                        <span>Zobacz szczegóły</span>
+                                        <i class="ph ph-caret-down details-toggle" id="step4-icon"></i>
+                                    </button>
+
+                                    <div id="step4-details" class="details-content mt-4">
+                                        <!-- Zadania Tomka -->
+                                        <div class="mb-4">
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user text-emerald-400 text-xs"></i>
+                                                    <span class="text-white font-semibold text-xs">TOMEK</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-white/5"></div>
+                                            </div>
+                                            <div class="grid grid-cols-1 gap-2 text-xs">
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-emerald-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Zaprojektowanie nowoczesnego wyglądu strony</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-emerald-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Zapewnienie pełnej responsywności (mobile + desktop)</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-emerald-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Optymalizacja układu pod konwersję</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-emerald-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Przygotowanie przekonujących treści sprzedażowych</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-emerald-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Optymalizacja szybkości ładowania</span>
+                                                </div>
+                                                <div class="flex items-start gap-2 text-zinc-300">
+                                                    <i class="ph ph-check-circle text-emerald-400/60 flex-shrink-0 text-sm mt-0.5"></i>
+                                                    <span>Wdrożenie podstawowych ustawień SEO</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Twoje zadania -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <div class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-md px-2 py-1">
+                                                    <i class="ph-fill ph-user-circle text-emerald-400 text-xs"></i>
+                                                    <span class="text-emerald-400 font-semibold text-xs">TWOJE ZADANIA</span>
+                                                </div>
+                                                <div class="h-px flex-1 bg-emerald-500/20"></div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-3.5">
+                                                    <div class="flex items-start gap-2.5">
+                                                        <i class="ph-fill ph-clipboard-text text-emerald-400 flex-shrink-0 text-lg mt-0.5"></i>
+                                                        <div>
+                                                            <div class="text-white font-semibold text-sm mb-1">Przegląd i akceptacja strony</div>
+                                                            <p class="text-zinc-400 text-xs leading-relaxed">Sprawdzenie wszystkich funkcji strony i zatwierdzenie gotowego produktu przed uruchomieniem.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-emerald-500/5 border border-emerald-500/20 rounded-lg p-3.5">
+                                                    <div class="flex items-start gap-2.5">
+                                                        <i class="ph-fill ph-shield-check text-emerald-400 flex-shrink-0 text-lg mt-0.5"></i>
+                                                        <div>
+                                                            <div class="text-white font-semibold text-sm mb-1">Decyzja o dalszej współpracy</div>
+                                                            <p class="text-zinc-400 text-xs leading-relaxed">Możesz kontynuować współpracę lub zrezygnować i otrzymać <span class="text-emerald-400 font-semibold">zwrot całkowitej wniesionej opłaty</span>.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trust & Partnership Section -->
+            <section class="py-12 fade-in">
+                <!-- Satisfaction Guarantee Banner -->
+                <div class="card p-5 sm:p-6 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-transparent border-blue-500/20 mb-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <i class="ph-fill ph-shield-check text-xl sm:text-2xl text-blue-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-semibold text-white mb-2">Gwarancja satysfakcji</h3>
+                            <p class="text-zinc-300 text-sm leading-relaxed mb-3">
+                                Jeśli po przygotowaniu wszystkich materiałów uznasz, że <span class="text-white font-medium">nie jesteś w pełni zadowolony</span>
+                                z jakości pracy lub z dowolnego innego powodu zdecydujesz się zrezygnować,
+                                <span class="text-white font-medium">Tomek zwróci Ci całą wpłaconą kwotę</span>.
+                            </p>
+                            <div class="bg-white/5 border border-white/10 rounded-lg p-3">
+                                <p class="text-zinc-400 text-xs leading-relaxed">
+                                    <i class="ph ph-handshake text-blue-400 mr-1"></i>
+                                    Pełne zadowolenie klienta to fundament długofalowej współpracy.
+                                    Tomek pracuje wyłącznie z osobami, które są w 100% przekonane do wspólnego projektu.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Two column section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Who -->
+                    <div class="card p-6 sm:p-8 bg-gradient-to-br from-amber-500/5 to-transparent border-amber-500/20">
+                        <div class="flex items-center gap-4 mb-5">
+                            <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat.png" alt="Tomek Niedzwiecki"
+                                 class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover ring-2 ring-white/10">
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Tomek Niedzwiecki</h3>
+                                <p class="text-zinc-500 text-sm">Przedsiębiorca, inwestor, twórca</p>
+                            </div>
+                        </div>
+                        <p class="text-zinc-300 leading-relaxed mb-5">
+                            Każdy etap wykonywany jest <span class="text-white font-semibold">bezpośrednio przez Tomka</span>.
+                            Pełna transparentność i wgląd w każdy etap realizacji.
+                        </p>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 text-amber-400 text-sm">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Wgląd do panelu z postępami</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-amber-400 text-sm">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Kontakt przez komunikator i e-mail</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-amber-400 text-sm">
+                                <i class="ph ph-check-circle"></i>
+                                <span>W razie potrzeby również telefonicznie</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Goal -->
+                    <div class="card p-6 sm:p-8 bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/20">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                <i class="ph ph-target text-2xl text-emerald-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white">Docelowy plan</h3>
+                        </div>
+                        <p class="text-zinc-300 leading-relaxed mb-6">
+                            <span class="text-white font-semibold">Tomek buduje</span> dla Ciebie biznes,
+                            <span class="text-white font-semibold">wdraża Cię</span> w jego prowadzenie, a następnie
+                            <span class="text-white font-semibold">możesz zostać wspólnikiem</span> — Tomek otrzymuje % udział w zyskach,
+                            pozostając aktywnie zaangażowany w rozwój firmy.
+                        </p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center gap-2 text-emerald-400 text-sm">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Długoterminowe partnerstwo</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-emerald-400 text-sm">
+                                <i class="ph ph-check-circle"></i>
+                                <span>Wspólny rozwój biznesu</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-lg p-3">
+                            <p class="text-zinc-400 text-xs">
+                                <i class="ph ph-handshake text-emerald-400 text-sm mr-1"></i>
+                                Szczegóły współpracy i modelu partnerskiego ustalane indywidualnie
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+
+    <!-- WhatsApp Widget -->
+    <div class="whatsapp-widget">
+        <a href="https://wa.me/48533308623?text=Cze%C5%9B%C4%87!%20Mam%20pytanie%20dotycz%C4%85ce%20oferty%20startowej." target="_blank" rel="noopener" class="whatsapp-btn" title="Napisz na WhatsApp">
+            <svg viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+        </a>
+    </div>
+
+    <script>
+        function toggleDetails(stepId) {
+            const detailsElement = document.getElementById(`${stepId}-details`);
+            const iconElement = document.getElementById(`${stepId}-icon`);
+            const buttonElement = event.target.closest('button');
+            const buttonText = buttonElement.querySelector('span');
+
+            if (detailsElement.classList.contains('expanded')) {
+                detailsElement.classList.remove('expanded');
+                iconElement.classList.remove('rotated');
+                buttonText.textContent = 'Zobacz szczegóły';
+            } else {
+                detailsElement.classList.add('expanded');
+                iconElement.classList.add('rotated');
+                buttonText.textContent = 'Ukryj szczegóły';
+            }
+        }
+
+        function initFadeInAnimations() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            fadeElements.forEach(el => observer.observe(el));
+        }
+
+        function initStickyHeader() {
+            const stickyHeader = document.getElementById('sticky-header');
+            const heroSection = document.querySelector('.hero-gradient');
+
+            if (!stickyHeader || !heroSection) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        stickyHeader.classList.remove('visible');
+                    } else {
+                        stickyHeader.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: '0px'
+            });
+
+            observer.observe(heroSection);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initFadeInAnimations();
+            initStickyHeader();
+        });
+    </script>
+</body>
+</html>
