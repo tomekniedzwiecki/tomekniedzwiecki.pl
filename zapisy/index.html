@@ -16,7 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Preload critical image -->
-    <link rel="preload" href="/img/tn_kwadrat.png" as="image" type="image/png">
+    <link rel="preload" href="/img/tn_kwadrat_small.webp" as="image" type="image/webp">
 
     <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
     <meta name="description" content="Zgłoś się do współpracy z Tomaszem Niedźwieckim. Zbuduję dla Ciebie biznes online.">
@@ -112,6 +112,12 @@
         ::selection {
             background: #10b981;
             color: #000;
+        }
+
+        /* Font display optimization for Phosphor Icons */
+        @font-face {
+            font-family: 'Phosphor';
+            font-display: swap;
         }
 
         /* === TYPOGRAPHY === */
@@ -770,7 +776,7 @@
             <div id="step-0" class="step-container active flex-col items-center">
                 <div class="text-center mb-8">
                     <div class="avatar-container w-20 h-20 mx-auto mb-3">
-                        <img src="/img/tn_kwadrat.png" alt="Tomasz Niedźwiecki" class="w-20 h-20 object-cover">
+                        <img src="/img/tn_kwadrat_small.webp" alt="Tomasz Niedźwiecki" class="w-20 h-20 object-cover">
                     </div>
                     <p class="text-white font-semibold text-lg mb-1">Tomasz Niedźwiecki</p>
                     <div class="flex items-center justify-center gap-3 text-xs text-zinc-500 mb-5">
