@@ -1404,7 +1404,7 @@
                 console.error('Error:', err);
             }
 
-            gtag('event', 'conversion', {'send_to': 'AW-17886093904/8_ykCOCF9OcbENDE4NBC'});
+            // Track email submission (Lead event)
             fbq('track', 'Lead', {
                 content_name: 'Formularz zapisy',
                 content_category: 'lead_form'
@@ -1565,6 +1565,8 @@
                 budget: null
             });
 
+            // Track form completion + Google Ads conversion
+            gtag('event', 'conversion', {'send_to': 'AW-17886093904/8_ykCOCF9OcbENDE4NBC'});
             gtag('event', 'form_complete', {'event_category': 'engagement'});
             fbq('track', 'CompleteRegistration');
             if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
