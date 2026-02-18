@@ -1218,6 +1218,13 @@
         // ==================== TRACKING ====================
         const TRACKING_PARAMS = ['gclid', 'gbraid', 'wbraid', 'gad_source', 'fbclid', 'ttclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id'];
 
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
         function captureTrackingParams() {
             const urlParams = new URLSearchParams(window.location.search);
             const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
@@ -1225,6 +1232,9 @@
                 const value = urlParams.get(param);
                 if (value) stored[param] = value;
             });
+            // Capture Facebook _fbp cookie for conversion API matching
+            const fbp = getCookie('_fbp');
+            if (fbp) stored.fbp = fbp;
             if (!stored.landing_page) stored.landing_page = window.location.href;
             if (!stored.referrer && document.referrer) stored.referrer = document.referrer;
             sessionStorage.setItem('tracking_params', JSON.stringify(stored));
@@ -1234,6 +1244,9 @@
         function getTrackingData() {
             const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
             stored.user_agent = navigator.userAgent;
+            // Re-check _fbp cookie (might be set after initial capture)
+            const fbp = getCookie('_fbp');
+            if (fbp) stored.fbp = fbp;
             return stored;
         }
 
