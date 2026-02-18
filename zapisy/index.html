@@ -1266,6 +1266,59 @@
 
         captureTrackingParams();
 
+        // ==================== GOOGLE ENHANCED CONVERSIONS ====================
+        async function sha256(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str.toLowerCase().trim());
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function normalizePhoneForGoogle(phone) {
+            if (!phone) return null;
+            let normalized = phone.replace(/[\s\-\(\)\.]/g, '');
+            if (normalized.startsWith('0')) {
+                normalized = '+48' + normalized.substring(1);
+            } else if (!normalized.startsWith('+')) {
+                normalized = '+48' + normalized;
+            }
+            return normalized;
+        }
+
+        async function setGoogleUserData() {
+            const savedData = loadSavedData();
+            if (!savedData.email) return;
+
+            const userData = {
+                email: await sha256(savedData.email)
+            };
+
+            if (savedData.phone) {
+                const normalizedPhone = normalizePhoneForGoogle(savedData.phone);
+                if (normalizedPhone) {
+                    userData.phone_number = await sha256(normalizedPhone);
+                }
+            }
+
+            if (savedData.name) {
+                // Try to split name into first/last
+                const nameParts = savedData.name.trim().split(/\s+/);
+                if (nameParts.length >= 1) {
+                    userData.address = {
+                        first_name: await sha256(nameParts[0]),
+                        country: 'PL'
+                    };
+                    if (nameParts.length >= 2) {
+                        userData.address.last_name = await sha256(nameParts.slice(1).join(' '));
+                    }
+                }
+            }
+
+            gtag('set', 'user_data', userData);
+            console.log('[Google Enhanced] user_data set:', Object.keys(userData));
+        }
+
         // ==================== TIKTOK SERVER-SIDE ====================
         async function sendTikTokServerEvent(eventName, extraData = {}) {
             try {
@@ -1625,7 +1678,8 @@
                 budget: null
             });
 
-            // Track form completion + Google Ads conversion
+            // Track form completion + Google Ads conversion with Enhanced Conversions
+            await setGoogleUserData();
             gtag('event', 'conversion', {'send_to': 'AW-17886093904/8_ykCOCF9OcbENDE4NBC'});
             gtag('event', 'form_complete', {'event_category': 'engagement'});
             fbq('track', 'CompleteRegistration');
