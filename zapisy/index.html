@@ -1253,6 +1253,37 @@
 
         captureTrackingParams();
 
+        // ==================== TIKTOK SERVER-SIDE ====================
+        async function sendTikTokServerEvent(eventName, extraData = {}) {
+            try {
+                const tracking = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+                const savedData = loadSavedData();
+
+                const payload = {
+                    event: eventName,
+                    email: savedData.email || null,
+                    phone: savedData.phone || null,
+                    ttclid: tracking.ttclid || null,
+                    lead_id: savedData.lead_id || null,
+                    url: window.location.href,
+                    ...extraData
+                };
+
+                // Fire and forget - don't block UI
+                fetch(`${SUPABASE_URL}/functions/v1/tiktok-event`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(r => r.json()).then(result => {
+                    console.log('[TikTok Server]', eventName, result.success ? 'sent' : 'failed');
+                }).catch(err => {
+                    console.warn('[TikTok Server] Error:', err);
+                });
+            } catch (err) {
+                console.warn('[TikTok Server] Error preparing event:', err);
+            }
+        }
+
         // ==================== DATABASE ====================
         async function updateLead(updates) {
             const email = loadSavedData().email;
@@ -1423,6 +1454,7 @@
                 content_category: 'lead_form'
             });
             if (typeof ttq !== 'undefined') ttq.track('SubmitForm');
+            sendTikTokServerEvent('SubmitForm');
 
             setLoading(submitBtn, false);
             goToStep(1);
@@ -1584,6 +1616,7 @@
             gtag('event', 'form_complete', {'event_category': 'engagement'});
             fbq('track', 'CompleteRegistration');
             if (typeof ttq !== 'undefined') ttq.track('CompleteRegistration');
+            sendTikTokServerEvent('CompleteRegistration');
             setLoading(openSubmit, false);
 
             clearData();
