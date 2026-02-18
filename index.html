@@ -2400,7 +2400,13 @@
         gs.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
         gs.onload = function() {
             gtag('js', new Date());
-            gtag('config', 'G-W8CLDSHVFC');
+            // Cross-domain tracking between tomekniedzwiecki.pl and crm.tomekniedzwiecki.pl
+            gtag('config', 'G-W8CLDSHVFC', {
+                'linker': {
+                    'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'],
+                    'accept_incoming': true
+                }
+            });
             gtag('config', 'AW-17886093904');
         };
         document.head.appendChild(gs);
