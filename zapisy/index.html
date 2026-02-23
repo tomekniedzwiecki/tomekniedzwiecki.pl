@@ -1397,24 +1397,6 @@
             }
         }
 
-        async function sendConfirmationEmail(email) {
-            try {
-                await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    },
-                    body: JSON.stringify({
-                        type: 'zapisy_confirmation',
-                        data: { email }
-                    })
-                });
-            } catch (err) {
-                console.error('Email confirmation error:', err);
-            }
-        }
-
         // ==================== RESTORE STATE ====================
         async function restoreSelections() {
             const data = loadSavedData();
@@ -1516,7 +1498,7 @@
                     console.log(result.is_new ? 'Created new lead:' : 'Updating existing lead:', leadId);
                 }
 
-                sendConfirmationEmail(email);
+                // Email confirmation is now handled by automation-trigger in lead-upsert
             } catch (err) {
                 console.error('Error:', err);
             }
