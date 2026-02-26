@@ -2444,13 +2444,29 @@
     <!-- Preserve UTM/tracking parameters when navigating to /zapisy -->
     <script>
     (function() {
-        var trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid', 'msclkid', 'ref'];
+        var trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'gclid', 'gbraid', 'wbraid', 'gad_source', 'fbclid', 'ttclid', 'msclkid', 'ref'];
         var currentParams = new URLSearchParams(window.location.search);
-        var paramsToPass = new URLSearchParams();
+
+        // Load existing params from sessionStorage and merge with URL params
+        var stored = {};
+        try { stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}'); } catch(e) {}
 
         trackingParams.forEach(function(param) {
             if (currentParams.has(param)) {
-                paramsToPass.set(param, currentParams.get(param));
+                stored[param] = currentParams.get(param);
+            }
+        });
+
+        // Save to sessionStorage (will be read by /zapisy)
+        if (Object.keys(stored).length > 0) {
+            sessionStorage.setItem('tracking_params', JSON.stringify(stored));
+        }
+
+        // Build params string for URL
+        var paramsToPass = new URLSearchParams();
+        trackingParams.forEach(function(param) {
+            if (stored[param]) {
+                paramsToPass.set(param, stored[param]);
             }
         });
 
