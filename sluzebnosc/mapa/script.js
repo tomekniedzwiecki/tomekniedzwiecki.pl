@@ -23,7 +23,10 @@ function initMainMap() {
 
     // Initialize map centered on Poland
     mainMap = L.map('main-map', {
-        zoomControl: true
+        zoomControl: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        dragging: true
     }).setView([52.0, 19.5], 6);
 
     // Add tile layer
@@ -118,7 +121,9 @@ async function loadPowerLines() {
                 const line = L.polyline(coords, {
                     color: getVoltageColor(voltage),
                     weight: getVoltageWeight(voltage),
-                    opacity: 0.8
+                    opacity: 1,
+                    lineCap: 'round',
+                    lineJoin: 'round'
                 });
 
                 // Add popup with info
@@ -151,20 +156,20 @@ async function loadPowerLines() {
  * Get color based on voltage
  */
 function getVoltageColor(voltage) {
-    if (voltage >= 380000) return '#dc2626'; // 400kV - red
-    if (voltage >= 200000) return '#ea580c'; // 220kV - orange
-    if (voltage >= 100000) return '#eab308'; // 110kV - yellow
-    return '#6b7280'; // other - gray
+    if (voltage >= 380000) return '#e11d48'; // 400kV - bright red/pink
+    if (voltage >= 200000) return '#f97316'; // 220kV - bright orange
+    if (voltage >= 100000) return '#facc15'; // 110kV - bright yellow
+    return '#a855f7'; // other - purple (more visible than gray)
 }
 
 /**
  * Get line weight based on voltage
  */
 function getVoltageWeight(voltage) {
-    if (voltage >= 380000) return 4;
-    if (voltage >= 200000) return 3;
-    if (voltage >= 100000) return 2.5;
-    return 2;
+    if (voltage >= 380000) return 6;
+    if (voltage >= 200000) return 5;
+    if (voltage >= 100000) return 4;
+    return 3;
 }
 
 /**
@@ -431,9 +436,9 @@ function haversineDistance(lat1, lng1, lat2, lng2) {
  * Convert color back to approximate voltage
  */
 function colorToVoltage(color) {
-    if (color === '#dc2626') return 400000;
-    if (color === '#ea580c') return 220000;
-    if (color === '#eab308') return 110000;
+    if (color === '#e11d48') return 400000;
+    if (color === '#f97316') return 220000;
+    if (color === '#facc15') return 110000;
     return 15000;
 }
 

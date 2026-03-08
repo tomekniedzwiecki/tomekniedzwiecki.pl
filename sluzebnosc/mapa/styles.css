@@ -23,10 +23,10 @@
     --color-border-dark: #d1d5db;
 
     /* Voltage colors */
-    --color-voltage-400: #dc2626;
-    --color-voltage-220: #ea580c;
-    --color-voltage-110: #eab308;
-    --color-voltage-other: #6b7280;
+    --color-voltage-400: #e11d48;
+    --color-voltage-220: #f97316;
+    --color-voltage-110: #facc15;
+    --color-voltage-other: #a855f7;
 
     /* Spacing */
     --space-1: 0.25rem;
