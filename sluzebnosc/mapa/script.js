@@ -83,8 +83,14 @@ async function loadPowerLines() {
     if (currentBounds === boundsStr) return;
     currentBounds = boundsStr;
 
-    // Show loading
-    document.getElementById('map-loading')?.classList.add('visible');
+    // Show loading state
+    const loadingEl = document.getElementById('map-loading');
+    const linesCountEl = document.getElementById('lines-count');
+
+    loadingEl?.classList.add('visible');
+    if (linesCountEl) {
+        linesCountEl.innerHTML = '<span class="loading-dots">Ładowanie</span>';
+    }
 
     try {
         // Overpass query for power lines
