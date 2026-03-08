@@ -61,27 +61,45 @@ function initMainMap() {
     });
 }
 
+// Rate limiting
+let lastApiCall = 0;
+const API_COOLDOWN = 3000; // 3 seconds between requests
+let isLoading = false;
+
 /**
  * Load power lines from Overpass API
  */
 async function loadPowerLines() {
     if (!mainMap) return;
 
+    // Prevent concurrent requests
+    if (isLoading) return;
+
+    // Rate limiting
+    const now = Date.now();
+    if (now - lastApiCall < API_COOLDOWN) {
+        console.log('Rate limited, waiting...');
+        return;
+    }
+
     const zoom = mainMap.getZoom();
 
     // Only load detailed lines at zoom >= 10
-    if (zoom < 8) {
+    if (zoom < 10) {
         document.getElementById('lines-count').textContent = '—';
         document.getElementById('area-name').textContent = 'Przybliż mapę';
         return;
     }
 
     const bounds = mainMap.getBounds();
-    const boundsStr = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+    const boundsStr = `${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)},${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}`;
 
     // Check if we already loaded this area
     if (currentBounds === boundsStr) return;
     currentBounds = boundsStr;
+
+    isLoading = true;
+    lastApiCall = now;
 
     // Show loading state
     const loadingEl = document.getElementById('map-loading');
@@ -117,16 +135,34 @@ async function loadPowerLines() {
         // Clear existing lines
         powerLinesLayer.clearLayers();
 
-        // Add lines to map
+        // Add lines to map with outline for better visibility
         let lineCount = 0;
         data.elements.forEach(element => {
             if (element.geometry && element.geometry.length > 1) {
                 const coords = element.geometry.map(p => [p.lat, p.lon]);
                 const voltage = parseInt(element.tags?.voltage) || 0;
+                const weight = getVoltageWeight(voltage);
 
+                // Black outline for contrast
+                const outline = L.polyline(coords, {
+                    color: '#000000',
+                    weight: weight + 4,
+                    opacity: 0.5
+                });
+                powerLinesLayer.addLayer(outline);
+
+                // White middle layer
+                const whiteLine = L.polyline(coords, {
+                    color: '#ffffff',
+                    weight: weight + 2,
+                    opacity: 1
+                });
+                powerLinesLayer.addLayer(whiteLine);
+
+                // Main colored line
                 const line = L.polyline(coords, {
                     color: getVoltageColor(voltage),
-                    weight: getVoltageWeight(voltage),
+                    weight: weight,
                     opacity: 1,
                     lineCap: 'round',
                     lineJoin: 'round'
@@ -152,20 +188,23 @@ async function loadPowerLines() {
 
     } catch (error) {
         console.error('Error loading power lines:', error);
-        document.getElementById('lines-count').textContent = 'Błąd';
+        document.getElementById('lines-count').textContent = 'Błąd API';
+        // Reset bounds so we can retry
+        currentBounds = null;
     } finally {
+        isLoading = false;
         document.getElementById('map-loading')?.classList.remove('visible');
     }
 }
 
 /**
- * Get color based on voltage
+ * Get color based on voltage - darker colors for better visibility
  */
 function getVoltageColor(voltage) {
-    if (voltage >= 380000) return '#e11d48'; // 400kV - bright red/pink
-    if (voltage >= 200000) return '#f97316'; // 220kV - bright orange
-    if (voltage >= 100000) return '#facc15'; // 110kV - bright yellow
-    return '#a855f7'; // other - purple (more visible than gray)
+    if (voltage >= 380000) return '#991b1b'; // 400kV - dark red
+    if (voltage >= 200000) return '#b91c1c'; // 220kV - red
+    if (voltage >= 100000) return '#c2410c'; // 110kV - dark orange
+    return '#6d28d9'; // other - purple
 }
 
 /**

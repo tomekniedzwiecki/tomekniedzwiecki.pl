@@ -586,9 +586,30 @@ function initPreviewMap() {
                     const coords = element.geometry.map(p => [p.lat, p.lon]);
                     const voltage = parseInt(element.tags?.voltage) || 0;
 
+                    // Darker, more saturated colors
+                    const color = voltage >= 200000 ? '#b91c1c' : voltage >= 100000 ? '#c2410c' : '#6d28d9';
+                    const weight = voltage >= 200000 ? 7 : voltage >= 100000 ? 6 : 5;
+
+                    // Black outline for maximum contrast
+                    const outline = L.polyline(coords, {
+                        color: '#000000',
+                        weight: weight + 4,
+                        opacity: 0.6
+                    });
+                    powerLinesLayer.addLayer(outline);
+
+                    // White middle layer
+                    const whiteLine = L.polyline(coords, {
+                        color: '#ffffff',
+                        weight: weight + 2,
+                        opacity: 1
+                    });
+                    powerLinesLayer.addLayer(whiteLine);
+
+                    // Colored line on top
                     const line = L.polyline(coords, {
-                        color: voltage >= 200000 ? '#e11d48' : voltage >= 100000 ? '#facc15' : '#a855f7',
-                        weight: voltage >= 200000 ? 6 : voltage >= 100000 ? 5 : 4,
+                        color: color,
+                        weight: weight,
                         opacity: 1
                     });
 
