@@ -1211,6 +1211,16 @@ input, textarea, select {
     animation: shake 0.4s ease;
 }
 
+/* Custom map pin */
+.custom-map-pin {
+    background: none;
+    border: none;
+}
+
+.custom-map-pin svg {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 /* ============================================
    Responsive
    ============================================ */
