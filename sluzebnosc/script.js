@@ -540,7 +540,12 @@ function initPreviewMap() {
 
     async function loadPreviewPowerLines() {
         const zoom = previewMap.getZoom();
-        if (zoom < 9) return;
+        console.log('Preview map zoom:', zoom);
+
+        if (zoom < 9) {
+            console.log('Zoom too low, skipping power lines load');
+            return;
+        }
 
         const bounds = previewMap.getBounds();
         const boundsStr = bounds.toBBoxString();
@@ -551,32 +556,49 @@ function initPreviewMap() {
         loadingEl?.classList.add('visible');
 
         try {
-            const query = `[out:json][timeout:25];way["power"="line"](${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()});out geom;`;
+            const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+            const query = `[out:json][timeout:30];way["power"="line"](${bbox});out geom;`;
+
+            console.log('Fetching power lines for bbox:', bbox);
+
             const response = await fetch('https://overpass-api.de/api/interpreter', {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'data=' + encodeURIComponent(query)
             });
 
-            if (!response.ok) throw new Error('API error');
-            const data = await response.json();
+            const text = await response.text();
+
+            // Check if response is JSON
+            if (!text.startsWith('{')) {
+                console.error('Overpass API returned non-JSON:', text.substring(0, 200));
+                return;
+            }
+
+            const data = JSON.parse(text);
+            console.log('Power lines found:', data.elements?.length || 0);
 
             powerLinesLayer.clearLayers();
 
-            data.elements.forEach(element => {
+            let lineCount = 0;
+            data.elements?.forEach(element => {
                 if (element.geometry && element.geometry.length > 1) {
                     const coords = element.geometry.map(p => [p.lat, p.lon]);
                     const voltage = parseInt(element.tags?.voltage) || 0;
 
                     const line = L.polyline(coords, {
                         color: voltage >= 200000 ? '#e11d48' : voltage >= 100000 ? '#facc15' : '#a855f7',
-                        weight: voltage >= 200000 ? 5 : voltage >= 100000 ? 4 : 3,
+                        weight: voltage >= 200000 ? 6 : voltage >= 100000 ? 5 : 4,
                         opacity: 1
                     });
 
                     line.bindPopup(`<strong>Linia ${voltage >= 1000 ? (voltage/1000) + ' kV' : 'energetyczna'}</strong>`);
                     powerLinesLayer.addLayer(line);
+                    lineCount++;
                 }
             });
+
+            console.log('Lines added to map:', lineCount);
         } catch (e) {
             console.error('Preview map error:', e);
         } finally {
