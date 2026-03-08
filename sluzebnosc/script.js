@@ -384,6 +384,9 @@ function initLeadForm() {
 
             // Reverse geocode to show location name
             reverseGeocode(lat, lng);
+
+            // Fetch parcel number from ULDK
+            fetchParcelInfo(lat, lng);
         });
 
         // Try to get user's location
@@ -423,6 +426,48 @@ function initLeadForm() {
             }
         } catch (error) {
             // Silently fail - display will show default text
+        }
+    }
+
+    async function fetchParcelInfo(lat, lng) {
+        const parcelInfo = document.getElementById('parcel-info');
+        const parcelNumber = document.getElementById('parcel-number');
+        const parcelInput = document.getElementById('numer-dzialki');
+
+        // Show loading state
+        parcelInfo.style.display = 'flex';
+        parcelNumber.textContent = 'Szukam...';
+
+        try {
+            // ULDK API - xy is longitude,latitude for srid=4326
+            const response = await fetch(
+                `https://uldk.gugik.gov.pl/?request=GetParcelByXY&xy=${lng},${lat}&srid=4326&result=teryt,parcel,region`
+            );
+            const text = await response.text();
+
+            // ULDK returns pipe-separated values or error code
+            if (text && !text.startsWith('-1') && !text.startsWith('0')) {
+                const parts = text.trim().split('|');
+                if (parts.length >= 2) {
+                    const teryt = parts[0];
+                    const parcel = parts[1];
+                    const region = parts[2] || '';
+
+                    // Format: region + numer działki
+                    const displayText = region ? `${region}, dz. ${parcel}` : `${teryt} / ${parcel}`;
+                    parcelNumber.textContent = displayText;
+                    parcelInput.value = `${teryt}|${parcel}`;
+                } else {
+                    parcelNumber.textContent = 'Nie znaleziono';
+                    parcelInput.value = '';
+                }
+            } else {
+                parcelNumber.textContent = 'Nie znaleziono';
+                parcelInput.value = '';
+            }
+        } catch (error) {
+            parcelNumber.textContent = 'Błąd pobierania';
+            parcelInput.value = '';
         }
     }
 
