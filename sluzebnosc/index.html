@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odszkodowanie za słupy energetyczne | Służebność przesyłu</title>
+    <meta name="description" content="Wyrok TK otworzył drogę do odszkodowań za słupy na działce. Bezpłatna analiza sprawy. Płacisz tylko gdy wygramy.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-inner">
+            <a href="#" class="logo">Służebność<span>Przesyłu</span></a>
+            <nav class="nav-links">
+                <a href="#jak-dziala">Jak to działa</a>
+                <a href="#ile-mozesz-uzyskac">Kwoty</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <a href="#" data-open-modal="lead-modal" class="btn btn-header">Bezpłatna analiza</a>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Słupy, kable lub rury<br>na <span class="text-highlight">Twojej działce</span>?</h1>
+                <p class="hero-amount">Odzyskaj <span class="gradient-text">nawet kilkadziesiąt tysięcy złotych</span></p>
+
+                <p class="hero-desc">Wyrok TK z 2025 r. zmienił zasady — teraz możesz dochodzić odszkodowania, nawet jeśli infrastruktura stoi od dekad.</p>
+
+                <div class="hero-cta">
+                    <a href="#" data-open-modal="lead-modal" class="btn btn-primary btn-lg">
+                        Bezpłatna analiza
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 10h6m0 0l-3-3m3 3l-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+                <p class="hero-note">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M13.333 4L6 11.333 2.667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Prowizja tylko od sukcesu
+                </p>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="hero-card-badge">Wygrana sprawa</div>
+                    <div class="hero-card-content">
+                        <div class="hero-card-amount">15 000 zł</div>
+                        <p class="hero-card-desc">Rolnik, 14 słupów na polu.<br>Firma proponowała tylko 2 000 zł.</p>
+                    </div>
+                    <div class="hero-card-meta">
+                        <span>4 miesiące</span>
+                        <span class="meta-dot"></span>
+                        <span>Ugoda</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social proof bar -->
+    <section class="proof-bar">
+        <div class="container">
+            <div class="proof-stats">
+                <div class="stat">
+                    <span class="stat-value">2,4 mln zł</span>
+                    <span class="stat-label">odzyskanych odszkodowań</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <span class="stat-value">340+</span>
+                    <span class="stat-label">wygranych spraw</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat">
+                    <span class="stat-value">91%</span>
+                    <span class="stat-label">skuteczność</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem / Agitation -->
+    <section class="section">
+        <div class="container">
+            <div class="two-col">
+                <div class="col-text">
+                    <span class="section-label">Problem</span>
+                    <h2>Przez lata firmy energetyczne korzystały z Twojej ziemi za darmo</h2>
+                    <p>Słupy i linie energetyczne ograniczają użytkowanie działki, utrudniają uprawę, blokują możliwość zabudowy. A zakład energetyczny? Nie płacił za to ani złotówki.</p>
+
+                    <div class="pain-points">
+                        <div class="pain-point">
+                            <div class="pain-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/>
+                                    <circle cx="19" cy="12" r="3"/>
+                                </svg>
+                            </div>
+                            <p><strong>Utrudniona praca na polu</strong> — trzeba każdy słup kilka razy objechać, kable wiszą coraz niżej</p>
+                        </div>
+                        <div class="pain-point">
+                            <div class="pain-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <p><strong>Ograniczona zabudowa</strong> — nie możesz budować gdzie chcesz, musisz zachować odległości</p>
+                        </div>
+                        <div class="pain-point">
+                            <div class="pain-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 17l6-6 4 4 8-8M17 7h4v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <p><strong>Niższa wartość działki</strong> — kupujący oferują mniej, bo widzą słupy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-visual">
+                    <div class="quote-card">
+                        <blockquote>"Wjeżdżam, kombinuję jak mogę, żeby nie było odłogu, a oni nie płacą za nic"</blockquote>
+                        <cite>
+                            <strong>Rolnik z woj. śląskiego</strong>
+                            <span>14 słupów na polu uprawnym</span>
+                        </cite>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution -->
+    <section class="section section-dark">
+        <div class="container">
+            <div class="solution-header">
+                <span class="section-label section-label-light">Rozwiązanie</span>
+                <h2>Wyrok Trybunału Konstytucyjnego zmienił zasady gry</h2>
+                <p class="section-desc">2 grudnia 2025 roku TK orzekł, że zasiedzenie służebności przesyłu sprzed 2008 roku jest <strong>niezgodne z Konstytucją</strong>.</p>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3>Wynagrodzenie wstecz</h3>
+                    <p>Możesz żądać zapłaty za bezumowne korzystanie z Twojej działki — do 6 lat wstecz.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <h3>Służebność na przyszłość</h3>
+                    <p>Możesz ustanowić płatną służebność przesyłu — stały dochód za użytkowanie gruntu.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <h3>Wznowienie spraw</h3>
+                    <p>Przegrałeś wcześniej? Możesz wznowić postępowanie na podstawie wyroku TK.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kwalifikacja -->
+    <section class="section" id="czy-ci-sie-nalezy">
+        <div class="container container-narrow">
+            <div class="section-header-center">
+                <h2>Czy przysługuje Ci odszkodowanie?</h2>
+                <p>Odpowiedz na 4 pytania i dowiedz się w 30 sekund</p>
+            </div>
+
+            <div class="checklist-card">
+                <div class="checklist-item">
+                    <span class="check-number">1</span>
+                    <div class="check-content">
+                        <strong>Czy na Twojej działce stoją słupy, przebiegają kable lub rury?</strong>
+                        <span class="check-hint">Słupy energetyczne, gazociąg, wodociąg, światłowód</span>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="check-number">2</span>
+                    <div class="check-content">
+                        <strong>Czy jesteś właścicielem tej działki?</strong>
+                        <span class="check-hint">Lub współwłaścicielem / spadkobiercą</span>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="check-number">3</span>
+                    <div class="check-content">
+                        <strong>Czy NIE podpisywałeś umowy na posadowienie urządzeń?</strong>
+                        <span class="check-hint">Jeśli nie wiesz — sprawdzimy to za Ciebie</span>
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <span class="check-number">4</span>
+                    <div class="check-content">
+                        <strong>Czy NIE pobierałeś wynagrodzenia od firmy energetycznej?</strong>
+                        <span class="check-hint">Za korzystanie z Twojego gruntu</span>
+                    </div>
+                </div>
+
+                <div class="checklist-result">
+                    <p><strong>Jeśli na wszystkie pytania odpowiedziałeś TAK</strong> — prawdopodobnie masz podstawy do odszkodowania.</p>
+                    <a href="#" data-open-modal="lead-modal" class="btn btn-primary">Sprawdź szczegóły bezpłatnie</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Kwoty -->
+    <section class="section section-alt" id="ile-mozesz-uzyskac">
+        <div class="container">
+            <div class="section-header-center">
+                <h2>Ile możesz uzyskać?</h2>
+                <p>Wysokość zależy od lokalizacji, rodzaju działki i infrastruktury</p>
+            </div>
+
+            <div class="amount-cards">
+                <div class="amount-card">
+                    <div class="amount-header">
+                        <span class="amount-type">Działka rolna</span>
+                    </div>
+                    <div class="amount-value">5 000 – 20 000 zł</div>
+                    <div class="amount-desc">Typowe wynagrodzenie za słupy na polu uprawnym</div>
+                </div>
+                <div class="amount-card amount-card-featured">
+                    <div class="amount-header">
+                        <span class="amount-type">Działka budowlana</span>
+                        <span class="amount-badge">Najczęstszy przypadek</span>
+                    </div>
+                    <div class="amount-value">15 000 – 50 000 zł</div>
+                    <div class="amount-desc">Wyższe stawki ze względu na ograniczenie zabudowy</div>
+                </div>
+                <div class="amount-card">
+                    <div class="amount-header">
+                        <span class="amount-type">Działka w mieście</span>
+                    </div>
+                    <div class="amount-value">do 100 000+ zł</div>
+                    <div class="amount-desc">Dla działek o wysokiej wartości rynkowej</div>
+                </div>
+            </div>
+
+            <div class="case-studies">
+                <h3>Przykłady z naszej praktyki</h3>
+                <div class="cases-grid">
+                    <div class="case-card">
+                        <div class="case-amount">12 000 zł</div>
+                        <p>Rolnik, woj. śląskie. 10 lat bezumownego korzystania pod linię energetyczną.</p>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-amount">9 000 zł + 900 zł/rok</div>
+                        <p>Transformator na działce. Firma proponowała 1 500 zł — uzyskaliśmy 6x więcej.</p>
+                    </div>
+                    <div class="case-card">
+                        <div class="case-amount">28 000 zł</div>
+                        <p>Działka budowlana pod Warszawą. Słup blokował optymalną lokalizację domu.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Jak działamy -->
+    <section class="section" id="jak-dziala">
+        <div class="container container-narrow">
+            <div class="section-header-center">
+                <h2>Jak to działa?</h2>
+                <p>Prosty proces w 4 krokach</p>
+            </div>
+
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Zgłoś się do nas</h4>
+                        <p>Wypełnij formularz lub zadzwoń. Potrzebujemy tylko numeru księgi wieczystej.</p>
+                    </div>
+                    <div class="step-time">2 minuty</div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Bezpłatna analiza</h4>
+                        <p>Sprawdzamy Twoją sytuację prawną i oceniamy szanse oraz potencjalną kwotę.</p>
+                    </div>
+                    <div class="step-time">24-48h</div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Negocjacje lub sąd</h4>
+                        <p>Wysyłamy wezwanie do zapłaty. Większość spraw kończy się ugodą bez sądu.</p>
+                    </div>
+                    <div class="step-time">kilka tygodni – miesięcy</div>
+                </div>
+
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Otrzymujesz pieniądze</h4>
+                        <p>Po ugodzie lub wyroku sądu wynagrodzenie trafia na Twoje konto.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guarantee-banner">
+                <div class="guarantee-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 2L4 7v8c0 7.5 5.1 14.5 12 16 6.9-1.5 12-8.5 12-16V7L16 2z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M11 16l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="guarantee-text">
+                    <strong>Zero ryzyka finansowego</strong>
+                    <p>Płacisz prowizję tylko gdy wygramy. Jeśli nie uzyskamy odszkodowania — nie płacisz nic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section-alt" id="faq">
+        <div class="container container-narrow">
+            <div class="section-header-center">
+                <h2>Często zadawane pytania</h2>
+            </div>
+
+            <div class="faq-list">
+                <details class="faq-item" open>
+                    <summary>Słupy stoją od 30 lat. Czy mogę jeszcze ubiegać się o odszkodowanie?</summary>
+                    <p>Tak. Wyrok Trybunału Konstytucyjnego z grudnia 2025 r. zmienił zasady — teraz firmy energetyczne nie mogą powoływać się na zasiedzenie sprzed 2008 roku. Niezależnie od tego, jak długo słupy stoją, możesz mieć prawo do wynagrodzenia.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Ile kosztuje obsługa prawna?</summary>
+                    <p>Analiza jest bezpłatna. Działamy w modelu success fee — prowizję (ok. 20%) pobieramy tylko gdy wygramy. Jeśli nie uzyskamy dla Ciebie odszkodowania, nie płacisz ani złotówki.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Jak długo trwa cały proces?</summary>
+                    <p>Większość spraw kończy się ugodą w ciągu kilku tygodni do kilku miesięcy. Jeśli sprawa trafi do sądu — może potrwać 12-24 miesiące, ale często warto poczekać na wyższą kwotę.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Czy zakład energetyczny może mi odłączyć prąd?</summary>
+                    <p>Absolutnie nie. Dochodzenie odszkodowania za służebność przesyłu nie ma żadnego związku z umową na dostawę prądu. To dwie całkowicie odrębne sprawy.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Jakie dokumenty muszę przygotować?</summary>
+                    <p>Na początek wystarczy numer księgi wieczystej (znajdziesz go w akcie notarialnym). Resztę dokumentów uzyskamy w Twoim imieniu.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Odziedziczyłem działkę ze słupami. Czy to dotyczy mnie?</summary>
+                    <p>Tak. Roszczenia przysługują aktualnemu właścicielowi, niezależnie od sposobu nabycia. Jako spadkobierca możesz dochodzić wynagrodzenia tak samo jak gdybyś kupił działkę.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section section-cta">
+        <div class="container">
+            <div class="cta-centered">
+                <h2>Sprawdź czy przysługuje Ci odszkodowanie</h2>
+                <p>Wypełnij krótki formularz i w ciągu 24 godzin otrzymasz bezpłatną analizę.</p>
+
+                <a href="#" data-open-modal="lead-modal" class="btn btn-cta-primary">
+                    Bezpłatna analiza
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12h6m0 0l-3-3m3 3l-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </a>
+
+                <div class="cta-features-inline">
+                    <span class="cta-feature">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M13.333 4L6 11.333 2.667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Bezpłatna analiza
+                    </span>
+                    <span class="cta-feature">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M13.333 4L6 11.333 2.667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Odpowiedź w 24h
+                    </span>
+                    <span class="cta-feature">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M13.333 4L6 11.333 2.667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Prowizja od sukcesu
+                    </span>
+                </div>
+
+                <div class="cta-phone">
+                    <p>Wolisz porozmawiać?</p>
+                    <a href="tel:+48123456789" class="phone-link">+48 123 456 789</a>
+                    <span>pon. – pt., 9:00 – 17:00</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <span class="logo">Służebność<span>Przesyłu</span></span>
+                    <p>Pomagamy właścicielom działek odzyskać należne odszkodowania za infrastrukturę przesyłową.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#jak-dziala">Jak to działa</a>
+                    <a href="#ile-mozesz-uzyskac">Kwoty</a>
+                    <a href="#faq">FAQ</a>
+                    <a href="#" data-open-modal="lead-modal">Kontakt</a>
+                </div>
+                <div class="footer-legal">
+                    <a href="#">Polityka prywatności</a>
+                    <a href="#">Regulamin</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 SłużebnośćPrzesyłu.pl</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lead Form Modal -->
+    <div class="modal" id="lead-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-card">
+                <button type="button" class="modal-close" aria-label="Zamknij">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+
+                <form id="lead-form" class="lead-form">
+                    <div class="form-progress">
+                        <div class="progress-bar" style="--progress: 20%"></div>
+                    </div>
+
+                    <!-- Step 1: Rodzaj urządzeń -->
+                    <div class="form-step active" data-step="1">
+                        <div class="form-step-header">
+                            <span class="step-indicator">Krok 1 z 5</span>
+                            <h3>Co znajduje się na Twojej działce?</h3>
+                            <p class="step-hint">Możesz wybrać kilka opcji</p>
+                        </div>
+                        <div class="option-cards">
+                            <label class="option-card">
+                                <input type="checkbox" name="urzadzenia" value="slupy">
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                            <path d="M20 6v28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                                            <path d="M10 10h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            <path d="M8 16h24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            <circle cx="10" cy="10" r="2" fill="currentColor"/>
+                                            <circle cx="30" cy="10" r="2" fill="currentColor"/>
+                                            <circle cx="8" cy="16" r="2" fill="currentColor"/>
+                                            <circle cx="32" cy="16" r="2" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <span>Słupy energetyczne</span>
+                                </div>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="urzadzenia" value="kable">
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                            <path d="M4 20C8 14 12 26 16 20C20 14 24 26 28 20C32 14 36 20 36 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                                            <path d="M4 28C8 22 12 34 16 28C20 22 24 34 28 28C32 22 36 28 36 28" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                                        </svg>
+                                    </div>
+                                    <span>Kable / linie</span>
+                                </div>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="urzadzenia" value="rury">
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                            <rect x="4" y="16" width="32" height="8" rx="4" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M12 16v-4a4 4 0 014-4h0a4 4 0 014 4v4" stroke="currentColor" stroke-width="2"/>
+                                            <circle cx="28" cy="20" r="2" fill="currentColor"/>
+                                            <path d="M4 32h8v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <span>Rury / gazociąg</span>
+                                </div>
+                            </label>
+                            <label class="option-card">
+                                <input type="checkbox" name="urzadzenia" value="inne">
+                                <div class="option-content">
+                                    <div class="option-icon">
+                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                            <rect x="8" y="12" width="24" height="18" rx="3" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M14 20h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                            <circle cx="20" cy="8" r="3" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M20 11v1" stroke="currentColor" stroke-width="2"/>
+                                        </svg>
+                                    </div>
+                                    <span>Inne urządzenia</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="form-error" id="step1-error">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M8 4.5v4M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Wybierz co najmniej jedną opcję
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block btn-form-next" data-next="2">
+                            Dalej
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7 10h6m0 0l-3-3m3 3l-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Kwalifikacja -->
+                    <div class="form-step" data-step="2">
+                        <div class="form-step-header">
+                            <span class="step-indicator">Krok 2 z 5</span>
+                            <h3>Kilka szybkich pytań</h3>
+                        </div>
+                        <div class="form-questions">
+                            <div class="form-question" data-question="wlasciciel">
+                                <p>Czy jesteś właścicielem tej działki?</p>
+                                <div class="question-options">
+                                    <label class="pill-option">
+                                        <input type="radio" name="wlasciciel" value="tak" required>
+                                        <span>Tak</span>
+                                    </label>
+                                    <label class="pill-option">
+                                        <input type="radio" name="wlasciciel" value="wspolwlasciciel">
+                                        <span>Współwłaściciel</span>
+                                    </label>
+                                    <label class="pill-option">
+                                        <input type="radio" name="wlasciciel" value="spadkobierca">
+                                        <span>Spadkobierca</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-question" data-question="umowa">
+                                <p>Czy podpisywałeś umowę z firmą przesyłową?</p>
+                                <div class="question-options">
+                                    <label class="pill-option">
+                                        <input type="radio" name="umowa" value="nie" required>
+                                        <span>Nie</span>
+                                    </label>
+                                    <label class="pill-option">
+                                        <input type="radio" name="umowa" value="nie_wiem">
+                                        <span>Nie wiem</span>
+                                    </label>
+                                    <label class="pill-option pill-option-negative">
+                                        <input type="radio" name="umowa" value="tak">
+                                        <span>Tak</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-question" data-question="wynagrodzenie">
+                                <p>Czy pobierasz wynagrodzenie za te urządzenia?</p>
+                                <div class="question-options">
+                                    <label class="pill-option">
+                                        <input type="radio" name="wynagrodzenie" value="nie" required>
+                                        <span>Nie</span>
+                                    </label>
+                                    <label class="pill-option pill-option-negative">
+                                        <input type="radio" name="wynagrodzenie" value="tak">
+                                        <span>Tak</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-error" id="step2-error">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M8 4.5v4M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Odpowiedz na wszystkie pytania
+                        </div>
+                        <div class="form-nav">
+                            <button type="button" class="btn btn-ghost btn-form-back" data-back="1">Wróć</button>
+                            <button type="button" class="btn btn-primary btn-form-next" data-next="3">Dalej</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Dane kontaktowe -->
+                    <div class="form-step" data-step="3">
+                        <div class="form-step-header">
+                            <span class="step-indicator">Krok 3 z 5</span>
+                            <h3>Jak możemy się z Tobą skontaktować?</h3>
+                        </div>
+                        <div class="form-fields">
+                            <div class="form-field">
+                                <label for="imie">Imię</label>
+                                <input type="text" id="imie" name="imie" required placeholder="Jan">
+                            </div>
+                            <div class="form-field">
+                                <label for="telefon">Telefon</label>
+                                <input type="tel" id="telefon" name="telefon" required placeholder="600 123 456">
+                            </div>
+                            <div class="form-field">
+                                <label for="email">Email <span class="optional">(opcjonalnie)</span></label>
+                                <input type="email" id="email" name="email" placeholder="jan@przyklad.pl">
+                            </div>
+                            <label class="checkbox-field" id="zgoda-field">
+                                <input type="checkbox" name="zgoda" required>
+                                <span>Wyrażam zgodę na kontakt w celu przedstawienia oferty oraz akceptuję <a href="#">politykę prywatności</a>.</span>
+                            </label>
+                        </div>
+                        <div class="form-error" id="step3-error">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M8 4.5v4M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span id="step3-error-text">Wypełnij wymagane pola</span>
+                        </div>
+                        <div class="form-nav">
+                            <button type="button" class="btn btn-ghost btn-form-back" data-back="2">Wróć</button>
+                            <button type="button" class="btn btn-primary btn-form-next" data-next="4">Dalej</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Lokalizacja -->
+                    <div class="form-step" data-step="4">
+                        <div class="form-step-header">
+                            <span class="step-indicator">Krok 4 z 5</span>
+                            <h3>Wskaż lokalizację działki</h3>
+                            <p class="step-hint">Kliknij na mapie, aby zaznaczyć działkę</p>
+                        </div>
+                        <div class="form-fields">
+                            <div class="form-field map-field">
+                                <div class="map-wrapper">
+                                    <div id="location-map" class="location-map"></div>
+                                    <button type="button" class="map-fullscreen-btn" id="map-fullscreen-btn" title="Powiększ mapę">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                            <path d="M3 7V3h4M17 7V3h-4M3 13v4h4M17 13v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="location-lat" name="location_lat">
+                                <input type="hidden" id="location-lng" name="location_lng">
+                                <div class="map-hint" id="map-hint">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M8 1C5.239 1 3 3.239 3 6c0 3.5 5 9 5 9s5-5.5 5-9c0-2.761-2.239-5-5-5z" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="8" cy="6" r="1.5" fill="currentColor"/>
+                                    </svg>
+                                    <span>Kliknij na mapie aby wskazać lokalizację</span>
+                                </div>
+                                <div class="map-selected" id="map-selected" style="display: none;">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M13.333 4L6 11.333 2.667 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    <span id="location-display">Lokalizacja wybrana</span>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label for="kw">Numer księgi wieczystej <span class="optional">(opcjonalnie)</span></label>
+                                <input type="text" id="kw" name="kw" placeholder="np. WA1M/00012345/6">
+                                <span class="field-hint">Znajdziesz go w akcie notarialnym lub na ekw.ms.gov.pl</span>
+                            </div>
+                        </div>
+                        <div class="form-error" id="step4-error">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M8 4.5v4M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            <span id="step4-error-text">Wskaż lokalizację na mapie</span>
+                        </div>
+                        <div class="form-nav">
+                            <button type="button" class="btn btn-ghost btn-form-back" data-back="3">Wróć</button>
+                            <button type="button" class="btn btn-primary btn-form-next" data-next="5">Dalej</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Dodatkowe informacje -->
+                    <div class="form-step" data-step="5">
+                        <div class="form-step-header">
+                            <span class="step-indicator">Krok 5 z 5</span>
+                            <h3>Czy chcesz coś dodać?</h3>
+                            <p class="step-hint">Każda informacja może pomóc w ocenie sprawy</p>
+                        </div>
+                        <div class="form-fields">
+                            <div class="form-field">
+                                <textarea id="dodatkowe-info" name="dodatkowe_info" rows="5" placeholder="Np. liczba słupów, od kiedy stoją, historia działki, wcześniejsze próby kontaktu z firmą przesyłową..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-nav">
+                            <button type="button" class="btn btn-ghost btn-form-back" data-back="4">Wróć</button>
+                            <button type="submit" class="btn btn-primary btn-submit">
+                                Wyślij zgłoszenie
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M16.667 5L7.5 14.167 3.333 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Success state -->
+                    <div class="form-success" style="display: none;">
+                        <div class="success-icon">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                                <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2"/>
+                                <path d="M44 24L28 40l-8-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>Dziękujemy za zgłoszenie!</h3>
+                        <p>Odezwiemy się w ciągu 24 godzin z bezpłatną analizą Twojej sprawy.</p>
+                        <button type="button" class="btn btn-outline modal-close-btn">Zamknij</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="script.js"></script>
+</body>
+</html>
