@@ -515,11 +515,11 @@ function initPreviewMap() {
     const mapContainer = document.getElementById('preview-map');
     if (!mapContainer) return;
 
-    // Initialize map
+    // Initialize map - start zoomed in to show power lines immediately
     const previewMap = L.map('preview-map', {
         zoomControl: true,
         scrollWheelZoom: true
-    }).setView([52.0, 19.0], 6);
+    }).setView([52.1, 21.0], 10); // Warsaw area - has many power lines
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OSM',
