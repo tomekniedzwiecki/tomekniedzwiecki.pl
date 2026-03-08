@@ -496,16 +496,31 @@ function initSearch() {
         searchBtn.disabled = true;
 
         try {
+            // Search with Poland bias using viewbox and bounded
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)},Polska&format=json&limit=1`
+                `https://nominatim.openstreetmap.org/search?` +
+                `q=${encodeURIComponent(query)}` +
+                `&format=json` +
+                `&limit=5` +
+                `&countrycodes=pl` +
+                `&addressdetails=1` +
+                `&viewbox=14.0,49.0,24.2,55.0` +
+                `&bounded=0`
             );
             const data = await response.json();
 
             if (data.length > 0) {
-                const { lat, lon } = data[0];
-                mainMap.setView([parseFloat(lat), parseFloat(lon)], 14);
+                // Take best result
+                const best = data[0];
+                const zoomLevel = getZoomForType(best.type, best.class);
+                mainMap.setView([parseFloat(best.lat), parseFloat(best.lon)], zoomLevel);
+
+                // Show what was found
+                if (data.length > 1) {
+                    console.log('Inne wyniki:', data.slice(1).map(r => r.display_name));
+                }
             } else {
-                alert('Nie znaleziono lokalizacji. Spróbuj inny adres.');
+                alert('Nie znaleziono "' + query + '". Spróbuj:\n• Pełna nazwa ulicy (np. "Grabiszyńska Wrocław")\n• Kod pocztowy\n• Nazwa miejscowości');
             }
         } catch (e) {
             alert('Błąd wyszukiwania. Spróbuj ponownie.');
@@ -514,6 +529,16 @@ function initSearch() {
             searchBtn.disabled = false;
         }
     };
+
+    // Get appropriate zoom level based on result type
+    function getZoomForType(type, cls) {
+        if (type === 'house' || type === 'building') return 18;
+        if (type === 'street' || type === 'road' || cls === 'highway') return 16;
+        if (type === 'village' || type === 'suburb' || type === 'neighbourhood') return 14;
+        if (type === 'town' || type === 'city') return 13;
+        if (type === 'county') return 11;
+        return 14;
+    }
 
     searchBtn.addEventListener('click', performSearch);
     searchInput.addEventListener('keypress', (e) => {
