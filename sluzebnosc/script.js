@@ -439,24 +439,25 @@ function initLeadForm() {
         parcelNumber.textContent = 'Szukam...';
 
         try {
-            // ULDK API - xy is longitude,latitude for srid=4326
+            // ULDK API - format: xy=longitude,latitude,SRID (4326 = WGS84)
             const response = await fetch(
-                `https://uldk.gugik.gov.pl/?request=GetParcelByXY&xy=${lng},${lat}&srid=4326&result=teryt,parcel,region`
+                `https://uldk.gugik.gov.pl/?request=GetParcelByXY&xy=${lng},${lat},4326&result=teryt,parcel,region`
             );
             const text = await response.text();
+            const lines = text.trim().split('\n');
 
-            // ULDK returns pipe-separated values or error code
-            if (text && !text.startsWith('-1') && !text.startsWith('0')) {
-                const parts = text.trim().split('|');
+            // ULDK returns: line 1 = status (0=success, -1=error), line 2 = data
+            if (lines[0] === '0' && lines[1]) {
+                const parts = lines[1].split('|');
                 if (parts.length >= 2) {
                     const teryt = parts[0];
                     const parcel = parts[1];
                     const region = parts[2] || '';
 
                     // Format: region + numer działki
-                    const displayText = region ? `${region}, dz. ${parcel}` : `${teryt} / ${parcel}`;
+                    const displayText = region ? `${region}, dz. ${parcel}` : parcel;
                     parcelNumber.textContent = displayText;
-                    parcelInput.value = `${teryt}|${parcel}`;
+                    parcelInput.value = teryt;
                 } else {
                     parcelNumber.textContent = 'Nie znaleziono';
                     parcelInput.value = '';
