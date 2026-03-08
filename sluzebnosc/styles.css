@@ -2305,6 +2305,212 @@ body.map-fullscreen-active .modal {
     font-weight: 600;
 }
 
+/* ========================================================================
+   Map Preview Section (on main page)
+   ======================================================================== */
+
+.section-map {
+    background: var(--color-bg-alt);
+}
+
+.map-preview-container {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+}
+
+.map-preview-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.preview-map {
+    height: 400px;
+    background: var(--color-bg);
+}
+
+.map-preview-loading {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-bg);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.map-preview-loading.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.map-preview-loading .loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.map-preview-legend {
+    position: absolute;
+    bottom: var(--space-4);
+    left: var(--space-4);
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.legend-dot.voltage-high { background: #e11d48; }
+.legend-dot.voltage-medium { background: #facc15; }
+.legend-dot.voltage-low { background: #a855f7; }
+
+.map-preview-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.map-preview-card {
+    padding: var(--space-6);
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.map-preview-card h4 {
+    font-size: var(--text-base);
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+}
+
+.preview-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+}
+
+.preview-info-row span {
+    color: var(--color-text-muted);
+}
+
+.preview-info-row strong {
+    color: var(--color-text);
+}
+
+.map-preview-card .btn {
+    margin-top: var(--space-5);
+}
+
+.map-preview-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: var(--space-8);
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--color-border);
+    text-align: center;
+}
+
+.map-preview-hint svg {
+    color: var(--color-accent);
+    margin-bottom: var(--space-4);
+}
+
+.map-preview-hint p {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+}
+
+.map-preview-hint .hint-sub {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.map-preview-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-6);
+}
+
+.map-preview-cta .btn-ghost {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-muted);
+}
+
+.map-preview-cta .btn-ghost:hover {
+    color: var(--color-accent);
+}
+
+/* Map preview responsive */
+@media (max-width: 900px) {
+    .map-preview-container {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-map {
+        height: 350px;
+    }
+
+    .map-preview-hint {
+        padding: var(--space-6);
+    }
+}
+
+@media (max-width: 540px) {
+    .preview-map {
+        height: 280px;
+    }
+
+    .map-preview-legend {
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+}
+
 /* Custom map pin */
 .custom-map-pin {
     background: none;

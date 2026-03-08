@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScroll();
     initModal();
     initLeadForm();
+    initPreviewMap();
 });
 
 /**
@@ -504,5 +505,172 @@ function initLeadForm() {
     function shakeButton(btn) {
         btn.classList.add('shake');
         setTimeout(() => btn.classList.remove('shake'), 500);
+    }
+}
+
+/**
+ * Preview Map on Main Page
+ */
+function initPreviewMap() {
+    const mapContainer = document.getElementById('preview-map');
+    if (!mapContainer) return;
+
+    // Initialize map
+    const previewMap = L.map('preview-map', {
+        zoomControl: true,
+        scrollWheelZoom: true
+    }).setView([52.0, 19.0], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OSM',
+        maxZoom: 19
+    }).addTo(previewMap);
+
+    // Power lines layer
+    const powerLinesLayer = L.layerGroup().addTo(previewMap);
+    let currentBounds = null;
+    let clickMarker = null;
+
+    // Load power lines when map moves
+    previewMap.on('moveend', debounce(() => loadPreviewPowerLines(), 500));
+    setTimeout(() => loadPreviewPowerLines(), 300);
+
+    // Click handler
+    previewMap.on('click', handlePreviewClick);
+
+    async function loadPreviewPowerLines() {
+        const zoom = previewMap.getZoom();
+        if (zoom < 9) return;
+
+        const bounds = previewMap.getBounds();
+        const boundsStr = bounds.toBBoxString();
+        if (currentBounds === boundsStr) return;
+        currentBounds = boundsStr;
+
+        const loadingEl = document.getElementById('preview-map-loading');
+        loadingEl?.classList.add('visible');
+
+        try {
+            const query = `[out:json][timeout:25];way["power"="line"](${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()});out geom;`;
+            const response = await fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST',
+                body: 'data=' + encodeURIComponent(query)
+            });
+
+            if (!response.ok) throw new Error('API error');
+            const data = await response.json();
+
+            powerLinesLayer.clearLayers();
+
+            data.elements.forEach(element => {
+                if (element.geometry && element.geometry.length > 1) {
+                    const coords = element.geometry.map(p => [p.lat, p.lon]);
+                    const voltage = parseInt(element.tags?.voltage) || 0;
+
+                    const line = L.polyline(coords, {
+                        color: voltage >= 200000 ? '#e11d48' : voltage >= 100000 ? '#facc15' : '#a855f7',
+                        weight: voltage >= 200000 ? 5 : voltage >= 100000 ? 4 : 3,
+                        opacity: 1
+                    });
+
+                    line.bindPopup(`<strong>Linia ${voltage >= 1000 ? (voltage/1000) + ' kV' : 'energetyczna'}</strong>`);
+                    powerLinesLayer.addLayer(line);
+                }
+            });
+        } catch (e) {
+            console.error('Preview map error:', e);
+        } finally {
+            document.getElementById('preview-map-loading')?.classList.remove('visible');
+        }
+    }
+
+    async function handlePreviewClick(e) {
+        const { lat, lng } = e.latlng;
+
+        // Pin icon
+        const pinIcon = L.divIcon({
+            className: 'custom-map-pin',
+            html: `<svg width="32" height="42" viewBox="0 0 32 42" fill="none">
+                <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 26 16 26s16-14 16-26c0-8.837-7.163-16-16-16z" fill="#2563eb"/>
+                <circle cx="16" cy="16" r="6" fill="white"/>
+            </svg>`,
+            iconSize: [32, 42],
+            iconAnchor: [16, 42]
+        });
+
+        if (clickMarker) previewMap.removeLayer(clickMarker);
+        clickMarker = L.marker([lat, lng], { icon: pinIcon }).addTo(previewMap);
+
+        // Show card, hide hint
+        document.getElementById('map-preview-card').style.display = 'block';
+        document.getElementById('map-preview-hint').style.display = 'none';
+
+        // Update with loading state
+        document.getElementById('preview-location').textContent = 'Szukam...';
+        document.getElementById('preview-parcel').textContent = 'Szukam...';
+        document.getElementById('preview-line').textContent = '—';
+
+        // Fetch location
+        try {
+            const locResponse = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pl`
+            );
+            const locData = await locResponse.json();
+            if (locData.address) {
+                const loc = locData.address.village || locData.address.town || locData.address.city || locData.address.county || '';
+                document.getElementById('preview-location').textContent = loc || 'Polska';
+            }
+        } catch (e) {
+            document.getElementById('preview-location').textContent = '—';
+        }
+
+        // Fetch parcel
+        try {
+            const parcelResponse = await fetch(
+                `https://uldk.gugik.gov.pl/?request=GetParcelByXY&xy=${lng},${lat},4326&result=teryt,parcel,region`
+            );
+            const parcelText = await parcelResponse.text();
+            const lines = parcelText.trim().split('\n');
+
+            if (lines[0] === '0' && lines[1]) {
+                const parts = lines[1].split('|');
+                const parcel = parts[1] || '';
+                const region = parts[2] || '';
+                document.getElementById('preview-parcel').textContent = region ? `${region}, dz. ${parcel}` : parcel;
+            } else {
+                document.getElementById('preview-parcel').textContent = 'Nie znaleziono';
+            }
+        } catch (e) {
+            document.getElementById('preview-parcel').textContent = '—';
+        }
+
+        // Check for nearby lines
+        let nearestVoltage = 0;
+        powerLinesLayer.eachLayer(layer => {
+            if (layer instanceof L.Polyline) {
+                const latlngs = layer.getLatLngs();
+                for (let i = 0; i < latlngs.length; i++) {
+                    const dist = previewMap.distance([lat, lng], latlngs[i]);
+                    if (dist < 500) {
+                        const color = layer.options.color;
+                        if (color === '#e11d48') nearestVoltage = Math.max(nearestVoltage, 400);
+                        else if (color === '#facc15') nearestVoltage = Math.max(nearestVoltage, 110);
+                        else nearestVoltage = Math.max(nearestVoltage, 15);
+                    }
+                }
+            }
+        });
+
+        document.getElementById('preview-line').textContent = nearestVoltage > 0
+            ? `${nearestVoltage} kV w pobliżu`
+            : 'Brak w widoku';
+    }
+
+    function debounce(fn, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => fn.apply(this, args), delay);
+        };
     }
 }

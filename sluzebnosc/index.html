@@ -228,6 +228,67 @@
         </div>
     </section>
 
+    <!-- Mapa linii energetycznych -->
+    <section class="section section-map" id="mapa">
+        <div class="container">
+            <div class="section-header-center">
+                <span class="section-label">Narzędzie</span>
+                <h2>Sprawdź czy przez Twoją działkę przechodzi linia</h2>
+                <p>Interaktywna mapa pokazuje linie energetyczne w Polsce. Kliknij aby sprawdzić numer działki.</p>
+            </div>
+
+            <div class="map-preview-container">
+                <div class="map-preview-wrapper">
+                    <div id="preview-map" class="preview-map"></div>
+                    <div class="map-preview-loading" id="preview-map-loading">
+                        <div class="loader"></div>
+                        <span>Ładowanie linii...</span>
+                    </div>
+                    <div class="map-preview-legend">
+                        <div class="legend-item"><span class="legend-dot voltage-high"></span> 220-400 kV</div>
+                        <div class="legend-item"><span class="legend-dot voltage-medium"></span> 110 kV</div>
+                        <div class="legend-item"><span class="legend-dot voltage-low"></span> Inne</div>
+                    </div>
+                </div>
+                <div class="map-preview-info">
+                    <div class="map-preview-card" id="map-preview-card" style="display: none;">
+                        <h4>Informacje o lokalizacji</h4>
+                        <div class="preview-info-row">
+                            <span>Lokalizacja:</span>
+                            <strong id="preview-location">—</strong>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Numer działki:</span>
+                            <strong id="preview-parcel">—</strong>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Najbliższa linia:</span>
+                            <strong id="preview-line">—</strong>
+                        </div>
+                        <a href="#" data-open-modal="lead-modal" class="btn btn-primary btn-full">Sprawdź odszkodowanie</a>
+                    </div>
+                    <div class="map-preview-hint" id="map-preview-hint">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 2C10.477 2 6 6.477 6 12c0 8 10 18 10 18s10-10 10-18c0-5.523-4.477-10-10-10z" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="16" cy="12" r="3" fill="currentColor"/>
+                        </svg>
+                        <p>Kliknij na mapie aby sprawdzić swoją działkę</p>
+                        <span class="hint-sub">lub użyj wyszukiwarki na pełnej mapie</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-preview-cta">
+                <a href="mapa/" class="btn btn-ghost">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M3 7V3h4M17 7V3h-4M3 13v4h4M17 13v4h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Otwórz pełną mapę z wyszukiwarką
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Kwoty -->
     <section class="section section-alt" id="ile-mozesz-uzyskac">
         <div class="container">
