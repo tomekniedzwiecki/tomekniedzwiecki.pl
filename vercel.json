@@ -1,4 +1,8 @@
 {
+  "rewrites": [
+    { "source": "/crm", "destination": "https://tn-crm.vercel.app/crm" },
+    { "source": "/crm/", "destination": "https://tn-crm.vercel.app/crm" }
+  ],
   "headers": [
     {
       "source": "/css/(.*)",
