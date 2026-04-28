@@ -324,7 +324,7 @@
 
         /* ==================== EXISTING STYLES ==================== */
         .gradient-text {
-            background: linear-gradient(to bottom, #fff 20%, #71717a);
+            background: linear-gradient(to bottom, #fff 20%, #a1a1aa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -342,10 +342,18 @@
             box-shadow:
                 0 1px 2px rgba(0,0,0,0.1),
                 inset 0 1px 0 rgba(255,255,255,0.5),
-                0 0 0 1px rgba(0,0,0,0.1);
+                0 0 0 1px rgba(0,0,0,0.1),
+                0 8px 24px rgba(255,255,255,0.06);
+            transition: box-shadow .2s ease, transform .2s ease;
         }
         .btn-primary:hover {
             background: linear-gradient(to bottom, #f4f4f5, #d4d4d8);
+            box-shadow:
+                0 1px 2px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.5),
+                0 0 0 1px rgba(0,0,0,0.1),
+                0 12px 32px rgba(255,255,255,0.1);
+            transform: translateY(-1px);
         }
 
         /* Track record section styles */
@@ -551,7 +559,7 @@
                 padding: 0 max(7vw, env(safe-area-inset-right, 7vw)) !important;
                 padding-left: max(7vw, env(safe-area-inset-left, 7vw)) !important;
                 padding-top: max(80px, 12vh) !important;
-                padding-bottom: max(40px, 6vh, env(safe-area-inset-bottom, 0)) !important;
+                padding-bottom: max(56px, 8vh, env(safe-area-inset-bottom, 0)) !important;
             }
             .fullpage-section .section-content {
                 justify-content: center !important;
@@ -1421,7 +1429,7 @@
                     <p class="text-[14px] text-zinc-500 tracking-[0.2em] uppercase mb-6">Jak to działa?</p>
                     <h2 class="text-[36px] md:text-[44px] font-bold text-white tracking-[-0.02em] leading-[1.2] mb-20 lg:mb-16">
                         Buduję Ci e-sklep.<br>
-                        <span class="text-zinc-500">Ty nim zarządzasz i zarabiasz.</span>
+                        <span class="text-zinc-400">Ty nim zarządzasz i zarabiasz.</span>
                     </h2>
 
                     <!-- Process Steps - vertical timeline on mobile, horizontal on desktop -->
@@ -1515,7 +1523,7 @@
                                      class="w-14 h-14 md:w-16 md:h-16 lg:w-[72px] lg:h-[72px] rounded-2xl object-cover ring-2 ring-white/10">
                                 <div>
                                     <div class="text-white font-medium text-[15px] md:text-[16px] mb-0.5">Tomek Niedźwiecki</div>
-                                    <div class="text-zinc-500 text-[13px] md:text-[14px] lg:text-[15px]">Buduję e-biznesy od 15 lat.</div>
+                                    <div class="text-zinc-400 text-[13px] md:text-[14px] lg:text-[15px]">Buduję e-biznesy od 15 lat.</div>
                                 </div>
                             </div>
                             <!-- Social icons -->
