@@ -379,6 +379,21 @@
         }
         .heads-up.show { display: block; }
 
+        /* Amount input with suffix */
+        .amount-wrap { position: relative; }
+        .amount-wrap .input { padding-right: 64px; }
+        .amount-suffix {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #71717a;
+            font-size: 14px;
+            font-weight: 500;
+            pointer-events: none;
+            letter-spacing: .02em;
+        }
+
         /* Done */
         .done-circle {
             width: 64px; height: 64px;
@@ -477,7 +492,7 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 1 z 7</p>
+                    <p class="eyebrow">Krok 1 z 6</p>
                     <h2 class="headline">Jak się z Tobą skontaktować?</h2>
                     <p class="lead" style="margin-top:8px">Najszybciej odpisuję na WhatsAppie. Numer trafia tylko do mnie.</p>
                 </div>
@@ -510,7 +525,7 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 2 z 7</p>
+                    <p class="eyebrow">Krok 2 z 6</p>
                     <h2 class="headline">Co już próbowałeś w biznesie online?</h2>
                     <p class="lead" style="margin-top:8px">Zaznacz wszystko, czego dotykałeś — choćby pobieżnie. „Nigdy" też jest poprawną odpowiedzią.</p>
                 </div>
@@ -549,7 +564,7 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 3 z 7</p>
+                    <p class="eyebrow">Krok 3 z 6</p>
                     <h2 class="headline">Twój obecny dochód miesięczny (na rękę).</h2>
                     <p class="lead" style="margin-top:8px">Etat, firma, freelance — sumarycznie. Pytam o stan dziś, nie o cele.</p>
                 </div>
@@ -586,54 +601,26 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 4 z 7</p>
-                    <h2 class="headline">Łączna pula, którą możesz przeznaczyć na ten biznes.</h2>
-                    <p class="lead" style="margin-top:8px">
-                        Łącznie: moje wynagrodzenie + Twoje koszty (produkt, reklamy, narzędzia, podatki). Realny próg startu to ok. 10 tys.
-                    </p>
+                    <p class="eyebrow">Krok 4 z 6</p>
+                    <h2 class="headline">Ile masz do zainwestowania w ten biznes?</h2>
+                    <p class="lead" style="margin-top:8px">Podaj realną kwotę w złotych.</p>
                 </div>
 
-                <div class="options" id="budget-options">
-                    <button type="button" class="opt" data-value="<5k">
-                        <span class="dot"></span>
-                        <span class="opt-main">
-                            <span class="opt-title">Poniżej 5 tys.</span>
-                            <span class="opt-sub">Za mało — start nie ma szans wyjść na plus</span>
-                        </span>
-                    </button>
-                    <button type="button" class="opt" data-value="5-10k">
-                        <span class="dot"></span>
-                        <span class="opt-main">
-                            <span class="opt-title">5–10 tys.</span>
-                            <span class="opt-sub">Na styk — bez poduszki na błędy</span>
-                        </span>
-                    </button>
-                    <button type="button" class="opt" data-value="10-20k">
-                        <span class="dot"></span>
-                        <span class="opt-main">
-                            <span class="opt-title">10–20 tys.</span>
-                            <span class="opt-sub">Realny start z marginesem na testy</span>
-                        </span>
-                    </button>
-                    <button type="button" class="opt" data-value="20-50k">
-                        <span class="dot"></span>
-                        <span class="opt-main">
-                            <span class="opt-title">20–50 tys.</span>
-                            <span class="opt-sub">Komfortowy budżet na rozkręcenie reklam</span>
-                        </span>
-                    </button>
-                    <button type="button" class="opt" data-value="50k+">
-                        <span class="dot"></span>
-                        <span class="opt-main">
-                            <span class="opt-title">Powyżej 50 tys.</span>
-                            <span class="opt-sub">Pełna swoboda decyzji</span>
-                        </span>
-                    </button>
+                <div>
+                    <label class="field-label" for="budget-input">Kwota</label>
+                    <div class="amount-wrap">
+                        <input class="input input-hero" type="text" inputmode="numeric" id="budget-input" placeholder="np. 15 000" autocomplete="off">
+                        <span class="amount-suffix">PLN</span>
+                    </div>
+                    <div class="input-error" id="budget-error">Podaj kwotę większą od zera.</div>
                 </div>
 
-                <div class="heads-up" id="budget-warning">
-                    Z budżetem poniżej 5 tys. zwykle odradzam zaczynanie. Możesz dokończyć aplikację, ale szczerze powiem Ci wtedy, że to nie ten moment.
-                </div>
+                <button type="button" class="btn" id="budget-submit" disabled>
+                    <span class="btn-text">Dalej
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="btn-spin"><span class="spin"></span></span>
+                </button>
             </div>
 
             <!-- ============ STEP 5: CZAS TYGODNIOWO ============ -->
@@ -644,7 +631,7 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 5 z 7</p>
+                    <p class="eyebrow">Krok 5 z 6</p>
                     <h2 class="headline">Ile czasu w tygodniu możesz realnie poświęcić?</h2>
                     <p class="lead" style="margin-top:8px">Bądź szczery — przesadzona deklaracja sabotuje projekt.</p>
                 </div>
@@ -677,43 +664,17 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 6 z 7</p>
-                    <h2 class="headline">Opowiedz konkretem: co próbowałeś i czemu nie wyszło?</h2>
-                    <p class="lead" style="margin-top:8px">Najlepiej kupują u mnie ludzie, którzy umieją to nazwać. Jeśli nigdy nie próbowałeś — napisz, dlaczego do tej pory.</p>
+                    <p class="eyebrow">Krok 6 z 6</p>
+                    <h2 class="headline">Powiedz mi coś o sobie.</h2>
+                    <p class="lead" style="margin-top:8px">Czym się zajmujesz, jaka jest Twoja sytuacja, dlaczego chcesz, żebym zbudował biznes razem z Tobą. Im więcej kontekstu, tym łatwiej mi ocenić, czy się dogadamy.</p>
                 </div>
 
                 <div>
-                    <textarea id="experience-input" class="textarea" placeholder="Np. „Założyłem sklep na Shopify z biżuterią. Zrobiłem 4 tys. obrotu i utknąłem — nie wiedziałem jak skalować reklamy. Wydałem 3 tys. na kurs, który dał ogóły. Wyszedłem na 1.5 tys. na minus i zamknąłem."></textarea>
+                    <textarea id="experience-input" class="textarea" placeholder="Np. Pracuję jako informatyk od 8 lat, ale czuję, że to nie moja droga. Mam żonę i małe dziecko. Od kilku lat marzę o czymś swoim — szukam partnera, który zna ten świat, bo sam już zgubiłem się w poradnikach z YouTube'a."></textarea>
                     <div class="counter warn" id="experience-counter">0 / 100 minimum</div>
                 </div>
 
                 <button type="button" class="btn" id="experience-submit" disabled>
-                    <span class="btn-text">Dalej
-                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </span>
-                    <span class="btn-spin"><span class="spin"></span></span>
-                </button>
-            </div>
-
-            <!-- ============ STEP 7: WHY NOW ============ -->
-            <div class="step" data-step="7">
-                <button type="button" class="btn-back" onclick="goToStep(6)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Wstecz
-                </button>
-
-                <div>
-                    <p class="eyebrow">Krok 7 z 7</p>
-                    <h2 class="headline">Dlaczego TERAZ?</h2>
-                    <p class="lead" style="margin-top:8px">Co się musi w Twoim życiu zmienić w ciągu roku? Co Cię dziś najbardziej uciska? Bez tego nie potrafię stwierdzić, czy w ogóle mam jak Ci pomóc.</p>
-                </div>
-
-                <div>
-                    <textarea id="whynow-input" class="textarea" placeholder="Np. „Pracuję na produkcji 3-zmianowej, kończą mi się siły fizyczne. Mam 36 lat, dwoje dzieci, kredyt — etat to mnie dawno przerósł. Musi się zmienić w ciągu 12 miesięcy, bo inaczej zdrowie mi tego nie wybaczy."></textarea>
-                    <div class="counter warn" id="whynow-counter">0 / 100 minimum</div>
-                </div>
-
-                <button type="button" class="btn" id="whynow-submit" disabled>
                     <span class="btn-text">Wyślij aplikację
                         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </span>
@@ -721,8 +682,8 @@
                 </button>
             </div>
 
-            <!-- ============ STEP 8: DONE ============ -->
-            <div class="step" data-step="8" style="text-align:center; align-items:center;">
+            <!-- ============ STEP 7: DONE ============ -->
+            <div class="step" data-step="7" style="text-align:center; align-items:center;">
                 <div class="done-circle">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
@@ -757,7 +718,7 @@
 
     // ==================== STATE ====================
     const STORAGE_KEY = 'tn_zapisy_v2_data';
-    const TOTAL_STEPS = 7; // pytania (kroki 1-7), bez hero (0) i thanks (8)
+    const TOTAL_STEPS = 6; // pytania (kroki 1-6), bez hero (0) i thanks (7)
     let currentStep = 0;
 
     function loadData() {
@@ -811,8 +772,8 @@
         const bar = document.getElementById('progress');
         const fill = document.getElementById('progress-fill');
         const stepLabel = document.getElementById('topbar-step');
-        // Show progress only on questions 1..7
-        if (currentStep >= 1 && currentStep <= 7) {
+        // Show progress only on questions 1..6
+        if (currentStep >= 1 && currentStep <= 6) {
             bar.style.display = 'block';
             const pct = (currentStep / TOTAL_STEPS) * 100;
             fill.style.width = pct + '%';
@@ -1002,13 +963,37 @@
         goToStep(4);
     });
 
-    // ==================== STEP 4: BUDGET ====================
-    const budgetWarning = document.getElementById('budget-warning');
-    setupRadio('budget-options', 'budget', async (v) => {
-        budgetWarning.classList.toggle('show', v === '<5k');
+    // ==================== STEP 4: BUDGET (numeric input) ====================
+    const budgetInput = document.getElementById('budget-input');
+    const budgetSubmit = document.getElementById('budget-submit');
+    const budgetError = document.getElementById('budget-error');
+
+    function formatThousands(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+    function parseAmount(s) { return parseInt((s || '').replace(/\D/g, ''), 10) || 0; }
+
+    function validateBudget() {
+        const raw = parseAmount(budgetInput.value);
+        budgetSubmit.disabled = !(raw > 0);
+        budgetError.classList.toggle('show', !!budgetInput.value.trim() && raw <= 0);
+    }
+    budgetInput.addEventListener('input', () => {
+        const raw = parseAmount(budgetInput.value);
+        budgetInput.value = raw > 0 ? formatThousands(raw) : '';
+        validateBudget();
+    });
+    if (loadData().budget) {
+        const stored = parseAmount(loadData().budget);
+        if (stored > 0) { budgetInput.value = formatThousands(stored); validateBudget(); }
+    }
+    budgetSubmit.addEventListener('click', async () => {
+        if (budgetSubmit.disabled) return;
+        setLoading(budgetSubmit, true);
+        const raw = parseAmount(budgetInput.value);
+        const v = String(raw);
+        saveData('budget', v);
         await updateLead({ budget: v });
-        // Don't auto-advance if low budget — let them see warning, then click delays
-        setTimeout(() => goToStep(5), v === '<5k' ? 1500 : 350);
+        setLoading(budgetSubmit, false);
+        goToStep(5);
     });
 
     // ==================== STEP 5: HOURS ====================
@@ -1045,50 +1030,16 @@
         setLoading(expSubmit, true);
         const v = expInput.value.trim();
         saveData('experience', v);
-        await updateLead({ experience: v });
-        setLoading(expSubmit, false);
-        goToStep(7);
-    });
-
-    // ==================== STEP 7: WHY NOW ====================
-    const whynowInput = document.getElementById('whynow-input');
-    const whynowCounter = document.getElementById('whynow-counter');
-    const whynowSubmit = document.getElementById('whynow-submit');
-
-    function validateWhynow() {
-        const len = whynowInput.value.trim().length;
-        whynowCounter.classList.remove('warn','ok');
-        if (len < 100) {
-            whynowCounter.textContent = `${len} / 100 minimum`;
-            whynowCounter.classList.add('warn');
-            whynowSubmit.disabled = true;
-        } else {
-            whynowCounter.textContent = `${len} znaków`;
-            whynowCounter.classList.add('ok');
-            whynowSubmit.disabled = false;
-        }
-        autoExpand(whynowInput);
-    }
-    whynowInput.addEventListener('input', validateWhynow);
-    if (loadData().open_question) { whynowInput.value = loadData().open_question; validateWhynow(); }
-    else validateWhynow();
-
-    whynowSubmit.addEventListener('click', async () => {
-        if (whynowSubmit.disabled) return;
-        setLoading(whynowSubmit, true);
-        const v = whynowInput.value.trim();
-        saveData('open_question', v);
         const d = loadData();
+        // Final upsert — wszystkie pola
         await updateLead({
-            open_question: v,
-            // Final upsert to make sure all fields are persisted
+            experience: v,
             name: d.name || undefined,
             phone: d.phone || undefined,
             direction: (d.tried || []).join(','),
             target_income: d.income || undefined,
             budget: d.budget || undefined,
-            weekly_hours: d.weekly_hours || undefined,
-            experience: d.experience || undefined
+            weekly_hours: d.weekly_hours || undefined
         });
 
         // Conversion events
@@ -1097,10 +1048,9 @@
         if (typeof gtag === 'function') gtag('event','conversion', { send_to: 'AW-17886093904/conversion' });
         sendTikTokEvent('CompleteRegistration');
 
-        // Clear local data after success
         clearData();
-        setLoading(whynowSubmit, false);
-        goToStep(8);
+        setLoading(expSubmit, false);
+        goToStep(7);
     });
 
     // ==================== HELPER: setupRadio ====================
