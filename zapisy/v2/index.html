@@ -973,9 +973,9 @@
         goToStep(3);
     });
 
-    // ==================== STEP 3: INCOME (target_income) ====================
+    // ==================== STEP 3: INCOME (current_income — obecny dochód v2) ====================
     setupRadio('income-options', 'income', async (v) => {
-        await updateLead({ target_income: v });
+        await updateLead({ current_income: v });
         goToStep(4);
     });
 
@@ -1057,7 +1057,7 @@
             name: d.name || undefined,
             phone: d.phone || undefined,
             direction: (d.tried || []).join(','),
-            target_income: d.income || undefined,
+            current_income: d.income || undefined,
             budget: d.budget || undefined,
             weekly_hours: d.weekly_hours || undefined
         });
