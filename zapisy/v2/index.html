@@ -324,7 +324,12 @@
         }
         .btn:hover { background: #ededed; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; background: #3f3f46; color: #a1a1aa; }
-        .btn .arrow { width: 18px; height: 18px; }
+        .btn .arrow { width: 18px; height: 18px; flex-shrink: 0; }
+        .btn-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
         .btn-loading .btn-text { display: none; }
         .btn-loading .btn-spin { display: inline-flex; }
         .btn-spin { display: none; }
