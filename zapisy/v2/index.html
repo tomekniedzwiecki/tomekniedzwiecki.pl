@@ -76,12 +76,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 32px 20px 64px;
+            padding: 32px 20px;
         }
-        @media (min-width: 768px) { .shell { padding: 56px 24px 96px; } }
+        @media (min-width: 768px) { .shell { padding: 48px 24px; } }
         .frame {
             width: 100%;
             max-width: 580px;
+            margin-block: auto; /* center pionowo gdy content < shell, scroll gdy content > shell */
             display: flex;
             flex-direction: column;
             gap: 24px;
@@ -140,14 +141,19 @@
             gap: 12px;
         }
         .me img {
-            width: 48px; height: 48px;
+            width: 52px; height: 52px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #10b981;
             box-shadow: 0 0 0 3px rgba(16,185,129,0.18);
         }
+        @media (min-width: 768px) { .me img { width: 60px; height: 60px; } }
         .me .name { color: #fff; font-weight: 600; font-size: 15px; }
         .me .role { color: #71717a; font-size: 13px; }
+        @media (min-width: 768px) {
+            .me .name { font-size: 16px; }
+            .me .role { font-size: 14px; }
+        }
 
         /* Email hero — pulsujący glow tylko na sam input */
         .email-form {
