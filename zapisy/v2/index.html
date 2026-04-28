@@ -981,9 +981,13 @@
         budgetInput.value = raw > 0 ? formatThousands(raw) : '';
         validateBudget();
     });
-    if (loadData().budget) {
-        const stored = parseAmount(loadData().budget);
-        if (stored > 0) { budgetInput.value = formatThousands(stored); validateBudget(); }
+    {
+        const rawStored = loadData().budget;
+        // Tylko czyste liczby (pomija stare bracketowe wartości typu "5-10k")
+        if (rawStored && /^\d+$/.test(rawStored)) {
+            const stored = parseInt(rawStored, 10);
+            if (stored > 0) { budgetInput.value = formatThousands(stored); validateBudget(); }
+        }
     }
     budgetSubmit.addEventListener('click', async () => {
         if (budgetSubmit.disabled) return;
