@@ -1080,6 +1080,7 @@
 
     expSubmit.addEventListener('click', async () => {
         if (expSubmit.disabled) return;
+        expSubmit.disabled = true;
         setLoading(expSubmit, true);
         const v = expInput.value.trim();
         saveData('experience', v);
