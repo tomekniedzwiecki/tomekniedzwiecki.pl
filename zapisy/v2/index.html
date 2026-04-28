@@ -87,18 +87,6 @@
             gap: 24px;
         }
 
-        /* Top bar */
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #71717a;
-        }
-        .topbar a { text-decoration: none; color: #71717a; transition: color .2s; }
-        .topbar a:hover { color: #fff; }
-        .topbar-step { font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-
         /* Progress */
         .progress {
             height: 2px;
@@ -478,12 +466,6 @@
     <div class="shell">
         <div class="frame">
 
-            <!-- Top bar -->
-            <div class="topbar">
-                <a href="/">← tomekniedzwiecki.pl</a>
-                <span class="topbar-step" id="topbar-step"></span>
-            </div>
-
             <!-- Progress -->
             <div class="progress" id="progress" style="display:none">
                 <div class="progress-fill" id="progress-fill"></div>
@@ -533,7 +515,6 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 1 z 6</p>
                     <h2 class="headline">Jak się z Tobą skontaktować?</h2>
                     <p class="lead" style="margin-top:8px">Najszybciej odpisuję na WhatsAppie. Numer trafia tylko do mnie.</p>
                 </div>
@@ -566,7 +547,6 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 2 z 6</p>
                     <h2 class="headline">Co już próbowałeś w biznesie online?</h2>
                     <p class="lead" style="margin-top:8px">Zaznacz wszystko, czego dotykałeś — choćby pobieżnie. „Nigdy" też jest poprawną odpowiedzią.</p>
                 </div>
@@ -605,7 +585,6 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 3 z 6</p>
                     <h2 class="headline">Twój obecny dochód miesięczny (na rękę).</h2>
                     <p class="lead" style="margin-top:8px">Etat, firma, freelance — sumarycznie. Pytam o stan dziś, nie o cele.</p>
                 </div>
@@ -642,7 +621,6 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 4 z 6</p>
                     <h2 class="headline">Ile masz do zainwestowania w ten biznes?</h2>
                     <p class="lead" style="margin-top:8px">Podaj realną kwotę w złotych.</p>
                 </div>
@@ -672,7 +650,6 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 5 z 6</p>
                     <h2 class="headline">Ile czasu w tygodniu możesz realnie poświęcić?</h2>
                     <p class="lead" style="margin-top:8px">Bądź szczery — przesadzona deklaracja sabotuje projekt.</p>
                 </div>
@@ -705,7 +682,6 @@
                 </button>
 
                 <div>
-                    <p class="eyebrow">Krok 6 z 6</p>
                     <h2 class="headline">Powiedz mi coś o sobie.</h2>
                     <p class="lead" style="margin-top:8px">Czym się zajmujesz, jaka jest Twoja sytuacja, dlaczego chcesz, żebym zbudował biznes razem z Tobą. Im więcej kontekstu, tym łatwiej mi ocenić, czy się dogadamy.</p>
                 </div>
@@ -804,16 +780,11 @@
     function updateProgress() {
         const bar = document.getElementById('progress');
         const fill = document.getElementById('progress-fill');
-        const stepLabel = document.getElementById('topbar-step');
-        // Show progress only on questions 1..6
         if (currentStep >= 1 && currentStep <= 6) {
             bar.style.display = 'block';
-            const pct = (currentStep / TOTAL_STEPS) * 100;
-            fill.style.width = pct + '%';
-            stepLabel.textContent = `${currentStep} / ${TOTAL_STEPS}`;
+            fill.style.width = ((currentStep / TOTAL_STEPS) * 100) + '%';
         } else {
             bar.style.display = 'none';
-            stepLabel.textContent = '';
         }
     }
 
