@@ -88,18 +88,25 @@
             gap: 24px;
         }
 
-        /* Progress */
+        /* Progress — fixed na samej górze viewportu */
         .progress {
-            height: 2px;
-            width: 100%;
+            position: fixed;
+            top: env(safe-area-inset-top, 0);
+            left: 0;
+            right: 0;
+            height: 3px;
             background: rgba(255,255,255,0.06);
-            border-radius: 1px;
-            overflow: hidden;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity .25s ease;
+            pointer-events: none;
         }
+        .progress.visible { opacity: 1; }
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: #fff;
+            background: #10b981;
+            box-shadow: 0 0 12px rgba(16,185,129,0.5);
             transition: width .45s cubic-bezier(.4,0,.2,1);
         }
 
@@ -469,13 +476,13 @@
     </style>
 </head>
 <body>
+    <!-- Progress (fixed na top viewportu) -->
+    <div class="progress" id="progress">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
     <div class="shell">
         <div class="frame">
-
-            <!-- Progress -->
-            <div class="progress" id="progress" style="display:none">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
 
             <!-- ============ STEP 0: HERO + EMAIL ============ -->
             <div class="step active" data-step="0">
@@ -786,11 +793,10 @@
     function updateProgress() {
         const bar = document.getElementById('progress');
         const fill = document.getElementById('progress-fill');
-        if (currentStep >= 1 && currentStep <= 6) {
-            bar.style.display = 'block';
+        const inSurvey = currentStep >= 1 && currentStep <= 6;
+        bar.classList.toggle('visible', inSurvey);
+        if (inSurvey) {
             fill.style.width = ((currentStep / TOTAL_STEPS) * 100) + '%';
-        } else {
-            bar.style.display = 'none';
         }
     }
 
