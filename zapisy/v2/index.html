@@ -394,43 +394,77 @@
             letter-spacing: .02em;
         }
 
-        /* Done */
+        /* Done — display sterowany przez .step / .step.active */
+        .step.done-wrap {
+            align-items: center;
+            gap: 18px;
+            padding-top: 32px;
+        }
         .done-circle {
-            width: 64px; height: 64px;
+            position: relative;
+            width: 84px; height: 84px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             display: grid;
             place-items: center;
-            margin-bottom: 8px;
+            box-shadow: 0 0 0 8px rgba(16,185,129,0.08), 0 12px 32px rgba(16,185,129,0.3);
+            animation: doneIn .55s cubic-bezier(.16,1,.3,1) both;
         }
-        .done-circle svg { width: 28px; height: 28px; color: #fff; }
+        .done-circle::after {
+            content: '';
+            position: absolute;
+            inset: -28px;
+            background: radial-gradient(circle, rgba(16,185,129,0.35) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .done-circle svg { width: 38px; height: 38px; color: #fff; stroke-width: 3; }
+        @keyframes doneIn {
+            from { opacity: 0; transform: scale(0.6); }
+            to   { opacity: 1; transform: scale(1); }
+        }
 
-        .done-card {
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 20px;
+        .done-headline {
+            font-size: clamp(26px, 4vw, 34px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin: 0;
+            text-align: center;
         }
-        .done-card h3 { margin: 0 0 8px; color: #fff; font-size: 17px; }
-        .done-card p { margin: 0 0 16px; color: #a1a1aa; font-size: 14px; }
+        .done-sub {
+            color: #a1a1aa;
+            font-size: 16px;
+            text-align: center;
+            margin: 0;
+            max-width: 380px;
+        }
+
         .wa-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            background: rgba(37,211,102,0.12);
-            border: 1px solid rgba(37,211,102,0.35);
-            color: #5eead4;
-            border-radius: 12px;
-            padding: 14px 22px;
+            gap: 12px;
+            background: #25D366;
+            border: 0;
+            color: #fff;
+            border-radius: 14px;
+            padding: 20px 24px;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
+            font-weight: 700;
+            font-size: 16px;
             width: 100%;
+            max-width: 420px;
             transition: all .2s;
+            box-shadow: 0 10px 28px rgba(37,211,102,0.28);
         }
-        .wa-btn:hover { background: rgba(37,211,102,0.18); }
+        .wa-btn:hover {
+            background: #20bd5a;
+            transform: translateY(-1px);
+            box-shadow: 0 14px 36px rgba(37,211,102,0.4);
+        }
+        .wa-btn svg { flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -683,23 +717,21 @@
             </div>
 
             <!-- ============ STEP 7: DONE ============ -->
-            <div class="step" data-step="7" style="text-align:center; align-items:center;">
+            <div class="step done-wrap" data-step="7">
                 <div class="done-circle">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
-                <h1 class="headline" style="text-align:center">Dzięki, aplikacja przyjęta.</h1>
+                <h1 class="done-headline">Dzięki, aplikacja przyjęta.</h1>
 
-                <p class="lead" style="text-align:center; max-width: 420px;">
-                    Napisz teraz na WhatsAppie — wtedy odezwę się szybciej.
-                </p>
+                <p class="done-sub">Napisz teraz na WhatsAppie — odezwę się szybciej.</p>
 
-                <a href="https://wa.me/48793113898?text=Wype%C5%82ni%C5%82em%20w%C5%82a%C5%9Bnie%20ankiet%C4%99%20i%20chcia%C5%82em%20si%C4%99%20przywita%C4%87" target="_blank" rel="noopener" class="wa-btn" style="max-width: 420px;">
-                    <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                    Napisz na WhatsApp · +48 793 11 38 98
+                <a href="https://wa.me/48793113898?text=Wype%C5%82ni%C5%82em%20w%C5%82a%C5%9Bnie%20ankiet%C4%99%20i%20chcia%C5%82em%20si%C4%99%20przywita%C4%87" target="_blank" rel="noopener" class="wa-btn">
+                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    +48 793 11 38 98
                 </a>
 
-                <a href="/" class="btn-back" style="margin-top: 8px;">← Strona główna</a>
+                <a href="/" class="btn-back" style="margin-top: 12px;">← Strona główna</a>
             </div>
 
         </div>
