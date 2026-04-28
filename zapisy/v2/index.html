@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Aplikacja do współpracy | Tomasz Niedźwiecki</title>
+    <meta name="description" content="Selekcjonuję osoby, z którymi buduję e-biznesy osobiście. Wypełnij aplikację, jeśli pasujesz do profilu.">
+    <meta name="robots" content="noindex,nofollow">
+
+    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+    <link rel="preload" href="/img/tn_kwadrat_small.webp" as="image" type="image/webp">
+
+    <!-- Google Consent Mode v2 -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+    </script>
+    <script>
+        window.addEventListener('load', function() {
+            var s = document.createElement('script');
+            s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
+            document.head.appendChild(s);
+            s.onload = function() {
+                gtag('js', new Date());
+                gtag('config', 'G-W8CLDSHVFC', {
+                    'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
+                });
+                gtag('config', 'AW-17886093904');
+            };
+        });
+    </script>
+    <script>
+    window.addEventListener('load', function() {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init','1668188210820080'); fbq('track','PageView');
+    });
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1"/></noscript>
+    <script>
+    window.addEventListener('load', function() {
+        !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+            ttq.load('D6AP4E3C77U3L7SP8O7G'); ttq.page();
+        }(window,document,'ttq');
+    });
+    </script>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <style>
+        *,*::before,*::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #000;
+            color: #ededed;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        ::selection { background: #fff; color: #000; }
+
+        a { color: inherit; }
+        button { font: inherit; cursor: pointer; }
+
+        /* Layout */
+        .shell {
+            min-height: 100dvh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 20px 64px;
+        }
+        @media (min-width: 768px) { .shell { padding: 56px 24px 96px; } }
+        .frame {
+            width: 100%;
+            max-width: 580px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Top bar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #71717a;
+        }
+        .topbar a { text-decoration: none; color: #71717a; transition: color .2s; }
+        .topbar a:hover { color: #fff; }
+        .topbar-step { font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+        /* Progress */
+        .progress {
+            height: 2px;
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            transition: width .45s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* Step container */
+        .step { display: none; flex-direction: column; gap: 24px; animation: fadeIn .35s cubic-bezier(.16,1,.3,1) both; }
+        .step.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Eyebrow + heading */
+        .eyebrow {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: #71717a;
+            font-weight: 500;
+        }
+        h1.headline, h2.headline {
+            font-size: clamp(28px, 4.4vw, 40px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.025em;
+            color: #fff;
+            margin: 0;
+        }
+        .lead {
+            font-size: 17px;
+            color: #a1a1aa;
+            margin: 0;
+        }
+        .small { font-size: 14px; color: #71717a; }
+
+        /* Avatar identity strip */
+        .me {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .me img {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .me .name { color: #fff; font-weight: 600; font-size: 15px; }
+        .me .role { color: #71717a; font-size: 13px; }
+
+        /* Email hero — pulsujący glow tylko na sam input */
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .input.input-hero {
+            border-color: rgba(16, 185, 129, 0.3);
+            animation: inputPulse 2.6s ease-in-out infinite;
+        }
+        .input.input-hero:focus,
+        .input.input-hero:not(:placeholder-shown) {
+            animation: none;
+            border-color: rgba(16, 185, 129, 0.7);
+            background: rgba(255,255,255,0.05);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        @keyframes inputPulse {
+            0%, 100% {
+                border-color: rgba(16, 185, 129, 0.25);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+            50% {
+                border-color: rgba(16, 185, 129, 0.55);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.08);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .input.input-hero { animation: none; border-color: rgba(16, 185, 129, 0.45); }
+        }
+
+        /* Numbers strip */
+        .stats {
+            display: flex;
+            gap: 16px;
+            color: #71717a;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+        .stats b { color: #fff; font-weight: 600; }
+        .stats .sep { color: #3f3f46; }
+
+        /* Inputs */
+        label.field-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #d4d4d8;
+            margin: 0 0 8px;
+        }
+        .input, .textarea {
+            width: 100%;
+            display: block;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px 18px;
+            color: #fff;
+            font: inherit;
+            font-size: 16px;
+            transition: border-color .2s, background .2s;
+        }
+        .input:hover, .textarea:hover { border-color: rgba(255,255,255,0.15); }
+        .input:focus, .textarea:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.05);
+        }
+        .textarea { min-height: 140px; resize: vertical; line-height: 1.55; }
+
+        .input-error { color: #f87171; font-size: 13px; margin-top: 8px; display: none; }
+        .input-error.show { display: block; }
+
+        /* Two-col grid for inputs */
+        .row { display: flex; flex-direction: column; gap: 16px; }
+        @media (min-width: 640px) {
+            .row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        }
+
+        /* Option cards (radio) */
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all .2s cubic-bezier(.16,1,.3,1);
+            color: #ededed;
+            font-size: 15px;
+            text-align: left;
+            width: 100%;
+        }
+        .opt:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+        .opt.selected {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.45);
+        }
+        .opt .dot {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            transition: all .2s;
+        }
+        .opt.selected .dot { border-color: #fff; }
+        .opt.selected .dot::after {
+            content: '';
+            width: 8px; height: 8px;
+            background: #fff;
+            border-radius: 50%;
+        }
+        .opt-main { flex: 1; }
+        .opt-title { font-weight: 500; color: #fff; }
+        .opt-sub { display: block; color: #71717a; font-size: 13px; margin-top: 2px; }
+
+        /* Multi-select chips */
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px;
+            color: #d4d4d8;
+            font-size: 14px;
+            transition: all .2s;
+        }
+        .chip:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+        .chip.selected {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+        .chip .check { display: none; }
+        .chip.selected .check { display: inline-block; }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            height: 56px;
+            padding: 0 28px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all .2s;
+            width: 100%;
+        }
+        .btn:hover { background: #ededed; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; background: #3f3f46; color: #a1a1aa; }
+        .btn .arrow { width: 18px; height: 18px; }
+        .btn-loading .btn-text { display: none; }
+        .btn-loading .btn-spin { display: inline-flex; }
+        .btn-spin { display: none; }
+        .spin {
+            width: 18px; height: 18px;
+            border: 2px solid rgba(0,0,0,0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-back {
+            background: transparent;
+            border: 0;
+            color: #71717a;
+            font-size: 14px;
+            padding: 8px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color .2s;
+        }
+        .btn-back:hover { color: #fff; }
+
+        .footer-note {
+            text-align: center;
+            color: #52525b;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+        .footer-note a { color: #71717a; text-decoration: underline; text-underline-offset: 2px; }
+
+        .counter {
+            font-size: 12px;
+            color: #71717a;
+            text-align: right;
+            margin-top: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+        .counter.ok { color: #86efac; }
+        .counter.warn { color: #fcd34d; }
+
+        /* Disqualify panel */
+        .heads-up {
+            background: rgba(255,180,0,0.06);
+            border: 1px solid rgba(255,180,0,0.2);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #fcd34d;
+            font-size: 14px;
+            line-height: 1.55;
+            display: none;
+        }
+        .heads-up.show { display: block; }
+
+        /* Done */
+        .done-circle {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            display: grid;
+            place-items: center;
+            margin-bottom: 8px;
+        }
+        .done-circle svg { width: 28px; height: 28px; color: #fff; }
+
+        .done-card {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .done-card h3 { margin: 0 0 8px; color: #fff; font-size: 17px; }
+        .done-card p { margin: 0 0 16px; color: #a1a1aa; font-size: 14px; }
+        .wa-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: rgba(37,211,102,0.12);
+            border: 1px solid rgba(37,211,102,0.35);
+            color: #5eead4;
+            border-radius: 12px;
+            padding: 14px 22px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            width: 100%;
+            transition: all .2s;
+        }
+        .wa-btn:hover { background: rgba(37,211,102,0.18); }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <div class="frame">
+
+            <!-- Top bar -->
+            <div class="topbar">
+                <a href="/">← tomekniedzwiecki.pl</a>
+                <span class="topbar-step" id="topbar-step"></span>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress" id="progress" style="display:none">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <!-- ============ STEP 0: HERO + EMAIL ============ -->
+            <div class="step active" data-step="0">
+                <div class="me">
+                    <img src="/img/tn_kwadrat_small.webp" alt="Tomasz Niedźwiecki">
+                    <div>
+                        <div class="name">Tomasz Niedźwiecki</div>
+                        <div class="role">Zbudowałem platformę SaaS dla 5&nbsp;000 sklepów. Teraz buduję biznesy 1 na 1.</div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="eyebrow">Aplikacja do współpracy</p>
+                    <h1 class="headline">Nie sprzedaję kursu. Buduję z Tobą biznes — i zostaję wspólnikiem.</h1>
+                </div>
+
+                <p class="lead">
+                    Pracuję 1 na 1, więc biorę kilka osób na raz. Wypełnij krótką aplikację (~3 min) — sprawdzę, czy ten model ma dla Ciebie sens i odezwę się osobiście.
+                </p>
+
+                <form id="email-form" class="email-form">
+                    <div>
+                        <label class="field-label" for="email-input">Zostaw e-mail, żeby zacząć aplikację</label>
+                        <input class="input input-hero" type="email" id="email-input" placeholder="ty@example.com" autocomplete="email" required>
+                        <div class="input-error" id="email-error">Podaj poprawny adres e-mail.</div>
+                    </div>
+                    <button type="submit" class="btn" id="email-submit">
+                        <span class="btn-text">Rozpocznij aplikację
+                            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                        <span class="btn-spin"><span class="spin"></span></span>
+                    </button>
+                </form>
+
+                <div class="stats">
+                    <span><b>3</b> firmy</span><span class="sep">·</span>
+                    <span><b>70 mln zł</b> przychodów</span><span class="sep">·</span>
+                    <span><b>15</b> lat e-commerce</span>
+                </div>
+
+                <p class="footer-note">Wysyłając akceptujesz <a href="/dokumenty/regulamin.html">regulamin</a> i <a href="/dokumenty/polityka-prywatnosci.html">politykę prywatności</a>.</p>
+            </div>
+
+            <!-- ============ STEP 1: NAME + PHONE ============ -->
+            <div class="step" data-step="1">
+                <button type="button" class="btn-back" onclick="goToStep(0)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 1 z 7</p>
+                    <h2 class="headline">Jak się z Tobą skontaktować?</h2>
+                    <p class="lead" style="margin-top:8px">Najszybciej odpisuję na WhatsAppie. Numer trafia tylko do mnie.</p>
+                </div>
+
+                <div class="row two">
+                    <div>
+                        <label class="field-label" for="name-input">Imię i nazwisko</label>
+                        <input class="input input-hero" type="text" id="name-input" placeholder="Jan Kowalski" autocomplete="name">
+                    </div>
+                    <div>
+                        <label class="field-label" for="phone-input">Telefon</label>
+                        <input class="input input-hero" type="tel" id="phone-input" placeholder="600 123 456" autocomplete="tel">
+                        <div class="input-error" id="phone-error">Podaj poprawny numer (9 cyfr).</div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn" id="contact-submit" disabled>
+                    <span class="btn-text">Dalej
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="btn-spin"><span class="spin"></span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 2: CO PRÓBOWAŁEŚ (multiselect) ============ -->
+            <div class="step" data-step="2">
+                <button type="button" class="btn-back" onclick="goToStep(1)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 2 z 7</p>
+                    <h2 class="headline">Co już próbowałeś w biznesie online?</h2>
+                    <p class="lead" style="margin-top:8px">Zaznacz wszystko, czego dotykałeś — choćby pobieżnie. „Nigdy" też jest poprawną odpowiedzią.</p>
+                </div>
+
+                <div class="chips" id="tried-chips">
+                    <button type="button" class="chip" data-value="sklep_online">Własny sklep online <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="allegro">Allegro <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="vinted_olx">Vinted / OLX <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="dropshipping">Dropshipping <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="takedrop">TakeDrop <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="amazon">Amazon FBA <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="kursy">Kursy / szkolenia online <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="freelance">Freelance / usługi online <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="afiliacja">Afiliacja <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="trading">Trading / krypto <span class="check">✓</span></button>
+                    <button type="button" class="chip" data-value="nigdy">Nigdy nie próbowałem <span class="check">✓</span></button>
+                </div>
+
+                <div class="heads-up" id="never-warning">
+                    Bez wcześniejszych prób będzie nam trudniej. To nie dyskwalifikuje, ale wymaga od Ciebie większej pokory wobec procesu.
+                </div>
+
+                <button type="button" class="btn" id="tried-submit" disabled>
+                    <span class="btn-text">Dalej
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="btn-spin"><span class="spin"></span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 3: OBECNY PRZYCHÓD ============ -->
+            <div class="step" data-step="3">
+                <button type="button" class="btn-back" onclick="goToStep(2)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 3 z 7</p>
+                    <h2 class="headline">Twój obecny dochód miesięczny (na rękę).</h2>
+                    <p class="lead" style="margin-top:8px">Etat, firma, freelance — sumarycznie. Pytam o stan dziś, nie o cele.</p>
+                </div>
+
+                <div class="options" id="income-options">
+                    <button type="button" class="opt" data-value="<5k">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">Poniżej 5 tys.</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="5-10k">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">5–10 tys.</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="10-20k">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">10–20 tys.</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="20-50k">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">20–50 tys.</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="50k+">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">Powyżej 50 tys.</span></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 4: BUDŻET INWESTYCYJNY ============ -->
+            <div class="step" data-step="4">
+                <button type="button" class="btn-back" onclick="goToStep(3)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 4 z 7</p>
+                    <h2 class="headline">Łączna pula, którą możesz przeznaczyć na ten biznes.</h2>
+                    <p class="lead" style="margin-top:8px">
+                        Łącznie: moje wynagrodzenie + Twoje koszty (produkt, reklamy, narzędzia, podatki). Realny próg startu to ok. 10 tys.
+                    </p>
+                </div>
+
+                <div class="options" id="budget-options">
+                    <button type="button" class="opt" data-value="<5k">
+                        <span class="dot"></span>
+                        <span class="opt-main">
+                            <span class="opt-title">Poniżej 5 tys.</span>
+                            <span class="opt-sub">Za mało — start nie ma szans wyjść na plus</span>
+                        </span>
+                    </button>
+                    <button type="button" class="opt" data-value="5-10k">
+                        <span class="dot"></span>
+                        <span class="opt-main">
+                            <span class="opt-title">5–10 tys.</span>
+                            <span class="opt-sub">Na styk — bez poduszki na błędy</span>
+                        </span>
+                    </button>
+                    <button type="button" class="opt" data-value="10-20k">
+                        <span class="dot"></span>
+                        <span class="opt-main">
+                            <span class="opt-title">10–20 tys.</span>
+                            <span class="opt-sub">Realny start z marginesem na testy</span>
+                        </span>
+                    </button>
+                    <button type="button" class="opt" data-value="20-50k">
+                        <span class="dot"></span>
+                        <span class="opt-main">
+                            <span class="opt-title">20–50 tys.</span>
+                            <span class="opt-sub">Komfortowy budżet na rozkręcenie reklam</span>
+                        </span>
+                    </button>
+                    <button type="button" class="opt" data-value="50k+">
+                        <span class="dot"></span>
+                        <span class="opt-main">
+                            <span class="opt-title">Powyżej 50 tys.</span>
+                            <span class="opt-sub">Pełna swoboda decyzji</span>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="heads-up" id="budget-warning">
+                    Z budżetem poniżej 5 tys. zwykle odradzam zaczynanie. Możesz dokończyć aplikację, ale szczerze powiem Ci wtedy, że to nie ten moment.
+                </div>
+            </div>
+
+            <!-- ============ STEP 5: CZAS TYGODNIOWO ============ -->
+            <div class="step" data-step="5">
+                <button type="button" class="btn-back" onclick="goToStep(4)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 5 z 7</p>
+                    <h2 class="headline">Ile czasu w tygodniu możesz realnie poświęcić?</h2>
+                    <p class="lead" style="margin-top:8px">Bądź szczery — przesadzona deklaracja sabotuje projekt.</p>
+                </div>
+
+                <div class="options" id="hours-options">
+                    <button type="button" class="opt" data-value="1-2h">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">1–2 godziny</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="3-5h">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">3–5 godzin</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="6-10h">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">6–10 godzin</span></span>
+                    </button>
+                    <button type="button" class="opt" data-value="fulltime">
+                        <span class="dot"></span>
+                        <span class="opt-main"><span class="opt-title">Full-time (rzucam etat lub już nie pracuję)</span></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 6: EXPERIENCE TEXT ============ -->
+            <div class="step" data-step="6">
+                <button type="button" class="btn-back" onclick="goToStep(5)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 6 z 7</p>
+                    <h2 class="headline">Opowiedz konkretem: co próbowałeś i czemu nie wyszło?</h2>
+                    <p class="lead" style="margin-top:8px">Najlepiej kupują u mnie ludzie, którzy umieją to nazwać. Jeśli nigdy nie próbowałeś — napisz, dlaczego do tej pory.</p>
+                </div>
+
+                <div>
+                    <textarea id="experience-input" class="textarea" placeholder="Np. „Założyłem sklep na Shopify z biżuterią. Zrobiłem 4 tys. obrotu i utknąłem — nie wiedziałem jak skalować reklamy. Wydałem 3 tys. na kurs, który dał ogóły. Wyszedłem na 1.5 tys. na minus i zamknąłem."></textarea>
+                    <div class="counter warn" id="experience-counter">0 / 100 minimum</div>
+                </div>
+
+                <button type="button" class="btn" id="experience-submit" disabled>
+                    <span class="btn-text">Dalej
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="btn-spin"><span class="spin"></span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 7: WHY NOW ============ -->
+            <div class="step" data-step="7">
+                <button type="button" class="btn-back" onclick="goToStep(6)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Wstecz
+                </button>
+
+                <div>
+                    <p class="eyebrow">Krok 7 z 7</p>
+                    <h2 class="headline">Dlaczego TERAZ?</h2>
+                    <p class="lead" style="margin-top:8px">Co się musi w Twoim życiu zmienić w ciągu roku? Co Cię dziś najbardziej uciska? Bez tego nie potrafię stwierdzić, czy w ogóle mam jak Ci pomóc.</p>
+                </div>
+
+                <div>
+                    <textarea id="whynow-input" class="textarea" placeholder="Np. „Pracuję na produkcji 3-zmianowej, kończą mi się siły fizyczne. Mam 36 lat, dwoje dzieci, kredyt — etat to mnie dawno przerósł. Musi się zmienić w ciągu 12 miesięcy, bo inaczej zdrowie mi tego nie wybaczy."></textarea>
+                    <div class="counter warn" id="whynow-counter">0 / 100 minimum</div>
+                </div>
+
+                <button type="button" class="btn" id="whynow-submit" disabled>
+                    <span class="btn-text">Wyślij aplikację
+                        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="btn-spin"><span class="spin"></span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 8: DONE ============ -->
+            <div class="step" data-step="8" style="text-align:center; align-items:center;">
+                <div class="done-circle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div>
+                    <p class="eyebrow" style="text-align:center">Aplikacja przyjęta</p>
+                    <h1 class="headline" style="text-align:center">Dzięki. Czytam wszystko osobiście.</h1>
+                    <p class="lead" style="margin-top:12px; max-width: 480px; margin-left:auto; margin-right:auto;">
+                        Selekcjonuję kilka osób z każdej tury. Jeśli pasujemy — odzywam się w ciągu kilku dni przez WhatsAppa. Jeśli nie pasujemy — też napiszę i wytłumaczę.
+                    </p>
+                </div>
+
+                <div class="done-card" style="width:100%; max-width: 480px;">
+                    <h3>Chcesz pominąć kolejkę?</h3>
+                    <p>Napisz mi krótko na WhatsAppie. Odbiję się szybciej.</p>
+                    <a href="https://wa.me/48533308623?text=Wype%C5%82ni%C5%82em%20aplikacj%C4%99%20i%20chcia%C5%82bym%20porozmawia%C4%87" target="_blank" rel="noopener" class="wa-btn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        +48 533 308 623
+                    </a>
+                </div>
+
+                <a href="/" class="btn-back" style="margin-top: 8px;">← Strona główna</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+    // ==================== CONFIG ====================
+    const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4bWF2d2t3bmZ1cGhqcWJlbHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NjQyNTUsImV4cCI6MjA4NDM0MDI1NX0.XeR0Fc7OFn6YbNJrOKTBEj36JtmLISZTM87y4ai9340';
+
+    // ==================== STATE ====================
+    const STORAGE_KEY = 'tn_zapisy_v2_data';
+    const TOTAL_STEPS = 7; // pytania (kroki 1-7), bez hero (0) i thanks (8)
+    let currentStep = 0;
+
+    function loadData() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+        catch(e) { return {}; }
+    }
+    function saveData(key, value) {
+        const d = loadData(); d[key] = value;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+    }
+    function clearData() { localStorage.removeItem(STORAGE_KEY); }
+
+    // ==================== TRACKING ====================
+    const TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id'];
+    function getCookie(name) {
+        const v = `; ${document.cookie}`; const parts = v.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
+    function captureTracking() {
+        const u = new URLSearchParams(window.location.search);
+        const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+        TRACKING_PARAMS.forEach(p => { const v = u.get(p); if (v) stored[p] = v; });
+        const fbp = getCookie('_fbp'); if (fbp) stored.fbp = fbp;
+        if (!stored.landing_page) stored.landing_page = window.location.href;
+        if (!stored.referrer && document.referrer) stored.referrer = document.referrer;
+        sessionStorage.setItem('tracking_params', JSON.stringify(stored));
+        return stored;
+    }
+    function getTracking() {
+        const s = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+        s.user_agent = navigator.userAgent;
+        const fbp = getCookie('_fbp'); if (fbp) s.fbp = fbp;
+        return s;
+    }
+    captureTracking();
+
+    // ==================== NAVIGATION ====================
+    function goToStep(n) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        const target = document.querySelector(`.step[data-step="${n}"]`);
+        if (!target) return;
+        target.classList.add('active');
+        currentStep = n;
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.goToStep = goToStep;
+
+    function updateProgress() {
+        const bar = document.getElementById('progress');
+        const fill = document.getElementById('progress-fill');
+        const stepLabel = document.getElementById('topbar-step');
+        // Show progress only on questions 1..7
+        if (currentStep >= 1 && currentStep <= 7) {
+            bar.style.display = 'block';
+            const pct = (currentStep / TOTAL_STEPS) * 100;
+            fill.style.width = pct + '%';
+            stepLabel.textContent = `${currentStep} / ${TOTAL_STEPS}`;
+        } else {
+            bar.style.display = 'none';
+            stepLabel.textContent = '';
+        }
+    }
+
+    // ==================== UTILS ====================
+    function setLoading(btn, loading) {
+        if (loading) btn.classList.add('btn-loading');
+        else btn.classList.remove('btn-loading');
+    }
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+    function validatePhone(p) {
+        const c = p.replace(/[\s\-]/g,'').replace(/^(\+?48)/,'');
+        return /^\d{9}$/.test(c);
+    }
+
+    // ==================== DB ====================
+    async function updateLead(updates) {
+        const email = loadData().email;
+        if (!email) return;
+        try {
+            await fetch(`${SUPABASE_URL}/functions/v1/lead-upsert`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, ...updates })
+            });
+        } catch (err) { console.error('updateLead error', err); }
+    }
+
+    async function sendTikTokEvent(eventName, extra = {}) {
+        try {
+            const tracking = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+            const saved = loadData();
+            fetch(`${SUPABASE_URL}/functions/v1/tiktok-event`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event: eventName,
+                    email: saved.email || null,
+                    phone: saved.phone || null,
+                    ttclid: tracking.ttclid || null,
+                    lead_id: saved.lead_id || null,
+                    url: window.location.href,
+                    user_agent: navigator.userAgent,
+                    ...extra
+                })
+            }).catch(() => {});
+        } catch (err) {}
+    }
+
+    async function sha256(str) {
+        const data = new TextEncoder().encode(str.toLowerCase().trim());
+        const buf = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    async function setGoogleUserData() {
+        const d = loadData(); if (!d.email) return;
+        const ud = { email: await sha256(d.email) };
+        if (d.phone) {
+            let p = d.phone.replace(/[\s\-\(\)\.]/g,'');
+            if (p.startsWith('0')) p = '+48' + p.substring(1);
+            else if (!p.startsWith('+')) p = '+48' + p;
+            ud.phone_number = await sha256(p);
+        }
+        if (d.name) {
+            const np = d.name.trim().split(/\s+/);
+            if (np.length >= 1) {
+                ud.address = { first_name: await sha256(np[0]), country: 'PL' };
+                if (np.length >= 2) ud.address.last_name = await sha256(np.slice(1).join(' '));
+            }
+        }
+        if (typeof gtag === 'function') gtag('set','user_data', ud);
+    }
+
+    // ==================== STEP 0: EMAIL ====================
+    const emailForm = document.getElementById('email-form');
+    const emailInput = document.getElementById('email-input');
+    const emailError = document.getElementById('email-error');
+    const emailSubmit = document.getElementById('email-submit');
+
+    // restore
+    if (loadData().email) emailInput.value = loadData().email;
+
+    emailForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        if (!validateEmail(email)) { emailError.classList.add('show'); return; }
+        emailError.classList.remove('show');
+        setLoading(emailSubmit, true);
+
+        saveData('email', email);
+        await updateLead({ tracking: getTracking() });
+
+        // Pixel events
+        if (typeof fbq === 'function') fbq('track','Lead');
+        if (typeof ttq === 'object' && ttq.track) ttq.track('SubmitForm', { email });
+        if (typeof gtag === 'function') gtag('event','generate_lead');
+        sendTikTokEvent('SubmitForm');
+        setGoogleUserData();
+
+        setLoading(emailSubmit, false);
+        goToStep(1);
+    });
+
+    // ==================== STEP 1: NAME + PHONE ====================
+    const nameInput = document.getElementById('name-input');
+    const phoneInput = document.getElementById('phone-input');
+    const phoneError = document.getElementById('phone-error');
+    const contactSubmit = document.getElementById('contact-submit');
+
+    function validateContact() {
+        const phoneOk = validatePhone(phoneInput.value);
+        contactSubmit.disabled = !(phoneOk);
+        if (phoneInput.value && !phoneOk) phoneError.classList.add('show');
+        else phoneError.classList.remove('show');
+    }
+    nameInput.addEventListener('input', () => { saveData('name', nameInput.value.trim()); });
+    phoneInput.addEventListener('input', validateContact);
+
+    // restore
+    if (loadData().name) nameInput.value = loadData().name;
+    if (loadData().phone) { phoneInput.value = loadData().phone; validateContact(); }
+
+    contactSubmit.addEventListener('click', async () => {
+        if (contactSubmit.disabled) return;
+        setLoading(contactSubmit, true);
+        const name = nameInput.value.trim();
+        const phone = phoneInput.value.trim();
+        saveData('name', name); saveData('phone', phone);
+        await updateLead({ name: name || undefined, phone });
+        if (typeof fbq === 'function') fbq('track','Contact');
+        setGoogleUserData();
+        setLoading(contactSubmit, false);
+        goToStep(2);
+    });
+
+    // ==================== STEP 2: TRIED (multiselect) ====================
+    const triedChips = document.querySelectorAll('#tried-chips .chip');
+    const triedSubmit = document.getElementById('tried-submit');
+    const neverWarning = document.getElementById('never-warning');
+    let triedSet = new Set(loadData().tried || []);
+
+    function renderTried() {
+        triedChips.forEach(c => {
+            if (triedSet.has(c.dataset.value)) c.classList.add('selected');
+            else c.classList.remove('selected');
+        });
+        triedSubmit.disabled = triedSet.size === 0;
+        neverWarning.classList.toggle('show', triedSet.has('nigdy'));
+    }
+
+    triedChips.forEach(c => {
+        c.addEventListener('click', () => {
+            const v = c.dataset.value;
+            if (v === 'nigdy') {
+                if (triedSet.has('nigdy')) triedSet.delete('nigdy');
+                else { triedSet.clear(); triedSet.add('nigdy'); }
+            } else {
+                triedSet.delete('nigdy');
+                if (triedSet.has(v)) triedSet.delete(v);
+                else triedSet.add(v);
+            }
+            renderTried();
+        });
+    });
+    renderTried();
+
+    triedSubmit.addEventListener('click', async () => {
+        if (triedSubmit.disabled) return;
+        setLoading(triedSubmit, true);
+        const arr = Array.from(triedSet);
+        saveData('tried', arr);
+        await updateLead({ direction: arr.join(',') });
+        setLoading(triedSubmit, false);
+        goToStep(3);
+    });
+
+    // ==================== STEP 3: INCOME (target_income) ====================
+    setupRadio('income-options', 'income', async (v) => {
+        await updateLead({ target_income: v });
+        goToStep(4);
+    });
+
+    // ==================== STEP 4: BUDGET ====================
+    const budgetWarning = document.getElementById('budget-warning');
+    setupRadio('budget-options', 'budget', async (v) => {
+        budgetWarning.classList.toggle('show', v === '<5k');
+        await updateLead({ budget: v });
+        // Don't auto-advance if low budget — let them see warning, then click delays
+        setTimeout(() => goToStep(5), v === '<5k' ? 1500 : 350);
+    });
+
+    // ==================== STEP 5: HOURS ====================
+    setupRadio('hours-options', 'weekly_hours', async (v) => {
+        await updateLead({ weekly_hours: v });
+        goToStep(6);
+    });
+
+    // ==================== STEP 6: EXPERIENCE TEXTAREA ====================
+    const expInput = document.getElementById('experience-input');
+    const expCounter = document.getElementById('experience-counter');
+    const expSubmit = document.getElementById('experience-submit');
+    function autoExpand(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+    function validateExp() {
+        const len = expInput.value.trim().length;
+        expCounter.classList.remove('warn','ok');
+        if (len < 100) {
+            expCounter.textContent = `${len} / 100 minimum`;
+            expCounter.classList.add('warn');
+            expSubmit.disabled = true;
+        } else {
+            expCounter.textContent = `${len} znaków`;
+            expCounter.classList.add('ok');
+            expSubmit.disabled = false;
+        }
+        autoExpand(expInput);
+    }
+    expInput.addEventListener('input', validateExp);
+    if (loadData().experience) { expInput.value = loadData().experience; validateExp(); }
+    else validateExp();
+
+    expSubmit.addEventListener('click', async () => {
+        if (expSubmit.disabled) return;
+        setLoading(expSubmit, true);
+        const v = expInput.value.trim();
+        saveData('experience', v);
+        await updateLead({ experience: v });
+        setLoading(expSubmit, false);
+        goToStep(7);
+    });
+
+    // ==================== STEP 7: WHY NOW ====================
+    const whynowInput = document.getElementById('whynow-input');
+    const whynowCounter = document.getElementById('whynow-counter');
+    const whynowSubmit = document.getElementById('whynow-submit');
+
+    function validateWhynow() {
+        const len = whynowInput.value.trim().length;
+        whynowCounter.classList.remove('warn','ok');
+        if (len < 100) {
+            whynowCounter.textContent = `${len} / 100 minimum`;
+            whynowCounter.classList.add('warn');
+            whynowSubmit.disabled = true;
+        } else {
+            whynowCounter.textContent = `${len} znaków`;
+            whynowCounter.classList.add('ok');
+            whynowSubmit.disabled = false;
+        }
+        autoExpand(whynowInput);
+    }
+    whynowInput.addEventListener('input', validateWhynow);
+    if (loadData().open_question) { whynowInput.value = loadData().open_question; validateWhynow(); }
+    else validateWhynow();
+
+    whynowSubmit.addEventListener('click', async () => {
+        if (whynowSubmit.disabled) return;
+        setLoading(whynowSubmit, true);
+        const v = whynowInput.value.trim();
+        saveData('open_question', v);
+        const d = loadData();
+        await updateLead({
+            open_question: v,
+            // Final upsert to make sure all fields are persisted
+            name: d.name || undefined,
+            phone: d.phone || undefined,
+            direction: (d.tried || []).join(','),
+            target_income: d.income || undefined,
+            budget: d.budget || undefined,
+            weekly_hours: d.weekly_hours || undefined,
+            experience: d.experience || undefined
+        });
+
+        // Conversion events
+        if (typeof fbq === 'function') fbq('track','CompleteRegistration');
+        if (typeof ttq === 'object' && ttq.track) ttq.track('CompleteRegistration');
+        if (typeof gtag === 'function') gtag('event','conversion', { send_to: 'AW-17886093904/conversion' });
+        sendTikTokEvent('CompleteRegistration');
+
+        // Clear local data after success
+        clearData();
+        setLoading(whynowSubmit, false);
+        goToStep(8);
+    });
+
+    // ==================== HELPER: setupRadio ====================
+    function setupRadio(containerId, dataKey, onSelect) {
+        const opts = document.querySelectorAll(`#${containerId} .opt`);
+        const stored = loadData()[dataKey];
+        opts.forEach(b => {
+            if (stored && b.dataset.value === stored) b.classList.add('selected');
+            b.addEventListener('click', async () => {
+                opts.forEach(o => o.classList.remove('selected'));
+                b.classList.add('selected');
+                const v = b.dataset.value;
+                saveData(dataKey, v);
+                await onSelect(v);
+            });
+        });
+    }
+
+    // Init progress on first paint
+    updateProgress();
+
+    </script>
+</body>
+</html>
