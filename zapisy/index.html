@@ -845,11 +845,15 @@
         const email = loadData().email;
         if (!email) return;
         try {
-            await fetch(`${SUPABASE_URL}/functions/v1/lead-upsert`, {
+            const res = await fetch(`${SUPABASE_URL}/functions/v1/lead-upsert`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, ...updates })
             });
+            const json = await res.json().catch(() => null);
+            if (json && json.lead_id && !loadData().lead_id) {
+                saveData('lead_id', json.lead_id);
+            }
         } catch (err) { console.error('updateLead error', err); }
     }
 
@@ -1097,6 +1101,7 @@
             email: d.email,
             name: d.name,
             phone: d.phone,
+            lead_id: loadData().lead_id,
             traffic_source: getTrafficSource(),
             weekly_hours: d.weekly_hours,
             current_income: d.income,
