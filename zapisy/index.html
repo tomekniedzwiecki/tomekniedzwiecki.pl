@@ -778,6 +778,35 @@
     }
     captureTracking();
 
+    function getTrafficSource() {
+        const t = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+        if (t.fbclid) return 'Facebook';
+        if (t.ttclid) return 'TikTok';
+        if (t.gclid || t.gbraid || t.wbraid || t.gad_source) return 'Google';
+        if (t.utm_source) {
+            const s = t.utm_source.toLowerCase();
+            if (s.includes('facebook') || s.includes('fb') || s.includes('meta')) return 'Facebook';
+            if (s.includes('tiktok') || s.includes('tt')) return 'TikTok';
+            if (s.includes('google') || s.includes('gads')) return 'Google';
+        }
+        return 'Direct';
+    }
+
+    async function sendSlackNotification(type, data) {
+        try {
+            await fetch(`${SUPABASE_URL}/functions/v1/slack-notify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                },
+                body: JSON.stringify({ type, data })
+            });
+        } catch (err) {
+            console.error('Slack notification error:', err);
+        }
+    }
+
     // ==================== NAVIGATION ====================
     function goToStep(n) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -1051,15 +1080,30 @@
         const v = expInput.value.trim();
         saveData('experience', v);
         const d = loadData();
+        const direction = (d.tried || []).join(',');
         // Final upsert — wszystkie pola
         await updateLead({
             experience: v,
             name: d.name || undefined,
             phone: d.phone || undefined,
-            direction: (d.tried || []).join(','),
+            direction: direction,
             current_income: d.income || undefined,
             budget: d.budget || undefined,
             weekly_hours: d.weekly_hours || undefined
+        });
+
+        // Slack notification
+        sendSlackNotification('new_lead', {
+            email: d.email,
+            name: d.name,
+            phone: d.phone,
+            traffic_source: getTrafficSource(),
+            weekly_hours: d.weekly_hours,
+            current_income: d.income,
+            budget: d.budget,
+            direction: direction,
+            experience: v,
+            survey_version: 2
         });
 
         // Conversion events
