@@ -6,9 +6,11 @@
     { "source": "/crm/funkcje/", "destination": "https://tn-crm.vercel.app/crm/funkcje" },
     { "source": "/crm/case-study/getmypermit", "destination": "https://tn-crm.vercel.app/crm/case-study/getmypermit" },
     { "source": "/crm/case-study/getmypermit/", "destination": "https://tn-crm.vercel.app/crm/case-study/getmypermit" },
-    { "source": "/zwolnie", "destination": "https://zwolnie-etaty.vercel.app/" },
     { "source": "/zwolnie/", "destination": "https://zwolnie-etaty.vercel.app/" },
     { "source": "/zwolnie/:path*", "destination": "https://zwolnie-etaty.vercel.app/:path*" }
+  ],
+  "redirects": [
+    { "source": "/zwolnie", "destination": "/zwolnie/", "permanent": false }
   ],
   "headers": [
     {
