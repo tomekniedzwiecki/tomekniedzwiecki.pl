@@ -21,8 +21,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
 
-    <!-- Preload hero avatar (LCP candidate) -->
+    <!-- Preload hero avatar + logo (LCP) -->
     <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="/img/logo/tn-logo-white-88.png" fetchpriority="high">
 
     <style>
     /* ============================================================
@@ -95,24 +96,17 @@
     .nav__brand {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        font-weight: 700;
-        font-size: 15px;
-        color: var(--text-strong);
-        letter-spacing: -0.005em;
+        height: 32px;
+        transition: opacity 0.25s var(--ease);
     }
-    .nav__brand-dot {
-        width: 8px;
-        height: 8px;
-        background: var(--accent-green);
-        border-radius: 50%;
-        box-shadow: 0 0 12px var(--accent-green);
-        animation: pulse 2.4s ease-in-out infinite;
+    .nav__brand:hover { opacity: 0.78; }
+    .nav__logo {
+        height: 100%;
+        width: auto;
+        display: block;
+        user-select: none;
     }
-    @keyframes pulse {
-        0%, 100% { opacity: 0.6; transform: scale(0.95); }
-        50%      { opacity: 1;   transform: scale(1.1); }
-    }
+    .nav__logo--icon { display: none; }
     .nav__contact {
         font-family: var(--serif);
         font-style: italic;
@@ -591,6 +585,10 @@
     }
     @media (max-width: 520px) {
         .nav__contact { display: none; } /* email ukryty — brand sam */
+        /* Logo switches to icon-only */
+        .nav__logo--full { display: none; }
+        .nav__logo--icon { display: block; }
+        .nav__brand { height: 28px; }
     }
     @media (max-width: 820px) {
 
@@ -694,9 +692,9 @@
 <!-- ============================================== -->
 <nav class="nav">
     <div class="nav__inner">
-        <a href="https://tomekniedzwiecki.pl/" class="nav__brand">
-            <span class="nav__brand-dot" aria-hidden="true"></span>
-            Tomek Niedźwiecki
+        <a href="https://tomekniedzwiecki.pl/" class="nav__brand" aria-label="Tomek Niedźwiecki — strona główna">
+            <img src="/img/logo/tn-logo-white-88.png" alt="Tomek Niedźwiecki" class="nav__logo nav__logo--full" width="244" height="32" fetchpriority="high">
+            <img src="/img/logo/tn-logo-icon-88.png" alt="" class="nav__logo nav__logo--icon" width="28" height="28" aria-hidden="true">
         </a>
         <a href="mailto:tomek@tomekniedzwiecki.pl" class="nav__contact">tomek@tomekniedzwiecki.pl</a>
     </div>
