@@ -560,6 +560,19 @@
         color: var(--accent-green);
         text-shadow: 0 0 80px rgba(0, 217, 126, 0.3);
     }
+    /* Coda — "Osobiście." mic drop: mniejsze, italic serif, subtelne */
+    .hero__h1-line--coda {
+        margin-top: clamp(8px, 1.4vh, 18px);
+    }
+    .hero__h1-personal {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: 0.5em;
+        letter-spacing: -0.015em;
+        color: var(--text-strong);
+        line-height: 1.05;
+    }
 
     .hero__sub {
         font-family: var(--serif);
@@ -1361,10 +1374,13 @@
                 <span class="hero__h1-line reveal-mask" data-reveal data-delay="650">
                     <span class="reveal-mask__inner"><span class="hero__h1-accent">biznes.</span></span>
                 </span>
+                <span class="hero__h1-line hero__h1-line--coda reveal-mask" data-reveal data-delay="1050">
+                    <span class="reveal-mask__inner"><span class="hero__h1-personal">Osobiście.</span></span>
+                </span>
             </h1>
 
-            <p class="hero__sub" data-reveal data-delay="1800">
-                <em>Od zera. Razem ze mną.</em>
+            <p class="hero__sub" data-reveal data-delay="1900">
+                <em>Buduję. Uczę.</em>
                 <span class="hero__sub-accent">Oddaję stery, kiedy działa.</span>
             </p>
 
