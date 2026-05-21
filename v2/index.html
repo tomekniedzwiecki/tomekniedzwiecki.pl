@@ -467,6 +467,75 @@
     }
 
     /* ============================================================
+       MOBILE PERFORMANCE OPTIMIZATIONS
+       Agresywne ograniczenia jank: wyłączamy animacje aurora,
+       zmniejszamy backdrop-filter, łagodzimy snap-scroll.
+       Każdy z osobna kosztuje GPU/composite — na mobile się stackuje.
+       ============================================================ */
+    @media (max-width: 820px) {
+        /* AURORA — static gradient bez animacji + mniejszy blur radius */
+        .scene__aurora {
+            animation: none !important;
+            filter: blur(60px);
+            opacity: 0.8;
+            will-change: auto;
+        }
+        .intro::before {
+            animation: introAurora 0.5s ease forwards !important;
+            filter: blur(50px);
+        }
+
+        /* BACKDROP-FILTER — wyłącz (drogi shader). Solidny rgba zamiast. */
+        .nav {
+            background: rgba(0, 0, 0, 0.88);
+            -webkit-backdrop-filter: none;
+                    backdrop-filter: none;
+        }
+        .progress {
+            -webkit-backdrop-filter: none;
+                    backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.85);
+        }
+        .progress__item em {
+            -webkit-backdrop-filter: none;
+                    backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.92);
+        }
+
+        /* SNAP-SCROLL — mniej agresywny. 'always' powoduje "stuck feeling" na touch */
+        .scene { scroll-snap-stop: normal; }
+        .footer-mini { scroll-snap-stop: normal; }
+        html { scroll-snap-type: y proximity; }  /* proximity zamiast mandatory */
+
+        /* REVEAL — mniejszy translate (mniej GPU pracy per frame) */
+        [data-reveal] {
+            transform: translateY(16px);
+            transition-duration: 0.6s;
+        }
+        .reveal-mask__inner { transition-duration: 0.8s; }
+
+        /* INFINITE ANIMATIONS — wyłącz nieistotne wizualnie */
+        .hero__meta-arrow { animation: none; opacity: 0.85; }
+        .intro__dot { animation: none; }
+
+        /* will-change — odpiąć po kompozycji (zostawiamy tylko na critical paths) */
+        [data-reveal] { will-change: auto; }
+        [data-reveal]:not(.is-visible) { will-change: opacity, transform; }
+
+        /* IFRAME scene 7 — wyłącz na mobile (scroll konflikt + waste memory).
+           Mobile: CTA button → direct nav do /zapisy. */
+        .scene--form { display: none; }
+        .progress__item[data-act="6"] { display: none; }
+
+        /* Hero arrow indicator — zbędne na mobile (bottom dock pokazuje progress) */
+        .hero__meta { display: none; }
+
+        /* Reveal mask __inner — zwolnij GPU layer po animacji (JS to robi też) */
+        .reveal-mask__inner { will-change: auto; }
+        [data-reveal]:not(.is-visible) .reveal-mask__inner { will-change: transform; }
+    }
+
+    /* ============================================================
        SCENE 1 — HERO
        ============================================================ */
     .scene--hero { padding-top: 110px; }
@@ -1587,6 +1656,7 @@
     'use strict';
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.matchMedia('(max-width: 820px)').matches;
     const intro = document.getElementById('intro');
     const progress = document.getElementById('progress');
     const progressItems = progress ? progress.querySelectorAll('.progress__item') : [];
@@ -1599,19 +1669,32 @@
     //  1500 - 2300ms : "Mam pomysł." fade-in
     //  2300 - 3500ms : hold
     //  3500 - 4200ms : fade out → hero reveals start
-    const INTRO_DURATION = reduceMotion ? 0 : 3500;
+    // Mobile: skrócone do 2500ms (mniejszy "wait" przy słabszym CPU)
+    const INTRO_DURATION = reduceMotion ? 0 : (isMobile ? 2500 : 3500);
 
     function startReveals() {
         if (reduceMotion) {
             document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
             return;
         }
+        // Mobile: skracamy delays 0.5x (krótsze "wait" na słabszym CPU)
+        const delayMul = isMobile ? 0.5 : 1;
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    const delay = parseInt(entry.target.dataset.delay || '0', 10);
+                    const rawDelay = parseInt(entry.target.dataset.delay || '0', 10);
+                    const delay = Math.round(rawDelay * delayMul);
                     setTimeout(() => {
                         entry.target.classList.add('is-visible');
+                        // Mobile: zwolnij GPU layer po zakończonej animacji
+                        if (isMobile) {
+                            setTimeout(() => {
+                                entry.target.style.willChange = 'auto';
+                                entry.target.querySelectorAll('.reveal-mask__inner').forEach(el => {
+                                    el.style.willChange = 'auto';
+                                });
+                            }, 900);
+                        }
                     }, delay);
                     observer.unobserve(entry.target);
                 }
@@ -1690,11 +1773,10 @@
     });
 
     // ===== Preload /zapisy iframe gdy user dotrze do CTA (Akt 6) =====
-    // Strategia: gdy CTA scena jest w 50% viewport, ładujemy form-frame.
-    // User scrolluje dalej i ma już gotowy formularz w 7. akcie.
+    // Desktop only — mobile używa direct nav przez CTA button (mniej memory pressure).
     const formFrame = document.querySelector('.form-frame');
     const ctaScene = document.getElementById('act-6');
-    if (formFrame && ctaScene) {
+    if (formFrame && ctaScene && !isMobile) {
         const formLoader = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && formFrame.src === 'about:blank') {
