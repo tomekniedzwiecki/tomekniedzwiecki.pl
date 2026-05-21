@@ -421,23 +421,33 @@
         letter-spacing: -0.005em;
     }
 
-    /* CTA — gigant text-link z animowanym arrow */
+    /* CTA — editorial pill button z accent-tint, mocniejszy niż text-link */
     .path__cta {
         display: inline-flex;
         align-items: center;
         gap: clamp(12px, 1.6vw, 22px);
         margin-top: clamp(24px, 4vh, 40px);
-        padding-bottom: 8px;
+        padding: clamp(14px, 1.6vw, 18px) clamp(22px, 2.6vw, 32px);
         font-family: var(--sans);
-        font-size: clamp(18px, 2vw, 26px);
+        font-size: clamp(17px, 1.8vw, 22px);
         font-weight: 700;
         letter-spacing: -0.02em;
         color: var(--text-strong);
-        border-bottom: 1px solid var(--text-faint);
-        transition: gap 0.4s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-strong);
+        border-radius: 999px;
+        transition: gap 0.4s var(--ease),
+                    background 0.35s var(--ease),
+                    border-color 0.35s var(--ease),
+                    color 0.3s var(--ease),
+                    box-shadow 0.4s var(--ease),
+                    transform 0.3s var(--ease);
         align-self: flex-start;
     }
-    .path:hover .path__cta { gap: clamp(20px, 2.6vw, 36px); }
+    .path:hover .path__cta {
+        gap: clamp(20px, 2.6vw, 36px);
+        transform: translateX(2px);
+    }
     .path__cta-arrow {
         font-weight: 700;
         transition: transform 0.4s var(--ease);
@@ -447,7 +457,18 @@
 
     /* ===== PATH A — ZBUDUJĘ (lewa, accent green) ===== */
     .path--a .path__verb { color: var(--text-strong); }
-    .path--a:hover .path__cta { border-color: var(--accent-green); color: var(--accent-green); }
+    .path--a .path__cta {
+        background: rgba(0, 217, 126, 0.10);
+        border-color: rgba(0, 217, 126, 0.35);
+    }
+    .path--a .path__cta-arrow { color: var(--accent-green); }
+    .path--a:hover .path__cta {
+        background: var(--accent-green);
+        border-color: var(--accent-green);
+        color: #04150c;
+        box-shadow: 0 14px 40px rgba(0, 217, 126, 0.35);
+    }
+    .path--a:hover .path__cta-arrow { color: #04150c; }
     .path--a .path__chapter { color: var(--accent-green); }
     .path--a .path__chapter::before { background: var(--accent-green); opacity: 0.7; }
 
@@ -485,10 +506,18 @@
         color: var(--accent-green);
         text-shadow: 0 0 60px rgba(0, 217, 126, 0.3);
     }
-    .path--b:hover .path__cta {
-        border-color: var(--accent-green);
-        color: var(--accent-green);
+    .path--b .path__cta {
+        background: rgba(255, 75, 62, 0.10);
+        border-color: rgba(255, 75, 62, 0.35);
     }
+    .path--b .path__cta-arrow { color: var(--accent-red); }
+    .path--b:hover .path__cta {
+        background: var(--accent-red);
+        border-color: var(--accent-red);
+        color: #1a0604;
+        box-shadow: 0 14px 40px rgba(255, 75, 62, 0.4);
+    }
+    .path--b:hover .path__cta-arrow { color: #1a0604; }
     .path--b:hover { transform: translateY(-3px); }
 
     /* ===== DIVIDER "albo" — pionowa linia + serif italic word ===== */
@@ -704,7 +733,7 @@
         <!-- PATH A — ZBUDUJĘ -->
         <a class="path path--a" href="https://tomekniedzwiecki.pl/" data-reveal data-delay="1700">
             <div class="path__chapter"><span>01 / Start</span></div>
-            <p class="path__eyebrow">Chcesz zbudować swój biznes.</p>
+            <p class="path__eyebrow">Chcesz mieć swój biznes.</p>
             <h2 class="path__verb">Zbuduję</h2>
             <p class="path__object"><em>Ci</em> biznes.</p>
             <p class="path__sub">
