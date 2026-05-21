@@ -533,6 +533,12 @@
         /* Reveal mask __inner — zwolnij GPU layer po animacji (JS to robi też) */
         .reveal-mask__inner { will-change: auto; }
         [data-reveal]:not(.is-visible) .reveal-mask__inner { will-change: transform; }
+
+        /* Motto word stagger — skróć na mobile (40ms zamiast 75ms) */
+        .motto__line--words.is-visible .motto__word {
+            transition-delay: calc(var(--wi, 0) * 40ms);
+            transition-duration: 0.5s;
+        }
     }
 
     /* ============================================================
@@ -930,6 +936,34 @@
     }
     .motto__line:last-child { margin-bottom: 0; }
     .motto__accent {
+        color: var(--accent-green);
+        font-weight: 500;
+        text-shadow: 0 0 80px rgba(0, 217, 126, 0.25);
+    }
+    /* Per-word blur reveal (21st.dev pattern, vanilla port) */
+    .motto__line--words {
+        opacity: 1;  /* nadrzędne: each word handles its own reveal */
+        transform: none;
+        transition: none;
+    }
+    .motto__word {
+        display: inline-block;
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(8px);
+        transition: opacity 0.65s var(--ease),
+                    filter 0.65s var(--ease),
+                    transform 0.65s var(--ease);
+        margin-right: 0.18em;
+    }
+    em.motto__word { font-style: italic; }
+    .motto__line--words.is-visible .motto__word {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+        transition-delay: calc(var(--wi, 0) * 75ms);
+    }
+    .motto__word--accent {
         color: var(--accent-green);
         font-weight: 500;
         text-shadow: 0 0 80px rgba(0, 217, 126, 0.25);
@@ -1472,7 +1506,7 @@
             <p class="proof__eyebrow" data-reveal>policzmy.</p>
 
             <div class="proof__hero" data-reveal data-delay="200">
-                <span class="proof__digits">70</span>
+                <span class="proof__digits" data-counter-to="70" data-counter-duration="1600">0</span>
                 <span class="proof__currency">mln zł</span>
             </div>
 
@@ -1536,17 +1570,35 @@
             <p class="motto__intro" data-reveal>Wyobraź sobie.</p>
 
             <blockquote class="motto__quote">
-                <span class="motto__line" data-reveal data-delay="200">
-                    Że ktoś <em>buduje Ci</em> biznes.
+                <span class="motto__line motto__line--words" data-reveal data-delay="200">
+                    <span class="motto__word" style="--wi:0">Że</span>
+                    <span class="motto__word" style="--wi:1">ktoś</span>
+                    <em class="motto__word" style="--wi:2">buduje</em>
+                    <em class="motto__word" style="--wi:3">Ci</em>
+                    <span class="motto__word" style="--wi:4">biznes.</span>
                 </span>
-                <span class="motto__line" data-reveal data-delay="700">
-                    Uczy <em>Cię</em> go prowadzić.
+                <span class="motto__line motto__line--words" data-reveal data-delay="700">
+                    <span class="motto__word" style="--wi:0">Uczy</span>
+                    <em class="motto__word" style="--wi:1">Cię</em>
+                    <span class="motto__word" style="--wi:2">go</span>
+                    <span class="motto__word" style="--wi:3">prowadzić.</span>
                 </span>
-                <span class="motto__line" data-reveal data-delay="1200">
-                    A potem zostaje <em>po Twojej stronie</em>.
+                <span class="motto__line motto__line--words" data-reveal data-delay="1200">
+                    <span class="motto__word" style="--wi:0">A</span>
+                    <span class="motto__word" style="--wi:1">potem</span>
+                    <span class="motto__word" style="--wi:2">zostaje</span>
+                    <em class="motto__word" style="--wi:3">po</em>
+                    <em class="motto__word" style="--wi:4">Twojej</em>
+                    <em class="motto__word" style="--wi:5">stronie.</em>
                 </span>
-                <span class="motto__line" data-reveal data-delay="1900">
-                    Bo <span class="motto__accent">zarabia tylko wtedy, gdy Ty zarabiasz.</span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="1900">
+                    <span class="motto__word" style="--wi:0">Bo</span>
+                    <span class="motto__word motto__word--accent" style="--wi:1">zarabia</span>
+                    <span class="motto__word motto__word--accent" style="--wi:2">tylko</span>
+                    <span class="motto__word motto__word--accent" style="--wi:3">wtedy,</span>
+                    <span class="motto__word motto__word--accent" style="--wi:4">gdy</span>
+                    <span class="motto__word motto__word--accent" style="--wi:5">Ty</span>
+                    <span class="motto__word motto__word--accent" style="--wi:6">zarabiasz.</span>
                 </span>
             </blockquote>
 
@@ -1672,9 +1724,28 @@
     // Mobile: skrócone do 2500ms (mniejszy "wait" przy słabszym CPU)
     const INTRO_DURATION = reduceMotion ? 0 : (isMobile ? 2500 : 3500);
 
+    // Animated counter (21st.dev pattern, vanilla rAF + ease-out)
+    function startCounter(el) {
+        const target = parseInt(el.dataset.counterTo, 10);
+        if (isNaN(target)) return;
+        const duration = parseInt(el.dataset.counterDuration || '1600', 10);
+        const startTs = performance.now();
+        function tick(now) {
+            const t = Math.min((now - startTs) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);  // ease-out cubic
+            el.textContent = Math.round(eased * target);
+            if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
     function startReveals() {
         if (reduceMotion) {
-            document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
+            document.querySelectorAll('[data-reveal]').forEach(el => {
+                el.classList.add('is-visible');
+                const c = el.querySelector('[data-counter-to]');
+                if (c) c.textContent = c.dataset.counterTo;
+            });
             return;
         }
         // Mobile: skracamy delays 0.5x (krótsze "wait" na słabszym CPU)
@@ -1686,6 +1757,11 @@
                     const delay = Math.round(rawDelay * delayMul);
                     setTimeout(() => {
                         entry.target.classList.add('is-visible');
+                        // Counter — odpalamy razem z reveal
+                        const counterEl = entry.target.matches('[data-counter-to]')
+                            ? entry.target
+                            : entry.target.querySelector('[data-counter-to]');
+                        if (counterEl) startCounter(counterEl);
                         // Mobile: zwolnij GPU layer po zakończonej animacji
                         if (isMobile) {
                             setTimeout(() => {
