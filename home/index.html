@@ -304,35 +304,10 @@
         opacity: 0;
         transform: translateY(24px);
     }
-    /* Spotlight cursor (21st.dev pattern, vanilla port) — radial light podążająca za myszą */
-    .path__spotlight {
-        position: absolute;
-        inset: 0;
-        border-radius: 4px;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.4s var(--ease);
-        z-index: 0;
+    /* Magnetic wrapper na CTA — pill button lekko podąża za myszą */
+    .path__cta {
+        will-change: transform;
     }
-    .path:hover .path__spotlight { opacity: 1; }
-    .path--a .path__spotlight {
-        background: radial-gradient(
-            260px circle at var(--mx, 50%) var(--my, 50%),
-            rgba(0, 217, 126, 0.16) 0%,
-            rgba(0, 217, 126, 0.04) 35%,
-            transparent 60%
-        );
-    }
-    .path--b .path__spotlight {
-        background: radial-gradient(
-            260px circle at var(--mx, 50%) var(--my, 50%),
-            rgba(255, 75, 62, 0.18) 0%,
-            rgba(255, 75, 62, 0.05) 35%,
-            transparent 60%
-        );
-    }
-    /* Path content sits above spotlight */
-    .path > *:not(.path__spotlight) { position: relative; z-index: 1; }
     .path.is-visible { opacity: 1; transform: translateY(0); transition: opacity 0.9s var(--ease) 0.2s, transform 0.9s var(--ease) 0.2s, background 0.45s var(--ease), border-color 0.45s var(--ease); }
     .path--b.is-visible { transition-delay: 0.4s, 0.4s, 0s, 0s; }
 
@@ -750,7 +725,7 @@
         </h1>
 
         <p class="hero__sub" data-reveal data-delay="1300">
-            Pracuję z dwoma typami ludzi. <strong>Wybierz swoją stronę.</strong>
+            <em>Albo</em> zbuduję. <em>Albo</em> zwolnię.
         </p>
     </header>
 
@@ -759,7 +734,6 @@
 
         <!-- PATH A — ZBUDUJĘ -->
         <a class="path path--a" href="https://tomekniedzwiecki.pl/" data-reveal data-delay="1700">
-            <span class="path__spotlight" aria-hidden="true"></span>
             <div class="path__chapter"><span>01 / Start</span></div>
             <p class="path__eyebrow">Chcesz mieć swój biznes.</p>
             <h2 class="path__verb">Zbuduję</h2>
@@ -786,7 +760,6 @@
 
         <!-- PATH B — ZWOLNIĘ -->
         <a class="path path--b" href="https://tomekniedzwiecki.pl/zwolnie/" data-reveal data-delay="2000">
-            <span class="path__spotlight" aria-hidden="true"></span>
             <div class="path__chapter"><span>02 / Optymalizacja</span></div>
             <p class="path__eyebrow">Masz firmę. Chcesz, żeby działała lepiej.</p>
             <h2 class="path__verb">Zwolnię</h2>
@@ -843,17 +816,30 @@
 
     document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
 
-    // Spotlight cursor (21st.dev pattern, vanilla port) — pomiń na touch devices
+    // Magnetic CTA (21st.dev pattern) — pill buttons lekko podążają za myszą
     const supportsHover = window.matchMedia('(hover: hover)').matches;
-    if (supportsHover) {
-        document.querySelectorAll('.path').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                card.style.setProperty('--mx', `${x}%`);
-                card.style.setProperty('--my', `${y}%`);
-            });
+    if (supportsHover && !reduceMotion) {
+        document.querySelectorAll('.path__cta').forEach(el => {
+            const strength = 0.3;
+            const radius = 120;
+            let isNear = false;
+            // Smooth via CSS transition na transform — uzupełniamy istniejący ease
+            el.style.transition = (el.style.transition ? el.style.transition + ', ' : '') + 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            document.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = e.clientX - cx;
+                const dy = e.clientY - cy;
+                const dist = Math.hypot(dx, dy);
+                if (dist < radius + Math.max(rect.width, rect.height) / 2) {
+                    if (!isNear) isNear = true;
+                    el.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+                } else if (isNear) {
+                    isNear = false;
+                    el.style.transform = 'translate(0, 0)';
+                }
+            }, { passive: true });
         });
     }
 })();
