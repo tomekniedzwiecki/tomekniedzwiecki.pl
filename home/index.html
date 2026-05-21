@@ -304,10 +304,6 @@
         opacity: 0;
         transform: translateY(24px);
     }
-    /* Magnetic wrapper na CTA — pill button lekko podąża za myszą */
-    .path__cta {
-        will-change: transform;
-    }
     .path.is-visible { opacity: 1; transform: translateY(0); transition: opacity 0.9s var(--ease) 0.2s, transform 0.9s var(--ease) 0.2s, background 0.45s var(--ease), border-color 0.45s var(--ease); }
     .path--b.is-visible { transition-delay: 0.4s, 0.4s, 0s, 0s; }
 
@@ -815,33 +811,6 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
 
     document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
-
-    // Magnetic CTA (21st.dev pattern) — pill buttons lekko podążają za myszą
-    const supportsHover = window.matchMedia('(hover: hover)').matches;
-    if (supportsHover && !reduceMotion) {
-        document.querySelectorAll('.path__cta').forEach(el => {
-            const strength = 0.3;
-            const radius = 120;
-            let isNear = false;
-            // Smooth via CSS transition na transform — uzupełniamy istniejący ease
-            el.style.transition = (el.style.transition ? el.style.transition + ', ' : '') + 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            document.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
-                const dx = e.clientX - cx;
-                const dy = e.clientY - cy;
-                const dist = Math.hypot(dx, dy);
-                if (dist < radius + Math.max(rect.width, rect.height) / 2) {
-                    if (!isNear) isNear = true;
-                    el.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
-                } else if (isNear) {
-                    isNear = false;
-                    el.style.transform = 'translate(0, 0)';
-                }
-            }, { passive: true });
-        });
-    }
 })();
 </script>
 
