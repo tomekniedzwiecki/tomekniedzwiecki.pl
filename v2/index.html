@@ -547,8 +547,6 @@
             border-color: var(--accent-green) !important;
         }
 
-        /* Lamp — desktop-only (mobile zbyt crowdy w portrait) */
-        .lamp { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
         .step--final { animation: none; }
@@ -935,94 +933,6 @@
                 mask-image: radial-gradient(ellipse 70% 60% at center, #000 30%, transparent 80%);
     }
 
-    /* Lamp — dramatic top-down spotlight (21st.dev pattern, vanilla port) */
-    .scene--motto { overflow: hidden; }
-    .lamp {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 1100px;
-        height: 70%;
-        pointer-events: none;
-        z-index: 1;
-    }
-    .lamp__beam {
-        position: absolute;
-        top: 0;
-        width: 55%;
-        height: 100%;
-        opacity: 0;
-        animation: lampOn 1.2s var(--ease) 0.3s forwards;
-    }
-    .lamp__beam--left {
-        right: 50%;
-        background: conic-gradient(
-            from 70deg at center top,
-            rgba(0, 217, 126, 0.55) 0deg,
-            rgba(0, 217, 126, 0.18) 10deg,
-            transparent 25deg
-        );
-        -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 80%),
-                            linear-gradient(to left, #000 0%, transparent 100%);
-        -webkit-mask-composite: source-in;
-                mask-image: linear-gradient(to bottom, #000 0%, transparent 80%),
-                            linear-gradient(to left, #000 0%, transparent 100%);
-                mask-composite: intersect;
-    }
-    .lamp__beam--right {
-        left: 50%;
-        background: conic-gradient(
-            from 290deg at center top,
-            transparent 0deg,
-            rgba(0, 217, 126, 0.18) 350deg,
-            rgba(0, 217, 126, 0.55) 360deg
-        );
-        -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 80%),
-                            linear-gradient(to right, #000 0%, transparent 100%);
-        -webkit-mask-composite: source-in;
-                mask-image: linear-gradient(to bottom, #000 0%, transparent 80%),
-                            linear-gradient(to right, #000 0%, transparent 100%);
-                mask-composite: intersect;
-    }
-    @keyframes lampOn {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
-    /* Lamp pool — świetlna kula u góry */
-    .lamp__pool {
-        position: absolute;
-        top: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 280px;
-        height: 80px;
-        background: radial-gradient(
-            ellipse at center top,
-            rgba(0, 217, 126, 0.6) 0%,
-            rgba(0, 217, 126, 0.18) 30%,
-            transparent 70%
-        );
-        filter: blur(20px);
-        opacity: 0;
-        animation: lampOn 1.5s var(--ease) 0.5s forwards;
-    }
-    /* Lamp bar — cienka pozioma świetlówka na samej górze */
-    .lamp__bar {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 260px;
-        height: 2px;
-        background: var(--accent-green);
-        box-shadow: 0 0 40px rgba(0, 217, 126, 0.95),
-                    0 0 80px rgba(0, 217, 126, 0.5);
-        opacity: 0;
-        animation: lampOn 0.8s var(--ease) 0.2s forwards;
-        z-index: 2;
-    }
     .scene--motto .scene__inner {
         max-width: 1400px;
         text-align: center;
@@ -1711,12 +1621,6 @@
     ===================================================== -->
     <section class="scene scene--motto" id="act-4" data-act="3">
         <div class="scene__aurora" aria-hidden="true"></div>
-        <div class="lamp" aria-hidden="true">
-            <div class="lamp__beam lamp__beam--left"></div>
-            <div class="lamp__beam lamp__beam--right"></div>
-            <div class="lamp__pool"></div>
-            <div class="lamp__bar"></div>
-        </div>
         <div class="scene__inner">
 
             <p class="motto__intro" data-reveal>Wyobraź sobie.</p>
