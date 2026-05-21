@@ -694,13 +694,15 @@
     }
 
     /* ============================================================
-       SCENE 3 — TRZY DROGI (track record asymmetric)
+       SCENE 3 — LEDGER (editorial 3-row receipt)
+       Każda firma = jedna linia: rok / nazwa / liczba.
+       Zero opisów. Niech liczby mówią.
        ============================================================ */
     .scene--journey .scene__aurora {
         background: radial-gradient(
             circle at 30% 50%,
-            rgba(255, 75, 62, 0.06) 0%,
-            rgba(0, 217, 126, 0.05) 50%,
+            rgba(255, 75, 62, 0.05) 0%,
+            rgba(0, 217, 126, 0.07) 50%,
             transparent 72%
         );
     }
@@ -718,9 +720,9 @@
     }
     .journey__title {
         font-family: var(--sans);
-        font-size: clamp(40px, 6vw, 96px);
+        font-size: clamp(36px, 5.2vw, 84px);
         font-weight: 800;
-        line-height: 0.92;
+        line-height: 0.95;
         letter-spacing: -0.045em;
         color: var(--text-strong);
     }
@@ -729,114 +731,89 @@
         font-style: italic;
         font-weight: 400;
         color: var(--text);
-        font-size: 0.7em;
-        padding: 0 0.1em;
+        font-size: 0.78em;
+        padding: 0 0.05em;
         letter-spacing: -0.015em;
     }
 
-    /* Asymmetric trio — 3 chapters */
-    .journey__grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: clamp(28px, 4vw, 56px);
-        position: relative;
-    }
-    /* Timeline horizontal — żółta nitka biegnąca przez kolumny */
-    .journey__grid::before {
-        content: '';
-        position: absolute;
-        top: 38px;
-        left: 12%;
-        right: 12%;
-        height: 1px;
-        background: linear-gradient(90deg,
-            transparent 0%,
-            rgba(255, 75, 62, 0.35) 20%,
-            rgba(0, 217, 126, 0.35) 80%,
-            transparent 100%);
-        z-index: 0;
-    }
-
-    .chapter {
-        position: relative;
-        z-index: 1;
+    /* LEDGER — 3 wiersze, każdy: rok · linia · nazwa · liczba */
+    .ledger {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        padding-top: 64px;
+        max-width: 1100px;
+        margin: 0 auto;
     }
-    .chapter__num {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: var(--bg);
-        border: 1px solid var(--border-strong);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: var(--sans);
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        color: var(--text);
-        font-variant-numeric: tabular-nums;
-        transition: border-color 0.4s var(--ease),
-                    color 0.4s var(--ease),
-                    box-shadow 0.4s var(--ease);
+    .ledger__row {
+        display: grid;
+        grid-template-columns: 110px 1fr auto;
+        align-items: baseline;
+        gap: clamp(20px, 3vw, 48px);
+        padding: clamp(22px, 3vh, 36px) 0;
+        border-bottom: 1px solid var(--border);
+        transition: border-color 0.4s var(--ease);
     }
-    .chapter--01 .chapter__num { border-color: rgba(255, 75, 62, 0.4); color: var(--accent-red); }
-    .chapter--02 .chapter__num { border-color: rgba(255, 75, 62, 0.45); color: var(--accent-red); }
-    .chapter--03 .chapter__num { border-color: var(--accent-green); color: var(--accent-green); box-shadow: 0 0 30px rgba(0, 217, 126, 0.3); }
+    .ledger__row:first-child { padding-top: clamp(16px, 2vh, 28px); border-top: 1px solid var(--border); }
+    .ledger__row:last-child { border-bottom: 1px solid var(--border); }
+    .ledger__row:hover { border-color: var(--border-strong); }
 
-    .chapter__years {
+    .ledger__year {
         font-family: var(--sans);
-        font-size: 11px;
+        font-size: clamp(12px, 1.2vw, 14px);
         font-weight: 700;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
+        letter-spacing: 0.18em;
         color: var(--text-faint);
         font-variant-numeric: tabular-nums;
+        white-space: nowrap;
     }
-    .chapter__name {
+
+    .ledger__name {
         font-family: var(--sans);
-        font-size: clamp(24px, 2.6vw, 38px);
-        font-weight: 800;
-        letter-spacing: -0.035em;
-        line-height: 1.05;
+        font-size: clamp(40px, 6vw, 96px);
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: -0.045em;
         color: var(--text-strong);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .chapter__metric {
+
+    .ledger__metric {
         font-family: var(--sans);
-        font-size: clamp(28px, 3.2vw, 48px);
+        font-size: clamp(28px, 3.8vw, 56px);
         font-weight: 800;
-        letter-spacing: -0.04em;
         line-height: 1;
-        margin-top: 6px;
+        letter-spacing: -0.035em;
+        color: var(--text-muted);
         font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        text-align: right;
     }
-    .chapter--01 .chapter__metric { color: var(--text); }
-    .chapter--02 .chapter__metric { color: var(--text); }
-    .chapter--03 .chapter__metric {
+    .ledger__metric--accent {
         color: var(--accent-green);
-        text-shadow: 0 0 50px rgba(0, 217, 126, 0.25);
+        text-shadow: 0 0 60px rgba(0, 217, 126, 0.3);
     }
-    .chapter__desc {
+
+    /* Spina-line — krótkie zdanie tying together */
+    .journey__footer {
+        margin-top: clamp(36px, 5vh, 64px);
+        text-align: center;
         font-family: var(--serif);
         font-style: italic;
-        font-size: clamp(15px, 1.4vw, 18px);
+        font-size: clamp(18px, 2.2vw, 28px);
         color: var(--text-muted);
-        line-height: 1.5;
         letter-spacing: -0.005em;
-        margin-top: 8px;
+        line-height: 1.4;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
     }
-    .chapter__desc strong {
+    .journey__footer strong {
         font-family: var(--sans);
         font-style: normal;
         font-weight: 600;
-        color: var(--text);
+        color: var(--text-strong);
+        font-size: 0.92em;
     }
 
     /* ============================================================
@@ -1190,7 +1167,9 @@
        ============================================================ */
     @media (max-width: 1100px) {
         .hero__h1 { font-size: clamp(52px, 11vw, 140px); }
-        .journey__grid::before { left: 8%; right: 8%; }
+        .ledger__row { grid-template-columns: 100px 1fr auto; gap: 20px; }
+        .ledger__name { font-size: clamp(36px, 5.8vw, 72px); }
+        .ledger__metric { font-size: clamp(24px, 3.6vw, 44px); }
         .how__steps { gap: 20px; }
     }
 
@@ -1223,18 +1202,29 @@
         .proof__subtitle { font-size: clamp(20px, 5vw, 30px); }
         .proof__supporting { font-size: clamp(15px, 4vw, 19px); margin-top: clamp(28px, 5vh, 48px); }
 
-        /* JOURNEY — stacked */
-        .journey__title { font-size: clamp(36px, 9vw, 56px); }
-        .journey__grid {
-            grid-template-columns: 1fr;
-            gap: 40px;
+        /* JOURNEY ledger — stacked rows per row */
+        .journey__title { font-size: clamp(34px, 8.5vw, 56px); }
+        .ledger__row {
+            grid-template-columns: 1fr auto;
+            grid-template-areas:
+                "year year"
+                "name metric";
+            row-gap: 8px;
+            column-gap: 16px;
+            padding: clamp(20px, 3vh, 28px) 0;
         }
-        .journey__grid::before { display: none; }
-        .chapter { padding-top: 0; padding-left: 76px; min-height: 56px; }
-        .chapter__num { width: 52px; height: 52px; font-size: 12px; }
-        .chapter__name { font-size: clamp(22px, 6vw, 28px); }
-        .chapter__metric { font-size: clamp(26px, 7vw, 38px); }
-        .chapter__desc { font-size: clamp(15px, 4vw, 17px); }
+        .ledger__year { grid-area: year; font-size: 11px; letter-spacing: 0.16em; }
+        .ledger__name {
+            grid-area: name;
+            font-size: clamp(36px, 10vw, 60px);
+            letter-spacing: -0.05em;
+        }
+        .ledger__metric {
+            grid-area: metric;
+            font-size: clamp(20px, 5vw, 32px);
+            align-self: end;
+        }
+        .journey__footer { font-size: clamp(16px, 4.4vw, 22px); margin-top: 36px; }
 
         /* MOTTO */
         .motto__intro { font-size: clamp(17px, 4.5vw, 22px); margin-bottom: 28px; }
@@ -1279,8 +1269,8 @@
         .proof__subtitle { font-size: clamp(18px, 4.6vw, 24px); }
         .proof__supporting { font-size: clamp(14px, 3.8vw, 17px); }
 
-        .chapter { padding-left: 64px; }
-        .chapter__num { width: 44px; height: 44px; font-size: 11px; }
+        .ledger__name { font-size: clamp(30px, 9.5vw, 48px); }
+        .ledger__metric { font-size: clamp(18px, 4.8vw, 26px); }
 
         .motto__quote { font-size: clamp(22px, 6vw, 30px); }
 
@@ -1410,7 +1400,7 @@
     </section>
 
     <!-- =====================================================
-         SCENE 3 — TRZY DROGI (track record)
+         SCENE 3 — LEDGER (3-row track record, no descriptions)
     ===================================================== -->
     <section class="scene scene--journey" id="act-3" data-act="2">
         <div class="scene__aurora" aria-hidden="true"></div>
@@ -1419,41 +1409,33 @@
             <header class="journey__header">
                 <p class="journey__eyebrow" data-reveal>Co już zbudowałem</p>
                 <h2 class="journey__title" data-reveal data-delay="150">
-                    Trzy firmy. <em>I wnioski</em>, które mam dla Ciebie.
+                    Trzy firmy. <em>Jedna droga.</em>
                 </h2>
             </header>
 
-            <div class="journey__grid">
-                <article class="chapter chapter--01" data-reveal data-delay="200">
-                    <div class="chapter__num">01</div>
-                    <p class="chapter__years">2011 — 2021</p>
-                    <h3 class="chapter__name">Sklep internetowy</h3>
-                    <p class="chapter__metric">40 mln zł</p>
-                    <p class="chapter__desc">
-                        Zacząłem od zera, dropshipping na studiach. Po latach — <strong>30 osób w zespole</strong>, jeden z największych w niszy. Nauczyłem się <strong>na własnych błędach</strong>. Dzięki temu Ty ich nie musisz powtarzać.
-                    </p>
-                </article>
+            <div class="ledger">
+                <div class="ledger__row" data-reveal data-delay="200">
+                    <span class="ledger__year">2011 — 2021</span>
+                    <span class="ledger__name">Sklep.</span>
+                    <span class="ledger__metric">40 mln zł</span>
+                </div>
 
-                <article class="chapter chapter--02" data-reveal data-delay="500">
-                    <div class="chapter__num">02</div>
-                    <p class="chapter__years">2017 — 2025</p>
-                    <h3 class="chapter__name">TakeDrop</h3>
-                    <p class="chapter__metric">25 mln zł</p>
-                    <p class="chapter__desc">
-                        SaaS wyceniony na <strong>25 mln zł</strong>, sprzedany. <strong>5&nbsp;000 sklepów</strong> uruchomionych na platformie. Najcenniejsze wyniesione — co naprawdę zatrzymuje ludzi wchodzących w e-commerce.
-                    </p>
-                </article>
+                <div class="ledger__row" data-reveal data-delay="450">
+                    <span class="ledger__year">2017 — 2025</span>
+                    <span class="ledger__name">TakeDrop.</span>
+                    <span class="ledger__metric">25 mln zł</span>
+                </div>
 
-                <article class="chapter chapter--03" data-reveal data-delay="800">
-                    <div class="chapter__num">03</div>
-                    <p class="chapter__years">2024 — dziś</p>
-                    <h3 class="chapter__name">Inkubator</h3>
-                    <p class="chapter__metric">tysiące osób</p>
-                    <p class="chapter__desc">
-                        Pierwszy w Polsce model — <strong>bez ZUS, bez firmy, bez ryzyka</strong>. Tysiące osób postawiło pierwszy krok. Ale zrozumiałem: <strong>usunięcie barier to za mało</strong> — trzeba poprowadzić dalej.
-                    </p>
-                </article>
+                <div class="ledger__row" data-reveal data-delay="700">
+                    <span class="ledger__year">2024 — dziś</span>
+                    <span class="ledger__name">Inkubator.</span>
+                    <span class="ledger__metric ledger__metric--accent">tysiące osób</span>
+                </div>
             </div>
+
+            <p class="journey__footer" data-reveal data-delay="1100">
+                Każda nauczyła mnie czegoś. <strong>Wnoszę to do Twojego biznesu.</strong>
+            </p>
         </div>
     </section>
 
