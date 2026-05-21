@@ -560,18 +560,16 @@
         color: var(--accent-green);
         text-shadow: 0 0 80px rgba(0, 217, 126, 0.3);
     }
-    /* Coda — "Osobiście." mic drop: mniejsze, italic serif, subtelne */
-    .hero__h1-line--coda {
-        margin-top: clamp(8px, 1.4vh, 18px);
-    }
+    /* Coda — "Osobiście." inline mic drop: mniejsze, italic serif, subtelne */
     .hero__h1-personal {
         font-family: var(--serif);
         font-style: italic;
         font-weight: 400;
-        font-size: 0.5em;
+        font-size: 0.4em;
         letter-spacing: -0.015em;
         color: var(--text-strong);
-        line-height: 1.05;
+        line-height: 1;
+        vertical-align: 0.12em;
     }
 
     .hero__sub {
@@ -1368,18 +1366,12 @@
                 <span class="hero__h1-line reveal-mask" data-reveal data-delay="0">
                     <span class="reveal-mask__inner">Zbuduję</span>
                 </span>
-                <span class="hero__h1-line reveal-mask" data-reveal data-delay="300">
-                    <span class="reveal-mask__inner"><span class="hero__h1-italic">Ci</span></span>
-                </span>
-                <span class="hero__h1-line reveal-mask" data-reveal data-delay="650">
-                    <span class="reveal-mask__inner"><span class="hero__h1-accent">biznes.</span></span>
-                </span>
-                <span class="hero__h1-line hero__h1-line--coda reveal-mask" data-reveal data-delay="1050">
-                    <span class="reveal-mask__inner"><span class="hero__h1-personal">Osobiście.</span></span>
+                <span class="hero__h1-line reveal-mask" data-reveal data-delay="400">
+                    <span class="reveal-mask__inner"><span class="hero__h1-italic">Ci</span>&nbsp;<span class="hero__h1-accent">biznes.</span>&nbsp;<span class="hero__h1-personal">Osobiście.</span></span>
                 </span>
             </h1>
 
-            <p class="hero__sub" data-reveal data-delay="1900">
+            <p class="hero__sub" data-reveal data-delay="1400">
                 <em>Buduję. Uczę.</em>
                 <span class="hero__sub-accent">Oddaję stery, kiedy działa.</span>
             </p>
