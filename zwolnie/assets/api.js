@@ -1,11 +1,13 @@
 /* =====================================================
-   ZWOLNIE ETATY - API client (Supabase)
-   Sends briefs from /zwolnie/ form to ze_leads + storage.
+   ZWOLNIE ETATY - API client (Supabase tn-crm)
+   Zapisuje brief z /zwolnie/ do public.zwolnie_leads
+   + zalaczniki do bucketu `zwolnie-attachments`
+   + Slack notyfikacja na kanal #zwolnie_lead (slack-notify edge function)
    ===================================================== */
 
-const SUPABASE_URL = 'https://tahusvkrzaijcywuivle.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhaHVzdmtyemFpamN5d3VpdmxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMDUyNTIsImV4cCI6MjA5NDY4MTI1Mn0.bPE5ct_Lt2w8gY_8lL6hZpKyMS7fJWp37qpLPFFLSR0';
-const STORAGE_BUCKET = 'ze-attachments';
+const SUPABASE_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
+const STORAGE_BUCKET = 'zwolnie-attachments';
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: { persistSession: false }
@@ -25,11 +27,33 @@ function dataUrlToBlob(dataUrl) {
     return new Blob([arr], { type: mime });
 }
 
+async function sendSlackNotification(payload) {
+    try {
+        await fetch(`${SUPABASE_URL}/functions/v1/slack-notify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ type: 'zwolnie_lead', data: payload })
+        });
+    } catch (err) {
+        console.error('Slack notification error:', err);
+    }
+}
+
 // --- Leads ---
 const Leads = {
     async create(data) {
+        // Klient generuje UUID, dzieki czemu nie potrzeba SELECT po INSERT (anon nie ma SELECT na zwolnie_leads).
+        const leadId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : null;
+        if (!leadId) {
+            throw new Error('Twoja przeglądarka nie obsługuje wymaganej funkcji (crypto.randomUUID). Zaktualizuj przeglądarkę.');
+        }
+
         const attachments = data.attachments || [];
         const leadPayload = {
+            id: leadId,
             source: 'zwolnie_form',
             status: 'new',
             contact_name: data.contact_name || null,
@@ -44,18 +68,13 @@ const Leads = {
             problem: data.problem || null
         };
 
-        const { data: lead, error } = await sb
-            .from('ze_leads')
-            .insert(leadPayload)
-            .select('id, token')
-            .single();
-
+        const { error } = await sb.from('zwolnie_leads').insert(leadPayload);
         if (error) {
             console.error('Lead insert failed:', error);
             throw error;
         }
 
-        // Upload attachments — śledź failures żeby wyświetlić w UI
+        // Upload zalacznikow — sledz failures zeby pokazac w UI
         const failed = [];
         let uploaded = 0;
         for (const a of attachments) {
@@ -64,7 +83,7 @@ const Leads = {
                 if (!blob) { failed.push(a.name); continue; }
                 const safeName = sanitizeFileName(a.name);
                 const unique = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-                const path = `leads/${lead.id}/${unique}_${safeName}`;
+                const path = `leads/${leadId}/${unique}_${safeName}`;
                 const { error: upErr } = await sb.storage
                     .from(STORAGE_BUCKET)
                     .upload(path, blob, { contentType: a.type, upsert: false });
@@ -73,8 +92,8 @@ const Leads = {
                     failed.push(a.name);
                     continue;
                 }
-                const { error: rowErr } = await sb.from('ze_lead_attachments').insert({
-                    lead_id: lead.id,
+                const { error: rowErr } = await sb.from('zwolnie_lead_attachments').insert({
+                    lead_id: leadId,
                     file_name: a.name,
                     file_type: a.type || null,
                     file_size: a.size || null,
@@ -93,7 +112,29 @@ const Leads = {
             }
         }
 
-        return { ...lead, attachments_total: attachments.length, attachments_uploaded: uploaded, attachments_failed: failed };
+        // Slack — fire and forget (nie blokuj UI gdyby Slack padl)
+        sendSlackNotification({
+            lead_id: leadId,
+            contact_name: leadPayload.contact_name,
+            contact_email: leadPayload.contact_email,
+            contact_phone: leadPayload.contact_phone,
+            company: leadPayload.company,
+            website: leadPayload.website,
+            industry: leadPayload.industry,
+            team_size: leadPayload.team_size,
+            payroll: leadPayload.payroll,
+            budget: leadPayload.budget,
+            problem: leadPayload.problem,
+            attachments_total: attachments.length,
+            attachments_uploaded: uploaded
+        });
+
+        return {
+            id: leadId,
+            attachments_total: attachments.length,
+            attachments_uploaded: uploaded,
+            attachments_failed: failed
+        };
     }
 };
 
