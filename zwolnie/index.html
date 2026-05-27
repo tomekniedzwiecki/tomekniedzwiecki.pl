@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Zwolnię Twoich pracowników | Tomek Niedźwiecki</title>
+    <meta name="description" content="Buduję CRM-y, automatyzacje i systemy, które zastępują etaty. Bez SaaS-a, bez „sam sobie klikniesz". Robotę robię ja.">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Zwolnię Twoich pracowników">
+    <meta property="og:description" content="...z roboty, której nie powinni robić. Buduję systemy, które robią to za 3 osoby.">
+    <meta property="og:locale" content="pl_PL">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<!-- ============================================== -->
+<!--                    NAV                         -->
+<!-- ============================================== -->
+<nav class="nav">
+    <div class="nav__inner">
+        <a href="https://tomekniedzwiecki.pl/" class="nav__brand" aria-label="Tomek Niedźwiecki — strona główna">
+            <img src="https://tomekniedzwiecki.pl/img/logo/tn-logo-white-88.png" alt="Tomek Niedźwiecki" class="nav__logo nav__logo--full" width="244" height="32" fetchpriority="high">
+            <img src="https://tomekniedzwiecki.pl/img/logo/tn-logo-icon-88.png" alt="" class="nav__logo nav__logo--icon" width="28" height="28" aria-hidden="true">
+        </a>
+        <div class="nav__links">
+            <a href="#jak">Jak to działa</a>
+            <a href="#formularz" class="nav__cta">Opisz problem →</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Intro overlay: "Panie Prezesie." sweep reveal → fade out → hero reveals -->
+<div class="intro-overlay" id="intro-overlay">
+    <div class="intro-overlay__content">
+        <h2 class="intro-overlay__greeting">
+            Panie <span class="intro-overlay__greeting-accent">Prezesie</span><span class="intro-overlay__dot">.</span>
+        </h2>
+        <p class="intro-overlay__followup"><em>Mamy chwilę?</em></p>
+    </div>
+    <span class="intro-overlay__skip">tak, mam chwilę &nbsp;↓</span>
+</div>
+
+<!-- Hero scroll progress sidebar -->
+<aside class="story__progress" id="story-progress" aria-hidden="true">
+    <a href="#act-1" class="story__progress-item is-active" data-act="0"><span>01</span><em>Wstęp</em></a>
+    <a href="#act-2" class="story__progress-item" data-act="1"><span>02</span><em>Koszt</em></a>
+    <a href="#act-3" class="story__progress-item" data-act="2"><span>03</span><em>Oferta</em></a>
+    <a href="#act-4" class="story__progress-item" data-act="3"><span>04</span><em>Efekt</em></a>
+    <a href="#jak" class="story__progress-item" data-act="4"><span>05</span><em>Proces</em></a>
+    <a href="#formularz" class="story__progress-item" data-act="5"><span>06</span><em>Brief</em></a>
+</aside>
+
+<!-- ============================================== -->
+<!--      STORYTELLING HERO (scroll-driven)         -->
+<!-- ============================================== -->
+<section class="story">
+
+    <!-- SCENE 1: HOOK -->
+    <div class="story__scene story__scene--hero" id="act-1" data-act="0">
+        <div class="story__center">
+            <div class="story__me" data-reveal data-delay="1300">
+                <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="48" height="48">
+                <div>
+                    <div class="story__me-name">Tomek Niedźwiecki</div>
+                    <div class="story__me-role">Buduję i automatyzuję biznesy od 15 lat</div>
+                </div>
+            </div>
+            <h1 class="story__h1">
+                <span class="story__h1-line reveal-mask" data-reveal data-delay="0">
+                    <span class="reveal-mask__inner">Zwolnię</span>
+                </span>
+                <span class="story__h1-line story__h1-line--connector reveal-mask" data-reveal data-delay="300">
+                    <span class="reveal-mask__inner">Twoich</span>
+                </span>
+                <span class="story__h1-line reveal-mask" data-reveal data-delay="650">
+                    <span class="reveal-mask__inner story__h1-accent">pracowników.</span>
+                </span>
+            </h1>
+            <p class="story__sub" data-reveal data-delay="1800">
+                <em>...<span class="story__sub-accent">z roboty</span>, której nie powinni robić.</em>
+            </p>
+        </div>
+    </div>
+
+    <!-- SCENE 2: HOOK FINANSOWY — INFINITE LOOP vs ONE SHOT -->
+    <div class="story__scene story__scene--cost" id="act-2" data-act="1">
+        <div class="story__center">
+            <div class="story__eyebrow story__eyebrow--lower" data-reveal>policzmy.</div>
+
+            <!-- Powtarzający się koszt — marquee -->
+            <div class="cost-loop" data-reveal data-delay="100">
+                <div class="cost-marquee" aria-label="Pensja, każdy miesiąc, w kółko">
+                    <div class="cost-marquee__track" aria-hidden="true">
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                        <span class="cost-marquee__word">PENSJA</span><span class="cost-marquee__dot">·</span>
+                    </div>
+                </div>
+                <p class="cost-sub" data-reveal data-delay="500">
+                    co miesiąc. co rok. <span class="cost-sub__red">zawsze.</span>
+                </p>
+            </div>
+
+            <!-- Divider "albo" -->
+            <div class="cost-divider" data-reveal data-delay="800">
+                <span class="cost-divider__line"></span>
+                <span class="cost-divider__word">albo</span>
+                <span class="cost-divider__line"></span>
+            </div>
+
+            <!-- Jednorazowy koszt — statyczny -->
+            <div class="cost-once-wrap" data-reveal data-delay="1100">
+                <h2 class="cost-once">TECHNOLOGIA</h2>
+                <p class="cost-sub cost-sub--once" data-reveal data-delay="1500">
+                    taniej. szybciej. <span class="cost-sub__green">lepiej.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCENE 3: USP — RECEIPT (rachunek z proporcjonalnymi paskami 100% vs 33%) -->
+    <div class="story__scene story__scene--compare" id="act-3" data-act="2">
+        <div class="compare-card">
+            <p class="compare-card__lead">
+                <span data-reveal data-delay="0">Wchodzę <em class="lead-prep">w</em> Twój <span class="lead-accent lead-accent--red">proces</span>.</span><br>
+                <span data-reveal data-delay="350">Wychodzę, gdy technologia <span class="lead-accent lead-accent--green">działa</span>.</span>
+            </p>
+
+            <div class="compare-viz" data-reveal data-delay="700">
+                <div class="compare-viz__row">
+                    <div class="compare-viz__meta">
+                        <span class="compare-viz__label">teraz</span>
+                        <span class="compare-viz__caption">Pensja osoby, która te zadania wykonuje</span>
+                    </div>
+                    <div class="compare-viz__track">
+                        <span class="compare-viz__bar compare-viz__bar--red"></span>
+                        <span class="compare-viz__num"><span data-counter-to="100" data-counter-duration="1400">0</span>%</span>
+                    </div>
+                </div>
+                <div class="compare-viz__row">
+                    <div class="compare-viz__meta">
+                        <span class="compare-viz__label">po wdrożeniu</span>
+                        <span class="compare-viz__caption">Technologia, która zrobi to lepiej</span>
+                    </div>
+                    <div class="compare-viz__track">
+                        <span class="compare-viz__bar compare-viz__bar--green"></span>
+                        <span class="compare-viz__num compare-viz__num--green">do&nbsp;<span data-counter-to="33" data-counter-duration="1400">0</span>%<sup class="usp__asterisk" aria-hidden="true">*</sup></span>
+                    </div>
+                </div>
+            </div>
+
+            <p class="compare-card__punch" data-reveal data-delay="2300">
+                Reszta <span class="compare-card__punch-accent">zostaje u Ciebie.</span>
+            </p>
+
+            <p class="compare-card__body" data-reveal data-delay="2700">
+                <sup class="usp__asterisk usp__asterisk--note" aria-hidden="true">*</sup>Osoby, która <span class="compare-card__body-strong">te zadania wykonuje</span>.
+            </p>
+        </div>
+    </div>
+
+    <!-- SCENE 4: PROMISE — dwa scenariusze, jeden wynik -->
+    <div class="story__scene story__scene--promise" id="act-4" data-act="3">
+        <div class="story__center story__center--narrow">
+            <div class="story__eyebrow" data-reveal>Dwa scenariusze. Twoja decyzja.</div>
+            <div class="story__choice">
+                <div class="choice-col" data-reveal data-delay="100">
+                    <span class="choice-col__num">01</span>
+                    <p class="story__line story__line--list">
+                        Ten sam obrót,<br>
+                        <span class="story__line-accent">mniejszy zespół.</span>
+                    </p>
+                </div>
+                <div class="story__choice-or" data-reveal data-delay="500">albo</div>
+                <div class="choice-col" data-reveal data-delay="900">
+                    <span class="choice-col__num">02</span>
+                    <p class="story__line story__line--list">
+                        <span class="story__line-accent story__line-accent--green">większy biznes,</span><br>
+                        tym samym zespołem.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+
+<!-- ============================================== -->
+<!--      JAK TO DZIAŁA (1 scena, 3-column grid)    -->
+<!-- ============================================== -->
+<section id="jak" class="story">
+    <div class="story__scene story__scene--steps" data-act="4">
+        <div class="steps-wrap">
+            <header class="steps__header">
+                <div class="story__eyebrow" data-reveal>Jak to działa</div>
+                <h2 class="steps__title" data-reveal data-delay="150">
+                    Trzy <span class="steps__title-accent">kroki</span>.
+                </h2>
+                <p class="steps__subtitle" data-reveal data-delay="350">
+                    <em>Twój brief → moja analiza → wspólna iteracja.</em>
+                </p>
+            </header>
+
+            <div class="steps-grid">
+                <article class="step step--ty" data-reveal data-delay="200">
+                    <span class="step__pov">ty</span>
+                    <div class="step__num-wrap">
+                        <div class="step__num">01</div>
+                        <div class="step__arrow" aria-hidden="true">→</div>
+                    </div>
+                    <span class="step__chip">5-10 minut</span>
+                    <p class="step__line">
+                        Opisujesz <span class="step__accent step__accent--yellow">problem.</span>
+                    </p>
+                    <p class="step__desc">
+                        Wypełniasz formularz. Im więcej konkretów, tym lepsza propozycja.
+                    </p>
+                </article>
+
+                <article class="step step--ja" data-reveal data-delay="500">
+                    <span class="step__pov">ja</span>
+                    <div class="step__num-wrap">
+                        <div class="step__num">02</div>
+                        <div class="step__arrow" aria-hidden="true">→</div>
+                    </div>
+                    <span class="step__chip">24-48 godzin</span>
+                    <p class="step__line">
+                        Analizuję <span class="step__accent step__accent--yellow">i wracam.</span>
+                    </p>
+                    <p class="step__desc">
+                        Mapuję procesy, liczę co da się zautomatyzować. Wracam z konkretną propozycją: co budujemy, ile kosztuje, kiedy działa.
+                    </p>
+                </article>
+
+                <article class="step step--razem" data-reveal data-delay="800">
+                    <span class="step__pov">razem</span>
+                    <div class="step__num-wrap">
+                        <div class="step__num">03</div>
+                    </div>
+                    <span class="step__chip">2-12 tygodni</span>
+                    <p class="step__line">
+                        Buduję <span class="step__accent step__accent--green">i wdrażam.</span>
+                    </p>
+                    <p class="step__desc">
+                        Proste automatyzacje 1-3 tygodnie, złożone integracje 6-12. Pracujemy iteracyjnie — widzisz postępy i zgłaszasz uwagi w trakcie.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================== -->
+<!--   CTA PRZED FORMULARZEM — gigant cycling word  -->
+<!-- ============================================== -->
+<section class="story">
+    <div class="story__scene story__scene--cta" data-act="5">
+        <div class="story__center cta-stage-wrap">
+            <p class="cta-intro" data-reveal>
+                <em>Sprawdźmy ile możesz...</em>
+            </p>
+
+            <div class="cta-stage" data-reveal data-delay="200">
+                <span class="cta-flip cta-flip--giant" aria-label="ile możesz">
+                    <span class="cta-flip__word is-active">nie zatrudniać.</span>
+                    <span class="cta-flip__word" style="color:var(--accent-red)">zwolnić.</span>
+                    <span class="cta-flip__word" style="color:var(--accent-green)">oszczędzić.</span>
+                    <span class="cta-flip__word">zarobić.</span>
+                    <span class="cta-flip__word" style="color:var(--accent-green)">odzyskać.</span>
+                </span>
+            </div>
+
+            <div class="cta-action" data-reveal data-delay="800">
+                <span class="cta-magnetic">
+                    <a href="#formularz" class="btn btn--cta-final">
+                        Wypełnij brief
+                        <span class="btn__arrow">→</span>
+                    </a>
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================== -->
+<!--           FORMULARZ (multi-step wizard)        -->
+<!-- ============================================== -->
+<section id="formularz" class="bw-section">
+
+    <!-- Progress bar -->
+    <div class="bw-progress" id="bw-progress">
+        <div class="bw-progress-fill" id="bw-progress-fill"></div>
+    </div>
+
+    <div class="bw-shell">
+        <div class="bw-frame">
+
+            <!-- ============ STEP 0: HERO + EMAIL ============ -->
+            <div class="bw-step is-active" data-step="0">
+                <div class="bw-me">
+                    <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="52" height="52">
+                    <div>
+                        <div class="bw-me__name">Tomek Niedźwiecki</div>
+                        <div class="bw-me__role">Buduję i automatyzuję biznesy od 15 lat</div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="bw-eyebrow">Twój brief</p>
+                    <h2 class="bw-headline">
+                        Sprawdźmy ile możesz
+                        <span class="cta-flip">
+                            <span class="cta-flip__word is-active">nie zatrudniać.</span>
+                            <span class="cta-flip__word" style="color:var(--accent-red)">zwolnić.</span>
+                            <span class="cta-flip__word" style="color:var(--accent-green)">oszczędzić.</span>
+                            <span class="cta-flip__word">zarobić.</span>
+                            <span class="cta-flip__word" style="color:var(--accent-green)">odzyskać.</span>
+                        </span>
+                    </h2>
+                </div>
+
+                <p class="bw-lead">
+                    6 krótkich pytań. Zaczynamy od maila — żebym mógł dać Ci link do dokończenia, gdyby coś przeszkodziło.
+                </p>
+
+                <form id="bw-email-form" class="bw-form">
+                    <div>
+                        <label class="bw-label" for="bw-email">Twój e-mail</label>
+                        <input class="bw-input bw-input--hero" type="email" id="bw-email" placeholder="ty@firma.pl" autocomplete="email" required>
+                        <div class="bw-error" id="bw-email-error">Podaj poprawny adres e-mail.</div>
+                    </div>
+                    <button type="submit" class="bw-btn" id="bw-email-submit">
+                        <span class="bw-btn-text">Zacznij brief <span class="bw-arrow">→</span></span>
+                    </button>
+                </form>
+
+                <p class="bw-footer-note">Twoje dane nie trafiają do żadnego newslettera. Czytam każde zgłoszenie osobiście.</p>
+            </div>
+
+            <!-- ============ STEP 1: IMIE + TELEFON ============ -->
+            <div class="bw-step" data-step="1">
+                <button type="button" class="bw-btn-back" onclick="bwGoToStep(0)">← Wstecz</button>
+                <div>
+                    <h2 class="bw-headline">Jak się z Tobą skontaktować?</h2>
+                    <p class="bw-lead">Telefon — żeby zadzwonić w razie czego. Imię — żeby się jakoś nazwać.</p>
+                </div>
+                <div class="bw-row bw-row--two">
+                    <div>
+                        <label class="bw-label" for="bw-name">Imię i nazwisko</label>
+                        <input class="bw-input bw-input--hero" type="text" id="bw-name" placeholder="Jan Kowalski" autocomplete="name">
+                    </div>
+                    <div>
+                        <label class="bw-label" for="bw-phone">Telefon</label>
+                        <input class="bw-input bw-input--hero" type="tel" id="bw-phone" placeholder="600 123 456" autocomplete="tel">
+                        <div class="bw-error" id="bw-phone-error">Podaj poprawny numer (9 cyfr).</div>
+                    </div>
+                </div>
+                <button type="button" class="bw-btn" id="bw-contact-submit" disabled>
+                    <span class="bw-btn-text">Dalej <span class="bw-arrow">→</span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 2: FIRMA + BRANZA ============ -->
+            <div class="bw-step" data-step="2">
+                <button type="button" class="bw-btn-back" onclick="bwGoToStep(1)">← Wstecz</button>
+                <div>
+                    <h2 class="bw-headline">Co robi Twoja firma?</h2>
+                    <p class="bw-lead">Krótko: nazwa i branża.</p>
+                </div>
+                <div>
+                    <label class="bw-label" for="bw-company">Nazwa firmy</label>
+                    <input class="bw-input bw-input--hero" type="text" id="bw-company" placeholder="Twoja Firma sp. z o.o.">
+                </div>
+                <div>
+                    <label class="bw-label" for="bw-website">Strona WWW <span style="color:var(--text-muted);font-weight:400">(opcjonalnie)</span></label>
+                    <input class="bw-input bw-input--hero" type="url" id="bw-website" placeholder="twojafirma.pl" autocomplete="url">
+                </div>
+                <div>
+                    <label class="bw-label">Branża</label>
+                    <div class="bw-options" id="bw-industry-opts">
+                        <button type="button" class="bw-opt" data-value="ecommerce"><span class="bw-dot"></span><span class="bw-opt-title">E-commerce / sklep online</span></button>
+                        <button type="button" class="bw-opt" data-value="uslugi"><span class="bw-dot"></span><span class="bw-opt-title">Usługi (B2B / B2C)</span></button>
+                        <button type="button" class="bw-opt" data-value="produkcja"><span class="bw-dot"></span><span class="bw-opt-title">Produkcja / fabryka</span></button>
+                        <button type="button" class="bw-opt" data-value="handel-b2b"><span class="bw-dot"></span><span class="bw-opt-title">Handel B2B / hurtownia</span></button>
+                        <button type="button" class="bw-opt" data-value="tech"><span class="bw-dot"></span><span class="bw-opt-title">Tech / SaaS / software</span></button>
+                        <button type="button" class="bw-opt" data-value="prawo"><span class="bw-dot"></span><span class="bw-opt-title">Kancelaria / doradztwo</span></button>
+                        <button type="button" class="bw-opt" data-value="finanse"><span class="bw-dot"></span><span class="bw-opt-title">Finanse / księgowość</span></button>
+                        <button type="button" class="bw-opt" data-value="medyczne"><span class="bw-dot"></span><span class="bw-opt-title">Medyczne / wellness</span></button>
+                        <button type="button" class="bw-opt" data-value="inna"><span class="bw-dot"></span><span class="bw-opt-title">Inna</span></button>
+                    </div>
+                </div>
+                <button type="button" class="bw-btn" id="bw-company-submit" disabled>
+                    <span class="bw-btn-text">Dalej <span class="bw-arrow">→</span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 3: WIELKOSC ZESPOLU ============ -->
+            <div class="bw-step" data-step="3">
+                <button type="button" class="bw-btn-back" onclick="bwGoToStep(2)">← Wstecz</button>
+                <div>
+                    <h2 class="bw-headline">Ile osób pracuje w firmie?</h2>
+                    <p class="bw-lead">Wszyscy — etat, kontrakt, freelancer.</p>
+                </div>
+                <div class="bw-options" id="bw-team-opts">
+                    <button type="button" class="bw-opt" data-value="1-5"><span class="bw-dot"></span><span class="bw-opt-title">1-5 osób</span></button>
+                    <button type="button" class="bw-opt" data-value="6-15"><span class="bw-dot"></span><span class="bw-opt-title">6-15 osób</span></button>
+                    <button type="button" class="bw-opt" data-value="16-50"><span class="bw-dot"></span><span class="bw-opt-title">16-50 osób</span></button>
+                    <button type="button" class="bw-opt" data-value="51-150"><span class="bw-dot"></span><span class="bw-opt-title">51-150 osób</span></button>
+                    <button type="button" class="bw-opt" data-value="150+"><span class="bw-dot"></span><span class="bw-opt-title">150+ osób</span></button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 4: KOSZTY OSOBOWE ============ -->
+            <div class="bw-step" data-step="4">
+                <button type="button" class="bw-btn-back" onclick="bwGoToStep(3)">← Wstecz</button>
+                <div>
+                    <h2 class="bw-headline">Ile co miesiąc wydajesz na pensje?</h2>
+                    <p class="bw-lead">Pytanie nie pułapkowe — liczę co da się uwolnić.</p>
+                </div>
+                <div class="bw-options" id="bw-payroll-opts">
+                    <button type="button" class="bw-opt" data-value="<50k"><span class="bw-dot"></span><span class="bw-opt-title">do 50 000 zł</span></button>
+                    <button type="button" class="bw-opt" data-value="50-150k"><span class="bw-dot"></span><span class="bw-opt-title">50 - 150 tys. zł</span></button>
+                    <button type="button" class="bw-opt" data-value="150-500k"><span class="bw-dot"></span><span class="bw-opt-title">150 - 500 tys. zł</span></button>
+                    <button type="button" class="bw-opt" data-value="500k-1.5M"><span class="bw-dot"></span><span class="bw-opt-title">500 tys. - 1,5 mln zł</span></button>
+                    <button type="button" class="bw-opt" data-value="1.5M+"><span class="bw-dot"></span><span class="bw-opt-title">powyżej 1,5 mln zł</span></button>
+                    <button type="button" class="bw-opt" data-value="nie-chce"><span class="bw-dot"></span><span class="bw-opt-title">Nie chcę podawać</span></button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 5: BUDZET ============ -->
+            <div class="bw-step" data-step="5">
+                <button type="button" class="bw-btn-back" onclick="bwGoToStep(4)">← Wstecz</button>
+                <div>
+                    <h2 class="bw-headline">Jaki budżet masz na rozwiązanie?</h2>
+                    <p class="bw-lead">Realnie. Jeśli mało — i tak powiem co da się zrobić.</p>
+                </div>
+                <div class="bw-options" id="bw-budget-opts">
+                    <button type="button" class="bw-opt" data-value="<20k"><span class="bw-dot"></span><span class="bw-opt-title">do 20 000 zł</span></button>
+                    <button type="button" class="bw-opt" data-value="20-50k"><span class="bw-dot"></span><span class="bw-opt-title">20 - 50 tys. zł</span></button>
+                    <button type="button" class="bw-opt" data-value="50-150k"><span class="bw-dot"></span><span class="bw-opt-title">50 - 150 tys. zł</span></button>
+                    <button type="button" class="bw-opt" data-value="150-500k"><span class="bw-dot"></span><span class="bw-opt-title">150 - 500 tys. zł</span></button>
+                    <button type="button" class="bw-opt" data-value="500k+"><span class="bw-dot"></span><span class="bw-opt-title">powyżej 500 tys. zł</span></button>
+                    <button type="button" class="bw-opt" data-value="nie-wiem"><span class="bw-dot"></span><span class="bw-opt-title">Nie wiem — zaproponuj</span></button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 6: OPIS PROBLEMU ============ -->
+            <div class="bw-step" data-step="6">
+                <button type="button" class="bw-btn-back" onclick="bwGoToStep(5)">← Wstecz</button>
+                <div>
+                    <h2 class="bw-headline">Co ma zniknąć z Twojej roboty?</h2>
+                    <p class="bw-lead">Co robicie, co Cię wkurza, co próbowałeś już zautomatyzować. Im więcej konkretów — tym lepsza propozycja.</p>
+                </div>
+                <div>
+                    <textarea id="bw-problem" class="bw-textarea" placeholder="Np. Prowadzę sklep z meblami biurowymi. 12 osób w zespole. Mam 3 handlowców, którzy 60% czasu wpisują maile do CRM-a, a nie sprzedają. Magazynierka liczy stany co tydzień ręcznie..."></textarea>
+                    <div class="bw-counter" id="bw-counter">0 / 100 minimum</div>
+                </div>
+                <div class="bw-attachments">
+                    <label class="bw-label" for="bw-files">Załączniki <span style="color:var(--text-muted);font-weight:400">(opcjonalnie)</span></label>
+                    <p class="bw-attachments-hint">Dorzuć wszystko, co może się przydać: schematy procesów, raporty, prezentacje, screeny z systemu, faktury, instrukcje. Im więcej kontekstu — tym konkretniejsza propozycja.</p>
+                    <label for="bw-files" class="bw-files-drop">
+                        <span class="bw-files-icon">+</span>
+                        <span class="bw-files-cta">Wybierz pliki</span>
+                        <span class="bw-files-formats">PDF, DOCX, XLSX, PNG, JPG · max 10 MB łącznie</span>
+                        <input type="file" id="bw-files" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.txt,.csv" hidden>
+                    </label>
+                    <ul class="bw-files-list" id="bw-files-list"></ul>
+                    <div class="bw-error" id="bw-files-error">Łączny rozmiar plików przekracza 10 MB. Usuń kilka albo wyślij większe maila po wysłaniu briefa.</div>
+                </div>
+                <button type="button" class="bw-btn" id="bw-final-submit" disabled>
+                    <span class="bw-btn-text">Wyślij brief <span class="bw-arrow">→</span></span>
+                    <span class="bw-btn-spin"><span class="bw-spin"></span></span>
+                </button>
+            </div>
+
+            <!-- ============ STEP 7: DONE ============ -->
+            <div class="bw-step bw-done" data-step="7">
+                <div class="bw-done-circle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/></svg>
+                </div>
+                <h2 class="bw-done-headline">Brief dotarł.</h2>
+                <p class="bw-done-sub">Czytam dziś. W ciągu 48 godzin dostaniesz na maila konkretną propozycję — co budujemy, ile kosztuje, ile etatów uwalniamy. Jeśli będę miał pytania, odezwę się wcześniej.</p>
+                <p class="bw-done-sub" style="font-size:13px;opacity:.6;margin-top:8px">Sprawdź też folder Oferty / Spam — czasem trafiam tam zamiast głównej skrzynki.</p>
+                <a href="/" class="bw-btn-back" style="margin-top:12px">← Strona główna</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Minimal footer: tylko linki legal -->
+<footer class="footer-mini">
+    <a href="https://tomekniedzwiecki.pl/dokumenty/regulamin.html">Regulamin</a>
+    <span>·</span>
+    <a href="https://tomekniedzwiecki.pl/dokumenty/polityka-prywatnosci.html">Polityka prywatności</a>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="assets/api.js"></script>
+<script>
+// =====================================================
+//  LANDING PAGE LOGIC
+// =====================================================
+
+// ===================== REVEAL ON SCROLL =====================
+// Animated counter (21st.dev pattern, vanilla rAF)
+function startCounter(el) {
+    const target = parseInt(el.dataset.counterTo, 10);
+    if (isNaN(target) || el.dataset.counterStarted) return;
+    el.dataset.counterStarted = '1';
+    const duration = parseInt(el.dataset.counterDuration || '1400', 10);
+    const startTs = performance.now();
+    function tick(now) {
+        const t = Math.min((now - startTs) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(eased * target);
+        if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+}
+
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const delay = parseInt(entry.target.dataset.delay || '0', 10);
+            setTimeout(() => {
+                entry.target.classList.add('is-visible');
+                // Start any counters inside the revealed element
+                entry.target.querySelectorAll('[data-counter-to]').forEach(startCounter);
+            }, delay);
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+function registerReveals(root = document) {
+    root.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
+}
+
+// Magnetic button (21st.dev pattern, vanilla port)
+(function attachMagnetic() {
+    const supportsHover = window.matchMedia('(hover: hover)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!supportsHover || reduceMotion) return;
+    document.querySelectorAll('.cta-magnetic').forEach(wrap => {
+        const strength = 0.3;
+        const radius = 120;
+        let isNear = false;
+        document.addEventListener('mousemove', (e) => {
+            const rect = wrap.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dx = e.clientX - cx;
+            const dy = e.clientY - cy;
+            const dist = Math.hypot(dx, dy);
+            if (dist < radius + Math.max(rect.width, rect.height) / 2) {
+                if (!isNear) isNear = true;
+                wrap.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+            } else if (isNear) {
+                isNear = false;
+                wrap.style.transform = 'translate(0, 0)';
+            }
+        }, { passive: true });
+    });
+})();
+
+// ===================== INTRO OVERLAY (sweep) =====================
+// Timeline:
+//   0    - 400ms : black overlay, idle
+//   400  - 2000ms: "Panie Prezesie." sweeps in (clip-path reveal L→R)
+//   1800 - 2600ms: "Mamy chwilę?" fade-in (subtitle)
+//   2600 - 4500ms: hold both (1.9s — czas na przeczytanie)
+//   4500 - 5200ms: overlay fade out → hero reveals start
+const INTRO_DURATION = 4500;
+const intro = document.getElementById('intro-overlay');
+
+function startHeroReveals() {
+    registerReveals();
+}
+
+function hideIntro() {
+    if (intro) intro.classList.add('is-hiding');
+}
+
+if (intro) {
+    // Click anywhere on intro to skip
+    intro.addEventListener('click', () => {
+        hideIntro();
+        setTimeout(startHeroReveals, 400);
+    }, { once: true });
+
+    // Auto-hide overlay, then start hero reveals
+    setTimeout(() => {
+        hideIntro();
+        setTimeout(startHeroReveals, 700);
+    }, INTRO_DURATION);
+} else {
+    registerReveals();
+}
+
+// ===================== HERO MOUSE SPOTLIGHT =====================
+(function() {
+    const spot = document.getElementById('story-spotlight');
+    if (!spot) return;
+    const heroSection = document.querySelector('section.story:first-of-type');
+    if (!heroSection) return;
+
+    let rafId = null;
+    let pendingX = 0, pendingY = 0;
+
+    function applyPosition() {
+        spot.style.setProperty('--mx', pendingX + 'px');
+        spot.style.setProperty('--my', pendingY + 'px');
+        rafId = null;
+    }
+
+    heroSection.addEventListener('mousemove', (e) => {
+        pendingX = e.clientX;
+        pendingY = e.clientY;
+        spot.classList.add('is-active');
+        if (rafId === null) rafId = requestAnimationFrame(applyPosition);
+    }, { passive: true });
+
+    heroSection.addEventListener('mouseleave', () => {
+        spot.classList.remove('is-active');
+    });
+
+    // Also deactivate when hero scrolls out of viewport
+    const heroOutObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+                spot.classList.remove('is-active');
+            }
+        });
+    }, { threshold: 0 });
+    heroOutObserver.observe(heroSection);
+})();
+
+// ===================== SCROLL PROGRESS SIDEBAR (full page) =====================
+(function() {
+    const progress = document.getElementById('story-progress');
+    if (!progress) return;
+    const items = progress.querySelectorAll('.story__progress-item');
+    const acts = document.querySelectorAll('.story__scene[data-act]');
+    if (!acts.length) return;
+
+    const formSection = document.getElementById('formularz');
+    const footer = document.querySelector('.footer-mini');
+
+    // Show sidebar after first act becomes visible; hide when form/footer takes over
+    const firstAct = document.querySelector('[data-act="0"]');
+    if (firstAct) {
+        const showObs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) progress.classList.add('is-shown');
+            });
+        }, { threshold: 0.1 });
+        showObs.observe(firstAct);
+    }
+
+    const hideTargets = [formSection, footer].filter(Boolean);
+    if (hideTargets.length) {
+        const hideObs = new IntersectionObserver((entries) => {
+            const anyVisible = entries.some(e => e.isIntersecting);
+            progress.classList.toggle('is-shown', !anyVisible);
+        }, { threshold: 0.1 });
+        hideTargets.forEach(t => hideObs.observe(t));
+    }
+
+    // Track which act is currently active
+    const actObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const actIdx = parseInt(entry.target.dataset.act, 10);
+                items.forEach(item => {
+                    const itemIdx = parseInt(item.dataset.act, 10);
+                    item.classList.toggle('is-active', itemIdx === actIdx);
+                });
+            }
+        });
+    }, { threshold: 0.5 });
+    acts.forEach(act => actObserver.observe(act));
+})();
+
+// ===================== WORD-FLIPS (cycling, universal) =====================
+(function() {
+    const flips = document.querySelectorAll('.cta-flip');
+    flips.forEach(flip => {
+        const items = flip.querySelectorAll('.cta-flip__word');
+        if (items.length < 2) return;
+
+        let idx = 0;
+        let intervalId = null;
+
+        function tick() {
+            items[idx].classList.remove('is-active');
+            idx = (idx + 1) % items.length;
+            items[idx].classList.add('is-active');
+        }
+
+        // Cycle only when this flip is in viewport
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !intervalId) {
+                    intervalId = setInterval(tick, 2200);
+                } else if (!entry.isIntersecting && intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+            });
+        }, { threshold: 0.3 });
+        observer.observe(flip);
+    });
+})();
+
+// ===================== BRIEF WIZARD (multi-step) =====================
+(function() {
+    const WIZARD_STORAGE = 'bw_data_v1';
+    const TOTAL_QUESTIONS = 6;
+    let currentStep = 0;
+
+    const load = () => {
+        try { return JSON.parse(localStorage.getItem(WIZARD_STORAGE) || '{}'); }
+        catch { return {}; }
+    };
+    const save = (key, value) => {
+        const d = load(); d[key] = value;
+        localStorage.setItem(WIZARD_STORAGE, JSON.stringify(d));
+    };
+    const clearWizard = () => localStorage.removeItem(WIZARD_STORAGE);
+
+    function goToStep(n) {
+        document.querySelectorAll('.bw-step').forEach(s => s.classList.remove('is-active'));
+        const target = document.querySelector(`.bw-step[data-step="${n}"]`);
+        if (!target) return;
+        target.classList.add('is-active');
+        currentStep = n;
+        updateProgress();
+        const section = document.getElementById('formularz');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    window.bwGoToStep = goToStep;
+
+    function updateProgress() {
+        const bar = document.getElementById('bw-progress');
+        const fill = document.getElementById('bw-progress-fill');
+        if (!bar || !fill) return;
+        const inSurvey = currentStep >= 1 && currentStep <= TOTAL_QUESTIONS;
+        bar.classList.toggle('is-visible', inSurvey);
+        if (inSurvey) fill.style.width = ((currentStep / TOTAL_QUESTIONS) * 100) + '%';
+    }
+
+    const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    const validPhone = p => {
+        const c = (p || '').replace(/[\s\-()]/g, '').replace(/^(\+?48)/, '');
+        return /^\d{9}$/.test(c);
+    };
+    const setLoading = (btn, on) => btn.classList.toggle('bw-btn-loading', on);
+
+    // ---- Step 0: Email ----
+    const emailForm = document.getElementById('bw-email-form');
+    const emailInput = document.getElementById('bw-email');
+    const emailError = document.getElementById('bw-email-error');
+    if (load().email) emailInput.value = load().email;
+    emailForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const v = emailInput.value.trim();
+        if (!validEmail(v)) { emailError.classList.add('is-shown'); return; }
+        emailError.classList.remove('is-shown');
+        save('email', v);
+        goToStep(1);
+    });
+
+    // ---- Step 1: Name + phone ----
+    const nameInput = document.getElementById('bw-name');
+    const phoneInput = document.getElementById('bw-phone');
+    const phoneError = document.getElementById('bw-phone-error');
+    const contactSubmit = document.getElementById('bw-contact-submit');
+    if (load().contact_name) nameInput.value = load().contact_name;
+    if (load().contact_phone) phoneInput.value = load().contact_phone;
+    function validateContact() {
+        const phoneOk = validPhone(phoneInput.value);
+        const nameOk = (nameInput.value || '').trim().length > 1;
+        contactSubmit.disabled = !(phoneOk && nameOk);
+        phoneError.classList.toggle('is-shown', phoneInput.value && !phoneOk);
+    }
+    nameInput.addEventListener('input', validateContact);
+    phoneInput.addEventListener('input', validateContact);
+    validateContact();
+    contactSubmit.addEventListener('click', () => {
+        if (contactSubmit.disabled) return;
+        save('contact_name', nameInput.value.trim());
+        save('contact_phone', phoneInput.value.trim());
+        goToStep(2);
+    });
+
+    // ---- Step 2: Company + website + industry ----
+    const companyInput = document.getElementById('bw-company');
+    const websiteInput = document.getElementById('bw-website');
+    const industryOpts = document.querySelectorAll('#bw-industry-opts .bw-opt');
+    const companySubmit = document.getElementById('bw-company-submit');
+    let selectedIndustry = load().industry || '';
+    if (load().company) companyInput.value = load().company;
+    if (load().website) websiteInput.value = load().website;
+    if (selectedIndustry) {
+        const o = document.querySelector(`#bw-industry-opts .bw-opt[data-value="${selectedIndustry}"]`);
+        if (o) o.classList.add('is-selected');
+    }
+    function validateCompany() {
+        const okC = (companyInput.value || '').trim().length > 0;
+        const okI = !!selectedIndustry;
+        companySubmit.disabled = !(okC && okI);
+    }
+    companyInput.addEventListener('input', validateCompany);
+    websiteInput.addEventListener('input', () => save('website', websiteInput.value.trim()));
+    industryOpts.forEach(opt => {
+        opt.addEventListener('click', () => {
+            industryOpts.forEach(o => o.classList.remove('is-selected'));
+            opt.classList.add('is-selected');
+            selectedIndustry = opt.dataset.value;
+            validateCompany();
+        });
+    });
+    validateCompany();
+    companySubmit.addEventListener('click', () => {
+        if (companySubmit.disabled) return;
+        save('company', companyInput.value.trim());
+        save('website', websiteInput.value.trim());
+        save('industry', selectedIndustry);
+        goToStep(3);
+    });
+
+    // ---- Steps 3/4/5: auto-advance options ----
+    function bindAutoOpts(containerId, key, nextStep) {
+        const opts = document.querySelectorAll(`#${containerId} .bw-opt`);
+        const saved = load()[key];
+        if (saved) {
+            const o = document.querySelector(`#${containerId} .bw-opt[data-value="${saved}"]`);
+            if (o) o.classList.add('is-selected');
+        }
+        opts.forEach(opt => {
+            opt.addEventListener('click', () => {
+                opts.forEach(o => o.classList.remove('is-selected'));
+                opt.classList.add('is-selected');
+                save(key, opt.dataset.value);
+                setTimeout(() => goToStep(nextStep), 250);
+            });
+        });
+    }
+    bindAutoOpts('bw-team-opts', 'team_size', 4);
+    bindAutoOpts('bw-payroll-opts', 'payroll', 5);
+    bindAutoOpts('bw-budget-opts', 'budget', 6);
+
+    // ---- Step 6: Problem text + attachments + final submit ----
+    const problemTa = document.getElementById('bw-problem');
+    const counter = document.getElementById('bw-counter');
+    const finalSubmit = document.getElementById('bw-final-submit');
+    const filesInput = document.getElementById('bw-files');
+    const filesList = document.getElementById('bw-files-list');
+    const filesError = document.getElementById('bw-files-error');
+    const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
+    let attachments = [];
+
+    if (load().problem) problemTa.value = load().problem;
+    function updateCounter() {
+        const len = (problemTa.value || '').length;
+        counter.textContent = `${len} / 100 minimum`;
+        counter.classList.toggle('is-ok', len >= 100);
+        finalSubmit.disabled = len < 100;
+    }
+    problemTa.addEventListener('input', () => {
+        save('problem', problemTa.value);
+        updateCounter();
+    });
+    updateCounter();
+
+    function fmtSize(bytes) {
+        if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+        return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+    }
+    function renderFiles() {
+        filesList.innerHTML = '';
+        attachments.forEach((a, idx) => {
+            const li = document.createElement('li');
+            li.className = 'bw-file-item';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'bw-file-name';
+            nameSpan.textContent = a.name;
+            const sizeSpan = document.createElement('span');
+            sizeSpan.className = 'bw-file-size';
+            sizeSpan.textContent = fmtSize(a.size);
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'bw-file-remove';
+            removeBtn.setAttribute('aria-label', 'Usuń załącznik');
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', () => {
+                attachments.splice(idx, 1);
+                filesError.classList.remove('is-shown');
+                renderFiles();
+            });
+            li.append(nameSpan, sizeSpan, removeBtn);
+            filesList.appendChild(li);
+        });
+    }
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
+    }
+    filesInput.addEventListener('change', async (e) => {
+        const incoming = Array.from(e.target.files || []);
+        filesInput.value = '';
+        let overflow = false;
+        for (const f of incoming) {
+            const totalSize = attachments.reduce((s, a) => s + a.size, 0) + f.size;
+            if (totalSize > MAX_TOTAL_BYTES) { overflow = true; break; }
+            try {
+                const data = await fileToBase64(f);
+                attachments.push({ name: f.name, type: f.type || 'application/octet-stream', size: f.size, data });
+            } catch (err) {
+                console.error('File read failed:', f.name, err);
+            }
+        }
+        filesError.classList.toggle('is-shown', overflow);
+        renderFiles();
+    });
+
+    finalSubmit.addEventListener('click', async () => {
+        if (finalSubmit.disabled) return;
+        setLoading(finalSubmit, true);
+        try {
+            const d = load();
+            const data = {
+                problem: d.problem,
+                industry: d.industry,
+                team_size: d.team_size,
+                payroll: d.payroll,
+                budget: d.budget,
+                contact_name: d.contact_name,
+                company: d.company,
+                website: d.website || '',
+                contact_email: d.email,
+                contact_phone: d.contact_phone,
+                attachments: attachments,
+            };
+            const result = await Leads.create(data);
+            clearWizard();
+            goToStep(7);
+            if (result && result.attachments_failed && result.attachments_failed.length) {
+                const warn = document.createElement('div');
+                warn.style.cssText = 'margin-top:16px;padding:12px 16px;border-radius:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d;font-size:13px;max-width:420px';
+                warn.innerHTML = '⚠️ Nie udało się wysłać ' + result.attachments_failed.length + ' z ' + result.attachments_total + ' załączników. Wyślij je mailem na <a href="mailto:tomek@tomekniedzwiecki.pl" style="color:#fde68a">tomek@tomekniedzwiecki.pl</a>.';
+                document.querySelector('.bw-done').appendChild(warn);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Coś poszło nie tak. Napisz na tomek@tomekniedzwiecki.pl');
+            setLoading(finalSubmit, false);
+        }
+    });
+})();
+
+// Smooth-scroll for nav + reveal wizard when CTA "Wypełnij brief" clicked
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+        const targetSel = a.getAttribute('href');
+        const target = document.querySelector(targetSel);
+        if (!target) return;
+        e.preventDefault();
+        // If targeting wizard, reveal it first
+        if (targetSel === '#formularz') {
+            target.classList.add('is-revealed');
+            // Let layout settle, then scroll
+            requestAnimationFrame(() => {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        } else {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+
+// Auto-reveal formularza gdy user dotrze do CTA sceny — przy kolejnym scrollu
+// trafia w gotowy formularz (analog /v2 iframe lazy-load).
+(function () {
+    const formSection = document.getElementById('formularz');
+    const ctaScene = document.querySelector('.story__scene--cta');
+    if (!formSection || !ctaScene) return;
+
+    const revealObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !formSection.classList.contains('is-revealed')) {
+                formSection.classList.add('is-revealed');
+                revealObs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.4 });
+    revealObs.observe(ctaScene);
+})();
+</script>
+
+</body>
+</html>
