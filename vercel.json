@@ -7,9 +7,6 @@
     { "source": "/crm/case-study/getmypermit", "destination": "https://tn-crm.vercel.app/crm/case-study/getmypermit" },
     { "source": "/crm/case-study/getmypermit/", "destination": "https://tn-crm.vercel.app/crm/case-study/getmypermit" }
   ],
-  "redirects": [
-    { "source": "/zwolnie", "destination": "/zwolnie/", "permanent": false }
-  ],
   "headers": [
     {
       "source": "/css/(.*)",
