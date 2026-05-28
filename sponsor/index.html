@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Wspieram tenis — od dzieciaków po profi · Tomek Niedźwiecki</title>
+    <meta name="description" content="Sponsoring zawodników, akademia video dla wszystkich, zaplecze online. Dla profi, amatorów, dzieci i trenerów.">
+    <meta name="robots" content="index, follow">
+
+    <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
+    <link rel="canonical" href="https://tomekniedzwiecki.pl/sponsor/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Wspieram tenis — od dzieciaków po profi · Tomek Niedźwiecki">
+    <meta property="og:description" content="Sponsoring zawodników, akademia video, zaplecze online. Dla profi, amatorów, dzieci i trenerów.">
+    <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
+    <meta property="og:locale" content="pl_PL">
+
+    <!-- Preconnect: Google Fonts (LCP) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+
+    <!-- Preload portret + logo (LCP) -->
+    <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="/img/logo/tn-logo-white-88.png" fetchpriority="high">
+
+    <style>
+    /* ============================================================
+       TOMEK NIEDŹWIECKI / V2 — Editorial storytelling landing
+       DNA: ten sam co /zwolnie + /home — Inter 700-900 + Instrument
+       Serif italic, accent-red #FF4B3E + accent-green #00D97E.
+       6 aktów, snap-scroll, cinematic intro overlay.
+       ============================================================ */
+    :root {
+        --bg: #000;
+        --bg-elev: #0a0a0a;
+        --bg-card: #0d0d0d;
+
+        --border: #1f1f1f;
+        --border-strong: #2d2d2d;
+        --border-hover: #404040;
+
+        --text: #ededed;
+        --text-strong: #ffffff;
+        --text-muted: #8a8a8a;
+        --text-faint: #5a5a5a;
+
+        --accent-green: #00d97e;
+        --accent-green-soft: rgba(0, 217, 126, 0.12);
+        --accent-green-dim: rgba(0, 217, 126, 0.05);
+        --accent-red: #ff4b3e;
+        --accent-red-soft: rgba(255, 75, 62, 0.12);
+
+        --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+        --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ============================================================
+       RESET + BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+        scroll-snap-type: y mandatory;
+    }
+    body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+    ::selection { background: var(--text-strong); color: var(--bg); }
+
+    /* Snap targets */
+    .scene,
+    .footer-mini { scroll-snap-stop: always; }
+    .scene { scroll-snap-align: start; }
+    .footer-mini { scroll-snap-align: end; }
+
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-snap-type: none; scroll-behavior: auto; }
+    }
+
+    /* ============================================================
+       NAV (fixed, blur)
+       ============================================================ */
+    .nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.55);
+        -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+    }
+    .nav__inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+    .nav__brand {
+        display: inline-flex;
+        align-items: center;
+        height: 32px;
+        transition: opacity 0.25s var(--ease);
+    }
+    .nav__brand:hover { opacity: 0.78; }
+    .nav__logo {
+        height: 100%;
+        width: auto;
+        display: block;
+        user-select: none;
+    }
+    .nav__logo--icon { display: none; }
+    .nav__cta {
+        padding: 9px 18px;
+        background: rgba(0, 217, 126, 0.10);
+        border: 1px solid rgba(0, 217, 126, 0.35);
+        border-radius: 999px;
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--text-strong);
+        transition: background 0.3s var(--ease),
+                    border-color 0.3s var(--ease),
+                    color 0.25s var(--ease);
+    }
+    .nav__cta:hover {
+        background: var(--accent-green);
+        border-color: var(--accent-green);
+        color: #04150c;
+    }
+
+    /* ============================================================
+       INTRO OVERLAY — sweep reveal "Cześć." + "Mam pomysł."
+       ============================================================ */
+    .intro {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 1000;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    /* Aurora subtle za intro — green żeby pasowało do "Zbuduję" */
+    .intro::before {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        width: clamp(400px, 60vw, 800px);
+        aspect-ratio: 1;
+        background: radial-gradient(
+            circle at center,
+            rgba(0, 217, 126, 0.14) 0%,
+            rgba(0, 217, 126, 0.03) 40%,
+            transparent 70%
+        );
+        filter: blur(80px);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        opacity: 0;
+        animation: introAurora 1.2s ease 200ms forwards;
+    }
+    @keyframes introAurora { to { opacity: 1; } }
+
+    .intro.is-hiding {
+        animation: introHide 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes introHide {
+        to { opacity: 0; visibility: hidden; pointer-events: none; }
+    }
+    .intro__content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(16px, 2.5vh, 32px);
+        text-align: center;
+    }
+    .intro__greeting {
+        font-family: var(--sans);
+        font-weight: 900;
+        font-size: clamp(48px, 11vw, 168px);
+        line-height: 0.92;
+        letter-spacing: -0.045em;
+        color: var(--text-strong);
+        padding: 0 24px;
+        clip-path: inset(0 100% 0 0);
+        animation: introSweep 1.4s cubic-bezier(0.65, 0, 0.35, 1) 300ms forwards;
+    }
+    @keyframes introSweep { to { clip-path: inset(0 0 0 0); } }
+    .intro__dot {
+        color: var(--accent-green);
+        display: inline-block;
+        animation: introDotPulse 2.2s ease-in-out 2200ms infinite;
+    }
+    @keyframes introDotPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%      { opacity: 0.55; transform: scale(1.18); }
+    }
+    .intro__followup {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(28px, 4.5vw, 64px);
+        color: var(--text);
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        padding: 0 24px;
+        opacity: 0;
+        transform: translateY(12px);
+        animation: introFollowupIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1500ms forwards;
+    }
+    @keyframes introFollowupIn { to { opacity: 1; transform: translateY(0); } }
+
+    .intro__skip {
+        position: absolute;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--sans);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        opacity: 0;
+        animation: introSkipIn 0.6s ease 2400ms forwards,
+                   introSkipBob 2.4s ease 3200ms infinite;
+        z-index: 2;
+    }
+    @keyframes introSkipIn { to { opacity: 1; } }
+    @keyframes introSkipBob {
+        0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.7; }
+        50%      { transform: translateX(-50%) translateY(4px); opacity: 1; }
+    }
+    .intro:hover .intro__skip { color: var(--text); }
+
+    @media (max-width: 480px) {
+        .intro__greeting { font-size: clamp(38px, 13vw, 64px); padding: 0 18px; }
+        .intro__followup { font-size: clamp(22px, 6vw, 32px); padding: 0 18px; }
+        .intro__skip { bottom: 24px; font-size: 10.5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .intro__greeting { animation: none; clip-path: none; }
+        .intro__followup { animation: none; opacity: 1; transform: none; }
+        .intro::before { animation: none; opacity: 1; }
+        .intro__skip { animation: introSkipIn 0.3s ease forwards; }
+        .intro__dot { animation: none; }
+    }
+
+    /* ============================================================
+       SCROLL PROGRESS SIDEBAR (desktop) + DOCK (mobile)
+       ============================================================ */
+    .progress {
+        position: fixed;
+        left: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        opacity: 0;
+        transition: opacity 0.5s var(--ease);
+        pointer-events: auto;
+    }
+    .progress.is-shown { opacity: 1; }
+    .progress__item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--sans);
+        font-size: 11px;
+        color: var(--text-faint);
+        letter-spacing: 0.1em;
+        transition: color 0.35s var(--ease);
+        cursor: pointer;
+    }
+    .progress__item::before {
+        content: '';
+        width: 18px;
+        height: 1px;
+        background: currentColor;
+        transition: width 0.35s var(--ease);
+        flex-shrink: 0;
+    }
+    .progress__item span {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+    .progress__item em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 13px;
+        letter-spacing: -0.01em;
+        opacity: 0;
+        transform: translateX(-6px);
+        transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+    }
+    .progress__item:hover { color: var(--text); }
+    .progress__item.is-active { color: var(--text-strong); }
+    .progress__item.is-active::before { width: 40px; }
+    .progress__item.is-active em { opacity: 1; transform: translateX(0); }
+
+    @media (max-width: 920px) {
+        .progress {
+            left: 50%;
+            top: auto;
+            bottom: calc(14px + env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            flex-direction: row;
+            gap: 0;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.55);
+            -webkit-backdrop-filter: blur(14px);
+                    backdrop-filter: blur(14px);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            align-items: center;
+        }
+        .progress__item {
+            gap: 0;
+            padding: 6px 8px;
+            position: relative;
+        }
+        .progress__item::before {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-faint);
+            opacity: 0.6;
+            transition: width 0.3s var(--ease), background 0.3s var(--ease), opacity 0.3s var(--ease);
+        }
+        .progress__item.is-active::before {
+            width: 18px;
+            border-radius: 999px;
+            background: var(--accent-green);
+            opacity: 1;
+        }
+        .progress__item span { display: none; }
+        .progress__item em {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            font-size: 11px;
+            font-style: normal;
+            font-family: var(--sans);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-strong);
+            background: rgba(0, 0, 0, 0.7);
+            -webkit-backdrop-filter: blur(10px);
+                    backdrop-filter: blur(10px);
+            padding: 4px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+            pointer-events: none;
+            border: 1px solid var(--border);
+        }
+        .progress__item.is-active em { transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ============================================================
+       SCENE (każda 100dvh, snap target)
+       ============================================================ */
+    .story { position: relative; }
+    .scene {
+        position: relative;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 32px;
+        overflow: hidden;
+        scroll-margin-top: 56px;
+    }
+    .scene__inner {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 1280px;
+    }
+
+    /* Aurora blob — bazowy (overrideowany per scene) */
+    .scene__aurora {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: clamp(500px, 75vw, 1000px);
+        aspect-ratio: 1;
+        background: radial-gradient(
+            circle at center,
+            rgba(0, 217, 126, 0.07) 0%,
+            rgba(0, 217, 126, 0.02) 40%,
+            transparent 72%
+        );
+        filter: blur(110px);
+        pointer-events: none;
+        z-index: 0;
+        transform: translate(-50%, -50%);
+        animation: auroraDrift 24s ease-in-out infinite;
+        will-change: transform;
+    }
+    @keyframes auroraDrift {
+        0%, 100% { transform: translate(-52%, -50%) scale(1); }
+        50%      { transform: translate(-48%, -53%) scale(1.05); }
+    }
+
+    /* ============================================================
+       REVEAL ANIMATIONS
+       ============================================================ */
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+        will-change: opacity, transform;
+    }
+    [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Cinematic mask reveal — tekst wynurza się z dołu */
+    [data-reveal].reveal-mask {
+        opacity: 1;
+        transform: none;
+        overflow: hidden;
+        display: block;
+        transition: none;
+    }
+    .reveal-mask__inner {
+        display: inline-block;
+        transform: translateY(110%);
+        transition: transform 1.1s var(--ease);
+        will-change: transform;
+        padding-bottom: 0.12em;
+    }
+    [data-reveal].reveal-mask.is-visible .reveal-mask__inner {
+        transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        [data-reveal] { opacity: 1; transform: none; transition: none; }
+        .reveal-mask__inner { transform: none; transition: none; }
+        .scene__aurora { animation: none; }
+    }
+
+    /* ============================================================
+       MOBILE PERFORMANCE OPTIMIZATIONS
+       Agresywne ograniczenia jank: wyłączamy animacje aurora,
+       zmniejszamy backdrop-filter, łagodzimy snap-scroll.
+       Każdy z osobna kosztuje GPU/composite — na mobile się stackuje.
+       ============================================================ */
+    @media (max-width: 820px) {
+        /* AURORA — static gradient bez animacji + mniejszy blur radius */
+        .scene__aurora {
+            animation: none !important;
+            filter: blur(60px);
+            opacity: 0.8;
+            will-change: auto;
+        }
+        .intro::before {
+            animation: introAurora 0.5s ease forwards !important;
+            filter: blur(50px);
+        }
+
+        /* BACKDROP-FILTER — wyłącz (drogi shader). Solidny rgba zamiast. */
+        .nav {
+            background: rgba(0, 0, 0, 0.88);
+            -webkit-backdrop-filter: none;
+                    backdrop-filter: none;
+        }
+        .progress {
+            -webkit-backdrop-filter: none;
+                    backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.85);
+        }
+        .progress__item em {
+            -webkit-backdrop-filter: none;
+                    backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.92);
+        }
+
+        /* SNAP-SCROLL — mniej agresywny. 'always' powoduje "stuck feeling" na touch */
+        .scene { scroll-snap-stop: normal; }
+        .footer-mini { scroll-snap-stop: normal; }
+        html { scroll-snap-type: y proximity; }  /* proximity zamiast mandatory */
+
+        /* REVEAL — mniejszy translate (mniej GPU pracy per frame) */
+        [data-reveal] {
+            transform: translateY(16px);
+            transition-duration: 0.6s;
+        }
+        .reveal-mask__inner { transition-duration: 0.8s; }
+
+        /* INFINITE ANIMATIONS — wyłącz nieistotne wizualnie */
+        .hero__meta-arrow { animation: none; opacity: 0.85; }
+        .intro__dot { animation: none; }
+
+        /* will-change — odpiąć po kompozycji (zostawiamy tylko na critical paths) */
+        [data-reveal] { will-change: auto; }
+        [data-reveal]:not(.is-visible) { will-change: opacity, transform; }
+
+        /* IFRAME scene 7 — wyłącz na mobile (scroll konflikt + waste memory).
+           Mobile: CTA button → direct nav do /zapisy. */
+        .scene--form { display: none; }
+        .progress__item[data-act="6"] { display: none; }
+
+        /* Hero arrow indicator — zbędne na mobile (bottom dock pokazuje progress) */
+        .hero__meta { display: none; }
+
+        /* Reveal mask __inner — zwolnij GPU layer po animacji (JS to robi też) */
+        .reveal-mask__inner { will-change: auto; }
+        [data-reveal]:not(.is-visible) .reveal-mask__inner { will-change: transform; }
+
+        /* Motto word stagger — skróć na mobile (40ms zamiast 75ms) */
+        .motto__line--words.is-visible .motto__word {
+            transition-delay: calc(var(--wi, 0) * 40ms);
+            transition-duration: 0.5s;
+        }
+
+        /* Border beam — wyłącz animację na mobile (GPU savings) */
+        .step--final {
+            animation: none !important;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 217, 126, 0.06) 100%) !important;
+            border-color: var(--accent-green) !important;
+        }
+
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .step--final { animation: none; }
+    }
+
+    /* ============================================================
+       SCENE 1 — HERO
+       ============================================================ */
+    .scene--hero { padding-top: 110px; }
+    .scene--hero .scene__aurora {
+        background: radial-gradient(
+            circle at center,
+            rgba(0, 217, 126, 0.11) 0%,
+            rgba(0, 217, 126, 0.03) 40%,
+            transparent 72%
+        );
+    }
+    .scene--hero .scene__inner {
+        max-width: 1400px;
+        text-align: left;
+    }
+
+    /* Me strip — avatar + name + role */
+    .me {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 18px 6px 6px;
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        margin-bottom: clamp(28px, 5vh, 56px);
+        max-width: max-content;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.7s var(--ease) 1300ms, transform 0.7s var(--ease) 1300ms;
+    }
+    .me.is-visible { opacity: 1; transform: translateY(0); }
+    .me img {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-green);
+        box-shadow: 0 0 0 3px var(--accent-green-soft);
+        flex-shrink: 0;
+    }
+    .me__name {
+        color: var(--text-strong);
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.25;
+        letter-spacing: -0.005em;
+    }
+    .me__role {
+        color: var(--text-muted);
+        font-size: 12.5px;
+        line-height: 1.25;
+        margin-top: 2px;
+    }
+
+    /* Hero H1 — cinematic reveal */
+    .hero__h1 {
+        font-family: var(--sans);
+        font-size: clamp(56px, 12vw, 180px);
+        line-height: 0.86;
+        letter-spacing: -0.05em;
+        font-weight: 900;
+        color: var(--text-strong);
+        margin: 0;
+        max-width: 1200px;
+    }
+    .hero__h1-line {
+        display: block;
+        overflow: hidden;
+        line-height: 0.92;
+        margin-bottom: -0.05em;
+    }
+    .hero__h1-italic {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text-muted);
+        font-size: 0.65em;
+        line-height: 1;
+        letter-spacing: -0.015em;
+        padding: 0 0.15em;
+        vertical-align: 0.04em;
+    }
+    .hero__h1-accent {
+        color: var(--accent-green);
+        text-shadow: 0 0 80px rgba(0, 217, 126, 0.3);
+    }
+    /* Coda — "Osobiście." inline mic drop: mniejsze, italic serif, subtelne */
+    .hero__h1-personal {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: 0.4em;
+        letter-spacing: -0.015em;
+        color: var(--text-strong);
+        line-height: 1;
+        vertical-align: 0.12em;
+    }
+
+    .hero__sub {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(22px, 3.8vw, 48px);
+        color: var(--text);
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        margin-top: clamp(16px, 3vh, 32px);
+        max-width: 900px;
+    }
+    .hero__sub-accent {
+        color: var(--accent-green);
+        font-weight: 500;
+    }
+
+    .hero__meta {
+        margin-top: clamp(28px, 5vh, 52px);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: var(--sans);
+        font-size: 13px;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+    }
+    .hero__meta-arrow {
+        animation: arrowBob 2.4s ease-in-out infinite;
+        display: inline-block;
+    }
+    @keyframes arrowBob {
+        0%, 100% { transform: translateY(0); opacity: 0.7; }
+        50%      { transform: translateY(4px); opacity: 1; }
+    }
+
+    /* ============================================================
+       SCENE 2 — POLICZMY (one hero number, cinematic)
+       ============================================================ */
+    .scene--proof .scene__aurora {
+        background: radial-gradient(
+            circle at center,
+            rgba(0, 217, 126, 0.14) 0%,
+            rgba(0, 217, 126, 0.04) 40%,
+            transparent 72%
+        );
+    }
+    .scene--proof .scene__inner {
+        text-align: center;
+    }
+
+    .proof__eyebrow {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(20px, 2.6vw, 36px);
+        color: var(--text-muted);
+        margin-bottom: clamp(40px, 8vh, 96px);
+        letter-spacing: -0.005em;
+    }
+
+    /* Hero number — THE moment. Inline: digits + currency italic side */
+    .proof__hero {
+        display: inline-flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.12em;
+        position: relative;
+    }
+    .proof__digits {
+        font-family: var(--sans);
+        font-weight: 900;
+        font-size: clamp(120px, 26vw, 360px);
+        line-height: 0.88;
+        letter-spacing: -0.05em;
+        color: var(--accent-green);
+        text-shadow: 0 0 140px rgba(0, 217, 126, 0.32);
+        font-variant-numeric: tabular-nums;
+    }
+    .proof__currency {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: clamp(32px, 7vw, 92px);
+        letter-spacing: -0.015em;
+        color: var(--text);
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    /* Subtitle italic — co to znaczy */
+    .proof__subtitle {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(26px, 4vw, 56px);
+        color: var(--text);
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        margin-top: clamp(24px, 4vh, 48px);
+    }
+    .proof__subtitle strong {
+        font-family: var(--sans);
+        font-style: normal;
+        font-weight: 600;
+        color: var(--text-strong);
+        font-size: 0.92em;
+    }
+
+    /* Supporting line — context małym tekstem */
+    .proof__supporting {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(16px, 1.8vw, 22px);
+        color: var(--text-muted);
+        letter-spacing: -0.005em;
+        margin-top: clamp(40px, 6vh, 80px);
+        line-height: 1.45;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .proof__supporting strong {
+        font-family: var(--sans);
+        font-style: normal;
+        font-weight: 600;
+        color: var(--text);
+        font-size: 0.92em;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+    .proof__sep {
+        color: var(--text-faint);
+        padding: 0 0.3em;
+    }
+
+    /* ============================================================
+       SCENE 3 — LEDGER (editorial 3-row receipt)
+       Każda firma = jedna linia: rok / nazwa / liczba.
+       Zero opisów. Niech liczby mówią.
+       ============================================================ */
+    .scene--journey .scene__aurora {
+        background: radial-gradient(
+            circle at 30% 50%,
+            rgba(255, 75, 62, 0.05) 0%,
+            rgba(0, 217, 126, 0.07) 50%,
+            transparent 72%
+        );
+    }
+    .journey__header {
+        margin-bottom: clamp(40px, 6vh, 80px);
+        text-align: center;
+    }
+    .journey__eyebrow {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(18px, 2vw, 26px);
+        color: var(--text-muted);
+        margin-bottom: clamp(16px, 2vh, 24px);
+        letter-spacing: -0.005em;
+    }
+    .journey__title {
+        font-family: var(--sans);
+        font-size: clamp(36px, 5.2vw, 84px);
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.045em;
+        color: var(--text-strong);
+    }
+    .journey__title em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text);
+        font-size: 0.78em;
+        padding: 0 0.05em;
+        letter-spacing: -0.015em;
+    }
+
+    /* LEDGER — 3 wiersze, każdy: rok · linia · nazwa · liczba */
+    .ledger {
+        display: flex;
+        flex-direction: column;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .ledger__row {
+        display: grid;
+        grid-template-columns: 110px 1fr auto;
+        align-items: baseline;
+        gap: clamp(20px, 3vw, 48px);
+        padding: clamp(22px, 3vh, 36px) 0;
+        border-bottom: 1px solid var(--border);
+        transition: border-color 0.4s var(--ease);
+    }
+    .ledger__row:first-child { padding-top: clamp(16px, 2vh, 28px); border-top: 1px solid var(--border); }
+    .ledger__row:last-child { border-bottom: 1px solid var(--border); }
+    .ledger__row:hover { border-color: var(--border-strong); }
+
+    .ledger__year {
+        font-family: var(--sans);
+        font-size: clamp(12px, 1.2vw, 14px);
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        color: var(--text-faint);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    .ledger__name {
+        font-family: var(--sans);
+        font-size: clamp(40px, 6vw, 96px);
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: -0.045em;
+        color: var(--text-strong);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ledger__metric {
+        font-family: var(--sans);
+        font-size: clamp(28px, 3.8vw, 56px);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.035em;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        text-align: right;
+    }
+    .ledger__metric--accent {
+        color: var(--accent-green);
+        text-shadow: 0 0 60px rgba(0, 217, 126, 0.3);
+    }
+
+    /* Spina-line — krótkie zdanie tying together */
+    .journey__footer {
+        margin-top: clamp(36px, 5vh, 64px);
+        text-align: center;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(18px, 2.2vw, 28px);
+        color: var(--text-muted);
+        letter-spacing: -0.005em;
+        line-height: 1.4;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .journey__footer strong {
+        font-family: var(--sans);
+        font-style: normal;
+        font-weight: 600;
+        color: var(--text-strong);
+        font-size: 0.92em;
+    }
+
+    /* === SCENE 1 — HERO · v2 base + editorial editions === */
+    /* Top-right editorial mark */
+    .hero__edition {
+        position: absolute;
+        top: clamp(96px, 14vh, 130px);
+        right: clamp(24px, 4vw, 56px);
+        z-index: 3;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 12px;
+        padding: 6px 12px;
+        border-top: 1px solid var(--border-strong);
+        border-bottom: 1px solid var(--border-strong);
+    }
+    .hero__edition-num {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 22px;
+        color: var(--accent-red);
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+    .hero__edition-meta {
+        font-family: var(--sans);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+    @media (max-width: 820px) {
+        .hero__edition {
+            top: 76px;
+            right: 20px;
+            padding: 4px 10px;
+        }
+        .hero__edition-num { font-size: 16px; }
+        .hero__edition-meta { font-size: 9px; letter-spacing: 0.22em; }
+    }
+
+    /* Italic kicker — bridge typography */
+    .hero__kicker {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(17px, 1.8vw, 22px);
+        color: var(--text-muted);
+        margin: 0 0 clamp(14px, 2vh, 22px);
+        line-height: 1;
+        letter-spacing: -0.005em;
+    }
+    .hero__kicker em {
+        font-style: italic;
+        color: var(--accent-green);
+    }
+
+    /* Bottom 3-act teaser (DEAD — wracamy do plain hero__meta) */
+    .hero__teaser {
+        margin-top: clamp(28px, 5vh, 52px);
+        padding-top: clamp(14px, 2vh, 20px);
+        border-top: 1px dashed var(--border-strong);
+        display: flex;
+        align-items: center;
+        gap: clamp(16px, 3vw, 32px);
+        flex-wrap: wrap;
+    }
+    .hero__teaser-label {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(13px, 1.4vw, 16px);
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+    .hero__teaser-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        gap: clamp(14px, 2.5vw, 32px);
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    .hero__teaser-list li {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        font-family: var(--sans);
+        font-size: clamp(12.5px, 1.3vw, 14.5px);
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.005em;
+    }
+    .hero__teaser-list em {
+        font-family: var(--serif);
+        font-style: italic;
+        color: var(--accent-red);
+        font-size: 1.4em;
+        line-height: 0.8;
+        min-width: 14px;
+    }
+    .hero__teaser-cue {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        text-decoration: none;
+        transition: color 0.2s var(--ease);
+        margin-left: auto;
+    }
+    .hero__teaser-cue:hover { color: var(--text); }
+    .hero__teaser-arrow {
+        display: inline-block;
+        font-size: 14px;
+        animation: hero-teaser-arrow 2.4s ease-in-out infinite;
+    }
+    @keyframes hero-teaser-arrow {
+        0%, 100% { transform: translateY(0); opacity: 0.5; }
+        50%      { transform: translateY(4px); opacity: 1; }
+    }
+    @media (max-width: 720px) {
+        .hero__teaser {
+            gap: 12px;
+            margin-top: 28px;
+        }
+        .hero__teaser-list { gap: 14px; }
+        .hero__teaser-cue {
+            margin-left: 0;
+            order: 4;
+            flex: 1 0 100%;
+            justify-content: flex-start;
+            padding-top: 4px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+        }
+    }
+
+    /* === SCENE 1 — HERO · magazine front cover === */
+    .scene--cover {
+        background:
+            radial-gradient(ellipse 70% 50% at 50% 40%, rgba(255, 75, 62, 0.04), transparent 70%),
+            #000;
+        padding-top: 96px;
+        padding-bottom: 56px;
+        overflow: hidden;
+    }
+    .scene--cover .scene__aurora { display: none; }
+    .cover {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 clamp(24px, 5vw, 56px);
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto auto;
+        gap: clamp(28px, 5vh, 56px);
+        align-items: stretch;
+        position: relative;
+    }
+
+    /* Top masthead — name on the left, location on the right */
+    .cover__top {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--text-strong);
+    }
+    .cover__corner {
+        font-family: var(--sans);
+        font-size: clamp(11px, 1.2vw, 13px);
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+    .cover__corner--left { color: var(--text-strong); }
+    .cover__rule {
+        flex: 1;
+        height: 1px;
+        background: var(--border-strong);
+    }
+
+    /* Stage — the big keyword */
+    .cover__stage {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        gap: clamp(8px, 1.5vh, 18px);
+        position: relative;
+    }
+    .cover__kicker {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(20px, 2.2vw, 28px);
+        color: var(--text-muted);
+        margin: 0;
+        padding-left: clamp(8px, 1.5vw, 16px);
+        letter-spacing: -0.005em;
+    }
+    .cover__kicker em {
+        font-style: italic;
+        color: var(--text);
+    }
+    .cover__keyword {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: clamp(120px, 22vw, 260px);
+        line-height: 0.88;
+        letter-spacing: -0.045em;
+        color: var(--text-strong);
+        margin: 0;
+        position: relative;
+    }
+    .cover__keyword-dot {
+        color: var(--accent-red);
+        font-style: normal;
+    }
+    .cover__claim {
+        font-family: var(--sans);
+        font-size: clamp(18px, 2.4vw, 30px);
+        font-weight: 600;
+        color: var(--text);
+        margin: 0;
+        padding-left: clamp(8px, 1.5vw, 16px);
+        letter-spacing: -0.015em;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .cover__claim em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--accent-green);
+    }
+    .cover__claim-arrow {
+        color: var(--accent-red);
+        font-family: var(--sans);
+        font-weight: 700;
+        font-style: normal;
+        font-size: 0.85em;
+        line-height: 1;
+    }
+
+    /* Bottom contents — three-act teaser */
+    .cover__bottom {
+        display: flex;
+        align-items: baseline;
+        gap: clamp(20px, 4vw, 48px);
+        padding-top: 16px;
+        border-top: 1px dashed var(--border-strong);
+        flex-wrap: wrap;
+    }
+    .cover__contents-label {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(13px, 1.4vw, 16px);
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+    .cover__contents {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: clamp(16px, 3vw, 40px);
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    .cover__contents li {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 10px;
+        font-family: var(--sans);
+        font-size: clamp(13px, 1.4vw, 15px);
+        color: var(--text);
+    }
+    .cover__contents li span {
+        font-family: var(--serif);
+        font-style: italic;
+        color: var(--accent-red);
+        font-size: 1.4em;
+        line-height: 0.8;
+        min-width: 16px;
+    }
+    .cover__contents li em {
+        font-style: normal;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+
+    /* Scroll cue — bottom right */
+    .cover__scroll {
+        position: absolute;
+        right: clamp(24px, 5vw, 56px);
+        bottom: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        transition: color 0.2s var(--ease);
+        text-decoration: none;
+    }
+    .cover__scroll:hover { color: var(--text); }
+    .cover__scroll-arrow {
+        font-size: 14px;
+        animation: cover-arrow 2.4s ease-in-out infinite;
+        display: inline-block;
+    }
+    @keyframes cover-arrow {
+        0%, 100% { transform: translateY(0); opacity: 0.5; }
+        50%      { transform: translateY(4px); opacity: 1; }
+    }
+
+    @media (max-width: 820px) {
+        .scene--cover { padding-top: 84px; padding-bottom: 64px; }
+        .cover { gap: 28px; }
+        .cover__top { gap: 12px; flex-wrap: wrap; }
+        .cover__rule { order: 3; flex: 1 0 100%; }
+        .cover__corner--right { font-size: 10.5px; }
+        .cover__kicker { font-size: 18px; }
+        .cover__keyword { font-size: clamp(96px, 26vw, 160px); }
+        .cover__claim { font-size: 18px; gap: 8px; }
+        .cover__bottom { gap: 14px; padding-top: 12px; }
+        .cover__contents { gap: 14px; }
+        .cover__scroll { position: static; align-self: flex-start; padding-left: clamp(8px, 1.5vw, 16px); }
+    }
+
+    /* === SCENE 3 — PILLARS · poster spread, 3-column editorial === */
+    .scene--pillars {
+        background:
+            radial-gradient(ellipse 50% 35% at 50% 100%, rgba(255, 75, 62, 0.05), transparent 70%),
+            #000;
+    }
+    .pillars {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: clamp(48px, 8vh, 96px) clamp(24px, 5vw, 56px);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(40px, 6vh, 72px);
+    }
+    .pillars__head {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid var(--text-strong);
+    }
+    .pillars__roman {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(22px, 2.4vw, 30px);
+        color: var(--accent-red);
+        letter-spacing: -0.02em;
+        line-height: 1;
+        min-width: 36px;
+    }
+    .pillars__title {
+        font-family: var(--sans);
+        font-weight: 800;
+        font-size: clamp(28px, 4.6vw, 52px);
+        letter-spacing: -0.03em;
+        color: var(--text-strong);
+        margin: 0;
+        line-height: 1;
+    }
+    .pillars__title em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text);
+    }
+    .pillars__rule {
+        flex: 1;
+        height: 1px;
+        background: var(--border-strong);
+        align-self: center;
+    }
+
+    /* 3-column grid */
+    .pillars__grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+    }
+    .pillar {
+        padding: clamp(32px, 5vh, 56px) clamp(20px, 3vw, 36px);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        border-right: 1px solid var(--border);
+        position: relative;
+        transition: background-color 0.4s var(--ease);
+    }
+    .pillar:last-child { border-right: none; }
+    .pillar:hover {
+        background: rgba(255, 255, 255, 0.015);
+    }
+    .pillar__label {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(13px, 1.4vw, 16px);
+        color: var(--text-faint);
+        letter-spacing: 0.02em;
+        margin-bottom: 2px;
+    }
+    .pillar__name {
+        font-family: var(--sans);
+        font-weight: 800;
+        font-size: clamp(28px, 3.4vw, 44px);
+        letter-spacing: -0.025em;
+        color: var(--text-strong);
+        margin: 0;
+        line-height: 1.02;
+    }
+    .pillar__body {
+        font-family: var(--sans);
+        font-size: clamp(13.5px, 1.45vw, 15.5px);
+        line-height: 1.55;
+        color: var(--text-muted);
+        margin: 4px 0 0;
+        max-width: 38ch;
+        flex: 1;
+    }
+    .pillar__stat {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+    }
+    .pillar__stat-val {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(36px, 4.6vw, 64px);
+        font-weight: 400;
+        color: var(--accent-red);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+    }
+    .pillar__stat-val--symbol {
+        font-family: var(--sans);
+        font-style: normal;
+        font-weight: 200;
+        font-size: clamp(40px, 5.4vw, 78px);
+    }
+    .pillar__stat-unit {
+        font-family: var(--sans);
+        font-size: clamp(10.5px, 1.1vw, 12.5px);
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+    .pillar--accent .pillar__stat-val,
+    .pillar--accent .pillar__stat-val--symbol {
+        color: var(--accent-green);
+    }
+
+    /* Foot — manifesto bottom */
+    .pillars__foot {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: clamp(20px, 4vw, 48px);
+        align-items: baseline;
+        padding-top: 4px;
+    }
+    .pillars__lede {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(18px, 2.4vw, 28px);
+        line-height: 1.3;
+        color: var(--text);
+        margin: 0;
+        letter-spacing: -0.005em;
+    }
+    .pillars__lede em {
+        font-style: italic;
+        color: var(--accent-red);
+    }
+    .pillars__finance {
+        font-family: var(--sans);
+        font-size: clamp(12.5px, 1.3vw, 14px);
+        line-height: 1.55;
+        color: var(--text-muted);
+        margin: 0;
+        max-width: 44ch;
+    }
+    .pillars__chip {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(0, 217, 126, 0.12);
+        color: var(--accent-green);
+        font-weight: 700;
+        border-radius: 4px;
+        font-size: 0.92em;
+        letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 900px) {
+        .pillars__grid { grid-template-columns: 1fr; }
+        .pillar {
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+        }
+        .pillar:last-child { border-bottom: none; }
+        .pillars__foot {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+    }
+    @media (max-width: 720px) {
+        .pillars {
+            padding: 56px 22px;
+            gap: 32px;
+        }
+        .pillar { padding: 28px 4px; }
+        .pillars__head {
+            flex-wrap: wrap;
+            gap: 8px 14px;
+        }
+        .pillars__rule {
+            order: 4;
+            flex: 1 0 100%;
+        }
+        .pillars__lede { font-size: 18px; }
+    }
+
+    /* === SCENE 6 — AKADEMIA · magazine spread, editorial typography === */
+    .scene--academy {
+        background:
+            radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0, 217, 126, 0.04), transparent 70%),
+            #000;
+    }
+    .academy {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: clamp(48px, 8vh, 96px) clamp(24px, 5vw, 56px);
+        display: flex;
+        flex-direction: column;
+        gap: clamp(32px, 5vh, 56px);
+    }
+
+    /* Newspaper masthead */
+    .academy__masthead {
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+        border-top: 2px solid var(--text-strong);
+        border-bottom: 1px solid var(--border-strong);
+        padding: 14px 0 16px;
+    }
+    .academy__nameplate {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(28px, 5.4vw, 56px);
+        color: var(--text-strong);
+        letter-spacing: -0.024em;
+        line-height: 1;
+    }
+    .academy__rule {
+        flex: 1;
+        height: 1px;
+        background: var(--border-strong);
+        align-self: center;
+    }
+    .academy__edition {
+        font-family: var(--sans);
+        font-size: clamp(10.5px, 1.1vw, 12.5px);
+        font-weight: 700;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    /* Editorial lede */
+    .academy__lede {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(22px, 3.4vw, 40px);
+        line-height: 1.28;
+        color: var(--text);
+        max-width: 720px;
+        margin: 0;
+        letter-spacing: -0.005em;
+    }
+    .academy__lede em {
+        font-style: italic;
+        color: var(--accent-green);
+    }
+
+    /* Chapters list */
+    .academy__chapters {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border-top: 1px solid var(--border);
+    }
+    .chapter {
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        grid-template-rows: auto auto;
+        column-gap: 28px;
+        row-gap: 6px;
+        padding: clamp(22px, 3.5vh, 36px) 0;
+        border-bottom: 1px solid var(--border);
+        align-items: baseline;
+        transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
+        position: relative;
+    }
+    .chapter::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 1px;
+        background: var(--accent-red);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s var(--ease);
+    }
+    .chapter:hover {
+        background: rgba(255, 255, 255, 0.012);
+    }
+    .chapter:hover::after {
+        transform: scaleX(0.18);
+    }
+    .chapter__roman {
+        grid-row: 1 / 3;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(30px, 4.4vw, 54px);
+        color: var(--accent-red);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        align-self: center;
+        text-align: center;
+    }
+    .chapter__title {
+        grid-column: 2;
+        font-family: var(--sans);
+        font-size: clamp(20px, 2.6vw, 32px);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        color: var(--text-strong);
+        margin: 0;
+        line-height: 1.08;
+    }
+    .chapter__body {
+        grid-column: 2;
+        font-family: var(--sans);
+        font-size: clamp(13.5px, 1.5vw, 16px);
+        line-height: 1.55;
+        color: var(--text-muted);
+        margin: 0;
+        max-width: 62ch;
+    }
+
+    /* Colophon — magazine sign-off */
+    .academy__colophon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding-top: clamp(20px, 3vh, 32px);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(16px, 2.2vw, 24px);
+        color: var(--text-muted);
+        border-top: 1px dashed var(--border-strong);
+        letter-spacing: -0.005em;
+    }
+    .academy__colophon em {
+        font-style: italic;
+        color: var(--text);
+    }
+    .academy__colophon-arrow {
+        color: var(--accent-green);
+        font-style: normal;
+        font-family: var(--sans);
+        font-weight: 700;
+    }
+
+    @media (max-width: 720px) {
+        .academy {
+            padding: 56px 22px;
+            gap: 28px;
+        }
+        .academy__masthead {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .academy__rule {
+            order: 3;
+            flex: 1 0 100%;
+            margin-top: 4px;
+        }
+        .academy__edition {
+            order: 2;
+            font-size: 10px;
+            letter-spacing: 0.22em;
+        }
+        .chapter {
+            grid-template-columns: 40px 1fr;
+            column-gap: 16px;
+            padding: 22px 0;
+        }
+        .chapter__roman {
+            font-size: 28px;
+        }
+        .chapter__title {
+            font-size: 20px;
+        }
+        .academy__colophon {
+            font-size: 16px;
+            gap: 8px;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+    }
+
+    /* === Zuzia partners logo wall (visual proof w Akt 5) === */
+    .zuzia-partners {
+        margin-top: 48px;
+        padding: 28px 32px;
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        max-width: 880px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+    .zuzia-partners__label {
+        display: block;
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: var(--text-muted);
+        margin-bottom: 22px;
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.45;
+    }
+    .zuzia-partners__logos {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        align-items: center;
+    }
+    .zuzia-partners__logos img {
+        max-height: 38px;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+        opacity: 0.82;
+        transition: opacity 200ms var(--ease);
+        background: #f5f1e8;
+        padding: 10px 14px;
+        border-radius: 8px;
+        box-sizing: content-box;
+    }
+    .zuzia-partners__logos img:hover {
+        opacity: 1;
+    }
+    @media (max-width: 720px) {
+        .zuzia-partners { padding: 22px 18px; margin-top: 36px; }
+        .zuzia-partners__label { font-size: 12.5px; }
+        .zuzia-partners__logos { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .zuzia-partners__logos img { max-height: 28px; padding: 8px 10px; }
+    }
+
+    /* ============================================================
+       SCENE 4 — MOTTO (the big italic quote)
+       ============================================================ */
+    .scene--motto .scene__aurora {
+        background: radial-gradient(
+            circle at center,
+            rgba(0, 217, 126, 0.13) 0%,
+            rgba(0, 217, 126, 0.04) 40%,
+            transparent 72%
+        );
+        animation-duration: 30s;
+    }
+    /* Dotted grid background — subtle editorial texture (21st.dev pattern) */
+    .scene--motto::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+        background-size: 28px 28px;
+        background-position: 0 0;
+        pointer-events: none;
+        z-index: 1;
+        -webkit-mask-image: radial-gradient(ellipse 70% 60% at center, #000 30%, transparent 80%);
+                mask-image: radial-gradient(ellipse 70% 60% at center, #000 30%, transparent 80%);
+    }
+
+    .scene--motto .scene__inner {
+        max-width: 1400px;
+        text-align: center;
+    }
+    .motto__intro {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(20px, 2.2vw, 28px);
+        color: var(--text-muted);
+        margin-bottom: clamp(28px, 5vh, 56px);
+        letter-spacing: -0.005em;
+    }
+    .motto__quote {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(28px, 4.4vw, 72px);
+        line-height: 1.18;
+        letter-spacing: -0.015em;
+        color: var(--text);
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .motto__line {
+        display: block;
+        margin-bottom: 0.15em;
+    }
+    .motto__line:last-child { margin-bottom: 0; }
+    .motto__accent {
+        color: var(--accent-green);
+        font-weight: 500;
+        text-shadow: 0 0 80px rgba(0, 217, 126, 0.25);
+    }
+    /* Per-word blur reveal (21st.dev pattern, vanilla port) */
+    .motto__line--words {
+        opacity: 1;  /* nadrzędne: each word handles its own reveal */
+        transform: none;
+        transition: none;
+    }
+    .motto__word {
+        display: inline-block;
+        opacity: 0;
+        filter: blur(10px);
+        transform: translateY(8px);
+        transition: opacity 0.65s var(--ease),
+                    filter 0.65s var(--ease),
+                    transform 0.65s var(--ease);
+        margin-right: 0.18em;
+    }
+    em.motto__word { font-style: italic; }
+    .motto__line--words.is-visible .motto__word {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+        transition-delay: calc(var(--wi, 0) * 75ms);
+    }
+    .motto__word--accent {
+        color: var(--accent-green);
+        font-weight: 500;
+        text-shadow: 0 0 80px rgba(0, 217, 126, 0.25);
+    }
+    .motto__attribution {
+        margin-top: clamp(36px, 6vh, 64px);
+        font-family: var(--sans);
+        font-size: clamp(13px, 1.2vw, 15px);
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+    }
+    .motto__attribution::before {
+        content: '— ';
+        color: var(--text-faint);
+    }
+
+    /* ============================================================
+       SCENE 5 — JAK TO DZIAŁA (4 kroki)
+       ============================================================ */
+    .scene--how {
+        align-items: center;
+    }
+    .scene--how .scene__aurora {
+        background: radial-gradient(
+            circle at 70% 50%,
+            rgba(0, 217, 126, 0.08) 0%,
+            rgba(0, 217, 126, 0.02) 40%,
+            transparent 72%
+        );
+    }
+    .how__header {
+        text-align: center;
+        margin-bottom: clamp(40px, 6vh, 80px);
+    }
+    .how__eyebrow {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(18px, 2vw, 26px);
+        color: var(--text-muted);
+        margin-bottom: clamp(16px, 2vh, 24px);
+        letter-spacing: -0.005em;
+    }
+    .how__title {
+        font-family: var(--sans);
+        font-size: clamp(40px, 5.5vw, 88px);
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.045em;
+        color: var(--text-strong);
+    }
+    .how__title em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text);
+        font-size: 0.7em;
+        letter-spacing: -0.015em;
+        padding: 0 0.1em;
+    }
+    .how__title-accent { color: var(--accent-green); }
+
+    .how__steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: clamp(24px, 3vw, 48px);
+    }
+    .step {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: clamp(24px, 3vh, 36px) clamp(20px, 2vw, 28px);
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        transition: border-color 0.4s var(--ease),
+                    transform 0.4s var(--ease),
+                    background 0.4s var(--ease);
+    }
+    .step:hover {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+        background: var(--bg-card);
+    }
+    .step__num {
+        font-family: var(--sans);
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: var(--accent-green);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 4px;
+    }
+    .step__chip {
+        align-self: flex-start;
+        font-family: var(--sans);
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 4px 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+    }
+    .step__line {
+        font-family: var(--sans);
+        font-size: clamp(18px, 1.8vw, 22px);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.25;
+        color: var(--text-strong);
+        margin-top: 6px;
+    }
+    .step__line em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text-muted);
+        letter-spacing: -0.005em;
+    }
+    .step__accent { color: var(--accent-green); }
+
+    /* Step 4 highlight — THE flip moment z animowanym border beam (21st.dev port) */
+    @property --beam-angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+    }
+    .step--final {
+        position: relative;
+        border: 1px solid transparent;
+        background:
+            linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 217, 126, 0.06) 100%) padding-box,
+            conic-gradient(
+                from var(--beam-angle),
+                rgba(0, 217, 126, 0) 0deg,
+                rgba(0, 217, 126, 0) 200deg,
+                rgba(0, 217, 126, 0.85) 260deg,
+                rgba(0, 217, 126, 0) 320deg
+            ) border-box;
+        animation: beamRotate 4.5s linear infinite;
+    }
+    @keyframes beamRotate {
+        to { --beam-angle: 360deg; }
+    }
+    .step--final:hover {
+        box-shadow: 0 14px 40px rgba(0, 217, 126, 0.18);
+    }
+    /* Fallback dla browserów bez @property — statyczny green border */
+    @supports not (background: paint(something)) {
+        .step--final {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 217, 126, 0.06) 100%);
+            border-color: rgba(0, 217, 126, 0.5);
+            animation: none;
+        }
+    }
+
+    /* ============================================================
+       SCENE 6 — CTA FINAL
+       ============================================================ */
+    .scene--cta {
+        background: transparent;
+    }
+    .scene--cta .scene__aurora {
+        bottom: 15%;
+        top: auto;
+        left: 50%;
+        background: radial-gradient(
+            circle at center,
+            rgba(0, 217, 126, 0.14) 0%,
+            rgba(0, 217, 126, 0.04) 40%,
+            transparent 72%
+        );
+        transform: translate(-50%, 50%);
+    }
+    .scene--cta .scene__inner {
+        max-width: 1100px;
+        text-align: left;
+    }
+    .cta__eyebrow {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(20px, 2.6vw, 32px);
+        color: var(--text-muted);
+        margin-bottom: clamp(20px, 3vh, 40px);
+        letter-spacing: -0.005em;
+    }
+    .cta__h2 {
+        font-family: var(--sans);
+        font-size: clamp(44px, 7vw, 116px);
+        font-weight: 900;
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+        color: var(--text-strong);
+        margin-bottom: clamp(24px, 4vh, 48px);
+    }
+    .cta__h2-italic {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text);
+        font-size: 0.7em;
+        letter-spacing: -0.015em;
+        padding: 0 0.1em;
+    }
+    .cta__h2-accent {
+        color: var(--accent-green);
+        text-shadow: 0 0 80px rgba(0, 217, 126, 0.3);
+    }
+    .cta__sub {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(20px, 2.6vw, 32px);
+        color: var(--text);
+        line-height: 1.35;
+        letter-spacing: -0.005em;
+        margin-bottom: clamp(36px, 6vh, 64px);
+        max-width: 700px;
+    }
+    .cta__sub strong {
+        font-family: var(--sans);
+        font-style: normal;
+        font-weight: 600;
+        color: var(--text-strong);
+        font-size: 0.92em;
+    }
+
+    .cta__actions {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(20px, 3vh, 36px);
+        align-items: flex-start;
+    }
+    /* Magnetic wrapper — przycisk podąża za myszą (21st.dev port) */
+    .cta__magnetic {
+        display: inline-block;
+        transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        will-change: transform;
+    }
+    /* Primary CTA — /home pattern (green-tinted pill, solid on hover) */
+    .cta__primary {
+        display: inline-flex;
+        align-items: center;
+        gap: clamp(16px, 2vw, 28px);
+        padding: clamp(18px, 2.2vw, 26px) clamp(30px, 3.8vw, 52px);
+        font-family: var(--sans);
+        font-size: clamp(22px, 2.8vw, 36px);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        color: var(--text-strong);
+        background: rgba(0, 217, 126, 0.10);
+        border: 1px solid rgba(0, 217, 126, 0.35);
+        border-radius: 999px;
+        transition: gap 0.4s var(--ease),
+                    background 0.35s var(--ease),
+                    border-color 0.35s var(--ease),
+                    color 0.3s var(--ease),
+                    box-shadow 0.4s var(--ease),
+                    transform 0.3s var(--ease);
+    }
+    .cta__primary-arrow {
+        color: var(--accent-green);
+        font-size: 0.86em;
+        font-weight: 800;
+        line-height: 1;
+        flex-shrink: 0;
+        transition: transform 0.4s var(--ease), color 0.3s var(--ease);
+    }
+    .cta__primary:hover {
+        gap: clamp(22px, 2.8vw, 36px);
+        background: var(--accent-green);
+        border-color: var(--accent-green);
+        color: #04150c;
+        box-shadow: 0 16px 50px rgba(0, 217, 126, 0.45);
+        transform: translateY(-2px);
+    }
+    .cta__primary:hover .cta__primary-arrow {
+        color: #04150c;
+        transform: translateX(4px);
+    }
+
+    /* WhatsApp — secondary link, mały, italic-friendly */
+    .cta__whatsapp {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        font-family: var(--sans);
+        font-size: clamp(14px, 1.4vw, 16px);
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        color: var(--text-muted);
+        transition: color 0.25s var(--ease);
+    }
+    .cta__whatsapp:hover { color: var(--text-strong); }
+    .cta__whatsapp-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        fill: currentColor;
+    }
+
+    /* ============================================================
+       SCENE 7 — FORMULARZ (iframe /zapisy, full-bleed)
+       ============================================================ */
+    .scene--form {
+        padding: 0;
+        align-items: stretch;
+        justify-content: stretch;
+        background: var(--bg);
+        min-height: 100vh;
+        min-height: 100dvh;
+    }
+    .form-frame {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border: 0;
+        display: block;
+        background: var(--bg);
+    }
+
+    /* ============================================================
+       FOOTER MINI
+       ============================================================ */
+    .footer-mini {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+        font-size: 11px;
+        color: var(--text-faint);
+        background: var(--bg);
+        border-top: 1px solid var(--border);
+        position: relative;
+        z-index: 2;
+    }
+    .footer-mini a {
+        color: var(--text-faint);
+        transition: color 0.2s var(--ease);
+    }
+    .footer-mini a:hover { color: var(--text-muted); }
+
+    /* ============================================================
+       RESPONSIVE — Tablet (1100→820)
+       ============================================================ */
+    @media (max-width: 1100px) {
+        .hero__h1 { font-size: clamp(52px, 11vw, 140px); }
+        .ledger__row { grid-template-columns: 100px 1fr auto; gap: 20px; }
+        .ledger__name { font-size: clamp(36px, 5.8vw, 72px); }
+        .ledger__metric { font-size: clamp(24px, 3.6vw, 44px); }
+        .how__steps { gap: 20px; }
+    }
+
+    /* ============================================================
+       RESPONSIVE — Phone (≤820)
+       ============================================================ */
+    @media (max-width: 520px) {
+        /* Logo switches to icon — full text wide na małych */
+        .nav__logo--full { display: none; }
+        .nav__logo--icon { display: block; }
+        .nav__brand { height: 28px; }
+    }
+    @media (max-width: 820px) {
+        .nav__inner { padding: 14px 20px; gap: 12px; }
+        .nav__cta { padding: 8px 14px; font-size: 12px; }
+
+        .scene { padding: 84px 22px calc(115px + env(safe-area-inset-bottom)); }
+
+        /* HERO */
+        .me { padding: 5px 14px 5px 5px; gap: 10px; }
+        .me img { width: 38px; height: 38px; }
+        .me__name { font-size: 13px; }
+        .me__role { font-size: 11.5px; }
+
+        .hero__h1 {
+            font-size: clamp(56px, 16vw, 110px);
+            letter-spacing: -0.055em;
+        }
+        .hero__sub { font-size: clamp(20px, 5.5vw, 30px); }
+        .hero__meta { font-size: 12px; margin-top: 32px; }
+
+        /* PROOF — hero number cinematic */
+        .proof__eyebrow { font-size: clamp(18px, 4.8vw, 24px); margin-bottom: clamp(32px, 6vh, 64px); }
+        .proof__digits { font-size: clamp(108px, 28vw, 180px); letter-spacing: -0.055em; }
+        .proof__currency { font-size: clamp(30px, 7.5vw, 50px); }
+        .proof__subtitle { font-size: clamp(20px, 5vw, 30px); }
+        .proof__supporting { font-size: clamp(15px, 4vw, 19px); margin-top: clamp(28px, 5vh, 48px); }
+
+        /* JOURNEY ledger — stacked rows per row */
+        .journey__title { font-size: clamp(34px, 8.5vw, 56px); }
+        .ledger__row {
+            grid-template-columns: 1fr auto;
+            grid-template-areas:
+                "year year"
+                "name metric";
+            row-gap: 8px;
+            column-gap: 16px;
+            padding: clamp(20px, 3vh, 28px) 0;
+        }
+        .ledger__year { grid-area: year; font-size: 11px; letter-spacing: 0.16em; }
+        .ledger__name {
+            grid-area: name;
+            font-size: clamp(36px, 10vw, 60px);
+            letter-spacing: -0.05em;
+        }
+        .ledger__metric {
+            grid-area: metric;
+            font-size: clamp(20px, 5vw, 32px);
+            align-self: end;
+        }
+        .journey__footer { font-size: clamp(16px, 4.4vw, 22px); margin-top: 36px; }
+
+        /* MOTTO */
+        .motto__intro { font-size: clamp(17px, 4.5vw, 22px); margin-bottom: 28px; }
+        .motto__quote { font-size: clamp(24px, 6.4vw, 38px); line-height: 1.22; }
+        .motto__attribution { font-size: 12px; margin-top: 32px; }
+
+        /* HOW — stacked */
+        .how__title { font-size: clamp(36px, 9vw, 60px); }
+        .how__steps {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .step { padding: 24px 22px; }
+        .step__line { font-size: clamp(17px, 4.6vw, 21px); }
+
+        /* CTA */
+        .cta__h2 { font-size: clamp(40px, 10.5vw, 76px); }
+        .cta__sub { font-size: clamp(18px, 5vw, 24px); }
+        .cta__primary {
+            font-size: clamp(20px, 5.8vw, 30px);
+            padding: 16px 28px;
+            gap: 14px;
+            letter-spacing: -0.025em;
+        }
+    }
+
+    /* ============================================================
+       RESPONSIVE — Small phone (≤380)
+       ============================================================ */
+    @media (max-width: 380px) {
+        .scene { padding-left: 16px; padding-right: 16px; }
+        .nav__cta { display: none; }
+
+        .hero__h1 { font-size: clamp(44px, 13.5vw, 72px); letter-spacing: -0.06em; }
+        .hero__sub { font-size: clamp(18px, 5vw, 22px); }
+
+        .proof__digits { font-size: clamp(92px, 26vw, 140px); }
+        .proof__currency { font-size: clamp(26px, 6.6vw, 38px); }
+        .proof__subtitle { font-size: clamp(18px, 4.6vw, 24px); }
+        .proof__supporting { font-size: clamp(14px, 3.8vw, 17px); }
+
+        .ledger__name { font-size: clamp(30px, 9.5vw, 48px); }
+        .ledger__metric { font-size: clamp(18px, 4.8vw, 26px); }
+
+        .motto__quote { font-size: clamp(22px, 6vw, 30px); }
+
+        .how__title { font-size: clamp(32px, 9vw, 48px); }
+        .step { padding: 20px 18px; }
+        .step__line { font-size: clamp(16px, 4.4vw, 19px); }
+
+        .cta__h2 { font-size: clamp(36px, 11vw, 56px); }
+        .cta__primary { font-size: clamp(18px, 5vw, 24px); padding: 14px 24px; gap: 12px; }
+    }
+
+    /* ============================================================
+       RESPONSIVE — landscape phones (low height)
+       ============================================================ */
+    @media (max-height: 640px) and (max-width: 820px) {
+        .scene { padding-top: 70px; padding-bottom: 70px; }
+        .proof__num { font-size: clamp(56px, 14vh, 100px); }
+        .proof__stack { gap: 20px; }
+    }
+    </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAV — Tomek brand-dot + CTA "Zgłoś się"
+============================================================ -->
+<nav class="nav">
+    <div class="nav__inner">
+        <a href="https://tomekniedzwiecki.pl/home/" class="nav__brand" aria-label="Tomek Niedźwiecki — strona główna">
+            <img src="/img/logo/tn-logo-white-88.png" alt="Tomek Niedźwiecki" class="nav__logo nav__logo--full" width="244" height="32" fetchpriority="high">
+            <img src="/img/logo/tn-logo-icon-88.png" alt="" class="nav__logo nav__logo--icon" width="28" height="28" aria-hidden="true">
+        </a>
+        <a href="https://wa.me/48793113898?text=Cze%C5%9B%C4%87!%20Czyta%C5%82am%2Fem%20o%20Twoim%20modelu%20partnerstwa%20dla%20sportowc%C3%B3w%20i%20chc%C4%99%20porozmawia%C4%87." class="nav__cta" target="_blank" rel="noopener">Porozmawiajmy →</a>
+    </div>
+</nav>
+
+<!-- ============================================================
+     INTRO OVERLAY — sweep reveal "Cześć." + "Mam pomysł."
+============================================================ -->
+<div class="intro" id="intro">
+    <div class="intro__content">
+        <h2 class="intro__greeting">
+            Cześć<span class="intro__dot">.</span>
+        </h2>
+        <p class="intro__followup">Pomagam w tenisie.</p>
+    </div>
+    <span class="intro__skip">sponsoring, akademia, technologia &nbsp;↓</span>
+</div>
+
+<!-- ============================================================
+     PROGRESS SIDEBAR (desktop) / DOCK (mobile)
+============================================================ -->
+<aside class="progress" id="progress" aria-hidden="true">
+    <a href="#act-1" class="progress__item is-active" data-act="0"><span>01</span><em>Wstęp</em></a>
+    <a href="#act-2" class="progress__item" data-act="1"><span>02</span><em>Doświadczenie</em></a>
+    <a href="#act-3" class="progress__item" data-act="2"><span>03</span><em>3 filary</em></a>
+    <a href="#act-4" class="progress__item" data-act="3"><span>04</span><em>Obietnica</em></a>
+    <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Case Zuzi</em></a>
+    <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Akademia</em></a>
+    <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Rozmowa</em></a>
+</aside>
+
+<!-- ============================================================
+     STORY — 6 aktów editorial snap-scroll
+============================================================ -->
+<main class="story">
+
+    <!-- =====================================================
+         SCENE 1 — HERO
+    ===================================================== -->
+    <section class="scene scene--hero" id="act-1" data-act="0">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+
+            <div class="me" data-reveal data-delay="1300">
+                <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="44" height="44">
+                <div>
+                    <div class="me__name">Tomek Niedźwiecki</div>
+                    <div class="me__role">Sponsor + partner technologiczny</div>
+                </div>
+            </div>
+
+            <h1 class="hero__h1">
+                <span class="hero__h1-line reveal-mask" data-reveal data-delay="0">
+                    <span class="reveal-mask__inner">Wspieram tenis.</span>
+                </span>
+                <span class="hero__h1-line reveal-mask" data-reveal data-delay="400">
+                    <span class="reveal-mask__inner"><span class="hero__h1-italic">Od</span>&nbsp;<span class="hero__h1-accent">dzieciaków</span>&nbsp;<span class="hero__h1-personal">po profi.</span></span>
+                </span>
+            </h1>
+
+            <p class="hero__sub" data-reveal data-delay="1400">
+                <em>Sponsoring. Akademia. Zaplecze online.</em>
+            </p>
+
+            <p class="hero__meta" data-reveal data-delay="2300">
+                <span>SCROLL</span>
+                <span class="hero__meta-arrow" aria-hidden="true">↓</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SCENE 2 — POLICZMY (one hero number cinematic)
+    ===================================================== -->
+    <section class="scene scene--proof" id="act-2" data-act="1">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="proof__eyebrow" data-reveal>krótko o mnie.</p>
+
+            <div class="proof__hero" data-reveal data-delay="200">
+                <span class="proof__digits" data-counter-to="15" data-counter-duration="1400">0</span>
+                <span class="proof__currency">lat e-commerce</span>
+            </div>
+
+            <p class="proof__subtitle" data-reveal data-delay="800">
+                <strong>70 mln zł</strong> przychodów z własnych firm.
+            </p>
+
+            <p class="proof__supporting" data-reveal data-delay="1200">
+                Strony, marki, automatyzacje, CRM-y, AI <span class="proof__sep">·</span> <strong>to samo robię teraz dla sportowców</strong>.
+            </p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SCENE 3 — 3 FILARY (poster spread, 3-column editorial)
+    ===================================================== -->
+    <section class="scene scene--pillars" id="act-3" data-act="2">
+        <div class="scene__inner pillars">
+
+            <header class="pillars__head" data-reveal>
+                <span class="pillars__roman" aria-hidden="true">III</span>
+                <h2 class="pillars__title">Co robię <em>dla tenisa</em>.</h2>
+                <span class="pillars__rule" aria-hidden="true"></span>
+            </header>
+
+            <div class="pillars__grid">
+                <article class="pillar" data-reveal data-delay="200">
+                    <span class="pillar__label">jeden</span>
+                    <h3 class="pillar__name">Sponsoring</h3>
+                    <p class="pillar__body">Wspieram konkretne turnieje konkretnych zawodników. Transparentny budżet, rozliczenie publiczne.</p>
+                    <div class="pillar__stat">
+                        <span class="pillar__stat-val">5–30k</span>
+                        <span class="pillar__stat-unit">PLN / sezon</span>
+                    </div>
+                </article>
+
+                <article class="pillar" data-reveal data-delay="400">
+                    <span class="pillar__label">dwa</span>
+                    <h3 class="pillar__name">Akademia</h3>
+                    <p class="pillar__body">Wideo od czołowych trenerów świata. Dla dzieci, amatorów, profi i samych trenerów.</p>
+                    <div class="pillar__stat">
+                        <span class="pillar__stat-val pillar__stat-val--symbol">∞</span>
+                        <span class="pillar__stat-unit">poziomów</span>
+                    </div>
+                </article>
+
+                <article class="pillar pillar--accent" data-reveal data-delay="600">
+                    <span class="pillar__label">trzy</span>
+                    <h3 class="pillar__name">Zaplecze online</h3>
+                    <p class="pillar__body">Twoja domena. Sklep z merchem. Płatności BLIK. Strona, na której fani zostaną i wrócą.</p>
+                    <div class="pillar__stat">
+                        <span class="pillar__stat-val pillar__stat-val--symbol">∅</span>
+                        <span class="pillar__stat-unit">agencji</span>
+                    </div>
+                </article>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SCENE 4 — MOTTO (the big italic promise)
+    ===================================================== -->
+    <section class="scene scene--motto" id="act-4" data-act="3">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+
+            <p class="motto__intro" data-reveal>Po prostu.</p>
+
+            <blockquote class="motto__quote">
+                <span class="motto__line motto__line--words" data-reveal data-delay="200">
+                    <span class="motto__word" style="--wi:0">Sponsor</span>
+                    <em class="motto__word" style="--wi:1">płaci</em>
+                    <span class="motto__word" style="--wi:2">za</span>
+                    <span class="motto__word" style="--wi:3">buty.</span>
+                </span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="700">
+                    <em class="motto__word" style="--wi:0">Ja</em>
+                    <span class="motto__word" style="--wi:1">buduję</span>
+                    <span class="motto__word" style="--wi:2">to,</span>
+                </span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="1200">
+                    <span class="motto__word" style="--wi:0">co</span>
+                    <span class="motto__word" style="--wi:1">zostanie</span>
+                    <em class="motto__word" style="--wi:2">po</em>
+                    <em class="motto__word" style="--wi:3">karierze.</em>
+                </span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="1900">
+                    <span class="motto__word motto__word--accent" style="--wi:0">Markę.</span>
+                    <span class="motto__word motto__word--accent" style="--wi:1">Fanów.</span>
+                    <span class="motto__word motto__word--accent" style="--wi:2">Pieniądze.</span>
+                </span>
+            </blockquote>
+
+            <p class="motto__attribution" data-reveal data-delay="2600">Tomek Niedźwiecki</p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SCENE 5 — JAK TO DZIAŁA (4 kroki)
+    ===================================================== -->
+    <section class="scene scene--how" id="act-5" data-act="4">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+
+            <header class="how__header">
+                <p class="how__eyebrow" data-reveal>Pierwszy taki projekt</p>
+                <h2 class="how__title" data-reveal data-delay="150">
+                    Case study: <em>Zuzia Pawlikowska</em><br>
+                    <span class="how__title-accent">WTA #369. Wrocław.</span>
+                </h2>
+            </header>
+
+            <div class="how__steps">
+                <article class="step" data-reveal data-delay="200">
+                    <div class="step__num">01</div>
+                    <span class="step__chip">Sponsoring</span>
+                    <p class="step__line">Wspieram <em>konkretne</em> turnieje. <span class="step__accent">Transparentny budżet</span>, rozliczenie publiczne.</p>
+                </article>
+
+                <article class="step" data-reveal data-delay="400">
+                    <div class="step__num">02</div>
+                    <span class="step__chip">Strona</span>
+                    <p class="step__line">Zbudowałem <em>zuziapawlikowska.com</em> — premium landing z partnerami, kolekcją merchu i panelem wsparcia.</p>
+                </article>
+
+                <article class="step" data-reveal data-delay="600">
+                    <div class="step__num">03</div>
+                    <span class="step__chip">Tech &amp; AI</span>
+                    <p class="step__line">Wizualizacje merchu generowane <em>AI</em>. Panel płatności BLIK. System do śledzenia wpłat od fanów.</p>
+                </article>
+
+                <article class="step step--final" data-reveal data-delay="800">
+                    <div class="step__num">04</div>
+                    <span class="step__chip">Efekt</span>
+                    <p class="step__line">Jedna domena. Sześciu partnerów. Cała marka <span class="step__accent">w jednym miejscu</span> — bez agencji.</p>
+                </article>
+            </div>
+
+            <!-- Logo wall: partnerzy Zuzi (visual proof) -->
+            <div class="zuzia-partners" data-reveal data-delay="900">
+                <div class="zuzia-partners__logos">
+                    <img src="assets/logos/yonex.png" alt="Yonex" loading="lazy">
+                    <img src="assets/logos/joma.png" alt="Joma" loading="lazy">
+                    <img src="assets/logos/fitline.svg" alt="FitLine" loading="lazy">
+                    <img src="assets/logos/lotto.svg" alt="LOTTO" loading="lazy">
+                    <img src="assets/logos/pzt.png" alt="Polski Związek Tenisowy" loading="lazy">
+                </div>
+            </div>
+
+            <p class="journey__footer" data-reveal data-delay="1100" style="text-align:center;margin-top:32px;">
+                Zobacz na żywo: <a href="https://zuzannapawlikowska.com" target="_blank" rel="noopener" style="color:var(--accent-green);font-weight:700;border-bottom:1px solid currentColor;">zuzannapawlikowska.com</a> ↗
+            </p>
+
+            <p class="journey__footer" data-reveal data-delay="1300" style="text-align:center;margin-top:18px;font-size:14px;color:var(--text-muted);">
+                <strong style="color:var(--text);">Zuzia jest pierwsza.</strong> Szukam <span style="color:var(--accent-green);font-weight:700;">1–3 zawodników</span> na 2026.
+            </p>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SCENE 6 — AKADEMIA (magazine spread, editorial)
+    ===================================================== -->
+    <section class="scene scene--academy" id="act-6" data-act="5">
+        <div class="scene__inner academy">
+
+            <header class="academy__masthead" data-reveal>
+                <span class="academy__nameplate">Akademia</span>
+                <span class="academy__rule" aria-hidden="true"></span>
+            </header>
+
+            <p class="academy__lede" data-reveal data-delay="200">
+                Wideo od <em>czołowych trenerów świata</em>. <br>
+                Bez teorii dla teorii. Konkretnie i po polsku.
+            </p>
+
+            <ol class="academy__chapters" data-reveal data-delay="450">
+                <li class="chapter">
+                    <span class="chapter__roman" aria-hidden="true">I</span>
+                    <h3 class="chapter__title">Dzieci &amp; rodzice</h3>
+                    <p class="chapter__body">Pierwsza rakieta, pierwsze ćwiczenia w domu, pierwsza wymiana na korcie. Wytłumaczone tak, żeby rodzic też rozumiał, w czym pomaga.</p>
+                </li>
+                <li class="chapter">
+                    <span class="chapter__roman" aria-hidden="true">II</span>
+                    <h3 class="chapter__title">Amatorzy</h3>
+                    <p class="chapter__body">Grasz weekendy i chcesz grać lepiej. Drille, taktyka, head game. Bez owijania w bawełnę.</p>
+                </li>
+                <li class="chapter">
+                    <span class="chapter__roman" aria-hidden="true">III</span>
+                    <h3 class="chapter__title">Profesjonaliści</h3>
+                    <p class="chapter__body">Trenerzy, którzy pracują z top 100 WTA i ATP. Plan treningu, regeneracja, dieta, mental.</p>
+                </li>
+                <li class="chapter">
+                    <span class="chapter__roman" aria-hidden="true">IV</span>
+                    <h3 class="chapter__title">Trenerzy</h3>
+                    <p class="chapter__body">Metodyka prowadzenia zawodników na różnych poziomach. Najlepsi pokazują, jak to robią.</p>
+                </li>
+            </ol>
+
+            <footer class="academy__colophon" data-reveal data-delay="700">
+                <span>Od pierwszej rakiety</span>
+                <span class="academy__colophon-arrow" aria-hidden="true">→</span>
+                <span><em>do</em> top 100.</span>
+            </footer>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         SCENE 7 — CTA FINAL
+    ===================================================== -->
+    <section class="scene scene--cta" id="act-7" data-act="6">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+
+            <p class="cta__eyebrow" data-reveal>Zawodnik? Trener? Rodzic? Amator?</p>
+
+            <h2 class="cta__h2" data-reveal data-delay="100">
+                Wpadnij na <em class="cta__h2-italic">rozmowę</em>.<br>
+                <span class="cta__h2-accent">Pomyślę, jak pomóc.</span>
+            </h2>
+
+            <div class="cta__actions" data-reveal data-delay="350">
+                <span class="cta__magnetic">
+                    <a href="https://wa.me/48793113898?text=Cze%C5%9B%C4%87!%20Czyta%C5%82am%2Fem%20o%20Twoim%20modelu%20partnerstwa%20dla%20sportowc%C3%B3w%20i%20chc%C4%99%20porozmawia%C4%87." class="cta__primary" target="_blank" rel="noopener">
+                        Napisz na WhatsApp
+                        <span class="cta__primary-arrow" aria-hidden="true">→</span>
+                    </a>
+                </span>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER MINI
+============================================================ -->
+<footer class="footer-mini">
+    <a href="https://tomekniedzwiecki.pl/dokumenty/regulamin.html">Regulamin</a>
+    <span>·</span>
+    <a href="https://tomekniedzwiecki.pl/dokumenty/polityka-prywatnosci.html">Polityka prywatności</a>
+</footer>
+
+<script>
+// ============================================================
+//  V2 LANDING — choreography
+// ============================================================
+(function () {
+    'use strict';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.matchMedia('(max-width: 820px)').matches;
+    const intro = document.getElementById('intro');
+    const progress = document.getElementById('progress');
+    const progressItems = progress ? progress.querySelectorAll('.progress__item') : [];
+    const scenes = document.querySelectorAll('.scene');
+
+    // ===== INTRO OVERLAY =====
+    // Timeline:
+    //  0    - 300ms  : idle (black overlay)
+    //  300  - 1700ms : "Cześć." sweep (clip-path L→R)
+    //  1500 - 2300ms : "Mam pomysł." fade-in
+    //  2300 - 3500ms : hold
+    //  3500 - 4200ms : fade out → hero reveals start
+    // Mobile: skrócone do 2500ms (mniejszy "wait" przy słabszym CPU)
+    const INTRO_DURATION = reduceMotion ? 0 : (isMobile ? 2500 : 3500);
+
+    // Animated counter (21st.dev pattern, vanilla rAF + ease-out)
+    function startCounter(el) {
+        const target = parseInt(el.dataset.counterTo, 10);
+        if (isNaN(target)) return;
+        const duration = parseInt(el.dataset.counterDuration || '1600', 10);
+        const startTs = performance.now();
+        function tick(now) {
+            const t = Math.min((now - startTs) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);  // ease-out cubic
+            el.textContent = Math.round(eased * target);
+            if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    function startReveals() {
+        if (reduceMotion) {
+            document.querySelectorAll('[data-reveal]').forEach(el => {
+                el.classList.add('is-visible');
+                const c = el.querySelector('[data-counter-to]');
+                if (c) c.textContent = c.dataset.counterTo;
+            });
+            return;
+        }
+        // Mobile: skracamy delays 0.5x (krótsze "wait" na słabszym CPU)
+        const delayMul = isMobile ? 0.5 : 1;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const rawDelay = parseInt(entry.target.dataset.delay || '0', 10);
+                    const delay = Math.round(rawDelay * delayMul);
+                    setTimeout(() => {
+                        entry.target.classList.add('is-visible');
+                        // Counter — odpalamy razem z reveal
+                        const counterEl = entry.target.matches('[data-counter-to]')
+                            ? entry.target
+                            : entry.target.querySelector('[data-counter-to]');
+                        if (counterEl) startCounter(counterEl);
+                        // Mobile: zwolnij GPU layer po zakończonej animacji
+                        if (isMobile) {
+                            setTimeout(() => {
+                                entry.target.style.willChange = 'auto';
+                                entry.target.querySelectorAll('.reveal-mask__inner').forEach(el => {
+                                    el.style.willChange = 'auto';
+                                });
+                            }, 900);
+                        }
+                    }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+
+        document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+    }
+
+    function dismissIntro() {
+        if (!intro || intro.classList.contains('is-hiding')) return;
+        intro.classList.add('is-hiding');
+        startReveals();
+        // Pokaż progress sidebar po intro
+        setTimeout(() => {
+            if (progress) progress.classList.add('is-shown');
+            progress?.setAttribute('aria-hidden', 'false');
+        }, 600);
+        // Odblokuj scroll po finalnej fade out
+        setTimeout(() => {
+            intro.style.display = 'none';
+        }, 700);
+    }
+
+    if (reduceMotion) {
+        // Skip intro, just start
+        if (intro) intro.style.display = 'none';
+        startReveals();
+        if (progress) progress.classList.add('is-shown');
+        progress?.setAttribute('aria-hidden', 'false');
+    } else {
+        // Auto-dismiss po pełnym timeline
+        setTimeout(dismissIntro, INTRO_DURATION);
+        // Click/touch to skip
+        intro?.addEventListener('click', dismissIntro);
+        intro?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                e.preventDefault();
+                dismissIntro();
+            }
+        });
+        // Skip ESC during intro
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && intro && !intro.classList.contains('is-hiding')) {
+                dismissIntro();
+            }
+        }, { once: true });
+    }
+
+    // ===== PROGRESS SIDEBAR — active state per scene =====
+    if (scenes.length && progressItems.length) {
+        const actObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const act = entry.target.dataset.act;
+                    progressItems.forEach(item => {
+                        item.classList.toggle('is-active', item.dataset.act === act);
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        scenes.forEach(scene => actObserver.observe(scene));
+    }
+
+    // ===== Smooth scroll for progress dots =====
+    progressItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            const href = item.getAttribute('href');
+            if (href?.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // ===== Magnetic button (21st.dev port) — przycisk podąża za myszą =====
+    // Tylko devices z hover (desktop). Mobile zostaje statyczny.
+    const supportsHover = window.matchMedia('(hover: hover)').matches;
+    if (supportsHover && !reduceMotion) {
+        document.querySelectorAll('.cta__magnetic').forEach(wrap => {
+            const strength = 0.32; // jak mocno przyciąga (0 = brak, 1 = pełny)
+            const radius = 120;     // px — w jakim promieniu reaguje
+            let isNear = false;
+
+            const onMove = (e) => {
+                const rect = wrap.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = e.clientX - cx;
+                const dy = e.clientY - cy;
+                const dist = Math.hypot(dx, dy);
+                if (dist < radius + Math.max(rect.width, rect.height) / 2) {
+                    if (!isNear) isNear = true;
+                    wrap.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
+                } else if (isNear) {
+                    isNear = false;
+                    wrap.style.transform = 'translate(0, 0)';
+                }
+            };
+            document.addEventListener('mousemove', onMove, { passive: true });
+        });
+    }
+
+    // ===== Preload /zapisy iframe gdy user dotrze do CTA (Akt 6) =====
+    // Desktop only — mobile używa direct nav przez CTA button (mniej memory pressure).
+    const formFrame = document.querySelector('.form-frame');
+    const ctaScene = document.getElementById('act-6');
+    if (formFrame && ctaScene && !isMobile) {
+        const formLoader = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && formFrame.src === 'about:blank') {
+                    const dataSrc = formFrame.dataset.src;
+                    if (dataSrc) formFrame.src = dataSrc;
+                    formLoader.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        formLoader.observe(ctaScene);
+    }
+})();
+</script>
+
+</body>
+</html>
