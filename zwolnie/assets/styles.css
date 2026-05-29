@@ -192,9 +192,9 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 }
 .nav__logo--icon { display: none; }
 @media (max-width: 520px) {
-    .nav__logo--full { display: none; }
-    .nav__logo--icon { display: block; }
-    .nav__brand { height: 28px; }
+    .nav__logo--full { display: block; }
+    .nav__logo--icon { display: none; }
+    .nav__brand { height: 24px; }
 }
 @keyframes pulse {
     0%, 100% { opacity: 1; }
