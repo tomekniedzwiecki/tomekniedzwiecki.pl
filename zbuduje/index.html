@@ -1377,6 +1377,9 @@
         .footer-mini a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; }
 
         .scene { padding: 84px 22px calc(115px + env(safe-area-inset-bottom)); }
+        /* Scena formularza: iframe MUSI wypełniać ekran od góry (padding sceny
+           by go zepchnął o 84px i zrobił scenę wyższą niż viewport). */
+        .scene--form { padding: 0; }
 
         /* HERO */
         .me { padding: 6px 16px 6px 6px; gap: 10px; max-width: 100%; }
