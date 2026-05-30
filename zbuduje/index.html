@@ -286,6 +286,9 @@
         pointer-events: auto;
     }
     .progress.is-shown { opacity: 1; }
+    /* Na scenie formularza (act-7) dock zasłaniałby pole e-mail / przycisk —
+       chowamy go tam całkowicie (wraca przy scrollu w górę). */
+    .progress.is-hidden { opacity: 0; pointer-events: none; visibility: hidden; }
     .progress__item {
         display: flex;
         align-items: center;
@@ -1938,6 +1941,9 @@
                     progressItems.forEach(item => {
                         item.classList.toggle('is-active', item.dataset.act === act);
                     });
+                    // act-7 (data-act="6") = scena formularza: schowaj dock,
+                    // żeby nie zasłaniał pola e-mail i przycisku aplikacji.
+                    progress?.classList.toggle('is-hidden', act === '6');
                 }
             });
         }, { threshold: 0.5 });
