@@ -1428,8 +1428,14 @@
         .motto__attribution { font-size: 12px; margin-top: 32px; }
 
         /* HOW — stacked. Scena wyższa niż viewport: ścieśniamy karty + padding,
-           żeby overflow (a więc dodatkowe przewijanie w obrębie sceny) był minimalny. */
-        .scene--how { padding-top: 72px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+           żeby overflow (a więc dodatkowe przewijanie w obrębie sceny) był minimalny.
+           scroll-snap-stop: always — TA scena ma ważne 4 kroki, więc szybki swipe
+           NIE MOŻE jej pominąć: każdy gest musi się na niej zatrzymać. */
+        .scene--how {
+            padding-top: 72px;
+            padding-bottom: calc(92px + env(safe-area-inset-bottom));
+            scroll-snap-stop: always;
+        }
         .how__header { margin-bottom: clamp(20px, 3vh, 32px); }
         .how__title { font-size: clamp(36px, 9vw, 60px); }
         .how__steps {
