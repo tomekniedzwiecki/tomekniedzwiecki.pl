@@ -1427,24 +1427,38 @@
         .motto__quote { font-size: clamp(24px, 6.4vw, 38px); line-height: 1.22; }
         .motto__attribution { font-size: 12px; margin-top: 32px; }
 
-        /* HOW — stacked. Scena wyższa niż viewport: ścieśniamy karty + padding,
-           żeby overflow (a więc dodatkowe przewijanie w obrębie sceny) był minimalny.
-           scroll-snap-stop: always — TA scena ma ważne 4 kroki, więc szybki swipe
-           NIE MOŻE jej pominąć: każdy gest musi się na niej zatrzymać. */
+        /* HOW — scena z 4 ważnymi krokami (Produkt/Marka/Wiedza/Stery).
+           KLUCZ: scena MIEŚCI SIĘ w jednym ekranie, więc mandatory snapuje ją
+           idealnie jak każdą inną, a CAŁA treść jest widoczna naraz — nic nie
+           da się "przeskoczyć". Zwarte karty w 1 kolumnie (bez ścisku 2×2). */
         .scene--how {
-            padding-top: 72px;
-            padding-bottom: calc(92px + env(safe-area-inset-bottom));
-            scroll-snap-stop: always;
+            padding-top: 56px;
+            /* duży dolny padding: trzyma kartę 04 nad dockiem progressu +
+               jego dymkiem ("PROCES"), który wystaje ~98px nad dół ekranu. */
+            padding-bottom: calc(104px + env(safe-area-inset-bottom));
         }
-        .how__header { margin-bottom: clamp(20px, 3vh, 32px); }
-        .how__title { font-size: clamp(36px, 9vw, 60px); }
+        .scene--how .scene__inner { max-width: 600px; }
+        .how__header { margin-bottom: clamp(14px, 2.2vh, 22px); }
+        .how__eyebrow { font-size: clamp(13px, 3.4vw, 15px); margin-bottom: clamp(8px, 1.2vh, 12px); }
+        .how__title { font-size: clamp(28px, 7.6vw, 46px); line-height: 1.02; }
         .how__steps {
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: clamp(8px, 1.2vh, 10px);
         }
-        .step { padding: 16px 20px; gap: 8px; }
-        .step__num { margin-bottom: 0; }
-        .step__line { font-size: clamp(17px, 4.6vw, 21px); margin-top: 2px; }
+        /* Karty: numer + chip w jednym rzędzie u góry, tekst pod spodem.
+           Skraca każdą kartę o ~jeden wiersz względem pełnego sztaplowania. */
+        .step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-areas: "num chip" "line line";
+            align-items: center;
+            column-gap: 12px;
+            row-gap: 6px;
+            padding: clamp(11px, 1.6vh, 14px) 16px;
+        }
+        .step__num { grid-area: num; margin-bottom: 0; font-size: 24px; line-height: 1; }
+        .step__chip { grid-area: chip; justify-self: start; align-self: center; }
+        .step__line { grid-area: line; margin-top: 0; font-size: clamp(15px, 4vw, 18px); line-height: 1.25; }
 
         /* CTA */
         .cta__h2 { font-size: clamp(40px, 10.5vw, 76px); }
@@ -1483,6 +1497,25 @@
 
         .cta__h2 { font-size: clamp(36px, 11vw, 56px); }
         .cta__primary { font-size: clamp(18px, 5vw, 24px); padding: 14px 24px; gap: 12px; }
+    }
+
+    /* ============================================================
+       SCENE 5 — short-height phones (np. iPhone SE 667px).
+       Dociskamy padding/fonty żeby 4 kroki ZMIEŚCIŁY się też tutaj
+       w jednym ekranie (bez overflow → mandatory snapuje czysto).
+       ============================================================ */
+    @media (max-width: 820px) and (max-height: 720px) {
+        .scene--how {
+            padding-top: 44px;
+            padding-bottom: calc(96px + env(safe-area-inset-bottom));
+        }
+        .how__header { margin-bottom: 12px; }
+        .how__eyebrow { font-size: 13px; margin-bottom: 7px; }
+        .how__title { font-size: clamp(26px, 7vw, 38px); }
+        .how__steps { gap: 7px; }
+        .step { padding: 9px 14px; row-gap: 4px; }
+        .step__num { font-size: 21px; }
+        .step__line { font-size: clamp(14px, 3.8vw, 16px); }
     }
 
     /* ============================================================
