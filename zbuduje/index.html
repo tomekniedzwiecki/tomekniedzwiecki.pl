@@ -507,10 +507,13 @@
             background: rgba(0, 0, 0, 0.92);
         }
 
-        /* SNAP-SCROLL — mniej agresywny. 'always' powoduje "stuck feeling" na touch */
+        /* SNAP-SCROLL — one-pager na mobile: mandatory (każdy swipe ląduje na ekranie),
+           ale scroll-snap-stop: normal żeby nie było "stuck feeling" przy szybkim swipie.
+           Sceny wyższe niż viewport (np. "Buduję Ci e-sklep") wg spec scroll-snap pozwalają
+           swobodnie przewijać w swoim obrębie i przyklejają się dopiero na krawędziach. */
         .scene { scroll-snap-stop: normal; }
         .footer-mini { scroll-snap-stop: normal; }
-        html { scroll-snap-type: y proximity; }  /* proximity zamiast mandatory */
+        html { scroll-snap-type: y mandatory; }
 
         /* REVEAL — mniejszy translate (mniej GPU pracy per frame) */
         [data-reveal] {
@@ -1424,14 +1427,18 @@
         .motto__quote { font-size: clamp(24px, 6.4vw, 38px); line-height: 1.22; }
         .motto__attribution { font-size: 12px; margin-top: 32px; }
 
-        /* HOW — stacked */
+        /* HOW — stacked. Scena wyższa niż viewport: ścieśniamy karty + padding,
+           żeby overflow (a więc dodatkowe przewijanie w obrębie sceny) był minimalny. */
+        .scene--how { padding-top: 72px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+        .how__header { margin-bottom: clamp(20px, 3vh, 32px); }
         .how__title { font-size: clamp(36px, 9vw, 60px); }
         .how__steps {
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 12px;
         }
-        .step { padding: 24px 22px; }
-        .step__line { font-size: clamp(17px, 4.6vw, 21px); }
+        .step { padding: 16px 20px; gap: 8px; }
+        .step__num { margin-bottom: 0; }
+        .step__line { font-size: clamp(17px, 4.6vw, 21px); margin-top: 2px; }
 
         /* CTA */
         .cta__h2 { font-size: clamp(40px, 10.5vw, 76px); }
