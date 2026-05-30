@@ -162,6 +162,20 @@
             .me .role { font-size: 14px; }
         }
 
+        /* ===== MOBILE FIT — ekran startowy w całości widoczny bez scrolla =====
+           Na telefonie (pasek przeglądarki + nav rodzica w iframe /zbuduje
+           zjadają wysokość) ścieśniamy odstępy i fonty, żeby pole e-mail
+           i przycisk były od razu nad zgięciem. */
+        @media (max-width: 767px) {
+            .shell { padding: 18px 20px; }
+            .step { gap: 16px; }
+            .frame { gap: 16px; }
+            h1.headline, h2.headline { font-size: 26px; line-height: 1.14; }
+            .lead { font-size: 15px; line-height: 1.5; }
+            .me img { width: 44px; height: 44px; }
+            .eyebrow { font-size: 10.5px; }
+        }
+
         /* Email hero — pulsujący glow tylko na sam input */
         .email-form {
             display: flex;
@@ -500,7 +514,7 @@
                 </div>
 
                 <p class="lead">
-                    Najpierw biorę cały ciężar na siebie — buduję dla Ciebie biznes od zera, aż realnie zacznie sprzedawać. Potem przekazuję Ci stery i zostaję jako wspólnik, który doradza Ci strategicznie.
+                    Najpierw biorę cały ciężar na siebie — buduję Ci biznes od zera, aż realnie zacznie sprzedawać. Potem przekazuję Ci stery i zostaję wspólnikiem.
                 </p>
 
                 <form id="email-form" class="email-form">
