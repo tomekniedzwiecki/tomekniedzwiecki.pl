@@ -69,6 +69,7 @@
 
     <!-- Preload hero avatar + logo (LCP) -->
     <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat.webp" fetchpriority="high">
     <link rel="preload" as="image" href="/img/logo/tn-logo-white-88.png" fetchpriority="high">
 
     <style>
@@ -236,6 +237,236 @@
     @keyframes meIn {
         from { opacity: 0; transform: translateY(8px) scale(0.96); }
         to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ============================================================
+       HELLO INTRO — pełnoekranowe powitanie, które ZWIJA SIĘ do hero.
+       Duży avatar realnie przelatuje (FLIP) na miejsce .hero__avatar,
+       a powitanie kondensuje się do obecnej, mniejszej formy.
+       Desktop i mobile dostrojone osobno (sekcje niżej).
+       ============================================================ */
+
+    /* Podczas intro hero__avatar czeka ukryty — to avatar z overlayu "ląduje"
+       na jego miejscu (zero podwójnego zdjęcia). Bez intro (reduced-motion) —
+       normalny meIn. */
+    .hero__avatar { transition: opacity 0.35s var(--ease); }
+    .has-hello-intro .hero__avatar { animation: none; opacity: 0; }
+    .has-hello-intro .hero__avatar.is-landed { opacity: 1; }
+
+    .hello-intro {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        background: var(--bg);
+        cursor: pointer;
+        overflow: hidden;
+        /* opóźnienie 0.22s: kurtyna rusza DOPIERO gdy tekst powitania już zniknął
+           (na czarnym tle) — zero nakładania podpisu na treść hero */
+        transition: background 0.7s var(--ease) 0.22s;
+    }
+    /* aurora-glow — przesunięta w PRAWO, pod portret (asymetria okładki) */
+    .hello-intro::before {
+        content: '';
+        position: absolute;
+        top: 46%; left: 66%;
+        width: clamp(440px, 56vw, 900px);
+        aspect-ratio: 1;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle at center,
+            rgba(0, 217, 126, 0.14) 0%,
+            rgba(255, 75, 62, 0.05) 44%,
+            transparent 72%);
+        filter: blur(110px);
+        pointer-events: none;
+        transition: opacity 0.6s var(--ease) 0.22s;
+    }
+
+    /* OKŁADKA — kolumna: pasek meta (góra) / kompozycja / pasek meta (dół) */
+    .hello-intro__cover {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: clamp(22px, 4vh, 40px) clamp(28px, 6vw, 80px)
+                 calc(clamp(22px, 4vh, 40px) + env(safe-area-inset-bottom));
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: clamp(18px, 3vh, 36px);
+    }
+
+    /* paski meta */
+    .hello-intro__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .hello-intro__meta, .hello-intro__chapter, .hello-intro__hint {
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        white-space: nowrap;
+    }
+    .hello-intro__meta--brand { text-transform: none; letter-spacing: 0.04em; color: var(--text-muted); }
+    /* logo (wordmark) w górnym pasku okładki — zamiast tekstu domeny */
+    .hello-intro__logo {
+        height: 26px; width: auto; display: block;
+        opacity: 0;
+        animation: helloMetaIn 0.8s var(--ease) 0.15s forwards;
+    }
+    .hello-intro__chapter { display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted); }
+    .hello-intro__chapter::before { content: ''; width: 26px; height: 1px; background: var(--accent-green); opacity: 0.85; }
+    .hello-intro__hint { color: var(--text-muted); }
+    .hello-intro__hint b { font-weight: 600; color: var(--text); }
+
+    /* kompozycja główna: IMIĘ (lewo) + PORTRET (prawo) */
+    .hello-intro__main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: clamp(28px, 5vw, 80px);
+    }
+    .hello-intro__lead { min-width: 0; }
+
+    /* IMIĘ — gigant, łamane: "Tomek" (sans 800) + "Niedźwiecki" (serif italic) */
+    .hello-intro__name {
+        font-family: var(--sans);
+        font-weight: 800;
+        line-height: 0.9;
+        letter-spacing: -0.045em;
+        color: var(--text-strong);
+        margin: 0;
+        font-size: clamp(52px, 8vw, 116px);
+    }
+    .hello-intro__line { display: block; overflow: hidden; }
+    .hello-intro__line > span { display: inline-block; transform: translateY(110%); will-change: transform; }
+    .hello-intro__line:nth-child(1) > span { animation: helloLineIn 1.0s var(--ease) 0.35s forwards; }
+    .hello-intro__line:nth-child(2) > span { animation: helloLineIn 1.0s var(--ease) 0.50s forwards; }
+    @keyframes helloLineIn { to { transform: translateY(0); } }
+    .hello-intro__line--serif > span {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        padding-bottom: 0.08em; /* zejście dolnych wydłużeń (ż,ę) spod clipu */
+    }
+
+    /* hairline-rule pod imieniem (zielony segment na starcie) */
+    .hello-intro__rule {
+        display: block;
+        height: 1px;
+        width: clamp(200px, 30vw, 360px);
+        margin: clamp(20px, 3vh, 34px) 0 clamp(16px, 2.4vh, 24px);
+        background: linear-gradient(90deg, var(--border-strong) 0%, transparent 100%);
+        position: relative;
+        transform: scaleX(0);
+        transform-origin: left center;
+        animation: helloRuleIn 0.9s var(--ease) 0.85s forwards;
+    }
+    .hello-intro__rule::before {
+        content: '';
+        position: absolute; left: 0; top: 0;
+        width: 48px; height: 1px;
+        background: var(--accent-green);
+        box-shadow: 0 0 10px rgba(0, 217, 126, 0.6);
+    }
+    @keyframes helloRuleIn { to { transform: scaleX(1); } }
+
+    /* podpis-byline */
+    .hello-intro__sign {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(22px, 2.4vw, 34px);
+        color: var(--text);
+        letter-spacing: -0.005em;
+        line-height: 1.3;
+        margin: 0;
+        max-width: 46ch;
+        opacity: 0;
+        transform: translateY(14px);
+        animation: helloSignIn 0.9s var(--ease) 1.05s forwards;
+    }
+    @keyframes helloSignIn { to { opacity: 1; transform: translateY(0); } }
+    .hello-intro__sign strong {
+        font-style: normal;
+        font-weight: 600;
+        font-family: var(--sans);
+        color: var(--accent-green);
+        font-size: 0.9em;
+        white-space: nowrap; /* „— od 15 lat" nie łamie się w środku */
+    }
+
+    /* PORTRET — duży, ring + glow, prawa strona okładki */
+    .hello-intro__avatar {
+        flex-shrink: 0;
+        width: clamp(168px, 24vw, 240px);
+        height: clamp(168px, 24vw, 240px);
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-green);
+        box-shadow: 0 0 0 6px var(--accent-green-soft), 0 30px 80px rgba(0, 0, 0, 0.6);
+        transform-origin: center center;
+        opacity: 0;
+        animation: helloAvatarIn 1.0s var(--ease) 0.2s forwards;
+        will-change: transform, opacity;
+    }
+    @keyframes helloAvatarIn {
+        from { opacity: 0; transform: scale(0.82); }
+        to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* wejścia pasków meta (fade-in z lekkim stagger) */
+    .hello-intro__meta, .hello-intro__chapter, .hello-intro__hint {
+        opacity: 0;
+        animation: helloMetaIn 0.8s var(--ease) forwards;
+    }
+    .hello-intro__bar--top .hello-intro__meta:first-child { animation-delay: 0.15s; }
+    .hello-intro__bar--top .hello-intro__meta:last-child  { animation-delay: 0.28s; }
+    .hello-intro__chapter { animation-delay: 1.45s; }
+    .hello-intro__hint    { animation-delay: 1.65s; }
+    @keyframes helloMetaIn { to { opacity: 1; } }
+
+    /* ── faza zwijania (settle) — wspólna ──
+       Zanik wszystkich elementów .hello-fade robi JS: animacje wejścia mają
+       fill:forwards (nadpisałyby tu opacity). JS pinuje bieżący stan, zdejmuje
+       animację i dopiero wtedy przenika do 0 — patrz settle(). */
+    .hello-intro.is-settling { background: transparent; pointer-events: none; }
+    .hello-intro.is-settling::before { opacity: 0; }
+    .hello-intro__avatar.is-flying { z-index: 2; }
+
+    /* ── MOBILE — osobno (≤820px): portret NAD imieniem, lewa oś (spójnie z
+         masthead „Cześć."), wszystko w 100dvh, lądowanie na małym .hero__avatar ── */
+    @media (max-width: 820px) {
+        .hello-intro__cover {
+            padding: clamp(16px, 3vh, 26px) 24px calc(clamp(16px, 3vh, 26px) + env(safe-area-inset-bottom));
+            gap: clamp(14px, 2.4vh, 24px);
+        }
+        .hello-intro__main {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            gap: clamp(20px, 4vh, 36px);
+        }
+        .hello-intro__avatar { order: -1; width: clamp(96px, 26vw, 124px); height: clamp(96px, 26vw, 124px); }
+        .hello-intro__name { font-size: clamp(40px, 12vw, 66px); }
+        .hello-intro__rule { width: clamp(160px, 50vw, 240px); margin: clamp(16px, 2.4vh, 22px) 0 clamp(12px, 1.8vh, 18px); }
+        .hello-intro__sign { font-size: clamp(19px, 5.2vw, 26px); max-width: 26ch; }
+        .hello-intro__logo { height: 22px; }
+        .hello-intro__meta--est { display: none; } /* na wąsko zostaje samo logo w górnym pasku */
+    }
+    @media (max-width: 380px) {
+        .hello-intro__avatar { width: 84px; height: 84px; }
+        .hello-intro__name { font-size: clamp(34px, 11vw, 52px); }
+        .hello-intro__chapter span { display: none; } /* sama kreska-tick, oszczędzamy pion */
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hello-intro { display: none; }
     }
 
     /* H1 — editorial cinematic */
@@ -862,6 +1093,44 @@
 <body>
 
 <!-- ============================================== -->
+<!--      HELLO INTRO — zwija się do .hero__avatar   -->
+<!-- ============================================== -->
+<div class="hello-intro" id="hello-intro" aria-hidden="true">
+    <div class="hello-intro__cover">
+
+        <!-- pasek meta (góra) -->
+        <div class="hello-intro__bar hello-intro__bar--top">
+            <img class="hello-intro__logo hello-fade" src="https://tomekniedzwiecki.pl/img/logo/tn-logo-white-88.png"
+                 alt="tomekniedzwiecki.pl" width="244" height="32">
+            <span class="hello-intro__meta hello-intro__meta--est hello-fade">EST. 2010 — 15 lat</span>
+        </div>
+
+        <!-- kompozycja: imię (lewo) + portret (prawo) -->
+        <div class="hello-intro__main">
+            <div class="hello-intro__lead">
+                <h2 class="hello-intro__name hello-fade">
+                    <span class="hello-intro__line"><span>Tomek</span></span>
+                    <span class="hello-intro__line hello-intro__line--serif"><span>Niedźwiecki</span></span>
+                </h2>
+                <span class="hello-intro__rule hello-fade" aria-hidden="true"></span>
+                <p class="hello-intro__sign hello-fade">Buduję i&nbsp;automatyzuję biznesy <strong>— od 15 lat</strong></p>
+            </div>
+
+            <img class="hello-intro__avatar" id="hello-avatar"
+                 src="https://tomekniedzwiecki.pl/img/tn_kwadrat.webp"
+                 alt="Tomek Niedźwiecki" width="240" height="240">
+        </div>
+
+        <!-- pasek meta (dół) -->
+        <div class="hello-intro__bar hello-intro__bar--bottom">
+            <span class="hello-intro__chapter hello-fade"><span>Wprowadzenie</span></span>
+            <span class="hello-intro__hint hello-fade"><b>kliknij</b>, by wejść&nbsp;↓</span>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
 <!--                    NAV                          -->
 <!-- ============================================== -->
 <nav class="nav">
@@ -955,6 +1224,91 @@
     <a href="https://tomekniedzwiecki.pl/dokumenty/polityka-prywatnosci.html">Polityka prywatności</a>
 </footer>
 
+<!-- HELLO INTRO — zwinięcie pełnoekranowego powitania do .hero__avatar (FLIP) -->
+<script>
+(function () {
+    'use strict';
+    var intro = document.getElementById('hello-intro');
+    var fly   = document.getElementById('hello-avatar');
+    var dest  = document.querySelector('.hero__avatar');
+    if (!intro || !fly || !dest) return;
+    var texts = intro.querySelectorAll('.hello-fade');
+
+    // reduced-motion: bez sceny, hero od razu w finalnej formie
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (intro.parentNode) intro.parentNode.removeChild(intro);
+        return;
+    }
+
+    // gate: hero (Cześć. + podpis + ścieżki) odsłoni się DOPIERO przy zwijaniu,
+    // a hero__avatar czeka ukryty (avatar z overlayu "ląduje" na jego miejscu)
+    document.documentElement.classList.add('has-hello-intro');
+
+    var HOLD = 2700;   // ile trzyma pełnoekranowe powitanie (skip klikiem/scrollem)
+    var FLIGHT = 950;  // przelot avatara do hero
+    var done = false;
+
+    function settle() {
+        if (done) return; done = true;
+        window.clearTimeout(timer);
+
+        // KROK 1: imię + podpis + hint znikają NA CZARNYM TLE (kurtyna jeszcze stoi).
+        // Animacje wejścia mają fill:forwards (nadpisałyby opacity), więc najpierw
+        // pinujemy bieżącą widoczność inline i zdejmujemy animację, potem przenikamy.
+        texts.forEach(function (el) {
+            el.style.opacity = window.getComputedStyle(el).opacity;
+            el.style.animation = 'none';
+        });
+        void intro.offsetWidth; // commit widocznego stanu
+        texts.forEach(function (el) {
+            el.style.transition = 'opacity 0.22s var(--ease)';
+            el.style.opacity = '0';
+        });
+        intro.classList.add('is-settling');
+
+        // KROK 2 (po 240ms — tekst już zniknął): kurtyna w górę, hero się składa, avatar leci
+        window.setTimeout(function () {
+            window.dispatchEvent(new Event('hero:reveal'));
+
+            try {
+                // stan spoczynkowy avatara (zdejmij animację wejścia) PRZED pomiarem FLIP
+                fly.classList.add('is-flying');
+                fly.style.animation = 'none';
+                fly.style.opacity = '1';
+                fly.style.transform = 'none';
+                void fly.offsetWidth; // reflow
+
+                // FLIP: duży avatar (start) → miejsce .hero__avatar (cel; mierzone teraz,
+                // bo różni się desktop vs mobile — masthead jest center / lewy-flex)
+                var a = fly.getBoundingClientRect();
+                var b = dest.getBoundingClientRect();
+                var dx = (b.left + b.width  / 2) - (a.left + a.width  / 2);
+                var dy = (b.top  + b.height / 2) - (a.top  + a.height / 2);
+                var scale = b.width / a.width;
+
+                fly.style.transition = 'transform ' + FLIGHT + 'ms cubic-bezier(0.16,1,0.3,1)';
+                fly.style.transform  = 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')';
+            } catch (e) { /* awaryjnie po prostu zdejmiemy overlay niżej */ }
+
+            // gdy avatar dolatuje — odsłoń hero__avatar, przenikaj lecący, usuń overlay
+            window.setTimeout(function () {
+                dest.classList.add('is-landed');
+                fly.style.transition += ', opacity 0.25s linear';
+                fly.style.opacity = '0';
+                window.setTimeout(function () {
+                    if (intro.parentNode) intro.parentNode.removeChild(intro);
+                }, 280);
+            }, FLIGHT - 80);
+        }, 240);
+    }
+
+    var timer = window.setTimeout(settle, HOLD);
+    ['click', 'wheel', 'touchstart', 'keydown'].forEach(function (ev) {
+        window.addEventListener(ev, settle, { once: true, passive: true });
+    });
+})();
+</script>
+
 <script>
 // =====================================================
 //  HUB LANDING — reveal-on-enter (IntersectionObserver)
@@ -985,7 +1339,17 @@
         });
     }, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
 
-    document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+    function startReveals() {
+        document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+    }
+    // Z intro: czekaj na sygnał "hero:reveal" (po zwinięciu powitania).
+    // Bez intro / gdyby coś padło — backstop odpala reveals i tak.
+    if (document.documentElement.classList.contains('has-hello-intro')) {
+        window.addEventListener('hero:reveal', startReveals, { once: true });
+        window.setTimeout(startReveals, 6000);
+    } else {
+        startReveals();
+    }
 })();
 </script>
 
