@@ -1662,105 +1662,224 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     .step__arrow { display: none; }
 }
 
-/* Mobile — każdy step osobny snap-target (jeden scroll = kolejny krok) */
+/* ========================================================================
+   AKT "PROCES" (#jak) — MOBILE ≤720px — PIONOWY TIMELINE (rethink)
+
+   DLACZEGO: poprzednio akt dzielił się na 4 sceny-snap 100dvh (header + 3 kroki,
+   każdy scroll-snap-stop:always) -> iOS Safari gubił środkowe kroki przy
+   momentum-swipe (ten sam bug, z którym walczył /zbuduje). TERAZ: scena =
+   DOKŁADNIE JEDEN snap-target 100dvh (jak pozostałe 5 aktów); 3 kroki widoczne
+   NARAZ jako pionowy timeline (ciągła szyna ty->ja->razem + węzły 01/02/03).
+   Zero sub-scen => zero przeskoku; zero osi poziomej; zero zależności od JS-reveal.
+
+   Layout CZYSTYM CSS-grid (grid-template-areas) na ISTNIEJĄCYM DOM — bez zmian
+   HTML => desktop nietknięty z definicji (wszystko ≤720px, scoped).
+   Selektory .story__scene--steps (0,2,0) wygrywają z legacy .step (0,1,0)
+   bez !important. */
 @media (max-width: 720px) {
-    /* Wyłączamy snap na poziomie sceny i jej padding — children mają własne 100dvh */
-    .story__scene--steps {
-        padding: 0;
-        min-height: auto;
-        scroll-snap-align: none;
-        scroll-snap-stop: normal;
-        align-items: stretch;
-    }
-    .steps-wrap {
-        max-width: none;
-        width: 100%;
-        margin: 0;
-    }
-    /* Header "Trzy kroki." — własny snap target (intro do sekcji) */
-    .steps__header {
-        min-height: 100dvh;
-        padding: 84px 26px calc(115px + env(safe-area-inset-bottom));
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        margin-bottom: 0;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-    }
-    .steps__subtitle {
-        font-size: clamp(15px, 4.2vw, 19px);
-        margin-top: 16px;
-    }
-    /* Grid bez gap — każdy step pełny viewport */
-    .steps-grid {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-    /* Każdy step = 100dvh editorial "spread": gigantyczny numerał-duch w tle
-       (wypełnia scenę — koniec wiszenia w pustce, spójnie z hubem 01/02) +
-       zwarta treść na lewej osi z przodu.
-       Selektory SCOPED pod .story__scene--steps, żeby deterministycznie wygrać
-       z legacy komponentem .step (karty ~l.2528) kolidującym nazwą klasy:
-       neutralizujemy jego background/border/border-radius/padding. */
-    .story__scene--steps .step {
-        position: relative;
-        overflow: hidden;
-        min-height: 100dvh;
-        background: transparent;
-        border: 0;
-        border-radius: 0;
-        /* treść wycentrowana w pionie na lewej osi; numerał-duch wypełnia
-           całą wysokość sceny w tle (po prawej) — nigdzie pustki */
-        padding: 96px 28px calc(124px + env(safe-area-inset-bottom));
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 12px;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-    }
-    /* Gigantyczny numerał-duch — Instrument Serif italic (jak crisp numer),
-       kolor persony, subtelny. Wysoki watermark przez całą wysokość sceny,
-       wykrwawia się za prawą krawędź (spójnie z hubem 01/02). Treść (lewa oś)
-       leży przed nim i pozostaje czytelna. */
-    .story__scene--steps .step::before {
-        position: absolute;
-        right: -0.05em;
-        top: 50%;
-        transform: translateY(-50%);
-        font-family: var(--serif);
-        font-style: italic;
-        font-weight: 900;
-        font-size: min(82vw, 66dvh);
-        line-height: 0.74;
-        letter-spacing: -0.04em;
-        pointer-events: none;
-        z-index: 0;
-    }
-    .story__scene--steps .step--ty::before    { content: "01"; color: rgba(255, 75, 62, 0.13); }
-    .story__scene--steps .step--ja::before    { content: "02"; color: rgba(252, 211, 77, 0.14); }
-    .story__scene--steps .step--razem::before { content: "03"; color: rgba(0, 217, 126, 0.16); }
-    /* treść nad duchem */
-    .story__scene--steps .step > * { position: relative; z-index: 1; }
-    /* mały numerał + strzałka zbędne — numer niesie duch w tle */
-    .story__scene--steps .step__num-wrap { display: none; }
-    /* foreground: POV mocniejszy, chip, wielka linia, opis */
-    .story__scene--steps .step__pov {
-        font-size: clamp(17px, 5vw, 22px);
-        margin-bottom: 2px;
-    }
-    .story__scene--steps .step__chip { margin-bottom: 6px; }
-    .story__scene--steps .step__line {
-        font-size: clamp(30px, 8.5vw, 44px);
-        line-height: 1.05;
-        margin-bottom: 12px;
-    }
-    .story__scene--steps .step__desc {
-        font-size: clamp(15px, 4.2vw, 17px);
-        max-width: 32ch;
-    }
+
+  /* --- 1. SCENA = JEDEN snap-target 100dvh (kasuje split na 4 sub-sceny).
+     Naprawia też dock: actObserver (threshold 0.5) znów stabilnie trafia w scenę. */
+  .story__scene--steps {
+    min-height: 100dvh;
+    height: 100dvh;
+    align-items: stretch;
+    justify-content: flex-start;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+    padding: calc(58px + env(safe-area-inset-top)) 22px calc(122px + env(safe-area-inset-bottom));
+  }
+  .story__scene--steps .steps-wrap {
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* --- 2. HEADER wtopiony (był osobną sceną 100dvh — już NIE) --- */
+  .story__scene--steps .steps__header {
+    flex: 0 0 auto;
+    min-height: 0;
+    padding: 0;
+    margin: 0 0 clamp(14px, 2.4vh, 22px);
+    display: block;
+    text-align: left;
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
+  .story__scene--steps .steps__header .story__eyebrow {
+    margin-bottom: 6px;
+    text-align: left;
+    font-size: 13px;
+  }
+  .story__scene--steps .steps__title {
+    font-size: clamp(28px, 8vw, 38px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  /* podpis chowamy — narrację niesie szyna + chipy-czas (copy zostaje w HTML) */
+  .story__scene--steps .steps__subtitle { display: none; }
+
+  /* --- 3. TIMELINE: kroki dzielą resztę pionu sceny równo --- */
+  .story__scene--steps .steps-grid {
+    gap: 0;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;            /* kotwica ciągłej szyny */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  /* 3a. JEDNA ciągła szyna na rodzicu (gradient ty->ja->razem łączy 3 węzły) */
+  .story__scene--steps .steps-grid::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 16px;
+    bottom: 16px;
+    width: 2px;
+    background: linear-gradient(180deg,
+      rgba(255,75,62,0.5) 0%,
+      rgba(252,211,77,0.45) 50%,
+      rgba(0,217,126,0.5) 100%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* --- 4. WIERSZ KROKU = [węzeł 42px | treść]; neutralizacja legacy .step --- */
+  .story__scene--steps .step {
+    position: relative;
+    overflow: visible;
+    min-height: 0;
+    height: auto;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    grid-template-areas:
+      "node head"
+      "node line"
+      "node desc";
+    column-gap: 14px;
+    row-gap: 3px;
+    align-items: start;
+    padding: clamp(6px, 1.2vh, 12px) 0;
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
+  .story__scene--steps .step:first-child { padding-top: 0; }
+  .story__scene--steps .step:last-child  { padding-bottom: 0; }
+  /* kasujemy poprzedni numerał-duch watermark */
+  .story__scene--steps .step::before { content: none; }
+
+  /* --- 5. WĘZEŁ = .step__num-wrap; .step__num = numerał na szynie (maska #000) --- */
+  .story__scene--steps .step__num-wrap {
+    grid-area: node;
+    align-self: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    margin: 0;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .story__scene--steps .step__arrow { display: none; } /* przepływ niesie szyna */
+  .story__scene--steps .step__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 30px;
+    margin: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: 0;
+    font-variant-numeric: normal;
+    text-align: center;
+    background: var(--bg);         /* #000 maskuje szynę za numerałem */
+    text-shadow: none;
+  }
+  .story__scene--steps .step--ty    .step__num { color: var(--accent-red); }
+  .story__scene--steps .step--ja    .step__num { color: var(--accent-yellow); }
+  .story__scene--steps .step--razem .step__num { color: var(--accent-green); }
+  /* halo przy węźle "03" (partnership moment), statyczne */
+  .story__scene--steps .step--razem .step__num-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,217,126,0.30) 0%, transparent 65%);
+    filter: blur(9px);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* --- 6. TREŚĆ (prawa kolumna) — zwarta, całe copy.
+     head: POV (lewy) + chip (prawy) w JEDNEJ linii, ten sam cell grid (bez wrappera) */
+  .story__scene--steps .step__pov {
+    grid-area: head;
+    justify-self: start;
+    align-self: center;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .story__scene--steps .step--ty    .step__pov { color: rgba(255,75,62,0.85); }
+  .story__scene--steps .step--ja    .step__pov { color: rgba(252,211,77,0.9); }
+  .story__scene--steps .step--razem .step__pov { color: rgba(0,217,126,0.9); }
+  .story__scene--steps .step__chip {
+    grid-area: head;
+    justify-self: end;
+    align-self: center;
+    margin: 0;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    padding: 3px 9px;
+  }
+  .story__scene--steps .step__line {
+    grid-area: line;
+    font-size: clamp(19px, 5.4vw, 23px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 4px 0 0;
+    text-wrap: balance;
+  }
+  .story__scene--steps .step__desc {
+    grid-area: desc;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 500;
+    max-width: 34ch;
+    margin: 4px 0 0;
+  }
+
+  /* --- 7. ODPORNOŚĆ NA JS-REVEAL: krok nigdy niewidoczny, gdy IO nie odpali ---
+     Globalne [data-reveal]{opacity:0} + unobserve dałoby TRWALE puste kroki.
+     Wymuszamy widoczność twardo (data-reveal w HTML zostaje => desktop bez zmian). */
+  .story__scene--steps [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* --- 8. ≤390px / Dynamic Type — bufor pionu na iPhone SE i powiększenie tekstu --- */
+@media (max-width: 390px) {
+  .story__scene--steps { padding-top: calc(50px + env(safe-area-inset-top)); }
+  .story__scene--steps .steps__title { font-size: clamp(25px, 7.6vw, 32px); }
+  .story__scene--steps .step__line { font-size: clamp(18px, 5.2vw, 21px); }
+  .story__scene--steps .step__desc { font-size: 12.5px; line-height: 1.36; }
+  .story__scene--steps .step { row-gap: 2px; padding: clamp(5px, 1vh, 10px) 0; }
 }
 
 /* ======================================================
