@@ -557,7 +557,7 @@
         opacity: 0;
         transform: translateY(24px);
     }
-    .path.is-visible { opacity: 1; transform: translateY(0); transition: opacity 0.9s var(--ease) 0.2s, transform 0.9s var(--ease) 0.2s, background 0.45s var(--ease), border-color 0.45s var(--ease); }
+    .path.is-visible { opacity: 1; transform: translateY(0); transition: opacity 0.9s var(--ease) 0.2s, transform 0.9s var(--ease) 0.2s, background 0.45s var(--ease), border-color 0.45s var(--ease), box-shadow 0.5s var(--ease); }
     .path--b.is-visible { transition-delay: 0.4s, 0.4s, 0s, 0s; }
 
     .path:hover {
@@ -840,6 +840,72 @@
         .hero__h1 { font-size: clamp(52px, 11vw, 140px); }
         .path__verb { font-size: clamp(44px, 8.5vw, 96px); }
         .path__object { font-size: clamp(26px, 4.4vw, 48px); }
+    }
+
+    /* traveling border-beam — animowany kąt koloru przechodzącego po krawędzi */
+    @property --path-beam { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    @keyframes pathBeamSpin { to { --path-beam: 360deg; } }
+
+    /* ============================================================
+       DESKTOP/TABLET (≥821px) — dwa „path" czytają się jako delikatne,
+       nowoczesne panele JUŻ W SPOCZYNKU (nie tylko na hover): subtelna
+       krawędź + ledwie widoczna powierzchnia + ŚWIATŁO persony przechodzące
+       po krawędzi (border-beam). Mobile ma własny wariant (tint +
+       ghost-numeral) i NIE jest tu ruszany.
+       ============================================================ */
+    @media (min-width: 821px) {
+        .path {
+            border-radius: 14px;
+            border: 1px solid var(--border-strong);
+            background: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.025) 0%,
+                rgba(255, 255, 255, 0.006) 58%,
+                rgba(255, 255, 255, 0) 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+        .path--a { --path-accent: rgba(0, 217, 126, 0.9); }
+        .path--b { --path-accent: rgba(255, 75, 62, 0.95); }
+
+        /* ŚWIATŁO przechodzące po krawędzi: conic-gradient (miękki łuk) maskowany
+           do ringu 1px; kąt animowany przez @property → światło krąży delikatnie.
+           Subtelne w spoczynku, jaśniejsze na hover. */
+        .path::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 14px;
+            padding: 1px;
+            background: conic-gradient(from var(--path-beam),
+                transparent 0deg, transparent 58deg,
+                var(--path-accent) 90deg,
+                transparent 122deg, transparent 360deg);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+                    mask-composite: exclude;
+            opacity: 0.5;
+            pointer-events: none;
+            animation: pathBeamSpin 5.5s linear infinite;
+            transition: opacity 0.5s var(--ease);
+        }
+
+        .path:hover {
+            transform: translateY(-4px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 26px 64px rgba(0, 0, 0, 0.55);
+        }
+        .path:hover::after { opacity: 1; }
+        .path--a:hover {
+            border-color: rgba(0, 217, 126, 0.45);
+            background: linear-gradient(180deg, rgba(0, 217, 126, 0.07) 0%, rgba(255, 255, 255, 0.006) 55%, rgba(255, 255, 255, 0) 100%);
+        }
+        .path--b:hover {
+            border-color: rgba(255, 75, 62, 0.45);
+            background: linear-gradient(180deg, rgba(255, 75, 62, 0.07) 0%, rgba(255, 255, 255, 0.006) 55%, rgba(255, 255, 255, 0) 100%);
+        }
+    }
+    /* reduced-motion: światło nie krąży (zostaje statyczny, subtelny łuk akcentu) */
+    @media (prefers-reduced-motion: reduce) {
+        .path::after { animation: none; }
     }
 
     /* Mobile — split STACKED, divider pomiędzy */
