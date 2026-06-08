@@ -1697,33 +1697,69 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
         grid-template-columns: 1fr;
         gap: 0;
     }
-    /* Każdy step = 100dvh + snap start */
-    .step {
+    /* Każdy step = 100dvh editorial "spread": gigantyczny numerał-duch w tle
+       (wypełnia scenę — koniec wiszenia w pustce, spójnie z hubem 01/02) +
+       zwarta treść na lewej osi z przodu.
+       Selektory SCOPED pod .story__scene--steps, żeby deterministycznie wygrać
+       z legacy komponentem .step (karty ~l.2528) kolidującym nazwą klasy:
+       neutralizujemy jego background/border/border-radius/padding. */
+    .story__scene--steps .step {
+        position: relative;
+        overflow: hidden;
         min-height: 100dvh;
-        padding: 84px 26px calc(115px + env(safe-area-inset-bottom));
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        /* treść wycentrowana w pionie na lewej osi; numerał-duch wypełnia
+           całą wysokość sceny w tle (po prawej) — nigdzie pustki */
+        padding: 96px 28px calc(124px + env(safe-area-inset-bottom));
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 14px;
+        align-items: flex-start;
+        gap: 12px;
         scroll-snap-align: start;
         scroll-snap-stop: always;
     }
-    .step__num-wrap {
-        gap: 16px;
-        margin-bottom: 16px;
+    /* Gigantyczny numerał-duch — Instrument Serif italic (jak crisp numer),
+       kolor persony, subtelny. Wysoki watermark przez całą wysokość sceny,
+       wykrwawia się za prawą krawędź (spójnie z hubem 01/02). Treść (lewa oś)
+       leży przed nim i pozostaje czytelna. */
+    .story__scene--steps .step::before {
+        position: absolute;
+        right: -0.05em;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 900;
+        font-size: min(82vw, 66dvh);
+        line-height: 0.74;
+        letter-spacing: -0.04em;
+        pointer-events: none;
+        z-index: 0;
     }
-    .step__num {
-        font-size: clamp(48px, 16vw, 72px);
+    .story__scene--steps .step--ty::before    { content: "01"; color: rgba(255, 75, 62, 0.13); }
+    .story__scene--steps .step--ja::before    { content: "02"; color: rgba(252, 211, 77, 0.14); }
+    .story__scene--steps .step--razem::before { content: "03"; color: rgba(0, 217, 126, 0.16); }
+    /* treść nad duchem */
+    .story__scene--steps .step > * { position: relative; z-index: 1; }
+    /* mały numerał + strzałka zbędne — numer niesie duch w tle */
+    .story__scene--steps .step__num-wrap { display: none; }
+    /* foreground: POV mocniejszy, chip, wielka linia, opis */
+    .story__scene--steps .step__pov {
+        font-size: clamp(17px, 5vw, 22px);
+        margin-bottom: 2px;
     }
-    .step__pov {
-        font-size: clamp(15px, 4.5vw, 19px);
+    .story__scene--steps .step__chip { margin-bottom: 6px; }
+    .story__scene--steps .step__line {
+        font-size: clamp(30px, 8.5vw, 44px);
+        line-height: 1.05;
+        margin-bottom: 12px;
     }
-    .step__line {
-        font-size: clamp(22px, 6vw, 28px);
-    }
-    .step__desc {
+    .story__scene--steps .step__desc {
         font-size: clamp(15px, 4.2vw, 17px);
-        max-width: 100%;
+        max-width: 32ch;
     }
 }
 
