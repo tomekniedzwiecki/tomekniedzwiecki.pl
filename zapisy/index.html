@@ -1212,16 +1212,17 @@
         const regEventId = 'reg_' + (d.lead_id || Date.now());
         if (typeof fbq === 'function') fbq('track','CompleteRegistration', { value: regValue, currency: 'PLN' }, { eventID: regEventId });
         if (typeof ttq === 'object' && ttq.track) ttq.track('CompleteRegistration', { value: regValue, currency: 'PLN' }, { event_id: regEventId });
-        if (typeof gtag === 'function') gtag('event','conversion', { send_to: 'AW-17886093904/conversion', value: regValue, currency: 'PLN' });
-        // GA4: osobny event ukonczenia ankiety (BEZ send_to -> trafia do property GA4, czego konwersja Ads nie robi).
-        // Z wartoscia + jakoscia leada -> raporty konwersji wg source/medium/segmentu w GA4.
+        // GA4 'form_complete' = ukonczenie ankiety. Google Ads konwersja "Rejestracje" to IMPORT
+        // tego zdarzenia GA4 (akcja: tomekniedzwiecki.pl (web) form_complete) — NIE ma natywnego tagu
+        // Ads send_to dla rejestracji, wiec poprzedni placeholder 'AW-17886093904/conversion' byl martwy.
+        // Wartosc konwersji w Google Ads jest pobierana z value tego zdarzenia.
         if (typeof gtag === 'function') {
             const triedArr = d.tried || [];
             const budgetNum = parseInt(String(d.budget || '').replace(/\D/g, ''), 10) || 0;
             const leadValueTier = regValue >= 350 ? 'high' : (regValue >= 200 ? 'mid' : 'low');
             const budgetBucket = budgetNum >= 5000 ? '5k+' : (budgetNum >= 2000 ? '2-5k' : (budgetNum > 0 ? '<2k' : 'unknown'));
             const expWon = /(sklep|allegro|dropship|prob)/.test(String(d.experience || '').toLowerCase());
-            gtag('event', 'sign_up', {
+            gtag('event', 'form_complete', {
                 method: 'survey',
                 value: regValue,
                 currency: 'PLN',
