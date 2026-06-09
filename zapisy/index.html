@@ -805,6 +805,8 @@
         const stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
         TRACKING_PARAMS.forEach(p => { const v = u.get(p); if (v) stored[p] = v; });
         const fbp = getCookie('_fbp'); if (fbp) stored.fbp = fbp;
+        // Odzysk gclid z pierwszosciowego cookie Google (_gcl_aw: GCL.timestamp.gclid) gdy brak w URL
+        if (!stored.gclid) { const gcl = getCookie('_gcl_aw'); if (gcl) { const gp = gcl.split('.'); if (gp.length >= 3) stored.gclid = gp.slice(2).join('.'); } }
         if (!stored.landing_page) stored.landing_page = window.location.href;
         if (!stored.referrer && document.referrer) stored.referrer = document.referrer;
         sessionStorage.setItem('tracking_params', JSON.stringify(stored));
@@ -916,6 +918,40 @@
                 })
             }).catch(() => {});
         } catch (err) {}
+    }
+
+    // Meta Conversions API (server-side) — wzmacnia event rejestracji (piksel sam jest stratny: iOS/blokery).
+    // meta-event sam dociaga fbc/fbp z lead_tracking po lead_id; event_id = dedup z pikselem.
+    async function sendMetaEvent(eventName, extra = {}) {
+        try {
+            const saved = loadData();
+            fetch(`${SUPABASE_URL}/functions/v1/meta-event`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event: eventName,
+                    email: saved.email || null,
+                    phone: saved.phone || null,
+                    lead_id: saved.lead_id || null,
+                    url: window.location.href,
+                    user_agent: navigator.userAgent,
+                    ...extra
+                })
+            }).catch(() => {});
+        } catch (err) {}
+    }
+
+    // Wartosc leada wg sygnalow WON (z analizy formularza: dlugosc experience, slowa sklep/allegro/dropship/prob,
+    // zadeklarowany budzet). Baza 127 zl = proxy LTV/lead (37 WON/1000 x ~3440 zl). Pozwala na value-based optimization.
+    function computeLeadValue(d) {
+        const BASE = 127;
+        let mult = 1;
+        const exp = (d.experience || '').toLowerCase();
+        if (exp.length > 80) mult += 0.5;
+        if (/(sklep|allegro|dropship|prob)/.test(exp)) mult += 1;
+        const budget = parseInt(String(d.budget || '').replace(/\D/g, ''), 10) || 0;
+        if (budget >= 5000) mult += 1; else if (budget >= 2000) mult += 0.5;
+        return Math.round(BASE * mult);
     }
 
     async function sha256(str) {
@@ -1152,11 +1188,14 @@
             survey_version: 2
         });
 
-        // Conversion events
-        if (typeof fbq === 'function') fbq('track','CompleteRegistration');
-        if (typeof ttq === 'object' && ttq.track) ttq.track('CompleteRegistration');
-        if (typeof gtag === 'function') gtag('event','conversion', { send_to: 'AW-17886093904/conversion' });
-        sendTikTokEvent('CompleteRegistration');
+        // Conversion events — z wartoscia wg jakosci leada + dedup browser<->CAPI przez event_id
+        const regValue = computeLeadValue(d);
+        const regEventId = 'reg_' + (d.lead_id || Date.now());
+        if (typeof fbq === 'function') fbq('track','CompleteRegistration', { value: regValue, currency: 'PLN' }, { eventID: regEventId });
+        if (typeof ttq === 'object' && ttq.track) ttq.track('CompleteRegistration', { value: regValue, currency: 'PLN' }, { event_id: regEventId });
+        if (typeof gtag === 'function') gtag('event','conversion', { send_to: 'AW-17886093904/conversion', value: regValue, currency: 'PLN' });
+        sendMetaEvent('CompleteRegistration', { value: regValue, currency: 'PLN', event_id: regEventId });
+        sendTikTokEvent('CompleteRegistration', { value: regValue, currency: 'PLN', event_id: regEventId });
 
         clearData();
         setLoading(expSubmit, false);

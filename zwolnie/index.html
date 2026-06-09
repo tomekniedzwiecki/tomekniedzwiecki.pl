@@ -13,6 +13,42 @@
     <meta property="og:description" content="...z roboty, której nie powinni robić. Buduję systemy, które robią to za 3 osoby.">
     <meta property="og:locale" content="pl_PL">
 
+    <!-- ===================== POMIAR / TRACKING ===================== -->
+    <!-- Google Consent Mode v2 -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+    </script>
+    <!-- GA4 + Google Ads -->
+    <script>
+        window.addEventListener('load', function() {
+            var s = document.createElement('script');
+            s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
+            document.head.appendChild(s);
+            s.onload = function() {
+                gtag('js', new Date());
+                gtag('config', 'G-W8CLDSHVFC', {
+                    'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
+                });
+                gtag('config', 'AW-17886093904');
+            };
+        });
+    </script>
+    <!-- Meta Pixel -->
+    <script>
+    window.addEventListener('load', function() {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init','1668188210820080'); fbq('track','PageView');
+    });
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1"/></noscript>
+
     <!-- TikTok Pixel -->
     <script>
     window.addEventListener('load', function() {
@@ -33,6 +69,7 @@
             var stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
             TRACKING_PARAMS.forEach(function(p){var val=u.get(p); if(val) stored[p]=val;});
             var fbp = getCookie('_fbp'); if(fbp) stored.fbp = fbp;
+            if(!stored.gclid){var gcl=getCookie('_gcl_aw'); if(gcl){var gp=gcl.split('.'); if(gp.length>=3) stored.gclid=gp.slice(2).join('.');}}
             if(!stored.landing_page) stored.landing_page = window.location.href;
             if(!stored.referrer && document.referrer) stored.referrer = document.referrer;
             sessionStorage.setItem('tracking_params', JSON.stringify(stored));
