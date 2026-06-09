@@ -806,7 +806,8 @@
         TRACKING_PARAMS.forEach(p => { const v = u.get(p); if (v) stored[p] = v; });
         const fbp = getCookie('_fbp'); if (fbp) stored.fbp = fbp;
         // Odzysk gclid z pierwszosciowego cookie Google (_gcl_aw: GCL.timestamp.gclid) gdy brak w URL
-        if (!stored.gclid) { const gcl = getCookie('_gcl_aw'); if (gcl) { const gp = gcl.split('.'); if (gp.length >= 3) stored.gclid = gp.slice(2).join('.'); } }
+        // Odzysk gclid z _gcl_aw tylko gdy brak swiezszego click-ID (Meta/TikTok) — inaczej stary gclid przeklasyfikowalby leada na Google
+        if (!stored.gclid && !stored.fbclid && !stored.ttclid) { const gcl = getCookie('_gcl_aw'); if (gcl) { const gp = gcl.split('.'); if (gp.length >= 3) stored.gclid = gp.slice(2).join('.'); } }
         if (!stored.landing_page) stored.landing_page = window.location.href;
         if (!stored.referrer && document.referrer) stored.referrer = document.referrer;
         sessionStorage.setItem('tracking_params', JSON.stringify(stored));
