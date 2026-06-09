@@ -22,12 +22,14 @@
         });
     </script>
     <script>
-        window.addEventListener('load', function() {
+        // DOMContentLoaded (nie load) — gtag gotowy zanim user kliknie/odpali eventy ankiety; skrypt async, więc nie blokuje LCP
+        window.addEventListener('DOMContentLoaded', function() {
             var s = document.createElement('script');
             s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
             document.head.appendChild(s);
             s.onload = function() {
                 gtag('js', new Date());
+                gtag('set', 'user_properties', { persona: 'build' }); // lejek AWE
                 gtag('config', 'G-W8CLDSHVFC', {
                     'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
                 });
@@ -36,14 +38,14 @@
         });
     </script>
     <script>
-    window.addEventListener('load', function() {
+    window.addEventListener('DOMContentLoaded', function() {
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init','1668188210820080'); fbq('track','PageView');
     });
     </script>
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1"/></noscript>
     <script>
-    window.addEventListener('load', function() {
+    window.addEventListener('DOMContentLoaded', function() {
         !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
             ttq.load('D6AP4E3C77U3L7SP8O7G'); ttq.page();
         }(window,document,'ttq');
@@ -794,7 +796,7 @@
     loadThanksWhatsAppNumber();
 
     // ==================== TRACKING ====================
-    const TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id'];
+    const TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','msclkid','ref','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','network','campaignid','adgroupid','creative','placement','device','keyword','matchtype'];
     function getCookie(name) {
         const v = `; ${document.cookie}`; const parts = v.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
@@ -851,6 +853,7 @@
     }
 
     // ==================== NAVIGATION ====================
+    const SURVEY_STEP_NAMES = { 1: 'contact', 2: 'tried', 3: 'income', 4: 'budget', 5: 'hours', 6: 'experience' };
     function goToStep(n) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         const target = document.querySelector(`.step[data-step="${n}"]`);
@@ -859,6 +862,17 @@
         currentStep = n;
         updateProgress();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        // GA4 funnel: widoczność kroku ankiety (1-6) — pozwala zobaczyć gdzie odpada user
+        try {
+            if (typeof gtag === 'function' && n >= 1 && n <= 6) {
+                gtag('event', 'survey_step_view', {
+                    step_number: n,
+                    step_name: SURVEY_STEP_NAMES[n] || ('step_' + n),
+                    persona: 'build',
+                    traffic_source: getTrafficSource()
+                });
+            }
+        } catch (e) {}
     }
     window.goToStep = goToStep;
 
@@ -1002,7 +1016,10 @@
         // Pixel events
         if (typeof fbq === 'function') fbq('track','Lead');
         if (typeof ttq === 'object' && ttq.track) ttq.track('SubmitForm', { email });
-        if (typeof gtag === 'function') gtag('event','generate_lead');
+        if (typeof gtag === 'function') {
+            gtag('event','generate_lead', { step: 'email' });  // mikro (NIE key event) — email podany
+            gtag('event','survey_start', { persona: 'build', traffic_source: getTrafficSource() });  // start ankiety
+        }
         sendTikTokEvent('SubmitForm');
         setGoogleUserData();
 
@@ -1037,6 +1054,7 @@
         saveData('name', name); saveData('phone', phone);
         await updateLead({ name: name || undefined, phone });
         if (typeof fbq === 'function') fbq('track','Contact');
+        if (typeof gtag === 'function') gtag('event','add_contact_info', { persona: 'build' });  // GA4 lejek: dane kontaktowe
         setGoogleUserData();
         setLoading(contactSubmit, false);
         goToStep(2);
@@ -1195,6 +1213,30 @@
         if (typeof fbq === 'function') fbq('track','CompleteRegistration', { value: regValue, currency: 'PLN' }, { eventID: regEventId });
         if (typeof ttq === 'object' && ttq.track) ttq.track('CompleteRegistration', { value: regValue, currency: 'PLN' }, { event_id: regEventId });
         if (typeof gtag === 'function') gtag('event','conversion', { send_to: 'AW-17886093904/conversion', value: regValue, currency: 'PLN' });
+        // GA4: osobny event ukonczenia ankiety (BEZ send_to -> trafia do property GA4, czego konwersja Ads nie robi).
+        // Z wartoscia + jakoscia leada -> raporty konwersji wg source/medium/segmentu w GA4.
+        if (typeof gtag === 'function') {
+            const triedArr = d.tried || [];
+            const budgetNum = parseInt(String(d.budget || '').replace(/\D/g, ''), 10) || 0;
+            const leadValueTier = regValue >= 350 ? 'high' : (regValue >= 200 ? 'mid' : 'low');
+            const budgetBucket = budgetNum >= 5000 ? '5k+' : (budgetNum >= 2000 ? '2-5k' : (budgetNum > 0 ? '<2k' : 'unknown'));
+            const expWon = /(sklep|allegro|dropship|prob)/.test(String(d.experience || '').toLowerCase());
+            gtag('event', 'sign_up', {
+                method: 'survey',
+                value: regValue,
+                currency: 'PLN',
+                persona: 'build',
+                traffic_source: getTrafficSource(),
+                lead_value_tier: leadValueTier,
+                lead_budget_bucket: budgetBucket,
+                current_income: d.income || 'unknown',
+                weekly_hours: d.weekly_hours || 'unknown',
+                direction_primary: triedArr[0] || 'none',
+                tried_count: triedArr.length,
+                exp_won_signal: expWon
+            });
+            gtag('set', 'user_properties', { persona: 'build', lead_value_tier: leadValueTier, lead_budget_bucket: budgetBucket });
+        }
         sendMetaEvent('CompleteRegistration', { value: regValue, currency: 'PLN', event_id: regEventId });
         sendTikTokEvent('CompleteRegistration', { value: regValue, currency: 'PLN', event_id: regEventId });
 

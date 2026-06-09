@@ -32,12 +32,14 @@
     </script>
     <!-- GA4 + Google Ads -->
     <script>
-        window.addEventListener('load', function() {
+        // DOMContentLoaded (nie load) — gtag gotowy zanim user kliknie CTA / odpali eventy; skrypt async, nie blokuje LCP
+        window.addEventListener('DOMContentLoaded', function() {
             var s = document.createElement('script');
             s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
             document.head.appendChild(s);
             s.onload = function() {
                 gtag('js', new Date());
+                gtag('set', 'user_properties', { persona: 'build' }); // landing oferty AWE
                 gtag('config', 'G-W8CLDSHVFC', {
                     'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
                 });
@@ -47,7 +49,7 @@
     </script>
     <!-- Meta Pixel -->
     <script>
-    window.addEventListener('load', function() {
+    window.addEventListener('DOMContentLoaded', function() {
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init','1668188210820080'); fbq('track','PageView');
     });
@@ -56,7 +58,7 @@
 
     <!-- TikTok Pixel -->
     <script>
-    window.addEventListener('load', function() {
+    window.addEventListener('DOMContentLoaded', function() {
         !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
             ttq.load('D6AP4E3C77U3L7SP8O7G'); ttq.page();
         }(window,document,'ttq');
@@ -67,7 +69,7 @@
          Bez tego ruch z reklam ladujacy na /zbuduje gubi gclid/fbclid (zapisuje sie jako "direct"). -->
     <script>
     (function(){
-        var TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id'];
+        var TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','msclkid','ref','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','network','campaignid','adgroupid','creative','placement','device','keyword','matchtype'];
         function getCookie(name){var v='; '+document.cookie;var parts=v.split('; '+name+'=');if(parts.length===2)return parts.pop().split(';').shift();return null;}
         try {
             var u = new URLSearchParams(window.location.search);
@@ -79,6 +81,15 @@
             if(!stored.referrer && document.referrer) stored.referrer = document.referrer;
             sessionStorage.setItem('tracking_params', JSON.stringify(stored));
         } catch(e){}
+        // Forward click-ID/UTM do URL (iframe /zapisy + CTA) — deterministyczne przekazanie, niezaleznie od wspoldzielenia sessionStorage miedzy ramkami
+        window.getTrackingQS = function(){
+            try {
+                var s = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+                var parts = [];
+                TRACKING_PARAMS.forEach(function(k){ if(s[k]) parts.push(encodeURIComponent(k)+'='+encodeURIComponent(s[k])); });
+                return parts.join('&');
+            } catch(e){ return ''; }
+        };
     })();
     </script>
 
@@ -2001,6 +2012,7 @@
 
     // ===== PROGRESS SIDEBAR — active state per scene =====
     if (scenes.length && progressItems.length) {
+        const firedScenes = {};
         const actObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -2011,6 +2023,11 @@
                     // act-7 (data-act="6") = scena formularza: schowaj dock,
                     // żeby nie zasłaniał pola e-mail i przycisku aplikacji.
                     progress?.classList.toggle('is-hidden', act === '6');
+                    // GA4 engagement: pierwsze wejście w scenę (raz na scenę) — scroll-depth one-pagera
+                    if (act != null && !firedScenes[act]) {
+                        firedScenes[act] = true;
+                        try { if (typeof gtag === 'function') gtag('event', 'scene_view', { scene_index: Number(act) + 1, persona: 'build' }); } catch (e) {}
+                    }
                 }
             });
         }, { threshold: 0.5 });
@@ -2067,13 +2084,33 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting && formFrame.src === 'about:blank') {
                     const dataSrc = formFrame.dataset.src;
-                    if (dataSrc) formFrame.src = dataSrc;
+                    if (dataSrc) {
+                        // P5: doklej click-ID/UTM do URL iframe — /zapisy dostaje źródło niezależnie od sessionStorage
+                        const qs = (typeof window.getTrackingQS === 'function') ? window.getTrackingQS() : '';
+                        formFrame.src = dataSrc + (qs ? (dataSrc.indexOf('?') >= 0 ? '&' : '?') + qs : '');
+                        try { if (typeof gtag === 'function') gtag('event', 'view_form', { form: 'zapisy', persona: 'build' }); } catch (e) {}
+                    }
                     formLoader.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.3 });
         formLoader.observe(ctaScene);
     }
+
+    // ===== CTA -> /zapisy: doklej click-ID/UTM do href (P5) + GA4 cta_click (P7) =====
+    (function(){
+        const qs = (typeof window.getTrackingQS === 'function') ? window.getTrackingQS() : '';
+        document.querySelectorAll('a[href*="/zapisy"]').forEach(function(a){
+            if (qs) {
+                const href = a.getAttribute('href');
+                a.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + qs);
+            }
+            a.addEventListener('click', function(){
+                const loc = (a.className && a.className.indexOf('nav__cta') >= 0) ? 'nav' : 'body';
+                try { if (typeof gtag === 'function') gtag('event', 'cta_click', { cta_location: loc, destination: 'zapisy', persona: 'build' }); } catch (e) {}
+            });
+        });
+    })();
 })();
 </script>
 
