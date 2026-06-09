@@ -30,6 +30,11 @@
             s.onload = function() {
                 gtag('js', new Date());
                 gtag('set', 'user_properties', { persona: 'build' }); // lejek AWE
+                // User-ID: sklej lead -> purchase w jeden user journey (returning lead z poprzedniej sesji/urządzenia).
+                // Pokrywa się z gtag('set',{user_id}) w checkout/success.html i z MP w tpay-webhook/automation-trigger.
+                var savedLeadId = null;
+                try { savedLeadId = (JSON.parse(localStorage.getItem('tn_zapisy_v2_data') || '{}') || {}).lead_id || null; } catch (e) {}
+                if (savedLeadId) gtag('set', { user_id: String(savedLeadId) });
                 gtag('config', 'G-W8CLDSHVFC', {
                     'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
                 });
@@ -908,8 +913,11 @@
                 body: JSON.stringify({ email, ...updates })
             });
             const json = await res.json().catch(() => null);
-            if (json && json.lead_id && !loadData().lead_id) {
-                saveData('lead_id', json.lead_id);
+            if (json && json.lead_id) {
+                if (!loadData().lead_id) saveData('lead_id', json.lead_id);
+                // User-ID: ustaw gdy tylko znamy lead_id — kolejne eventy (generate_lead, survey_start,
+                // add_contact_info, form_complete) poniosą user_id, domykając pętlę lead -> purchase w GA4.
+                try { if (typeof gtag === 'function') gtag('set', { user_id: String(json.lead_id) }); } catch (e) {}
             }
         } catch (err) { console.error('updateLead error', err); }
     }
