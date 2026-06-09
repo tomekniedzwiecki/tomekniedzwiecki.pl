@@ -27,6 +27,24 @@
     });
     </script>
 
+    <!-- Capture click-ID / UTM do sessionStorage — przenoszone na /zapisy.
+         Bez tego ruch z reklam ladujacy na /zbuduje gubi gclid/fbclid (zapisuje sie jako "direct"). -->
+    <script>
+    (function(){
+        var TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id'];
+        function getCookie(name){var v='; '+document.cookie;var parts=v.split('; '+name+'=');if(parts.length===2)return parts.pop().split(';').shift();return null;}
+        try {
+            var u = new URLSearchParams(window.location.search);
+            var stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+            TRACKING_PARAMS.forEach(function(p){var val=u.get(p); if(val) stored[p]=val;});
+            var fbp = getCookie('_fbp'); if(fbp) stored.fbp = fbp;
+            if(!stored.landing_page) stored.landing_page = window.location.href;
+            if(!stored.referrer && document.referrer) stored.referrer = document.referrer;
+            sessionStorage.setItem('tracking_params', JSON.stringify(stored));
+        } catch(e){}
+    })();
+    </script>
+
     <!-- Preconnect: Google Fonts (LCP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
