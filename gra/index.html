@@ -45,6 +45,21 @@ canvas{display:block}
 .cert-stage{font-family:'Press Start 2P',monospace;font-size:7px;color:#00d97e;background:#0d1f16;border:1px solid #134d33;padding:5px 5px;line-height:1.5;border-radius:2px}
 .cert-copy{font-size:13.5px;color:#bdbdbd;line-height:1.6;margin:14px 0 18px;text-align:left}
 .cert-copy b{color:#fff}
+.cert-sec{text-align:left;margin:16px 0;border-top:1px solid #1f1f1f;padding-top:14px}
+.cert-sec-title{font-family:'Press Start 2P',monospace;font-size:8px;color:#ffd24a;letter-spacing:.12em;margin-bottom:10px;line-height:1.5}
+.cert-sec ul{list-style:none;padding:0;margin:0}
+.cert-sec li{font-size:12.5px;color:#bdbdbd;line-height:1.55;padding:3px 0 3px 16px;position:relative}
+.cert-sec li::before{content:'▸';position:absolute;left:0;color:#00d97e}
+.cert-sec li b{color:#fff}
+.cert-rules{display:none}
+.cert-rules.open{display:block}
+.cert-rules li{padding-left:0}
+.cert-rules li::before{content:''}
+.cert-rules .rule-t{font-family:'Press Start 2P',monospace;font-size:7px;color:#00d97e;display:block;margin-bottom:2px;line-height:1.5}
+.cert-rules li{margin-bottom:8px;border-left:2px solid #134d33;padding-left:10px}
+.cert-rules-toggle{width:100%;background:#0d1f16;color:#00d97e;font-family:'Press Start 2P',monospace;font-size:8px;padding:11px 8px;border:1px solid #134d33;border-radius:3px;cursor:pointer;line-height:1.5;margin-top:2px}
+.cert-rules-toggle:hover{border-color:#00d97e}
+.cert-cta-sub{font-size:11.5px;color:#8a8a8a;margin-top:9px;line-height:1.5}
 .cert-cta{display:block;width:100%;background:#00d97e;color:#000;font-family:'Press Start 2P',monospace;font-size:12px;padding:18px 12px;border:0;border-radius:3px;cursor:pointer;text-decoration:none;line-height:1.4;animation:cta-pulse 1.6s ease-in-out infinite}
 @keyframes cta-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,217,126,.5)}50%{box-shadow:0 0 0 10px rgba(0,217,126,0)}}
 .cert-ghosts{display:flex;gap:10px;margin-top:12px}
@@ -68,8 +83,26 @@ canvas{display:block}
       <div class="cert-stat"><b id="o-stars">0/21</b><span>gwiazdek</span></div>
     </div>
     <div class="cert-stages" id="o-stages"></div>
-    <div class="cert-copy">To była gra. W realu każdy z tych 7 etapów — <b>produkt, branding, strona, piksel, kampanie, optymalizacja, skalowanie</b> — robię ZA CIEBIE. Ty zostajesz właścicielem. 15 lat w e-commerce, system sprawdzony na dziesiątkach sklepów.</div>
-    <a class="cert-cta" id="o-cta" href="https://tomekniedzwiecki.pl/zapisy?utm_source=gra&utm_medium=cta_final&utm_campaign=ka-ching" target="_blank" rel="noopener">ZBUDUJ TO NAPRAWDĘ →</a>
+
+    <div class="cert-sec">
+      <div class="cert-sec-title">TWOJE DECYZJE — JAK W REALU</div>
+      <ul id="o-decisions"></ul>
+    </div>
+
+    <div class="cert-sec">
+      <div class="cert-sec-title">🔓 7 ZASAD, KTÓRE ZABIERASZ ZE SOBĄ</div>
+      <button class="cert-rules-toggle" id="o-rules-toggle">POKAŻ MOJE 7 ZASAD ▾</button>
+      <ul class="cert-rules" id="o-rules"></ul>
+    </div>
+
+    <div class="cert-sec">
+      <div class="cert-sec-title">CZEGO GRA CI NIE POKAZAŁA</div>
+      <ul id="o-notshown"></ul>
+    </div>
+
+    <div class="cert-copy">W grze: 5 minut. W realu: tygodnie roboty — dostawcy, dokumenty, bramka płatności, kampanie. Robię to od 15 lat i mam na to system: <b>buduję taki sklep ZA Ciebie</b>, od produktu po działające reklamy.</div>
+    <a class="cert-cta" id="o-cta" href="https://tomekniedzwiecki.pl/zapisy?utm_source=gra&utm_medium=cta_final&utm_campaign=ka-ching" target="_blank" rel="noopener">WYPEŁNIJ KWESTIONARIUSZ →</a>
+    <div class="cert-cta-sub">2 minuty: doświadczenie, czas, cel. Zero zobowiązań.</div>
     <div class="cert-ghosts">
       <button class="cert-ghost" id="o-again">ZAGRAJ JESZCZE RAZ</button>
       <button class="cert-ghost" id="o-share">POCHWAL SIĘ WYNIKIEM</button>
@@ -124,10 +157,10 @@ const COPY = {
 };
 
 const PRODUCTS = [
-  {n:'Korektor postawy', e:'🧍', good:1, m:.85, p:.8, k:.3},
-  {n:'Lampka LED', e:'💡', good:1, m:.75, p:.85, k:.35},
-  {n:'Mata do jogi PRO', e:'🧘', good:1, m:.8, p:.75, k:.4},
-  {n:'Organizer kuchenny', e:'🍳', good:1, m:.7, p:.8, k:.3},
+  {n:'Korektor postawy', e:'🧍', good:1, m:.85, p:.8, k:.3, why:'rozwiązuje ból po 8h przy biurku'},
+  {n:'Lampka LED', e:'💡', good:1, m:.75, p:.85, k:.35, why:'lekka, niełamliwa, efektowna na wideo'},
+  {n:'Mata do jogi PRO', e:'🧘', good:1, m:.8, p:.75, k:.4, why:'stały popyt cały rok, mało zwrotów'},
+  {n:'Organizer kuchenny', e:'🍳', good:1, m:.7, p:.8, k:.3, why:'codzienny problem, nie psuje się'},
   {n:'Fidget spinner', e:'🌀', good:0, m:.2, p:.15, k:.95, why:'rynek martwy od lat'},
   {n:'Odważnik gipsowy 20 kg', e:'🏋️', good:0, m:.15, p:.4, k:.6, why:'gips 20 kg = kurier płacze'},
   {n:'Wazon szklany XXL', e:'🏺', good:0, m:.35, p:.3, k:.5, why:'szkło = zwroty'},
@@ -138,6 +171,44 @@ const SECTIONS = ['HERO','OPINIE','OFERTA','GWARANCJA','CTA'];
 const TRAP = 'AUTOPLAY MUZYKA';
 
 const RANKS = [[17,'E-COM BOSS'],[12,'SKLEPIARZ'],[7,'UCIEKINIER Z ETATU'],[0,'PRAKTYKANT']];
+
+/* ─── TREŚCI EDUKACYJNE — 7 zasad + fakty (esencja realnego procesu) ─── */
+const EDU = {
+  rules: [
+    {title:'PRODUKT TO LICZBY',     text:'Marża, popyt, konkurencja, waga paczki. Produkt ma rozwiązywać problem, nie podobać się Tobie.'},
+    {title:'LUDZIE KUPUJĄ MARKI',   text:'Ten sam produkt z AliExpress sprzedasz 3× drożej z marką, której się ufa. Logo, paleta, spójność.'},
+    {title:'KOLEJNOŚĆ SPRZEDAJE',   text:'Hero ma 3 sekundy, opinie budują zaufanie, gwarancja zdejmuje ryzyko. Autoplay z muzyką wygania ludzi.'},
+    {title:'PIKSEL = OCZY ALGORYTMU',text:'Piksel zlicza wejścia, koszyki i zakupy. Z nich Meta uczy się, komu pokazać reklamę. Bez niego zgadujesz.'},
+    {title:'MÓW DO JEDNEJ OSOBY',   text:'Reklama ma mówić do jednej osoby z konkretnym problemem. Kreacja dla wszystkich nie sprzedaje nikomu.'},
+    {title:'TNIJ BEZ SENTYMENTU',   text:'Lajki nie płacą faktur. ROAS poniżej progu rentowności = wyłączasz i dajesz budżet zwycięzcom.'},
+    {title:'SKALA TO SYSTEM',       text:'Wyższy budżet to połowa skali. Druga: pobranie, szybka odpowiedź, opinie ze zdjęciami, wideo z produktem.'},
+  ],
+  budget: {
+    low:'Za 20 zł algorytm nie zbierze konwersji do nauki. Wyniki losowe, wnioski żadne.',
+    optimal:'Ok. 50 zł/dzień daje dane do nauki bez topienia oszczędności. Tak się startuje.',
+    high:'Algorytm w fazie uczenia strzela na oślep. 500 zł/dzień to drogie strzelanie.',
+  },
+  frenzyFacts: {
+    cod:'Część Polaków kupi w nowym sklepie TYLKO za pobraniem',
+    whatsapp:'Klient kupuje tam, gdzie pierwszy dostanie odpowiedź',
+    reviews:'Opinie ze zdjęciami przekonują mocniej niż sam tekst',
+    reels:'Produkt w akcji na wideo sprzedaje lepiej niż zdjęcie',
+  },
+  npcQuips:['Korektor działa, plecy bolą mniej!','Lampka LED zrobiła klimat na biurku!','Mata gruba, kolana już nie bolą!','Organizer ogarnął szufladę w 5 minut!','Zapłaciłem przy odbiorze, zero stresu!','Odpisali w 5 minut, biorę drugą!','Zdjęcia w opiniach mnie przekonały!','Z Reelsa! Wygląda jak na wideo!'],
+  world: {
+    korpo:'Open space, nadgodziny. Nigdy więcej.',
+    self:['Nie wracam na etat. Za żadne premie.','Mój sklep. Moje godziny. Moje błędy.','Szef właśnie czyta moje wypowiedzenie.','Boję się? Trochę. Robię dalej.'],
+    neon:'Mój neon, moja marka. Nie czyjeś KPI.',
+    leverDone:'Odpalone. Teraz decydują liczby, nie szef.',
+  },
+  notShown:[
+    'Negocjacje z dostawcami: ceny, terminy dostaw, próbki produktu',
+    'Regulamin, RODO, polityka zwrotów — dokumenty muszą być szczelne',
+    'Bramka płatności: wniosek, weryfikacja firmy, testy transakcji',
+    'Testy sklepu na telefonie: koszyk, checkout, mail z zamówieniem',
+    'Optymalizacja co tydzień: budżety, kreacje, raporty — miesiącami',
+  ],
+};
 
 /* ─── UTILS ──────────────────────────────────────────────────── */
 const rnd = (a,b)=>a+Math.random()*(b-a);
@@ -278,6 +349,36 @@ function updParts(dt){ for(let i=parts.length-1;i>=0;i--){ const p=parts[i];
   p.vy+=p.grav*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.life-=dt; if(p.life<=0) parts.splice(i,1); } }
 function drawParts(x){ parts.forEach(p=>{ x.globalAlpha=clamp(p.life,0,1); x.fillStyle=p.color; x.fillRect(p.x|0,p.y|0,p.size,p.size); }); x.globalAlpha=1; }
 
+/* dymki świata — każda ruchoma rzecz reaguje na tap */
+const BUBBLES = [];
+function worldBubble(x,y,text,color){
+  if(BUBBLES.length>1) BUBBLES.shift();
+  BUBBLES.push({x,y,text,color:color||PAL.white,life:3});
+  AU.beep();
+}
+function updBubbles(dt){ for(let i=BUBBLES.length-1;i>=0;i--){ BUBBLES[i].life-=dt; if(BUBBLES[i].life<=0) BUBBLES.splice(i,1); } }
+function drawBubbles(){
+  BUBBLES.forEach(b=>{
+    cx.font='6px '+FONT;
+    // łam tekst na linie max ~190px
+    const words=b.text.split(' '), lines=[]; let line='';
+    words.forEach(w2=>{ const t2=line?line+' '+w2:w2;
+      if(cx.measureText(t2).width>186&&line){ lines.push(line); line=w2; } else line=t2; });
+    if(line) lines.push(line);
+    const bw=Math.max(...lines.map(l=>cx.measureText(l).width))+18;
+    const bh=lines.length*10+12;
+    const bx=clamp(b.x-bw/2,4,W-bw-4), by=clamp(b.y-bh-12,20,H-bh-8);
+    cx.globalAlpha=clamp(b.life/.5,0,1);
+    cx.fillStyle='#0c0c0c'; cx.fillRect(bx,by,bw,bh);
+    cx.strokeStyle=b.color===PAL.white?PAL.green:b.color; cx.lineWidth=1; cx.strokeRect(bx+.5,by+.5,bw-1,bh-1);
+    cx.beginPath(); cx.moveTo(clamp(b.x,bx+8,bx+bw-8)-4,by+bh); cx.lineTo(clamp(b.x,bx+8,bx+bw-8)+4,by+bh); cx.lineTo(clamp(b.x,bx+8,bx+bw-8),by+bh+6); cx.closePath();
+    cx.fillStyle='#0c0c0c'; cx.fill();
+    cx.fillStyle=b.color; cx.textAlign='left';
+    lines.forEach((l,i)=>cx.fillText(l,bx+9,by+13+i*10));
+    cx.globalAlpha=1;
+  });
+}
+
 const floaters = [];
 function floatText(x,y,text,color,big){
   if(floaters.length>28) floaters.shift();
@@ -319,7 +420,8 @@ const G = { // global game state
   hitstop:0, shake:0, scanX:-1, neonT:0, frenzyMult:1, widgets:0,
   hoodie:false, refundFlags:[], time:0, ambient:0, ambientInt:2,
   npcs:[], introDone:false,
-  savings:0, lootT:3, coffeeT:20, lootTaught:false
+  savings:0, lootT:3, coffeeT:20, lootTaught:false,
+  pickedNames:[], budgetChoice:null, savedReturns:0
 };
 const ST = []; // stanowiska {x,y,label,done,unlocked}
 let wallH = 90;
@@ -852,7 +954,12 @@ function hubPointer(p){
   // tap stanowiska
   for(let i=0;i<7;i++){
     const s=ST[i];
-    if(dist(p.x,p.y,s.x,s.y)<32&&s.unlocked&&!s.done){
+    if(dist(p.x,p.y,s.x,s.y)<32){
+      if(s.done){ // ukończone stanowisko = powtórka zasady
+        worldBubble(s.x,s.y-26,'ZASADA #'+(i+1)+' — '+EDU.rules[i].title+': '+EDU.rules[i].text,PAL.green);
+        return;
+      }
+      if(!s.unlocked) continue;
       if(i===4&&lever.active&&!lever.on){ // terminal po targetowaniu = przekieruj do dźwigni
         if(dist(player.x,player.y,lever.x,lever.y)<42) pullLever();
         else { player.tx=lever.x; player.ty=lever.y+22; player.pending=-1; player.pendingLever=true;
@@ -864,8 +971,58 @@ function hubPointer(p){
       return;
     }
   }
+  if(worldTap(p)) return;
   // tap w podłogę = idź
   if(p.y>wallH){ player.tx=p.x; player.ty=p.y; player.pending=-1; player.pendingLever=false; }
+}
+/* każda ruchoma/żywa rzecz na planszy reaguje na dotyk */
+function worldTap(p){
+  // dźwignia po starcie kampanii
+  if(lever.on&&dist(p.x,p.y,lever.x,lever.y)<26){
+    worldBubble(lever.x,lever.y-18,EDU.world.leverDone,PAL.gold); return true;
+  }
+  // NPC-klient: opinia + iskierki, czasem upuszcza monetę
+  for(const n of G.npcs){
+    if(Math.abs(p.x-n.x)<14&&Math.abs(p.y-n.y)<18){
+      worldBubble(n.x,n.y-16,pick(EDU.npcQuips),PAL.white);
+      spawnParts(n.x,n.y-8,6,PAL.green,{spread:40,grav:80});
+      if(Math.random()<.3) LOOT.push({type:'coin',x:clamp(n.x+rnd(-14,14),24,W-24),y:clamp(n.y+rnd(8,18),wallH+24,H-24),life:8});
+      return true;
+    }
+  }
+  // dashboard: statystyki sklepu
+  if(p.x>dash.x&&p.x<dash.x+dash.w&&p.y>dash.y&&p.y<dash.y+dash.h){
+    const aov=G.orders>0?Math.round(G.revenue/G.orders):0;
+    worldBubble(dash.x+dash.w/2,dash.y+dash.h+44,
+      G.orders>0?('ZAMÓWIENIA: '+G.orders+' · ŚREDNI KOSZYK: '+aov+' zł · MARŻA ×'+G.marginMult.toFixed(1))
+      :'SKLEP JESZCZE NIE SPRZEDAJE. ZBUDUJ STRONĘ I ODPAL REKLAMY.',PAL.green);
+    return true;
+  }
+  // neon marki: flicker + duma
+  if(G.brand){
+    const nx=portrait?W/2:W-150, ny=portrait?wallH-22:70;
+    if(Math.abs(p.x-nx)<66&&Math.abs(p.y-ny)<16){
+      G.neonT=0; AU.osc('sawtooth',55,0,.4,.06);
+      worldBubble(nx,ny+34,EDU.world.neon,PAL.green); return true;
+    }
+  }
+  // okno KORPO
+  if(p.x>korpo.x&&p.x<korpo.x+52&&p.y>korpo.y&&p.y<korpo.y+62){
+    worldBubble(korpo.x+30,korpo.y+76,EDU.world.korpo,PAL.gray); return true;
+  }
+  // stos paczek przy bramie
+  if(G.packStack>0&&p.x>gate.x&&p.x<gate.x+gate.w&&p.y>H-40){
+    const prod=G.pickedNames.length?pick(G.pickedNames):'twój produkt';
+    worldBubble(gate.x+gate.w/2,H-44,'W ŚRODKU: '+prod.toUpperCase()+' · LECI DO '+pick(CITIES).toUpperCase(),PAL.gold);
+    return true;
+  }
+  // własna postać
+  if(dist(p.x,p.y,player.x,player.y)<20){
+    worldBubble(player.x,player.y-18,pick(EDU.world.self),PAL.white);
+    spawnParts(player.x,player.y-10,5,PAL.green,{spread:30,grav:60});
+    return true;
+  }
+  return false;
 }
 function hubKey(code){
   if(code==='KeyE'||code==='Space'){
@@ -950,7 +1107,8 @@ function mgProduct(){
       if(take){
         this.picked++;
         if(c.good){ this.good++; AU.coin(); this.flash=.25; this.flashGood=true;
-          floatText(W/2,H/2-60,'PEREŁKA! +20% marży',PAL.green); }
+          G.pickedNames.push(c.n);
+          floatText(W/2,H/2-60,(c.why||'PEREŁKA! +20% marży').toUpperCase(),PAL.green); }
         else { this.bad++; AU.buzz(); this.flash=.25; this.flashGood=false;
           floatText(W/2,H/2-60,c.why?c.why.toUpperCase():'BUBEL!',PAL.red); }
       } else {
@@ -1146,11 +1304,12 @@ function mgPixel(){
   };
 }
 
-/* MG5 — KAMPANIA faza A: targetowanie tłumu */
+/* MG5 — KAMPANIA: targetowanie tłumu → wybór budżetu → dźwignia */
 function mgTargeting(){
   return {
-    t:20, caught:0, miss:0, dudes:[], spawnT:0,
+    t:20, caught:0, miss:0, dudes:[], spawnT:0, phase:'target', budgetRects:[],
     update(dt){
+      if(this.phase==='budget') return;
       this.t-=dt; this.spawnT-=dt;
       if(this.spawnT<=0){
         this.spawnT=.42;
@@ -1165,6 +1324,7 @@ function mgTargeting(){
       if(this.t<=0||this.caught>=10) this.finish();
     },
     draw(){
+      if(this.phase==='budget'){ this.drawBudget(); return; }
       const r=drawPanel('ETAP 5 · ZŁAP LUDZI ('+this.caught+'/10)',this.t);
       cx.save(); cx.beginPath(); cx.rect(r.x+4,r.y+26,r.w-8,r.h-54); cx.clip();
       this.dudes.forEach(d=>{
@@ -1179,6 +1339,12 @@ function mgTargeting(){
       cx.textAlign='left';
     },
     onPointer(p){
+      if(this.phase==='budget'){
+        for(const rc of this.budgetRects){
+          if(inBtn(p,rc)){ this.pickBudget(rc.key); return; }
+        }
+        return;
+      }
       for(let i=this.dudes.length-1;i>=0;i--){
         const d=this.dudes[i];
         if(Math.abs(p.x-d.x)<16&&Math.abs(p.y-d.y)<20){
@@ -1195,11 +1361,52 @@ function mgTargeting(){
       }
     },
     onKey(){},
-    finish(){
-      if(this.finished)return; this.finished=true;
-      const stars=this.caught>=10&&this.miss<=1?3:this.miss<=3?2:1;
+    drawBudget(){
+      const r=drawPanel('ETAP 5 · USTAW BUDŻET DZIENNY');
+      cx.font='6px '+FONT; cx.textAlign='center'; cx.fillStyle=PAL.gray;
+      cx.fillText('AUDIENCE GOTOWE. ILE WYDAJESZ DZIENNIE NA START?',r.x+r.w/2,r.y+36);
+      this.budgetRects=[];
+      const opts=[
+        {key:'low', big:'20 zł', sub:'OSTROŻNIE'},
+        {key:'optimal', big:'50 zł', sub:'ROZSĄDNIE'},
+        {key:'high', big:'500 zł', sub:'OD RAZU MOCNO'},
+      ];
+      const gw=(r.w-56)/3;
+      opts.forEach((o,i)=>{
+        const gx2=r.x+16+i*(gw+12), gy2=r.y+50, gh=r.h-110;
+        cx.fillStyle='#141414'; cx.fillRect(gx2,gy2,gw,gh);
+        cx.strokeStyle='#2d2d2d'; cx.lineWidth=1; cx.strokeRect(gx2+.5,gy2+.5,gw-1,gh-1);
+        cx.font='13px '+FONT; cx.fillStyle=PAL.white;
+        cx.fillText(o.big,gx2+gw/2,gy2+gh/2-8);
+        cx.font='6px '+FONT; cx.fillStyle=PAL.gray;
+        cx.fillText('/ DZIEŃ',gx2+gw/2,gy2+gh/2+8);
+        cx.fillText(o.sub,gx2+gw/2,gy2+gh/2+24);
+        this.budgetRects.push({x:gx2,y:gy2,w:gw,h:gh,key:o.key});
+      });
+      cx.font='6px '+FONT; cx.fillStyle=PAL.gray;
+      cx.fillText('W REALU TO JEDNA Z NAJWAŻNIEJSZYCH DECYZJI. WYBIERZ.',r.x+r.w/2,r.y+r.h-16);
+      cx.textAlign='left';
+    },
+    pickBudget(key){
+      G.budgetChoice=key;
+      if(key==='optimal'){ AU.perfect(); G.hitstop=60;
+        floatText(W/2,H/2-70,'DOBRA DECYZJA',PAL.green,true); }
+      else if(key==='high'){ AU.buzz(); G.shake=4;
+        G.revenue=Math.max(0,G.revenue-150);
+        floatText(W/2,H/2-70,'PRZEPALONE −150 zł',PAL.red,true); }
+      else { AU.beep();
+        floatText(W/2,H/2-70,'ZA WOLNO ZBIERZESZ DANE',PAL.gold,true); }
+      const lesson=EDU.budget[key];
+      let stars=this.caught>=10&&this.miss<=1?3:this.miss<=3?2:1;
+      if(key!=='optimal') stars=Math.min(stars,2); // zła decyzja budżetowa kosztuje gwiazdkę
+      this.finished=true;
       this.onDone=()=>{ lever.active=true; addFeed('PODEJDŹ DO DŹWIGNI PRZY TERMINALU!',PAL.gold); };
-      closeMinigame(stars,'AUDIENCE GOTOWE — TERAZ DŹWIGNIA!',this.onDone,true);
+      closeMinigame(stars,lesson.length>42?'BUDŻET USTAWIONY':lesson,this.onDone,true);
+      RESULT.bridge=lesson; // lekcja budżetowa zamiast mostka
+    },
+    finish(){
+      if(this.finished)return;
+      this.phase='budget'; AU.arp(); // po targetowaniu: decyzja budżetowa
     }
   };
 }
@@ -1210,7 +1417,7 @@ function pullLever(){
   spawnParts(lever.x,lever.y,80,PAL.green,{spread:160,vyMin:-260,vyMax:-60});
   floatText(W/2,H/2-40,'KAMPANIA WYSTARTOWAŁA!',PAL.green,true);
   G.stage=5; ST[4].done=true; ST[5].unlocked=true; setOrderRate();
-  G.roas=1.6;
+  G.roas = G.budgetChoice==='optimal'?1.8 : G.budgetChoice==='high'?1.2 : 1.4; // budżet ma konsekwencje
   for(let i=0;i<5;i++) setTimeout(()=>spawnOrder(),300+i*220);
   // oszczędności z monet → dodatkowa salwa klientów (payoff biegania z minut 0-2)
   const extra=Math.floor(G.savings/50);
@@ -1328,6 +1535,8 @@ const FRENZY = {
         spawnParts(p.x,p.y,30,PAL.gold,{spread:120});
         floatText(p.x,p.y-20,p.label+'!',PAL.gold);
         floatText(W/2,H*.32,'KASA ×'+G.frenzyMult.toFixed(2),PAL.gold,true); // mnożnik = gwiazda ekranu
+        const factKey=['cod','whatsapp','reviews','reels'][p.idx];
+        if(EDU.frenzyFacts[factKey]) worldBubble(W/2,H*.62,EDU.frenzyFacts[factKey].toUpperCase(),PAL.gold);
         setOrderRate();
         continue;
       }
@@ -1497,7 +1706,7 @@ function evResolve(){
     spawnParts(e.x,e.y,25,PAL.gold,{spread:120});
     floatText(e.x,e.y-20,'+'+val+' zł VIP!',PAL.gold,true);
   } else if(e.type==='return'){
-    G.packStack++; G.hitstop=40; AU.perfect();
+    G.packStack++; G.savedReturns++; G.hitstop=40; AU.perfect();
     spawnParts(e.x,e.y,12,PAL.green,{spread:60});
     floatText(e.x,e.y-18,'+89 zł URATOWANE!',PAL.green,true);
   }
@@ -1618,6 +1827,7 @@ function closeMinigame(stars,reward,onDone,skipBridgeNow){
   G.stars[i]=stars;
   RESULT.stars=stars; RESULT.reward=reward; RESULT.t=0;
   RESULT.bridge = skipBridgeNow? '' : COPY.bridges[i];
+  RESULT.ruleIdx=i; // odblokowana zasada e-commerce tego etapu
   RESULT.onDone=onDone||null;
   // awans etapu — wyjątkiem kampania (etap zamyka dopiero dźwignia)
   if(i!==4){ G.stage=i+1; ST[i].done=true; if(ST[i+1]) ST[i+1].unlocked=true; setOrderRate(); track('stage_complete',{stage:i+1}); }
@@ -1657,8 +1867,8 @@ function wrapText(text,x,y,maxW,lh,color,font){
 
 function drawResult(){
   drawWorld();
-  cx.fillStyle='rgba(0,0,0,.75)'; cx.fillRect(0,0,W,H);
-  const pw=Math.min(W-30,360), ph=150, px2=(W-pw)/2, py2=(H-ph)/2;
+  cx.fillStyle='rgba(0,0,0,.78)'; cx.fillRect(0,0,W,H);
+  const pw=Math.min(W-30,380), ph=216, px2=(W-pw)/2, py2=(H-ph)/2;
   cx.fillStyle='#0c0c0c'; cx.fillRect(px2,py2,pw,ph);
   cx.strokeStyle=PAL.green; cx.strokeRect(px2+1,py2+1,pw-2,ph-2);
   cx.textAlign='center';
@@ -1667,13 +1877,23 @@ function drawResult(){
     cx.font='22px sans-serif';
     cx.fillStyle = i<RESULT.stars&&show?PAL.gold:'#262626';
     const pop = show&&i<RESULT.stars? 1+Math.max(0,.4-(RESULT.t-(.25+i*.3)))*1.5 : 1;
-    cx.save(); cx.translate(px2+pw/2-34+i*34,py2+40); cx.scale(pop,pop);
+    cx.save(); cx.translate(px2+pw/2-34+i*34,py2+36); cx.scale(pop,pop);
     cx.fillText('★',0,8); cx.restore();
   }
   cx.font='9px '+FONT; cx.fillStyle=PAL.green;
-  cx.fillText(RESULT.reward,px2+pw/2,py2+76);
+  cx.fillText(RESULT.reward,px2+pw/2,py2+70);
+  // odblokowana zasada — realna lekcja etapu
+  if(RESULT.t>.9&&RESULT.ruleIdx!==undefined&&EDU.rules[RESULT.ruleIdx]){
+    const r=EDU.rules[RESULT.ruleIdx];
+    cx.strokeStyle=PAL.gold; cx.lineWidth=1;
+    cx.strokeRect(px2+14.5,py2+84.5,pw-29,64);
+    cx.font='7px '+FONT; cx.fillStyle=PAL.gold;
+    cx.fillText('🔓 ZASADA #'+(RESULT.ruleIdx+1)+': '+r.title,px2+pw/2,py2+100);
+    wrapText(r.text,px2+24,py2+114,pw-48,11,PAL.white,'6px '+FONT);
+    cx.textAlign='center';
+  }
   if(RESULT.bridge){
-    wrapText('TOMEK: '+RESULT.bridge,px2+18,py2+96,pw-36,11,PAL.gray,'6px '+FONT);
+    wrapText('TOMEK: '+RESULT.bridge,px2+18,py2+164,pw-36,11,PAL.gray,'6px '+FONT);
     cx.textAlign='center';
   }
   if(RESULT.t>.7){
@@ -1697,12 +1917,15 @@ function drawFinale(){
   if(FIN.t>1){
     cx.font='12px '+FONT; cx.textAlign='center';
     cx.fillStyle=PAL.green;
-    cx.fillText('ZBUDOWAŁEŚ TO.',W/2,H/2-10);
+    cx.fillText('ZBUDOWAŁEŚ TO.',W/2,H/2-22);
     cx.font='7px '+FONT; cx.fillStyle=PAL.white;
-    cx.fillText('W 5 MINUT. WYOBRAŹ SOBIE 5 MIESIĘCY.',W/2,H/2+12);
+    cx.fillText('W 5 MINUT. WYOBRAŹ SOBIE 5 MIESIĘCY.',W/2,H/2);
+    cx.font='6px '+FONT; cx.fillStyle=PAL.gold;
+    cx.fillText('🔓 ZASADA #7 — '+EDU.rules[6].title,W/2,H/2+26);
+    wrapText(EDU.rules[6].text,W/2-150,H/2+40,300,11,PAL.gray,'6px '+FONT);
     cx.textAlign='left';
   }
-  if(FIN.t>3) showOutro();
+  if(FIN.t>4) showOutro();
 }
 
 /* ─── HUD ────────────────────────────────────────────────────── */
@@ -1794,9 +2017,29 @@ function showOutro(){
     d.textContent='✓ '+s+' '+'★'.repeat(G.stars[i]);
     stEl.appendChild(d);
   });
+  // TWOJE DECYZJE — personalizowane podsumowanie ruchów gracza
+  const dec=[];
+  if(G.pickedNames.length) dec.push('Produkty: <b>'+G.pickedNames.join(', ')+'</b>'+(G.badPicked?' (+ '+G.badPicked+' bubel — kosztował zwroty)':' — czysty research'));
+  dec.push('Marka: <b>'+(G.glyph?G.glyph+' ':'')+(G.brand||'—')+'</b> z własnym neonem');
+  const bMap={low:'20 zł/dzień — za mało danych dla algorytmu',optimal:'50 zł/dzień — tak się startuje',high:'500 zł/dzień — przepalanie w fazie uczenia'};
+  if(G.budgetChoice) dec.push('Budżet startowy: <b>'+bMap[G.budgetChoice]+'</b>');
+  if(G.savedReturns>0) dec.push('Uratowane zwroty: <b>'+G.savedReturns+'</b> — refleks się opłaca');
+  dec.push('Dźwignie skali: <b>'+G.widgets+'/4</b> (pobranie, WhatsApp, opinie, reels)');
+  document.getElementById('o-decisions').innerHTML=dec.map(d=>'<li>'+d+'</li>').join('');
+  // 7 zasad
+  document.getElementById('o-rules').innerHTML=EDU.rules.map((r,i)=>
+    '<li><span class="rule-t">#'+(i+1)+' '+r.title+'</span>'+r.text+'</li>').join('');
+  // czego gra nie pokazała
+  document.getElementById('o-notshown').innerHTML=EDU.notShown.map(t=>'<li>'+t+'</li>').join('');
   document.getElementById('outro').classList.add('show');
   track('game_complete',{revenue:Math.round(G.revenue),orders:G.orders,stars:sum,rank});
 }
+document.getElementById('o-rules-toggle').addEventListener('click',()=>{
+  const ul=document.getElementById('o-rules'), b=document.getElementById('o-rules-toggle');
+  const open=ul.classList.toggle('open');
+  b.textContent=open?'UKRYJ ZASADY ▴':'POKAŻ MOJE 7 ZASAD ▾';
+  if(open) track('rules_open');
+});
 document.getElementById('o-again').addEventListener('click',()=>{ track('play_again'); location.reload(); });
 document.getElementById('o-cta').addEventListener('click',()=>{ AU.kaching(0); track('cta_click'); });
 document.getElementById('o-share').addEventListener('click',async()=>{
@@ -1861,14 +2104,14 @@ function frame(now){
   if(G.state==='INTRO') introT+=dt;
   if(G.hitstop>0){ G.hitstop-=dt*1000; draw(); return; }
   switch(G.state){
-    case 'HUB': updPlayer(dt); updEconomy(dt); updEvents(dt); break;
+    case 'HUB': updPlayer(dt); updEconomy(dt); updEvents(dt); updBubbles(dt); break;
     case 'MINIGAME': if(MG) MG.update(dt); updEconomy(dt); break;
     case 'CARD': CARD.t+=dt; updEconomy(dt); break;
     case 'RESULT': RESULT.t+=dt; updEconomy(dt);
-      if(RESULT.t>5){ if(RESULT.onDone){RESULT.onDone();RESULT.onDone=null;} G.state='HUB'; }
+      if(RESULT.t>9){ if(RESULT.onDone){RESULT.onDone();RESULT.onDone=null;} G.state='HUB'; } // czas na przeczytanie zasady
       break;
     case 'FBRIEF': updFBrief(dt); updEconomy(dt); break;
-    case 'FRENZY': updPlayer(dt); FRENZY.update(dt); updEconomy(dt); break;
+    case 'FRENZY': updPlayer(dt); FRENZY.update(dt); updEconomy(dt); updBubbles(dt); break;
     case 'FINALE': FIN.t+=dt; if(FIN.t>1) G.orderInterval=2.5; updEconomy(dt); break; // cisza przed CTA
   }
   if(G.scanX>=0){ G.scanX+=W*dt/.8; if(G.scanX>W+40) G.scanX=-1; }
@@ -1886,12 +2129,12 @@ function draw(){
   switch(G.state){
     case 'BOOT': drawBoot(); break;
     case 'INTRO': drawIntro(); break;
-    case 'HUB': drawWorld(); drawEvents(); drawHUD(); break;
+    case 'HUB': drawWorld(); drawEvents(); drawBubbles(); drawHUD(); break;
     case 'CARD': drawCard(); drawHUD(); break;
     case 'MINIGAME': drawWorld(); if(MG) MG.draw(); drawHUD(); break;
     case 'RESULT': drawResult(); drawHUD(); break;
     case 'FBRIEF': drawFBrief(); drawHUD(); break;
-    case 'FRENZY': drawWorld(); FRENZY.draw(); drawHUD(); break;
+    case 'FRENZY': drawWorld(); FRENZY.draw(); drawBubbles(); drawHUD(); break;
     case 'FINALE': drawFinale(); drawHUD(); break;
     case 'OUTRO': drawWorld(); break;
   }
