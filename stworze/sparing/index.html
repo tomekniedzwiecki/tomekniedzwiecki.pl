@@ -1604,8 +1604,7 @@
        ============================================================ */
     var SPAR_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-chat';
     var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
-    var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
-    var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // oferta "Pierwsza Makieta — Stworzę" (500 zł)
+    var PANEL_URL = 'https://crm.tomekniedzwiecki.pl/stworze-projekt.html'; // panel projektu po rozmowie
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
 
     var LS_SESSION = 'spar_session';
@@ -2709,10 +2708,8 @@
     /* ============================================================
        WERDYKT — render
        ============================================================ */
-    function checkoutURL() {
-        var u = CHECKOUT_BASE + '?offer=' + encodeURIComponent(OFFER_ID);
-        if (state.leadId) u += '&lead=' + encodeURIComponent(state.leadId);
-        return u;
+    function panelURL() {
+        return PANEL_URL + '?id=' + encodeURIComponent(state.sessionId || '');
     }
 
     function kartaHTML(k) {
@@ -2744,18 +2741,18 @@
             '</div></div>';
     }
 
-    function payboxHTML() {
+    function panelBoxHTML() {
         return '<div class="paybox">' +
-            '<div class="paybox__eyebrow">Następny krok</div>' +
-            '<h3 class="paybox__title">Klikalna makieta — <em>500 zł zadatku</em></h3>' +
+            '<div class="paybox__eyebrow">Projekt gotowy</div>' +
+            '<h3 class="paybox__title">Twój panel projektu <em>czeka</em></h3>' +
             '<ul class="paybox__list">' +
-            '<li><strong>Dokładna, klikalna makieta</strong> Twojego narzędzia — z uwzględnieniem wszystkich uwag i wytycznych z tej rozmowy. W 7 dni roboczych.</li>' +
-            '<li><strong>Wideo-walkthrough</strong> — przechodzę przez makietę ekran po ekranie i tłumaczę decyzje.</li>' +
-            '<li><strong>Wycena budowy</strong> działającej wersji. Konkretna kwota, nie widełki z sufitu.</li>' +
+            '<li><strong>Karta projektu</strong> — wszystko, co ustaliliśmy, w jednym miejscu.</li>' +
+            '<li><strong>Podgląd narzędzia</strong> — do oglądania i pokazywania innym.</li>' +
+            '<li><strong>Twoje uwagi i propozycje</strong> — poklikaj, dopisz pomysły; wszystko trafia do briefu makiety.</li>' +
+            '<li><strong>Zamówienie klikalnej makiety</strong> — kiedy będziesz gotowy, jednym przyciskiem.</li>' +
             '</ul>' +
-            '<p class="paybox__credit"><strong>Zadatek odliczam w 100% od ceny budowy.</strong> Jeśli wchodzisz dalej: budowa od 14 000 zł brutto + 20% udziałów — zarabiam wtedy, gdy narzędzie zarabia.</p>' +
-            '<a class="paybox__btn" href="' + checkoutURL() + '" target="_blank" rel="noopener">Wpłacam zadatek → 500 zł</a>' +
-            '<p class="paybox__note">Płatność online: BLIK, karta lub przelew. Otworzy się w nowej karcie — ta rozmowa zostaje.</p>' +
+            '<a class="paybox__btn" href="' + panelURL() + '">Wchodzę do panelu <span class="btn__arrow">→</span></a>' +
+            '<p class="paybox__note">Link działa na tym urządzeniu — zapisz go sobie, jeśli chcesz wrócić później.</p>' +
             '</div>';
     }
 
@@ -2766,13 +2763,13 @@
         if (color === 'zielony') {
             wrap.innerHTML =
                 '<div class="vbanner vbanner--green">' +
-                '<div class="vbanner__title">Werdykt: <em>zielony.</em></div>' +
-                '<div class="vbanner__sub">Problem się broni: jest ból, jest płacący i jest droga dotarcia. Karta Problemu poniżej — <strong>na jej podstawie powstanie makieta</strong>.</div>' +
+                '<div class="vbanner__title">Projekt <em>zdefiniowany.</em></div>' +
+                '<div class="vbanner__sub">Wszystko, co ustaliliśmy, jest w Karcie poniżej — <strong>na jej podstawie powstanie makieta</strong>. Dalej pracujemy w Twoim panelu projektu.</div>' +
                 '</div>' +
                 kartaHTML(karta) +
-                payboxHTML();
+                panelBoxHTML();
             el('chat-msgs').appendChild(wrap);
-            lockComposer('Werdykt zielony — rozmowa zakończona. Podsumowanie dostaniesz na ' + (state.email || 'maila') + '.');
+            lockComposer('Rozmowa zakończona — Twój projekt czeka w panelu.');
         } else if (color === 'zolty') {
             wrap.innerHTML =
                 '<div class="vbanner vbanner--yellow">' +
