@@ -637,6 +637,63 @@
         100% { opacity: 1; transform: none; box-shadow: 0 0 44px -14px rgba(77, 159, 255, 0.5); }
     }
 
+    /* Multi-select — chipy-przełączniki + zatwierdzenie */
+    .qr__hint {
+        flex-basis: 100%;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+        margin: 0 2px 2px;
+    }
+    .qr button.qr-tog { display: inline-flex; align-items: center; gap: 9px; }
+    .qr-check {
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border-strong);
+        display: inline-grid;
+        place-items: center;
+        flex-shrink: 0;
+        transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+    }
+    .qr-check svg {
+        width: 10px;
+        height: 10px;
+        color: var(--accent-ink);
+        opacity: 0;
+        transform: scale(0.4);
+        transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .qr button.qr-tog.is-sel {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        box-shadow: 0 0 20px -8px rgba(77, 159, 255, 0.5);
+    }
+    .qr button.qr-tog.is-sel .qr-check { background: var(--accent); border-color: var(--accent); }
+    .qr button.qr-tog.is-sel .qr-check svg { opacity: 1; transform: scale(1); }
+    .qr-go {
+        flex-basis: 100%;
+        margin-top: 6px;
+        min-height: 48px;
+        border-radius: 999px;
+        font-size: 14.5px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: var(--accent-ink);
+        background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 50%, var(--accent-2) 100%);
+        box-shadow: var(--glow-accent);
+        transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), opacity 0.2s;
+    }
+    .qr-go:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 40px -10px rgba(77, 159, 255, 0.55); }
+    .qr-go:disabled {
+        background: var(--glass);
+        color: var(--text-faint);
+        border: 1px dashed var(--border-strong);
+        box-shadow: none;
+        cursor: default;
+    }
+
     /* Afordancja „napisz po swojemu" — ghost chip z piórem */
     .qr button.qr-own {
         display: inline-flex;
@@ -1757,8 +1814,8 @@
             // Przywróć dymki odpowiedzi z ostatniej tury AI (bramka je schowała)
             var lastMsg = messages[messages.length - 1];
             if (lastMsg && lastMsg.role === 'assistant' && !state.verdict) {
-                var gateOpcje = parseOpcje(lastMsg.content);
-                if (gateOpcje) renderSuggestions(gateOpcje);
+                var gateSugg = suggestionsFrom(lastMsg.content);
+                if (gateSugg) renderSuggestions(gateSugg.opts, gateSugg.multi);
             }
             if (window.matchMedia('(hover: hover)').matches) el('chat-input').focus();
         });
@@ -1787,6 +1844,7 @@
         var t = raw
             .replace(/<werdykt>[\s\S]*?<\/werdykt>/g, '')
             .replace(/<projekt>[\s\S]*?<\/projekt>/g, '')
+            .replace(/<opcje_multi>[\s\S]*?<\/opcje_multi>/g, '')
             .replace(/<opcje>[\s\S]*?<\/opcje>/g, '')
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
             .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
@@ -1953,19 +2011,30 @@
     /* ============================================================
        DYMKI ODPOWIEDZI — marker <opcje> z każdej tury AI
        ============================================================ */
-    function parseOpcje(raw) {
+    function parseChipArray(raw, tag, max) {
         if (!raw) return null;
-        var ms = raw.match(/<opcje>([\s\S]*?)<\/opcje>/g);
+        var re = new RegExp('<' + tag + '>([\\s\\S]*?)<\\/' + tag + '>', 'g');
+        var ms = raw.match(re);
         if (!ms || !ms.length) return null;
-        var inner = ms[ms.length - 1].replace(/^<opcje>/, '').replace(/<\/opcje>$/, '');
+        var inner = ms[ms.length - 1].replace(new RegExp('^<' + tag + '>'), '').replace(new RegExp('<\\/' + tag + '>$'), '');
         try {
             var arr = JSON.parse(inner);
             if (!Array.isArray(arr)) return null;
             arr = arr.filter(function (x) { return typeof x === 'string' && x.trim(); })
                 .map(function (x) { return x.trim().slice(0, 120); })
-                .slice(0, 4);
+                .slice(0, max);
             return arr.length ? arr : null;
         } catch (e) { return null; }
+    }
+    function parseOpcje(raw) { return parseChipArray(raw, 'opcje', 4); }
+    function parseOpcjeMulti(raw) { return parseChipArray(raw, 'opcje_multi', 6); }
+
+    // Jedna bramka dla wszystkich miejsc renderowania: multi ma pierwszeństwo
+    function suggestionsFrom(content) {
+        var m = parseOpcjeMulti(content);
+        if (m) return { opts: m, multi: true };
+        var s = parseOpcje(content);
+        return s ? { opts: s, multi: false } : null;
     }
 
     var chipStreak = 0;      // kliknięcia w dymki z rzędu (bez własnego tekstu)
@@ -1984,27 +2053,71 @@
         setTimeout(updateHero, 7000); // updateHero przywraca standardowy placeholder
     }
 
-    function renderSuggestions(opts) {
+    function renderSuggestions(opts, multi) {
         removeChips();
         var div = document.createElement('div');
-        div.className = 'qr';
+        div.className = 'qr' + (multi ? ' qr--multi' : '');
         div.id = 'qr-chips';
+        var selected = [];
+        var goBtn = null;
+
+        if (multi) {
+            var hint = document.createElement('div');
+            hint.className = 'qr__hint';
+            hint.textContent = 'Zaznacz wszystko, co pasuje:';
+            div.appendChild(hint);
+
+            goBtn = document.createElement('button');
+            goBtn.type = 'button';
+            goBtn.className = 'qr-go';
+            goBtn.disabled = true;
+            goBtn.textContent = 'Zaznacz, co pasuje';
+            goBtn.addEventListener('click', function () {
+                if (streaming || el('inline-gate') || !selected.length) return;
+                chipStreak++;
+                maybeNudgeComposer();
+                var msg = selected.join(', ');
+                removeChips();
+                sendOpening(msg);
+            });
+        }
+
         opts.forEach(function (label) {
-            // Prefiks "~" = wyróżniona opcja AI („zaproponuj za mnie")
-            var isAi = label.charAt(0) === '~';
-            var text = isAi ? label.slice(1).trim() : label;
+            // Prefiks "~" = wyróżniona opcja AI (tylko w trybie pojedynczym)
+            var isAi = !multi && label.charAt(0) === '~';
+            var text = (label.charAt(0) === '~' ? label.slice(1) : label).trim();
             if (!text) return;
             var b = document.createElement('button');
             b.type = 'button';
-            if (isAi) b.className = 'qr-ai';
-            b.textContent = text;
-            b.addEventListener('click', function () {
-                if (streaming || el('inline-gate')) return;
-                chipStreak++;
-                maybeNudgeComposer();
-                removeChips();
-                sendOpening(text);
-            });
+            if (multi) {
+                b.className = 'qr-tog';
+                b.setAttribute('aria-pressed', 'false');
+                b.innerHTML = '<span class="qr-check" aria-hidden="true">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
+                    '</span>' + esc(text);
+                b.addEventListener('click', function () {
+                    if (streaming || el('inline-gate')) return;
+                    var i = selected.indexOf(text);
+                    var on = i < 0;
+                    if (on) selected.push(text); else selected.splice(i, 1);
+                    b.classList.toggle('is-sel', on);
+                    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+                    goBtn.disabled = selected.length === 0;
+                    goBtn.textContent = selected.length
+                        ? 'Wybieram (' + selected.length + ') →'
+                        : 'Zaznacz, co pasuje';
+                });
+            } else {
+                if (isAi) b.className = 'qr-ai';
+                b.textContent = text;
+                b.addEventListener('click', function () {
+                    if (streaming || el('inline-gate')) return;
+                    chipStreak++;
+                    maybeNudgeComposer();
+                    removeChips();
+                    sendOpening(text);
+                });
+            }
             div.appendChild(b);
         });
         // Afordancja: własna odpowiedź to zawsze pełnoprawna opcja
@@ -2017,6 +2130,7 @@
             el('chat-input').focus();
         });
         div.appendChild(own);
+        if (multi) div.appendChild(goBtn);
         el('chat-msgs').appendChild(div);
         scrollToBottom(false);
     }
@@ -2187,10 +2301,10 @@
                 renderInlineGate();
             }
 
-            // Dymki proponowanych odpowiedzi z tej tury (marker <opcje>)
+            // Dymki proponowanych odpowiedzi z tej tury (<opcje> / <opcje_multi>)
             if (!state.verdict && !el('inline-gate')) {
-                var opcje = parseOpcje(raw);
-                if (opcje) renderSuggestions(opcje);
+                var sugg = suggestionsFrom(raw);
+                if (sugg) renderSuggestions(sugg.opts, sugg.multi);
             }
             updateStages();
             scrollToBottom(false);
@@ -2663,8 +2777,8 @@
         if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
             var lastMsg = messages[messages.length - 1];
             if (lastMsg.role === 'assistant' && !lastMsg.local) {
-                var resumeOpcje = parseOpcje(lastMsg.content);
-                if (resumeOpcje) renderSuggestions(resumeOpcje);
+                var resumeSugg = suggestionsFrom(lastMsg.content);
+                if (resumeSugg) renderSuggestions(resumeSugg.opts, resumeSugg.multi);
             }
         }
 
