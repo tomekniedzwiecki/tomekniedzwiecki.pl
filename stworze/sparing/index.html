@@ -430,6 +430,35 @@
     }
     .qr button:active { transform: translateY(0) scale(0.98); }
 
+    /* Wyróżniony chip AI — „zaproponuj za mnie" */
+    .qr button.qr-ai {
+        position: relative;
+        padding-left: 38px;
+        border: 1px solid transparent;
+        background:
+            linear-gradient(rgba(10, 10, 16, 0.88), rgba(10, 10, 16, 0.88)) padding-box,
+            linear-gradient(135deg, rgba(109, 179, 255, 0.9), rgba(99, 91, 255, 0.65), rgba(0, 217, 126, 0.45)) border-box;
+        box-shadow: 0 0 26px -8px rgba(77, 159, 255, 0.55);
+    }
+    .qr button.qr-ai::before {
+        content: '';
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        margin-top: -8px;
+        width: 16px;
+        height: 16px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3z' fill='%234d9fff'/%3E%3C/svg%3E") center / 16px no-repeat;
+        filter: drop-shadow(0 0 6px rgba(77, 159, 255, 0.7));
+        animation: sparkBreathe 3.4s ease-in-out infinite;
+    }
+    .qr button.qr-ai:hover {
+        background:
+            linear-gradient(rgba(12, 16, 24, 0.92), rgba(12, 16, 24, 0.92)) padding-box,
+            linear-gradient(135deg, rgba(109, 179, 255, 1), rgba(99, 91, 255, 0.85), rgba(0, 217, 126, 0.6)) border-box;
+        box-shadow: 0 0 34px -6px rgba(77, 159, 255, 0.75);
+    }
+
     /* ============================================================
        BRAMKA INLINE (imię + mail)
        ============================================================ */
@@ -1460,13 +1489,18 @@
         div.className = 'qr';
         div.id = 'qr-chips';
         opts.forEach(function (label) {
+            // Prefiks "~" = wyróżniona opcja AI („zaproponuj za mnie")
+            var isAi = label.charAt(0) === '~';
+            var text = isAi ? label.slice(1).trim() : label;
+            if (!text) return;
             var b = document.createElement('button');
             b.type = 'button';
-            b.textContent = label;
+            if (isAi) b.className = 'qr-ai';
+            b.textContent = text;
             b.addEventListener('click', function () {
                 if (streaming || el('inline-gate')) return;
                 removeChips();
-                sendOpening(label);
+                sendOpening(text);
             });
             div.appendChild(b);
         });
