@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#050507">
     <title>Stworzę — zamień pomysł w produkt cyfrowy | Tomek Niedźwiecki</title>
-    <meta name="description" content="Masz pomysł na narzędzie albo znasz problem swojej branży? Kilka minut rozmowy z AI, podgląd Twojego narzędzia, a potem klikalna makieta w 7 dni roboczych.">
+    <meta name="description" content="Masz pomysł na narzędzie albo znasz problem swojej branży? Kilka minut rozmowy z AI, podgląd Twojego narzędzia — a potem wspólna budowa biznesu z Tomkiem.">
     <meta name="robots" content="noindex, follow">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
@@ -14,7 +14,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tomekniedzwiecki.pl/stworze/sparing/">
     <meta property="og:title" content="Stworzę — zamień pomysł w produkt cyfrowy">
-    <meta property="og:description" content="Kilka minut rozmowy, podgląd Twojego narzędzia, potem klikalna makieta w 7 dni roboczych.">
+    <meta property="og:description" content="Kilka minut rozmowy, podgląd Twojego narzędzia — a potem wspólna budowa biznesu z Tomkiem.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
 
@@ -2225,10 +2225,10 @@
         <div class="side__foot">
             <div class="side-cta" id="side-cta" hidden>
                 <div class="side-cta__t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Karta projektu gotowa</div>
-                <div class="side-cta__d">Makieta od Tomka — pierwszy krok współpracy. 500 zł wliczone w budowę.</div>
-                <a class="side-cta__btn" id="side-cta-btn" href="#" target="_blank" rel="noopener">Zamów makietę → 500 zł</a>
+                <div class="side-cta__d">Zarezerwuj wspólną rozmowę — Tomek przygotuje plan przedsięwzięcia i odezwie się osobiście. 500 zł, w pełni zwrotne.</div>
+                <a class="side-cta__btn" id="side-cta-btn" href="#" target="_blank" rel="noopener">Rezerwuję rozmowę → 500 zł</a>
             </div>
-            <p class="side__note">AI Tomka Niedźwieckiego — prowadzi Cię do makiety, dalej rozmawiasz z Tomkiem osobiście.</p>
+            <p class="side__note">AI Tomka Niedźwieckiego — zbiera fundamenty projektu, dalej rozmawiasz z Tomkiem osobiście.</p>
         </div>
     </aside>
 
@@ -2248,7 +2248,7 @@
                 <li class="stage" data-stage="1"><span class="stage__dot">1</span><span class="stage__label">Pomysł</span></li>
                 <li class="stage" data-stage="2"><span class="stage__dot">2</span><span class="stage__label">Produkt</span></li>
                 <li class="stage" data-stage="3"><span class="stage__dot">3</span><span class="stage__label">Podgląd</span></li>
-                <li class="stage" data-stage="4"><span class="stage__dot">4</span><span class="stage__label">Makieta</span></li>
+                <li class="stage" data-stage="4"><span class="stage__dot">4</span><span class="stage__label">Współpraca</span></li>
             </ol>
             <span class="chat-top__spacer" aria-hidden="true"></span>
         </header>
@@ -2495,7 +2495,7 @@
         var body = el('pane-karta-body');
         var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój projekt</div>' +
             '<h2 class="tabpane__title">Karta projektu</h2>' +
-            '<p class="tabpane__sub">Wszystko, co ustaliliśmy w rozmowie, w jednym miejscu. Na tej karcie Tomek oprze klikalną makietę.</p></div>';
+            '<p class="tabpane__sub">Wszystko, co ustaliliśmy w rozmowie, w jednym miejscu. Na tej karcie Tomek oprze plan przedsięwzięcia i waszą wspólną rozmowę.</p></div>';
         if (state.karta) {
             body.innerHTML = head + kartaHTML(state.karta);
         } else {
@@ -2512,7 +2512,7 @@
         var items = lightboxItems();
         var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Podgląd narzędzia</div>' +
             '<h2 class="tabpane__title">Ekrany narzędzia</h2>' +
-            '<p class="tabpane__sub">Poglądowe ekrany z rozmowy — kliknij, aby powiększyć. Klikalna makieta od Tomka powstanie na ich bazie, z Twoimi uwagami.</p></div>';
+            '<p class="tabpane__sub">Poglądowe ekrany z rozmowy — kliknij, aby powiększyć. Na ich bazie Tomek przygotuje plan przedsięwzięcia i pierwszą wersję narzędzia.</p></div>';
         if (!items.length) {
             body.innerHTML = head + '<div class="tabpane__empty">Ekrany pojawią się tu po wygenerowaniu podglądu w rozmowie.<br>' +
                 '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
@@ -2536,18 +2536,19 @@
         body.innerHTML =
             '<div class="tabpane__head"><div class="tabpane__eyebrow">Wspólny biznes</div>' +
             '<h2 class="tabpane__title">Jak budujemy to razem z Tomkiem</h2>' +
-            '<p class="tabpane__sub">To nie jest sklep z makietami. Ty wnosisz znajomość branży — Tomek Niedźwiecki (15 lat e-commerce, 70 mln zł sprzedaży online) osobiście buduje narzędzie i sprzedaż, wkładając w projekt własne pieniądze.</p></div>' +
+            '<p class="tabpane__sub">To nie jest kolejne narzędzie, które ktoś Ci zrobi i zostajesz z nim sam. Ty wnosisz znajomość branży — Tomek Niedźwiecki (15 lat e-commerce, 70 mln zł sprzedaży online) z zespołem buduje narzędzie, a potem osobiście rozkręca biznes do pierwszych 50 płacących klientów.</p></div>' +
             '<div class="collab-grid">' +
             '<div class="collab-step' + (done ? '' : ' is-now') + '"><span class="collab-step__n">1</span><div><div class="collab-step__t">Rozmowa — projekt</div><div class="collab-step__d">Tu, w czacie: problem, odbiorcy, ekrany i podgląd narzędzia. <strong>Karta projektu</strong> i <strong>ekrany</strong> lądują w menu obok.</div></div></div>' +
-            '<div class="collab-step' + (done ? ' is-now' : '') + '"><span class="collab-step__n">2</span><div><div class="collab-step__t">Klikalna makieta — 500 zł zadatku</div><div class="collab-step__d">Tomek buduje ją <strong>osobiście w 7 dni roboczych</strong> z karty i Twoich uwag + nagrywa wideo z decyzjami. Zadatek wliczany w 100% w Twoją część budowy.</div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">3</span><div><div class="collab-step__t">Umowa i plan — bezpośrednio z Tomkiem</div><div class="collab-step__d">Od makiety rozmawiasz już z Tomkiem na żywo: dopracowanie, umowa o współpracy, plan etapów. <strong>Po makiecie nie ma żadnego zobowiązania.</strong></div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">4</span><div><div class="collab-step__t">Budowa — budżet 30 000 zł na pół</div><div class="collab-step__d"><strong>Połowę (15 000 zł) pokrywa Tomek.</strong> Powstaje kompletne narzędzie gotowe przyjmować klientów i płatności: konta, abonamenty, panel klienta, strona sprzedażowa, kampania reklamowa, analityka, hosting.</div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">5</span><div><div class="collab-step__t">Start sprzedaży i skala</div><div class="collab-step__d">Tomek buduje kampanię i lejek — Ty otwierasz drzwi do swojej branży. Abonamenty płyną co miesiąc, narzędzie rośnie.</div></div></div>' +
+            '<div class="collab-step' + (done ? ' is-now' : '') + '"><span class="collab-step__n">2</span><div><div class="collab-step__t">Rezerwacja — 500 zł, w pełni zwrotne</div><div class="collab-step__d">Tomek osobiście analizuje projekt, przygotowuje <strong>plan przedsięwzięcia</strong> (zakres, model przychodów, droga do pierwszych klientów) i <strong>odzywa się do Ciebie</strong>, żeby wspólnie przegadać projekt. Rezerwacja oddziela poważnie myślących od ciekawskich.</div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">3</span><div><div class="collab-step__t">Wspólna decyzja i umowa</div><div class="collab-step__d">Przegadujecie plan na żywo. Wchodzicie — 500 zł wliczane w Twoją część. <strong>Nie wchodzicie — pełny zwrot 500 zł</strong>, obojętnie z czyjej strony decyzja.</div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">4</span><div><div class="collab-step__t">Budowa — budżet 30 000 zł na pół</div><div class="collab-step__d"><strong>Połowę (15 000 zł) pokrywa Tomek.</strong> On i jego zespół budują kompletne narzędzie gotowe przyjmować klientów i płatności: konta, abonamenty, panel klienta, strona sprzedażowa, analityka, hosting.</div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">5</span><div><div class="collab-step__t">Pierwsze pół roku prowadzi Tomek</div><div class="collab-step__d">Kampanie, sprzedaż, rozwój produktu — <strong>aż do pierwszych 50 płacących klientów</strong>. Ty w tym czasie otwierasz drzwi do swojej branży: kontakty, grupy, polecenia.</div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">6</span><div><div class="collab-step__t">Stery przechodzą do Ciebie</div><div class="collab-step__d">Rozkręcony biznes z płacącymi klientami przejmujesz Ty. Tomek zostaje <strong>doradcą strategicznym</strong> — ma 20% udziałów, więc zależy mu długoterminowo.</div></div></div>' +
             '</div>' +
-            '<div class="collab-fin"><strong>Skóra w grze:</strong> Tomek wkłada własne 15 000 zł i obejmuje <strong>20% udziałów</strong> — zarabia dopiero wtedy, gdy Twoje narzędzie zarabia. Dlatego nie wchodzi w projekty, w które nie wierzy. Ta rozmowa (AI) prowadzi Cię do makiety — dalej przejmuje Tomek osobiście.</div>' +
+            '<div class="collab-fin"><strong>Skóra w grze:</strong> Tomek wkłada własne 15 000 zł, pół roku swojej pracy i obejmuje <strong>20% udziałów</strong> — zarabia dopiero wtedy, gdy Twoje narzędzie zarabia. Dlatego nie wchodzi w projekty, w które nie wierzy. Ta rozmowa (AI) zbiera fundamenty — od rezerwacji rozmawiasz już z Tomkiem osobiście.</div>' +
             '<div class="collab-cta">' +
             (done
-                ? '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener" style="flex:1;min-width:220px;">Zamów makietę → 500 zł</a>'
+                ? '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener" style="flex:1;min-width:220px;">Rezerwuję rozmowę → 500 zł</a>'
                 : '') +
             '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Dokończ projekt w rozmowie') + '</button>' +
             '</div>';
@@ -2691,7 +2692,7 @@
         div.className = 'msg msg--ai msg--gate';
         div.id = 'inline-gate';
         div.innerHTML =
-            '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — zostaw imię i mail, żebym wiedział, dla kogo powstanie makieta, i mógł się odezwać w sprawie Twojego narzędzia.</p>' +
+            '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — zostaw imię i mail, żebym wiedział, dla kogo budujemy ten projekt, i mógł się odezwać w sprawie Twojego narzędzia.</p>' +
             '<form id="gate-form" novalidate>' +
             '<div class="f-row f-row--two">' +
             '<div><label class="f-label" for="gate-name">Imię</label>' +
@@ -2827,16 +2828,16 @@
         return /<makieta\s*(\/\s*)?>/.test(raw || '');
     }
 
-    // Karta zamówienia makiety inline w czacie (marker <makieta>)
+    // Karta rezerwacji wspólnej rozmowy inline w czacie (marker <makieta>)
     function mkCardEl() {
         var div = document.createElement('div');
         div.className = 'mk-card';
         div.innerHTML =
             '<div class="mk-card__eyebrow">Pierwszy krok współpracy</div>' +
-            '<div class="mk-card__title">Klikalna makieta — 500 zł zadatku</div>' +
-            '<p class="mk-card__d">Tomek buduje ją osobiście w 7 dni roboczych z karty, ekranów i Twoich uwag. Zadatek w 100% wliczony w budowę — od makiety rozmawiasz już bezpośrednio z nim.</p>' +
-            '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Zamawiam makietę → 500 zł</a>' +
-            '<p class="mk-card__note">BLIK, karta lub przelew · otworzy się w nowej karcie</p>';
+            '<div class="mk-card__title">Rezerwacja wspólnej rozmowy — 500 zł</div>' +
+            '<p class="mk-card__d">Tomek osobiście przygotuje plan przedsięwzięcia dla Twojego projektu (zakres, model przychodów, droga do pierwszych 50 płacących klientów) i odezwie się, żeby wspólnie go przegadać. <strong>Nie nawiążemy współpracy — 500 zł wraca w całości.</strong> Wchodzimy — kwota wliczana w Twoją część budowy.</p>' +
+            '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję rozmowę → 500 zł</a>' +
+            '<p class="mk-card__note">BLIK, karta lub przelew · w pełni zwrotne · otworzy się w nowej karcie</p>';
         return div;
     }
 
@@ -3619,8 +3620,8 @@
                 var forma = remaining === 1 ? 'poprawkę' : (remaining < 5 ? 'poprawki' : 'poprawek');
                 return base + ' Masz jeszcze ' + remaining + ' ' + forma + ' — opisz, co zmienić, a pokażę nowe wersje (każdy nowy ekran to jedna poprawka).';
             }
-            if (remaining === 0) return base + ' Pula poprawek wyczerpana — kolejne uwagi opisz słowami, trafią prosto do makiety.';
-            return base + ' Klikalna makieta powstanie na bazie Twoich uwag.';
+            if (remaining === 0) return base + ' Pula poprawek wyczerpana — kolejne uwagi opisz słowami, trafią do karty projektu.';
+            return base + ' Pierwsza wersja narzędzia powstanie na bazie Twoich uwag.';
         }
 
         function tileSkeletonHTML(view) {
