@@ -584,10 +584,26 @@
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
-        padding: 18px;
+        padding: 18px 18px 8px;
         font-size: 13.5px;
         color: var(--text-muted);
     }
+    /* Insighty branżowe rotowane podczas generowania */
+    .preview-insight {
+        min-height: 52px;
+        padding: 6px 18px 18px;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 16px;
+        line-height: 1.55;
+        color: var(--text);
+        opacity: 0;
+        transform: translateY(5px);
+        transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    }
+    .preview-insight.is-in { opacity: 1; transform: none; }
+    .preview-insight::before { content: '„'; color: var(--accent); }
+    .preview-insight::after { content: '"'; color: var(--accent); }
     .preview-retry {
         padding: 9px 16px;
         min-height: 38px;
@@ -1725,7 +1741,7 @@
             }
 
             // Marker <projekt> → wygeneruj podgląd graficzny w czacie
-            if (meta.projekt) requestPreview();
+            if (meta.projekt) requestPreview(null, meta.projekt);
 
             // Werdykt: spar_meta ma priorytet, fallback = parsowanie markera
             var parsed = parseWerdykt(raw);
@@ -1771,27 +1787,76 @@
         try { return JSON.parse(m[1]); } catch (e) { return null; }
     }
 
+    function parseProjektJson(raw) {
+        if (!raw) return null;
+        var ms = raw.match(/<projekt>([\s\S]*?)<\/projekt>/g);
+        if (!ms || !ms.length) return null;
+        var inner = ms[ms.length - 1].replace(/^<projekt>/, '').replace(/<\/projekt>$/, '');
+        try {
+            var o = JSON.parse(inner);
+            return (o && typeof o === 'object') ? o : null;
+        } catch (e) { return null; }
+    }
+
     /* ============================================================
        PODGLĄD GRAFICZNY — marker <projekt> → spar-image → obraz w czacie
        ============================================================ */
-    function requestPreview(knownUrl) {
+    function requestPreview(knownUrl, projekt) {
         var wrap = document.createElement('div');
         wrap.className = 'msg msg--ai msg--preview';
         el('chat-msgs').appendChild(wrap);
 
-        function showImage(url) {
+        // Insighty z markera <projekt> — rotowane podczas generowania
+        var insights = (projekt && Array.isArray(projekt.insighty))
+            ? projekt.insighty.filter(function (x) { return typeof x === 'string' && x.trim(); })
+                .map(function (x) { return x.trim().slice(0, 200); }).slice(0, 6)
+            : [];
+        if (!insights.length) {
+            insights = [
+                'Dobre narzędzie niszowe wygrywa językiem branży, nie liczbą funkcji.',
+                'Najszybciej płacą ci, którym oszczędzasz czas w czymś, co robią co tydzień.',
+                'Jedna dopracowana funkcja sprzedaje lepiej niż dziesięć obiecanych.'
+            ];
+        }
+        var insTimer = null, insIdx = 0;
+        function stopInsights() { if (insTimer) { clearInterval(insTimer); insTimer = null; } }
+
+        function noteText(remaining) {
+            var base = 'Kliknij obrazek, aby powiększyć.';
+            if (typeof remaining === 'number' && remaining > 0) {
+                var forma = remaining === 1 ? 'darmową poprawkę' : (remaining < 5 ? 'darmowe poprawki' : 'darmowych poprawek');
+                return base + ' Masz jeszcze ' + remaining + ' ' + forma + ' — opisz uwagi, pokażę nową wersję.';
+            }
+            return base + ' Klikalna makieta powstanie na bazie Twoich uwag.';
+        }
+
+        function showImage(url, remaining) {
+            stopInsights();
             wrap.innerHTML = '<img class="preview-img" src="' + esc(url) + '" alt="Podgląd narzędzia — kliknij, aby powiększyć" loading="lazy">' +
-                '<div class="preview-note">Kliknij obrazek, aby powiększyć. Klikalna makieta powstanie na bazie Twoich uwag.</div>';
+                '<div class="preview-note">' + esc(noteText(remaining)) + '</div>';
             wrap.querySelector('.preview-img').addEventListener('click', function () { openLightbox(url); });
             scrollToBottom(false);
         }
 
         // Resume: obrazek już istnieje — pokaż bez ponownego generowania
-        if (knownUrl) { showImage(knownUrl); return; }
+        if (knownUrl) { showImage(knownUrl, null); return; }
 
         function run() {
+            stopInsights();
             wrap.innerHTML = '<div class="preview-loading"><span class="typing"><i></i><i></i><i></i></span>' +
-                '<span>Generuję podgląd narzędzia — to potrwa do minuty…</span></div>';
+                '<span>Generuję podgląd narzędzia…</span></div>' +
+                '<div class="preview-insight" aria-live="polite"></div>';
+            var insEl = wrap.querySelector('.preview-insight');
+            function cycle() {
+                insEl.classList.remove('is-in');
+                setTimeout(function () {
+                    insEl.textContent = insights[insIdx % insights.length];
+                    insIdx++;
+                    insEl.classList.add('is-in');
+                }, 280);
+            }
+            cycle();
+            insTimer = setInterval(cycle, 4800);
             scrollToBottom(false);
             fetch(SPAR_IMAGE_ENDPOINT, {
                 method: 'POST',
@@ -1806,8 +1871,9 @@
                 return res.json();
             }).then(function (d) {
                 saveJSON(LS_PREVIEW, { sessionId: state.sessionId, url: d.url });
-                showImage(d.url);
+                showImage(d.url, (typeof d.remaining === 'number') ? d.remaining : null);
             }).catch(function (e) {
+                stopInsights();
                 if (e && e.code === 'limit_podgladow') {
                     wrap.innerHTML = '<div class="preview-loading">Limit podglądów w tej rozmowie osiągnięty — opisz uwagi słowami, uwzględnię je w makiecie.</div>';
                     return;
@@ -1950,13 +2016,16 @@
 
         // Resume podglądu: jeśli w historii był marker <projekt>, odtwórz obrazek
         // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem
-        var hasProjekt = false;
+        var projektContent = null;
         for (var pi = messages.length - 1; pi >= 0; pi--) {
-            if (messages[pi].role === 'assistant' && messages[pi].content.indexOf('<projekt>') >= 0) { hasProjekt = true; break; }
+            if (messages[pi].role === 'assistant' && messages[pi].content.indexOf('<projekt>') >= 0) { projektContent = messages[pi].content; break; }
         }
-        if (hasProjekt) {
+        if (projektContent) {
             var savedPrev = loadJSON(LS_PREVIEW);
-            requestPreview((savedPrev && savedPrev.sessionId === state.sessionId) ? savedPrev.url : null);
+            requestPreview(
+                (savedPrev && savedPrev.sessionId === state.sessionId) ? savedPrev.url : null,
+                parseProjektJson(projektContent)
+            );
         }
 
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
