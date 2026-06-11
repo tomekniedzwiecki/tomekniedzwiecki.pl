@@ -152,7 +152,7 @@
     /* ============================================================
        APP / WIDOK CZATU — kolumna 100dvh
        ============================================================ */
-    .app { position: relative; z-index: 2; }
+    .app { position: relative; z-index: 2; display: flex; }
 
     .view { display: none; }
     .view.is-active { display: flex; }
@@ -160,7 +160,313 @@
         flex-direction: column;
         height: 100vh;
         height: 100dvh;
+        flex: 1;
+        min-width: 0;
     }
+
+    /* ============================================================
+       SIDEBAR — menu projektu (konwencja ChatGPT/Claude/Gemini:
+       wąski ciemny panel, pozycje-zakładki, aktywna podświetlona)
+       ============================================================ */
+    .side {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 264px;
+        flex-shrink: 0;
+        height: 100vh;
+        height: 100dvh;
+        position: sticky;
+        top: 0;
+        padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
+        background: rgba(7, 8, 11, 0.86);
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+        border-right: 1px solid var(--glass-border-soft);
+        z-index: 60;
+    }
+    .side__brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px 14px;
+    }
+    .side__brand img {
+        height: 24px;
+        width: auto;
+        filter: drop-shadow(0 0 12px rgba(77, 159, 255, 0.35));
+    }
+    .side__brand span {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 19px;
+        color: var(--text-strong);
+    }
+    .side__new {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        background: var(--glass);
+        color: var(--text-strong);
+        font-size: 13.5px;
+        font-weight: 600;
+        transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .side__new:hover { border-color: var(--border-strong); background: var(--glass-strong); }
+    .side__new svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
+    .side__nav { display: flex; flex-direction: column; gap: 2px; }
+    .side__item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: var(--text-muted);
+        font-size: 13.5px;
+        font-weight: 600;
+        text-align: left;
+        transition: background 0.2s var(--ease), color 0.2s var(--ease);
+    }
+    .side__item:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-strong); }
+    .side__item.is-active { background: var(--accent-dim); color: var(--text-strong); }
+    .side__item.is-active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 9px;
+        bottom: 9px;
+        width: 3px;
+        border-radius: 3px;
+        background: var(--accent);
+        box-shadow: 0 0 10px rgba(77, 159, 255, 0.6);
+    }
+    .side__item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; }
+    .side__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-left: auto;
+        background: var(--accent);
+        box-shadow: 0 0 8px rgba(77, 159, 255, 0.7);
+        animation: dotPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes dotPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.72); opacity: 0.55; } }
+    .side__foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 12px; }
+    .side__note {
+        font-size: 11px;
+        line-height: 1.55;
+        color: var(--text-muted);
+        opacity: 0.75;
+        padding: 0 10px;
+    }
+    .side-cta {
+        border-radius: 14px;
+        padding: 13px;
+        background:
+            linear-gradient(rgba(10, 10, 14, 0.94), rgba(10, 10, 14, 0.94)) padding-box,
+            linear-gradient(140deg, rgba(77, 159, 255, 0.65), rgba(77, 159, 255, 0.12) 45%, rgba(0, 217, 126, 0.35)) border-box;
+        border: 1px solid transparent;
+        box-shadow: 0 0 36px -16px rgba(77, 159, 255, 0.45);
+    }
+    .side-cta__t {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        font-weight: 800;
+        color: var(--text-strong);
+    }
+    .side-cta__t svg { width: 13px; height: 13px; color: var(--green, #00d97e); }
+    .side-cta__d { font-size: 11.5px; line-height: 1.5; color: var(--text-muted); margin: 6px 0 10px; }
+    .side-cta__btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #061320;
+        background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 50%, var(--accent-2) 100%);
+        box-shadow: 0 8px 26px -10px rgba(77, 159, 255, 0.55);
+        transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+    .side-cta__btn:hover { transform: translateY(-1px); box-shadow: 0 12px 32px -10px rgba(77, 159, 255, 0.7); }
+    .side-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 55;
+        background: rgba(0, 0, 0, 0.62);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        animation: lbIn 0.25s var(--ease);
+    }
+    .chat-top__menu {
+        display: none;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        border: 1px solid var(--glass-border);
+        border-radius: 11px;
+        background: var(--glass);
+        color: var(--text-strong);
+        transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .chat-top__menu:hover { border-color: var(--border-strong); background: var(--glass-strong); }
+    .chat-top__menu svg { width: 19px; height: 19px; }
+    .chat-top__spacer { width: 40px; flex-shrink: 0; }
+    @media (min-width: 1024px) {
+        .chat-top__brand { display: none; }
+        .chat-top__spacer { display: none; }
+        .chat-top { justify-content: center; }
+    }
+    @media (max-width: 1023.98px) {
+        .side {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            height: auto;
+            width: 290px;
+            max-width: 85vw;
+            background: rgba(7, 8, 11, 0.97);
+            border-right: 1px solid var(--glass-border);
+            transform: translateX(-103%);
+            transition: transform 0.34s var(--ease);
+            box-shadow: 30px 0 80px -30px rgba(0, 0, 0, 0.8);
+        }
+        .side.is-open { transform: none; }
+        .chat-top__menu { display: grid; }
+    }
+
+    /* Zakładki projektu — pełnoekranowe panele w miejscu czatu */
+    .tabpane { display: none; }
+    .view--chat.is-pane .chat-scroll,
+    .view--chat.is-pane .chat-composer,
+    .view--chat.is-pane .chat-locked { display: none !important; }
+    .view--chat.is-pane .tabpane.is-active {
+        display: block;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+    .tabpane__inner {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 28px clamp(14px, 4vw, 26px) 70px;
+        animation: msgIn 0.35s var(--ease);
+    }
+    .tabpane__head { margin-bottom: 18px; }
+    .tabpane__eyebrow {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+    }
+    .tabpane__title {
+        font-size: clamp(22px, 3.4vw, 30px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text-strong);
+    }
+    .tabpane__sub { font-size: 14px; color: var(--text-muted); margin-top: 6px; max-width: 60ch; line-height: 1.6; }
+    .tabpane__empty {
+        border: 1px dashed var(--glass-border);
+        border-radius: 16px;
+        padding: 34px 22px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 14px;
+        line-height: 1.65;
+    }
+    .tabpane__empty .preview-retry { margin-top: 14px; }
+    .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 560px) { .shots { grid-template-columns: 1fr; } }
+    .shots .pv-tile { cursor: zoom-in; }
+
+    /* Współpraca — droga i zasady */
+    .collab-grid { display: flex; flex-direction: column; gap: 10px; }
+    .collab-step {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 14px;
+        padding: 14px 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+    }
+    .collab-step.is-now { border-color: rgba(77, 159, 255, 0.4); box-shadow: 0 0 30px -16px rgba(77, 159, 255, 0.5); }
+    .collab-step__n {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--accent);
+        border: 1px solid rgba(77, 159, 255, 0.5);
+        background: var(--accent-dim);
+    }
+    .collab-step__t { font-size: 14.5px; font-weight: 800; color: var(--text-strong); }
+    .collab-step__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin-top: 3px; }
+    .collab-step__d strong { color: var(--text); }
+    .collab-fin {
+        margin-top: 14px;
+        border-radius: 14px;
+        border: 1px dashed rgba(77, 159, 255, 0.35);
+        background: var(--accent-dim);
+        padding: 14px 16px;
+        font-size: 13px;
+        line-height: 1.65;
+        color: var(--text);
+    }
+    .collab-fin strong { color: var(--text-strong); }
+    .collab-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+    /* Karta zamówienia makiety inline w czacie (marker <makieta>) */
+    .mk-card {
+        align-self: flex-start;
+        width: 100%;
+        max-width: min(560px, 92%);
+        margin-left: 34px;
+        border-radius: 16px;
+        padding: 16px;
+        background:
+            linear-gradient(rgba(10, 10, 14, 0.95), rgba(10, 10, 14, 0.95)) padding-box,
+            linear-gradient(140deg, rgba(77, 159, 255, 0.65), rgba(77, 159, 255, 0.12) 45%, rgba(0, 217, 126, 0.35)) border-box;
+        border: 1px solid transparent;
+        box-shadow: 0 0 44px -18px rgba(77, 159, 255, 0.4);
+        animation: msgIn 0.45s var(--ease) backwards;
+    }
+    .mk-card__eyebrow {
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 5px;
+    }
+    .mk-card__title { font-size: 17px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
+    .mk-card__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin: 7px 0 12px; }
+    .mk-card .side-cta__btn { width: 100%; min-height: 46px; font-size: 14.5px; }
+    .mk-card__note { font-size: 11px; color: var(--text-muted); opacity: 0.8; text-align: center; margin-top: 8px; }
+    @media (max-width: 640px) { .mk-card { margin-left: 0; max-width: 100%; } }
 
     /* ============================================================
        HEADER — szklana belka
@@ -1720,10 +2026,56 @@
 <main class="app">
 
     <!-- =====================================================
-         KROK 4 — CZAT (sparing)
+         SIDEBAR — menu projektu (konwencja paneli AI)
+    ===================================================== -->
+    <div class="side-backdrop" id="side-backdrop" hidden></div>
+    <aside class="side" id="side" aria-label="Menu projektu">
+        <a class="side__brand" href="/stworze/">
+            <img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">
+            <span>Stworzę</span>
+        </a>
+        <button type="button" class="side__new" id="btn-restart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            Nowa rozmowa
+        </button>
+        <nav class="side__nav">
+            <button type="button" class="side__item is-active" data-tab="chat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Rozmowa
+            </button>
+            <button type="button" class="side__item" data-tab="karta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
+                Karta projektu
+                <i class="side__dot" id="dot-karta" hidden></i>
+            </button>
+            <button type="button" class="side__item" data-tab="ekrany">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+                Ekrany narzędzia
+                <i class="side__dot" id="dot-ekrany" hidden></i>
+            </button>
+            <button type="button" class="side__item" data-tab="wspolpraca">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17a5 5 0 0 1-5 5H3v-3a5 5 0 0 1 5-5"></path><path d="M13 7a5 5 0 0 1 5-5h3v3a5 5 0 0 1-5 5"></path><path d="M8 16l8-8"></path></svg>
+                Współpraca
+            </button>
+        </nav>
+        <div class="side__foot">
+            <div class="side-cta" id="side-cta" hidden>
+                <div class="side-cta__t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Karta projektu gotowa</div>
+                <div class="side-cta__d">Makieta od Tomka — pierwszy krok współpracy. 500 zł wliczone w budowę.</div>
+                <a class="side-cta__btn" id="side-cta-btn" href="#" target="_blank" rel="noopener">Zamów makietę → 500 zł</a>
+            </div>
+            <p class="side__note">AI Tomka Niedźwieckiego — prowadzi Cię do makiety, dalej rozmawiasz z Tomkiem osobiście.</p>
+        </div>
+    </aside>
+
+    <!-- =====================================================
+         KROK 4 — CZAT (sparing) + zakładki projektu
     ===================================================== -->
     <section class="view view--chat" id="view-chat">
         <header class="chat-top">
+            <button type="button" class="chat-top__menu" id="btn-side" aria-label="Menu projektu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            </button>
             <div class="chat-top__brand">
                 <img src="/img/logo/tn-logo-icon-88.png" alt="" width="28" height="28" aria-hidden="true">
                 <span>Stworzę</span>
@@ -1734,7 +2086,7 @@
                 <li class="stage" data-stage="3"><span class="stage__dot">3</span><span class="stage__label">Podgląd</span></li>
                 <li class="stage" data-stage="4"><span class="stage__dot">4</span><span class="stage__label">Makieta</span></li>
             </ol>
-            <button type="button" class="chat-top__restart" id="btn-restart">Nowa rozmowa</button>
+            <span class="chat-top__spacer" aria-hidden="true"></span>
         </header>
 
         <div class="chat-scroll" id="chat-scroll">
@@ -1757,6 +2109,11 @@
             </div>
         </div>
         <div class="chat-locked" id="chat-locked" hidden><span id="chat-locked-text"></span></div>
+
+        <!-- Zakładki projektu (karta / ekrany / współpraca) -->
+        <div class="tabpane" id="pane-karta"><div class="tabpane__inner" id="pane-karta-body"></div></div>
+        <div class="tabpane" id="pane-ekrany"><div class="tabpane__inner" id="pane-ekrany-body"></div></div>
+        <div class="tabpane" id="pane-wspolpraca"><div class="tabpane__inner" id="pane-wspolpraca-body"></div></div>
     </section>
 
 </main>
@@ -1770,7 +2127,8 @@
        ============================================================ */
     var SPAR_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-chat';
     var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
-    var PANEL_URL = 'https://crm.tomekniedzwiecki.pl/stworze-projekt.html'; // panel projektu po rozmowie
+    var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
+    var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Pierwsza Makieta — Stworzę" (500 zł)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
 
     var LS_SESSION = 'spar_session';
@@ -1849,8 +2207,10 @@
         karta: null,            // obiekt karty z markera
         leadId: null,
         kamien: 0,              // najwyższy domknięty kamień rozmowy (marker <kamien>)
-        previews: {}            // {view:url} — wygenerowane widoki podglądu (lightbox/resume)
+        previews: {},           // {view:url} — wygenerowane widoki podglądu (lightbox/resume)
+        emailKnown: false       // serwer zna maila tej sesji (powrót z linku ?id= — nie pytaj drugi raz)
     };
+    var activeTab = 'chat';
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -1884,7 +2244,8 @@
             verdict: state.verdict,
             karta: state.karta,
             leadId: state.leadId,
-            kamien: state.kamien || 0
+            kamien: state.kamien || 0,
+            emailKnown: !!state.emailKnown
         });
     }
     function saveMessages() { saveJSON(LS_MESSAGES, messages); }
@@ -1918,6 +2279,115 @@
         el('view-chat').classList.add('is-active');
         document.body.classList.add('is-chat');
         window.scrollTo(0, 0);
+    }
+
+    /* ============================================================
+       SIDEBAR + ZAKŁADKI PROJEKTU (Rozmowa / Karta / Ekrany / Współpraca)
+       ============================================================ */
+    function checkoutURL() {
+        var u = CHECKOUT_BASE + '?offer=' + encodeURIComponent(OFFER_ID);
+        if (state.leadId) u += '&lead=' + encodeURIComponent(state.leadId);
+        return u;
+    }
+
+    function openSide() {
+        el('side').classList.add('is-open');
+        el('side-backdrop').hidden = false;
+    }
+    function closeSide() {
+        el('side').classList.remove('is-open');
+        el('side-backdrop').hidden = true;
+    }
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.side__item').forEach(function (b) {
+            b.classList.toggle('is-active', b.dataset.tab === tab);
+        });
+        var isPane = tab !== 'chat';
+        el('view-chat').classList.toggle('is-pane', isPane);
+        ['karta', 'ekrany', 'wspolpraca'].forEach(function (t) {
+            el('pane-' + t).classList.toggle('is-active', tab === t);
+        });
+        if (tab === 'karta') { renderPaneKarta(); el('dot-karta').hidden = true; }
+        if (tab === 'ekrany') { renderPaneEkrany(); el('dot-ekrany').hidden = true; }
+        if (tab === 'wspolpraca') renderPaneWspolpraca();
+        if (tab === 'chat') scrollToBottom(true);
+        closeSide();
+    }
+
+    function updateSideBadges() {
+        // kropka = jest nowa zawartość, a user nie patrzy na tę zakładkę
+        var hasKarta = state.verdict === 'zielony' && !!state.karta;
+        var hasEkrany = lightboxItems().length > 0;
+        el('dot-karta').hidden = !(hasKarta && activeTab !== 'karta');
+        el('dot-ekrany').hidden = !(hasEkrany && activeTab !== 'ekrany');
+        var cta = el('side-cta');
+        cta.hidden = state.verdict !== 'zielony';
+        if (!cta.hidden) el('side-cta-btn').href = checkoutURL();
+    }
+
+    function renderPaneKarta() {
+        var body = el('pane-karta-body');
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój projekt</div>' +
+            '<h2 class="tabpane__title">Karta projektu</h2>' +
+            '<p class="tabpane__sub">Wszystko, co ustaliliśmy w rozmowie, w jednym miejscu. Na tej karcie Tomek oprze klikalną makietę.</p></div>';
+        if (state.karta) {
+            body.innerHTML = head + kartaHTML(state.karta);
+        } else {
+            body.innerHTML = head + '<div class="tabpane__empty">Karta uzupełni się automatycznie, gdy domkniemy projekt w rozmowie.<br>' +
+                'Kilka pytań i będzie gotowa.<br>' +
+                '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
+        }
+        var goBtn = body.querySelector('[data-go-chat]');
+        if (goBtn) goBtn.addEventListener('click', function () { switchTab('chat'); });
+    }
+
+    function renderPaneEkrany() {
+        var body = el('pane-ekrany-body');
+        var items = lightboxItems();
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Podgląd narzędzia</div>' +
+            '<h2 class="tabpane__title">Ekrany narzędzia</h2>' +
+            '<p class="tabpane__sub">Poglądowe ekrany z rozmowy — kliknij, aby powiększyć. Klikalna makieta od Tomka powstanie na ich bazie, z Twoimi uwagami.</p></div>';
+        if (!items.length) {
+            body.innerHTML = head + '<div class="tabpane__empty">Ekrany pojawią się tu po wygenerowaniu podglądu w rozmowie.<br>' +
+                '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
+            var goBtn = body.querySelector('[data-go-chat]');
+            if (goBtn) goBtn.addEventListener('click', function () { switchTab('chat'); });
+            return;
+        }
+        body.innerHTML = head + '<div class="shots">' + items.map(function (it) {
+            return '<div class="pv-tile is-done" data-view="' + it.view + '">' +
+                '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
+                '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
+        }).join('') + '</div>';
+        body.querySelectorAll('.pv-tile').forEach(function (t) {
+            t.addEventListener('click', function () { openLightbox(t.dataset.view); });
+        });
+    }
+
+    function renderPaneWspolpraca() {
+        var body = el('pane-wspolpraca-body');
+        var done = state.verdict === 'zielony';
+        body.innerHTML =
+            '<div class="tabpane__head"><div class="tabpane__eyebrow">Wspólny biznes</div>' +
+            '<h2 class="tabpane__title">Jak budujemy to razem z Tomkiem</h2>' +
+            '<p class="tabpane__sub">To nie jest sklep z makietami. Ty wnosisz znajomość branży — Tomek Niedźwiecki (15 lat e-commerce, 70 mln zł sprzedaży online) osobiście buduje narzędzie i sprzedaż, wkładając w projekt własne pieniądze.</p></div>' +
+            '<div class="collab-grid">' +
+            '<div class="collab-step' + (done ? '' : ' is-now') + '"><span class="collab-step__n">1</span><div><div class="collab-step__t">Rozmowa — projekt</div><div class="collab-step__d">Tu, w czacie: problem, odbiorcy, ekrany i podgląd narzędzia. <strong>Karta projektu</strong> i <strong>ekrany</strong> lądują w menu obok.</div></div></div>' +
+            '<div class="collab-step' + (done ? ' is-now' : '') + '"><span class="collab-step__n">2</span><div><div class="collab-step__t">Klikalna makieta — 500 zł zadatku</div><div class="collab-step__d">Tomek buduje ją <strong>osobiście w 7 dni roboczych</strong> z karty i Twoich uwag + nagrywa wideo z decyzjami. Zadatek wliczany w 100% w Twoją część budowy.</div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">3</span><div><div class="collab-step__t">Umowa i plan — bezpośrednio z Tomkiem</div><div class="collab-step__d">Od makiety rozmawiasz już z Tomkiem na żywo: dopracowanie, umowa o współpracy, plan etapów. <strong>Po makiecie nie ma żadnego zobowiązania.</strong></div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">4</span><div><div class="collab-step__t">Budowa — budżet 30 000 zł na pół</div><div class="collab-step__d"><strong>Połowę (15 000 zł) pokrywa Tomek.</strong> Powstaje kompletne narzędzie gotowe przyjmować klientów i płatności: konta, abonamenty, panel klienta, strona sprzedażowa, kampania reklamowa, analityka, hosting.</div></div></div>' +
+            '<div class="collab-step"><span class="collab-step__n">5</span><div><div class="collab-step__t">Start sprzedaży i skala</div><div class="collab-step__d">Tomek buduje kampanię i lejek — Ty otwierasz drzwi do swojej branży. Abonamenty płyną co miesiąc, narzędzie rośnie.</div></div></div>' +
+            '</div>' +
+            '<div class="collab-fin"><strong>Skóra w grze:</strong> Tomek wkłada własne 15 000 zł i obejmuje <strong>20% udziałów</strong> — zarabia dopiero wtedy, gdy Twoje narzędzie zarabia. Dlatego nie wchodzi w projekty, w które nie wierzy. Ta rozmowa (AI) prowadzi Cię do makiety — dalej przejmuje Tomek osobiście.</div>' +
+            '<div class="collab-cta">' +
+            (done
+                ? '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener" style="flex:1;min-width:220px;">Zamów makietę → 500 zł</a>'
+                : '') +
+            '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Dokończ projekt w rozmowie') + '</button>' +
+            '</div>';
+        body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
     }
 
     // Hero state: przed pierwszą wiadomością usera wszystko (powitanie + pasek)
@@ -2041,13 +2511,14 @@
     var GATE_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
     function gatePending() {
-        if (state.email || state.verdict) return false;
+        // emailKnown: serwer ma już maila tej sesji (powrót z linku ?id=) — nie pytamy drugi raz
+        if (state.email || state.emailKnown || state.verdict) return false;
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
         return userCount >= GATE_AFTER_USER_MSGS;
     }
 
     function renderInlineGate() {
-        if (el('inline-gate') || state.email) return;
+        if (el('inline-gate') || state.email || state.emailKnown) return;
         removeChips();
         setComposerEnabled(false);
         var div = document.createElement('div');
@@ -2104,6 +2575,8 @@
         state.verdict = null; state.karta = null; state.leadId = null;
         state.kamien = 0;
         state.previews = {};
+        state.emailKnown = false; // nowa sesja = nowy wiersz w bazie, serwer maila jeszcze nie ma
+        if (activeTab !== 'chat') switchTab('chat');
         if (!state.pSlug) state.profession = null;
         messages = [];
         el('chat-msgs').innerHTML = '';
@@ -2116,7 +2589,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien', '<makieta']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -2124,6 +2597,8 @@
             .replace(/<projekt>[\s\S]*?<\/projekt>/g, '')
             .replace(/<opcje_multi>[\s\S]*?<\/opcje_multi>/g, '')
             .replace(/<opcje>[\s\S]*?<\/opcje>/g, '')
+            .replace(/<makieta>[\s\S]*?<\/makieta>/g, '')
+            .replace(/<makieta\s*\/?>/g, '')
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
             .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
             .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
@@ -2174,6 +2649,23 @@
         return out.join('');
     }
 
+    function hasMakieta(raw) {
+        return /<makieta\s*(\/\s*)?>/.test(raw || '');
+    }
+
+    // Karta zamówienia makiety inline w czacie (marker <makieta>)
+    function mkCardEl() {
+        var div = document.createElement('div');
+        div.className = 'mk-card';
+        div.innerHTML =
+            '<div class="mk-card__eyebrow">Pierwszy krok współpracy</div>' +
+            '<div class="mk-card__title">Klikalna makieta — 500 zł zadatku</div>' +
+            '<p class="mk-card__d">Tomek buduje ją osobiście w 7 dni roboczych z karty, ekranów i Twoich uwag. Zadatek w 100% wliczony w budowę — od makiety rozmawiasz już bezpośrednio z nim.</p>' +
+            '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Zamawiam makietę → 500 zł</a>' +
+            '<p class="mk-card__note">BLIK, karta lub przelew · otworzy się w nowej karcie</p>';
+        return div;
+    }
+
     function appendMessage(role, content) {
         var div = document.createElement('div');
         div.className = 'msg msg--' + (role === 'user' ? 'user' : 'ai');
@@ -2187,6 +2679,7 @@
             if (sk) el('chat-msgs').appendChild(renderSekcjeEl(sk));
             var kr = parseKaruzela(content);
             if (kr) el('chat-msgs').appendChild(renderKaruzelaEl(kr));
+            if (hasMakieta(content)) el('chat-msgs').appendChild(mkCardEl());
         }
         scrollToBottom(false);
         return div;
@@ -2226,6 +2719,7 @@
             li.classList.toggle('is-done', n < stage || (state.verdict && n === 4));
             li.classList.toggle('is-active', n === stage && !(state.verdict && n === 4));
         });
+        updateSideBadges();
     }
 
     /* ============================================================
@@ -2478,6 +2972,11 @@
                 if (ev === 'spar_meta') {
                     meta.verdict = obj.verdict || null;
                     meta.leadId = obj.leadId || null;
+                    if (obj.emailKnown && !state.email && !state.emailKnown) {
+                        // serwer zna maila tej sesji (powrót z ?id=) — bramka niepotrzebna
+                        state.emailKnown = true;
+                        persistSession();
+                    }
                     return;
                 }
                 if (ev === 'spar_projekt') {
@@ -2568,7 +3067,12 @@
                     anchor = skEl;
                 }
                 var karuzela = parseKaruzela(raw);
-                if (karuzela) anchor.insertAdjacentElement('afterend', renderKaruzelaEl(karuzela));
+                if (karuzela) {
+                    var krEl = renderKaruzelaEl(karuzela);
+                    anchor.insertAdjacentElement('afterend', krEl);
+                    anchor = krEl;
+                }
+                if (hasMakieta(raw)) anchor.insertAdjacentElement('afterend', mkCardEl());
             } else {
                 bubble.remove();
             }
@@ -2956,6 +3460,7 @@
 
             function persistPreviews() {
                 saveJSON(LS_PREVIEW, { sessionId: state.sessionId, images: state.previews });
+                updateSideBadges();
             }
 
             function finishAll() {
@@ -3031,10 +3536,6 @@
     /* ============================================================
        WERDYKT — render
        ============================================================ */
-    function panelURL() {
-        return PANEL_URL + '?id=' + encodeURIComponent(state.sessionId || '');
-    }
-
     // ID sesji w pasku adresu — link z przeglądarki jest zawsze „pełny"
     // (można go zapisać/wysłać i wrócić do tej rozmowy)
     function syncUrlId() {
@@ -3076,18 +3577,16 @@
             '</div></div>';
     }
 
-    function panelBoxHTML() {
+    function cardBoxHTML() {
         return '<div class="paybox" id="panel-box">' +
-            '<div class="paybox__eyebrow">Projekt gotowy</div>' +
-            '<h3 class="paybox__title">Twój panel projektu <em>czeka</em></h3>' +
+            '<div class="paybox__eyebrow">Projekt zdefiniowany</div>' +
+            '<h3 class="paybox__title">Karta projektu <em>gotowa</em></h3>' +
             '<ul class="paybox__list">' +
-            '<li><strong>Karta projektu</strong> — wszystko, co ustaliliśmy, w jednym miejscu.</li>' +
-            '<li><strong>Podgląd narzędzia</strong> — do oglądania i pokazywania innym.</li>' +
-            '<li><strong>Twoje uwagi i propozycje</strong> — poklikaj, dopisz pomysły; wszystko trafia do briefu makiety.</li>' +
-            '<li><strong>Zamówienie klikalnej makiety</strong> — kiedy będziesz gotowy, jednym przyciskiem.</li>' +
+            '<li><strong>Karta projektu</strong> i <strong>ekrany narzędzia</strong> czekają w menu obok — wszystko, co ustaliliśmy.</li>' +
+            '<li>Teraz najważniejsze: <strong>jak budujemy to razem z Tomkiem</strong> — on wkłada w ten projekt własne pieniądze i czas.</li>' +
             '</ul>' +
-            '<a class="paybox__btn" href="' + panelURL() + '">Wchodzę do panelu <span class="btn__arrow">→</span></a>' +
-            '<p class="paybox__note">Możesz też pisać dalej — dopracujemy projekt, a każda zmiana zaktualizuje kartę w panelu.</p>' +
+            '<button type="button" class="paybox__btn" id="btn-collab-talk">Pogadajmy o współpracy <span class="btn__arrow">→</span></button>' +
+            '<p class="paybox__note">Możesz też pisać dalej i dopracowywać projekt — każda zmiana zaktualizuje kartę.</p>' +
             '</div>';
     }
 
@@ -3097,15 +3596,23 @@
 
         if (color === 'zielony') {
             // Rozmowa zostaje OTWARTA — user może dopracowywać projekt dalej.
-            // Bez karty i banera w czacie (karta żyje w panelu); kolejne werdykty
-            // tylko aktualizują panel (bez dublowania boxa).
+            // Karta żyje w zakładce „Karta projektu"; kolejne werdykty tylko ją
+            // aktualizują (bez dublowania boxa).
             if (el('panel-box')) {
                 wrap.remove();
-                sysMsg('Karta projektu zaktualizowana — Twój panel ma już nową wersję.');
+                sysMsg('Karta projektu zaktualizowana — zakładka obok ma już nową wersję.');
             } else {
-                wrap.innerHTML = panelBoxHTML();
+                wrap.innerHTML = cardBoxHTML();
                 el('chat-msgs').appendChild(wrap);
+                var talkBtn = wrap.querySelector('#btn-collab-talk');
+                if (talkBtn) talkBtn.addEventListener('click', function () {
+                    if (streaming) return;
+                    talkBtn.disabled = true;
+                    sendOpening('Jak dokładnie działa współpraca z Tomkiem?');
+                });
             }
+            if (activeTab === 'karta' || activeTab === 'wspolpraca') switchTab(activeTab); // odśwież otwartą zakładkę
+            updateSideBadges();
             unlockComposer();
         } else if (color === 'zolty') {
             wrap.innerHTML =
@@ -3249,6 +3756,13 @@
             stickBottom = (sc.scrollHeight - sc.scrollTop - sc.clientHeight) < 140;
         }, { passive: true });
         el('btn-restart').addEventListener('click', restartAll);
+
+        // Sidebar: zakładki + mobile off-canvas
+        document.querySelectorAll('.side__item').forEach(function (b) {
+            b.addEventListener('click', function () { switchTab(b.dataset.tab); });
+        });
+        el('btn-side').addEventListener('click', openSide);
+        el('side-backdrop').addEventListener('click', closeSide);
     }
 
     function init() {
@@ -3290,6 +3804,14 @@
             state.karta = saved.karta || null;
             state.leadId = saved.leadId || null;
             state.kamien = saved.kamien || 0;
+            state.emailKnown = !!saved.emailKnown;
+            // Widoki podglądu z LS — zakładka „Ekrany narzędzia" musi je znać
+            // nawet zanim/bez odtworzenia gridu w czacie
+            var savedPrevLS = loadJSON(LS_PREVIEW);
+            if (savedPrevLS && savedPrevLS.sessionId === state.sessionId) {
+                if (savedPrevLS.images && typeof savedPrevLS.images === 'object') state.previews = savedPrevLS.images;
+                else if (typeof savedPrevLS.url === 'string') state.previews = { panel: savedPrevLS.url };
+            }
             messages = loadJSON(LS_MESSAGES) || [];
             // Odtwórz postęp kamieni z historii (odporne na brak w LS)
             messages.forEach(function (m) {
