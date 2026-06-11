@@ -759,6 +759,115 @@
     .preview-insight.is-in { opacity: 1; transform: none; }
     .preview-insight::before { content: '„'; color: var(--accent); }
     .preview-insight::after { content: '"'; color: var(--accent); }
+
+    /* ── Teatr generowania — duża scena na czas tworzenia obrazka ── */
+    .gen { padding: 0 0 14px; }
+    .gen__head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 18px 12px;
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--text-strong);
+    }
+    .gen__spark {
+        width: 18px;
+        height: 18px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3z' fill='%234d9fff'/%3E%3C/svg%3E") center / 18px no-repeat;
+        filter: drop-shadow(0 0 8px rgba(77, 159, 255, 0.7));
+        animation: sparkBreathe 2.6s ease-in-out infinite;
+    }
+    .gen .preview-insight { min-height: 58px; padding: 10px 18px 6px; }
+
+    /* Szkielet narzędzia "rysujący się" na żywo */
+    .gen-mock {
+        position: relative;
+        height: 200px;
+        margin: 4px 14px 0;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 12px;
+        background: rgba(5, 6, 10, 0.6);
+        overflow: hidden;
+    }
+    .gm {
+        position: absolute;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.055);
+        animation: gmIn 0.6s var(--ease) backwards, gmGlow 3.2s ease-in-out infinite;
+    }
+    @keyframes gmIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @keyframes gmGlow { 0%, 100% { background: rgba(255,255,255,0.05); } 50% { background: rgba(255,255,255,0.085); } }
+    .gm-side { left: 10px; top: 10px; bottom: 10px; width: 44px; animation-delay: 0.1s, 0s; }
+    .gm-top  { left: 64px; right: 10px; top: 10px; height: 22px; animation-delay: 0.3s, 0.4s; }
+    .gm-kpi  { top: 42px; height: 34px; width: calc((100% - 64px - 10px - 20px) / 3); }
+    .gm-k1 { left: 64px; animation-delay: 0.55s, 0.2s; }
+    .gm-k2 { left: calc(64px + (100% - 64px - 10px - 20px) / 3 + 10px); animation-delay: 0.7s, 0.5s; }
+    .gm-k3 { right: 10px; animation-delay: 0.85s, 0.8s; }
+    .gm-chart {
+        position: absolute;
+        left: 64px; right: 10px; top: 86px; height: 62px;
+        border-radius: 6px;
+        background: rgba(77, 159, 255, 0.05);
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        padding: 8px 10px;
+        animation: gmIn 0.6s var(--ease) 1s backwards;
+    }
+    .gm-chart b {
+        flex: 1;
+        border-radius: 3px 3px 0 0;
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.85), rgba(77, 159, 255, 0.25));
+        transform-origin: bottom;
+        animation: gmBar 2.6s ease-in-out infinite;
+    }
+    .gm-chart b:nth-child(1) { height: 36%; animation-delay: 0s; }
+    .gm-chart b:nth-child(2) { height: 58%; animation-delay: 0.2s; }
+    .gm-chart b:nth-child(3) { height: 44%; animation-delay: 0.4s; }
+    .gm-chart b:nth-child(4) { height: 72%; animation-delay: 0.6s; }
+    .gm-chart b:nth-child(5) { height: 52%; animation-delay: 0.8s; }
+    .gm-chart b:nth-child(6) { height: 84%; animation-delay: 1.0s; }
+    .gm-chart b:nth-child(7) { height: 64%; animation-delay: 1.2s; }
+    .gm-chart b:nth-child(8) { height: 92%; animation-delay: 1.4s; }
+    @keyframes gmBar { 0%, 100% { transform: scaleY(0.75); opacity: 0.7; } 50% { transform: scaleY(1); opacity: 1; } }
+    .gm-row { left: 64px; right: 10px; height: 10px; border-radius: 4px; }
+    .gm-r1 { top: 158px; animation-delay: 1.2s, 0.3s; }
+    .gm-r2 { top: 172px; right: 60px; animation-delay: 1.35s, 0.6s; }
+    .gm-r3 { top: 186px; right: 110px; height: 8px; animation-delay: 1.5s, 0.9s; }
+    .gm-scan {
+        position: absolute;
+        top: 0; bottom: 0;
+        width: 70px;
+        background: linear-gradient(90deg, transparent, rgba(77, 159, 255, 0.16), rgba(77, 159, 255, 0.45) 55%, transparent);
+        filter: blur(1px);
+        animation: gmScan 3.4s var(--ease) infinite;
+        pointer-events: none;
+    }
+    @keyframes gmScan { 0% { left: -80px; } 100% { left: 105%; } }
+
+    .gen__foot { padding: 8px 18px 0; }
+    .gen__bar {
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        overflow: hidden;
+    }
+    .gen__bar i {
+        display: block;
+        height: 100%;
+        width: 4%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent-2), var(--accent), #6db3ff);
+        box-shadow: 0 0 12px rgba(77, 159, 255, 0.6);
+        transition: width 0.4s linear;
+    }
+    .gen__step {
+        margin-top: 8px;
+        font-size: 12.5px;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+    }
     .preview-retry {
         padding: 9px 16px;
         min-height: 38px;
@@ -2110,8 +2219,12 @@
                 'Jedna dopracowana funkcja sprzedaje lepiej niż dziesięć obiecanych.'
             ];
         }
-        var insTimer = null, insIdx = 0;
-        function stopInsights() { if (insTimer) { clearInterval(insTimer); insTimer = null; } }
+        var insTimer = null, insIdx = 0, stepTimer = null, barTimer = null;
+        function stopInsights() {
+            if (insTimer) { clearInterval(insTimer); insTimer = null; }
+            if (stepTimer) { clearInterval(stepTimer); stepTimer = null; }
+            if (barTimer) { clearInterval(barTimer); barTimer = null; }
+        }
 
         function noteText(remaining) {
             var base = 'Kliknij obrazek, aby powiększyć.';
@@ -2133,12 +2246,35 @@
         // Resume: obrazek już istnieje — pokaż bez ponownego generowania
         if (knownUrl) { showImage(knownUrl, null); return; }
 
+        var GEN_STEPS = [
+            'Analizuję problem i odbiorców…',
+            'Układam ekrany narzędzia…',
+            'Dobieram polskie dane przykładowe…',
+            'Rysuję interfejs w wysokiej jakości…'
+        ];
+
         function run() {
             stopInsights();
-            wrap.innerHTML = '<div class="preview-loading"><span class="typing"><i></i><i></i><i></i></span>' +
-                '<span>Generuję podgląd narzędzia…</span></div>' +
-                '<div class="preview-insight" aria-live="polite"></div>';
+            wrap.innerHTML =
+                '<div class="gen">' +
+                '<div class="gen__head"><span class="gen__spark" aria-hidden="true"></span>Buduję podgląd Twojego narzędzia</div>' +
+                '<div class="gen-mock" aria-hidden="true">' +
+                '<i class="gm gm-side"></i><i class="gm gm-top"></i>' +
+                '<i class="gm gm-kpi gm-k1"></i><i class="gm gm-kpi gm-k2"></i><i class="gm gm-kpi gm-k3"></i>' +
+                '<span class="gm-chart"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span>' +
+                '<i class="gm gm-row gm-r1"></i><i class="gm gm-row gm-r2"></i><i class="gm gm-row gm-r3"></i>' +
+                '<i class="gm-scan"></i>' +
+                '</div>' +
+                '<div class="preview-insight" aria-live="polite"></div>' +
+                '<div class="gen__foot">' +
+                '<div class="gen__bar"><i></i></div>' +
+                '<div class="gen__step"></div>' +
+                '</div>' +
+                '</div>';
             var insEl = wrap.querySelector('.preview-insight');
+            var stepEl = wrap.querySelector('.gen__step');
+            var barEl = wrap.querySelector('.gen__bar i');
+
             function cycle() {
                 insEl.classList.remove('is-in');
                 setTimeout(function () {
@@ -2149,6 +2285,27 @@
             }
             cycle();
             insTimer = setInterval(cycle, 4800);
+
+            // Etapy budowy — przeskok co ~9 s, ostatni zostaje
+            var stepIdx = 0;
+            stepEl.textContent = GEN_STEPS[0];
+            stepTimer = setInterval(function () {
+                if (stepIdx < GEN_STEPS.length - 1) {
+                    stepIdx++;
+                    stepEl.textContent = GEN_STEPS[stepIdx];
+                } else {
+                    clearInterval(stepTimer);
+                    stepTimer = null;
+                }
+            }, 9000);
+
+            // Pasek postępu — asymptotycznie do ~92% (kończy się przy obrazku)
+            var t = 0;
+            barTimer = setInterval(function () {
+                t += 0.3;
+                var pct = 92 * (1 - Math.exp(-t / 20));
+                barEl.style.width = pct.toFixed(1) + '%';
+            }, 300);
             scrollToBottom(false);
             if (demo) {
                 // Tryb demo (?demo=podglad): pokaż pełny cykl bez kosztu API
