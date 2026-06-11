@@ -437,6 +437,11 @@
     .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 560px) { .shots { grid-template-columns: 1fr; } }
     .shots .pv-tile { cursor: zoom-in; }
+    .shots--old { grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    @media (max-width: 560px) { .shots--old { grid-template-columns: repeat(2, 1fr); } }
+    .shots--old .pv-tile { opacity: 0.65; transition: opacity 0.2s var(--ease); }
+    .shots--old .pv-tile:hover { opacity: 1; }
+    .shots--old .pv-tile__label { font-size: 10px; padding: 3px 8px; }
 
     /* Zakładka Projekt — karta w blokach narracyjnych + wersje + poprawki */
     .pj-vers { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 14px; }
@@ -2497,6 +2502,7 @@
         leadId: null,
         kamien: 0,              // najwyższy domknięty kamień rozmowy (marker <kamien>)
         previews: {},           // {view:url} — wygenerowane widoki podglądu (lightbox/resume)
+        previewHistory: {},     // {view:[starsze urls]} — poprzednie wersje ekranów (nic nie przepada)
         emailKnown: false,      // serwer zna maila tej sesji (powrót z linku ?id= — nie pytaj drugi raz)
         lastBrief: null,        // ostatni brief <projekt> (nazwa/opis do nagłówka zakładki Projekt)
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
@@ -2602,10 +2608,12 @@
         state.editsUsed = saved.editsUsed || 0;
         state.editPending = !!saved.editPending;
         state.previews = {};
+        state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
         if (savedPrev) {
             if (savedPrev.images && typeof savedPrev.images === 'object') state.previews = savedPrev.images;
             else if (typeof savedPrev.url === 'string') state.previews = { panel: savedPrev.url };
+            if (savedPrev.history && typeof savedPrev.history === 'object') state.previewHistory = savedPrev.history;
         }
         messages = loadJSON(messagesKey(saved.sessionId)) || [];
         messages.forEach(function (m) {
@@ -2786,6 +2794,22 @@
             }).join('') + '</div>';
         }
 
+        // Wcześniejsze wersje ekranów — nic nie przepada
+        var oldShots = [];
+        VIEW_META.forEach(function (vm) {
+            (state.previewHistory[vm[0]] || []).forEach(function (u, hi) {
+                oldShots.push({ view: vm[0], label: vm[1] + ' — v' + (hi + 1), url: u });
+            });
+        });
+        if (oldShots.length) {
+            html += '<div class="pj-later" style="margin:0 0 8px">Wcześniejsze wersje ekranów:</div>' +
+                '<div class="shots shots--old" style="margin-bottom:18px">' + oldShots.map(function (s, i) {
+                    return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
+                        '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
+                        '<div class="pv-tile__body"><img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
+                }).join('') + '</div>';
+        }
+
         // Karta w blokach narracyjnych
         if (k) {
             var ICO = function (p) {
@@ -2824,8 +2848,12 @@
         }
 
         body.innerHTML = html;
+        var oldList = oldShots;
         body.querySelectorAll('.pv-tile').forEach(function (t) {
-            t.addEventListener('click', function () { openLightbox(t.dataset.view); });
+            t.addEventListener('click', function () {
+                if (t.dataset.old !== undefined) openLightbox(oldList[parseInt(t.dataset.old, 10)].url);
+                else openLightbox(t.dataset.view);
+            });
         });
         body.querySelectorAll('.pj-ver').forEach(function (b) {
             b.addEventListener('click', function () { renderPaneProjekt(parseInt(b.dataset.ver, 10)); });
@@ -2917,11 +2945,13 @@
 
     function openLightbox(startView) {
         if (el('spar-lightbox')) return;
-        var items = lightboxItems();
-        if (!items.length && typeof startView === 'string' && /^https?:/.test(startView)) {
-            // kompatybilność: stare wywołanie z gołym URL-em
-            items = [{ view: 'panel', label: 'Podgląd narzędzia', url: startView }];
+        var items;
+        if (typeof startView === 'string' && /^https?:/.test(startView)) {
+            // pojedynczy URL (np. wcześniejsza wersja ekranu z archiwum)
+            items = [{ view: 'panel', label: 'Wcześniejsza wersja', url: startView }];
             startView = 'panel';
+        } else {
+            items = lightboxItems();
         }
         if (!items.length) return;
         var idx = 0;
@@ -3056,6 +3086,7 @@
         state.verdict = null; state.karta = null; state.leadId = null;
         state.kamien = 0;
         state.previews = {};
+        state.previewHistory = {};
         state.emailKnown = false; // nowa sesja = nowy wiersz w bazie, serwer maila jeszcze nie ma
         state.lastBrief = null;
         state.editsUsed = 0;
@@ -4075,7 +4106,7 @@
             var anyLimit = false;
 
             function persistPreviews() {
-                saveJSON(previewKey(state.sessionId), { images: state.previews });
+                saveJSON(previewKey(state.sessionId), { images: state.previews, history: state.previewHistory });
                 updateSideBadges();
             }
 
@@ -4106,6 +4137,11 @@
                     }
                     return res.json();
                 }).then(function (d) {
+                    // poprzednia wersja tego widoku NIE przepada — ląduje w archiwum
+                    if (state.previews[view] && state.previews[view] !== d.url) {
+                        if (!state.previewHistory[view]) state.previewHistory[view] = [];
+                        state.previewHistory[view].push(state.previews[view]);
+                    }
                     state.previews[view] = d.url;
                     // równoległe odpowiedzi wracają w dowolnej kolejności — liczy się najniższy stan puli
                     if (typeof d.remaining === 'number') {
