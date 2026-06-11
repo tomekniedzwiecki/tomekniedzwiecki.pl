@@ -894,43 +894,43 @@
        ============================================================ */
     var GATE_AFTER_USER_MSGS = 4; // po tylu wiadomościach rozmówcy pojawia się bramka (imię + mail)
 
-    var PROF_CHIPS = [
-        { apiName: 'Księgowi / biuro rachunkowe',      label: 'Prowadzę biuro rachunkowe' },
-        { apiName: 'Architekci / projektanci wnętrz',  label: 'Projektuję wnętrza albo budynki' },
-        { apiName: 'Agenci nieruchomości',             label: 'Sprzedaję nieruchomości' },
-        { apiName: 'Fizjoterapeuci',                   label: 'Prowadzę gabinet fizjoterapii' },
-        { apiName: 'Szkoleniowcy / firmy szkoleniowe', label: 'Szkolę ludzi i firmy' },
-        { apiName: 'Marketingowcy / agencje',          label: 'Robię marketing klientom' }
+    // Otwarcie: lekkie, z obietnicą (podgląd narzędzia za parę minut), zero progów
+    var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
+    var OPENER_PROMISE = 'Kilka pytań — głównie klikasz, nie piszesz — i za parę minut zobaczysz pierwszy **podgląd swojego narzędzia**.\n\nOd czego zaczynamy?';
+
+    var OPENER_GENERIC = OPENER_HI + ' Pomagam zamienić to, co znasz, w Twój własny produkt cyfrowy — narzędzie, za które inni płacą co miesiąc.\n\n' + OPENER_PROMISE;
+
+    // Chipy startowe = trzy drogi wejścia (pomysł / problem / szukamy)
+    var START_CHIPS = [
+        'Mam już pomysł na narzędzie',
+        'Znam problem, który warto rozwiązać',
+        'Nie mam pomysłu — poszukajmy razem'
     ];
-
-    var OPENER_INTRO = 'Cześć. Jestem sparingiem wytrenowanym przez Tomka Niedźwieckiego — sprawdzam, czy problem z Twojej codziennej roboty nadaje się na narzędzie, za które Twoja branża zapłaci. I umiem powiedzieć „nie".';
-
-    var OPENER_GENERIC = OPENER_INTRO + '\n\nCzym się zajmujesz na co dzień? Wybierz niżej albo napisz po swojemu.';
 
     var P_OPENERS = {
         ksiegowosc: {
             apiName: 'Księgowi / biuro rachunkowe',
-            opener: OPENER_INTRO + '\n\nProwadzisz biuro rachunkowe, tak? To zacznijmy od najgorszego momentu miesiąca: **co się u Ciebie dzieje między 15. a 20.?**'
+            opener: OPENER_HI + ' Prowadzisz biuro rachunkowe? Świetnie — znasz od środka branżę, w której aż prosi się o dobre narzędzia. Zamieńmy Twoją wiedzę w produkt, za który inne biura będą płacić co miesiąc.\n\n' + OPENER_PROMISE
         },
         architektura: {
             apiName: 'Architekci / projektanci wnętrz',
-            opener: OPENER_INTRO + '\n\nProjektujesz wnętrza albo budynki, tak? Zacznijmy od inwestorów: **co w pracy z nimi kosztuje Cię najwięcej godzin albo nerwów?**'
+            opener: OPENER_HI + ' Projektujesz wnętrza albo budynki? Świetnie — wiesz lepiej niż ktokolwiek, czego brakuje pracowniom. Zamieńmy to w produkt, za który inne pracownie będą płacić co miesiąc.\n\n' + OPENER_PROMISE
         },
         nieruchomosci: {
             apiName: 'Agenci nieruchomości',
-            opener: OPENER_INTRO + '\n\nDziałasz w nieruchomościach, tak? Zacznijmy od procesu: **gdzie między pozyskaniem oferty a aktem tracisz najwięcej czasu?**'
+            opener: OPENER_HI + ' Działasz w nieruchomościach? Świetnie — znasz tę branżę od kuchni. Zamieńmy to w narzędzie, za które inni agenci będą płacić co miesiąc.\n\n' + OPENER_PROMISE
         },
         fizjoterapia: {
             apiName: 'Fizjoterapeuci',
-            opener: OPENER_INTRO + '\n\nProwadzisz gabinet fizjoterapii, tak? Zacznijmy od pacjentów: **co dzieje się między wizytami, czego nie widzisz — a co psuje efekty terapii?**'
+            opener: OPENER_HI + ' Prowadzisz gabinet fizjoterapii? Świetnie — wiesz, czego gabinetom naprawdę brakuje. Zamieńmy to w produkt, za który inne gabinety będą płacić co miesiąc.\n\n' + OPENER_PROMISE
         },
         szkolenia: {
             apiName: 'Szkoleniowcy / firmy szkoleniowe',
-            opener: OPENER_INTRO + '\n\nSzkolisz ludzi albo firmy, tak? Zacznijmy od zaplecza: **co przy każdym szkoleniu robisz ręcznie od nowa, choć zawsze wygląda tak samo?**'
+            opener: OPENER_HI + ' Szkolisz ludzi i firmy? Świetnie — znasz ten rynek od środka. Zamieńmy Twoją wiedzę w produkt, za który inni szkoleniowcy będą płacić co miesiąc.\n\n' + OPENER_PROMISE
         },
         marketing: {
             apiName: 'Marketingowcy / agencje',
-            opener: OPENER_INTRO + '\n\nRobisz marketing klientom, tak? Zacznijmy od obsługi: **co przy każdym kliencie pożera czas, choć nie jest robotą kreatywną?**'
+            opener: OPENER_HI + ' Robisz marketing klientom? Świetnie — wiesz, co w tej robocie zżera czas. Zamieńmy to w narzędzie, za które inne agencje będą płacić co miesiąc.\n\n' + OPENER_PROMISE
         }
     };
 
@@ -1033,26 +1033,10 @@
         messages.push({ role: 'assistant', content: o ? o.opener : OPENER_GENERIC, local: true });
     }
 
-    // Chipy szybkich odpowiedzi pod otwarciem (tylko wejście ogólne, bez ?p=)
+    // Chipy startowe pod otwarciem — trzy drogi wejścia (renderSuggestions robi resztę)
     function renderChips() {
         if (el('qr-chips')) return;
-        var div = document.createElement('div');
-        div.className = 'qr';
-        div.id = 'qr-chips';
-        PROF_CHIPS.forEach(function (c) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.textContent = c.label;
-            b.addEventListener('click', function () {
-                if (streaming) return;
-                state.profession = c.apiName;
-                persistSession();
-                removeChips();
-                sendOpening(c.label);
-            });
-            div.appendChild(b);
-        });
-        el('chat-msgs').appendChild(div);
+        renderSuggestions(START_CHIPS);
     }
     function removeChips() {
         var c = el('qr-chips');
@@ -1655,7 +1639,7 @@
             if (isResume && state.verdict === 'zolty') {
                 sysMsg('Wróciłeś do rozmowy. Werdykt na ten moment: żółty — doprecyzuj i pisz dalej.');
             }
-        } else if (userCount === 0 && !state.profession) {
+        } else if (userCount === 0) {
             renderChips();
         } else if (gatePending()) {
             renderInlineGate();
