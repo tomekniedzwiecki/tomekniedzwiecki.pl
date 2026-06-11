@@ -1091,6 +1091,7 @@
     var LS_SESSION = 'spar_session';
     var LS_MESSAGES = 'spar_messages';
     var LS_TRACKING = 'spar_tracking';
+    var LS_PREVIEW = 'spar_preview'; // {sessionId, url} — ostatni wygenerowany podgląd (resume po refreshu)
     var MAX_MSG_LEN = 2000;
     var WERDYKT_MARK = '<werdykt';
 
@@ -1692,10 +1693,19 @@
     /* ============================================================
        PODGLĄD GRAFICZNY — marker <projekt> → spar-image → obraz w czacie
        ============================================================ */
-    function requestPreview() {
+    function requestPreview(knownUrl) {
         var wrap = document.createElement('div');
         wrap.className = 'msg msg--ai msg--preview';
         el('chat-msgs').appendChild(wrap);
+
+        function showImage(url) {
+            wrap.innerHTML = '<img class="preview-img" src="' + esc(url) + '" alt="Podgląd narzędzia" loading="lazy">' +
+                '<div class="preview-note">Podgląd poglądowy — klikalna makieta powstanie na bazie Twoich uwag.</div>';
+            scrollToBottom(false);
+        }
+
+        // Resume: obrazek już istnieje — pokaż bez ponownego generowania
+        if (knownUrl) { showImage(knownUrl); return; }
 
         function run() {
             wrap.innerHTML = '<div class="preview-loading"><span class="typing"><i></i><i></i><i></i></span>' +
@@ -1713,9 +1723,8 @@
                 }
                 return res.json();
             }).then(function (d) {
-                wrap.innerHTML = '<img class="preview-img" src="' + esc(d.url) + '" alt="Podgląd narzędzia" loading="lazy">' +
-                    '<div class="preview-note">Podgląd poglądowy — klikalna makieta powstanie na bazie Twoich uwag.</div>';
-                scrollToBottom(false);
+                saveJSON(LS_PREVIEW, { sessionId: state.sessionId, url: d.url });
+                showImage(d.url);
             }).catch(function (e) {
                 if (e && e.code === 'limit_podgladow') {
                     wrap.innerHTML = '<div class="preview-loading">Limit podglądów w tej rozmowie osiągnięty — opisz uwagi słowami, uwzględnię je w makiecie.</div>';
@@ -1833,6 +1842,7 @@
         try {
             localStorage.removeItem(LS_SESSION);
             localStorage.removeItem(LS_MESSAGES);
+            localStorage.removeItem(LS_PREVIEW);
         } catch (e) {}
         unlockComposer();
         startFresh(false);
@@ -1851,6 +1861,17 @@
             saveMessages();
         }
         messages.forEach(function (m) { appendMessage(m.role, m.content); });
+
+        // Resume podglądu: jeśli w historii był marker <projekt>, odtwórz obrazek
+        // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem
+        var hasProjekt = false;
+        for (var pi = messages.length - 1; pi >= 0; pi--) {
+            if (messages[pi].role === 'assistant' && messages[pi].content.indexOf('<projekt>') >= 0) { hasProjekt = true; break; }
+        }
+        if (hasProjekt) {
+            var savedPrev = loadJSON(LS_PREVIEW);
+            requestPreview((savedPrev && savedPrev.sessionId === state.sessionId) ? savedPrev.url : null);
+        }
 
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
 
