@@ -2362,14 +2362,14 @@
             // Marker <projekt> → generowanie BLOKUJE rozmowę do pokazania efektu
             // (inaczej user klika dalej i nigdy nie widzi podglądu); dymki tej
             // tury renderują się dopiero POD obrazkiem.
-            var sugg = (!state.verdict && !el('inline-gate')) ? suggestionsFrom(raw) : null;
+            var sugg = (!el('inline-gate')) ? suggestionsFrom(raw) : null;
             if (meta.projekt) {
                 setComposerEnabled(false);
                 el('chat-input').placeholder = 'Generuję podgląd — daj mi chwilę…';
                 requestPreview(null, meta.projekt, false, function () {
                     if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
                     updateHero(); // przywraca standardowy placeholder
-                    if (sugg && !state.verdict && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
+                    if (sugg && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
                     else if (gatePending() && !el('inline-gate')) renderInlineGate();
                 });
             } else if (sugg) {
@@ -2712,6 +2712,18 @@
         return PANEL_URL + '?id=' + encodeURIComponent(state.sessionId || '');
     }
 
+    // ID sesji w pasku adresu — link z przeglądarki jest zawsze „pełny"
+    // (można go zapisać/wysłać i wrócić do tej rozmowy)
+    function syncUrlId() {
+        if (!state.sessionId || !window.history || !history.replaceState) return;
+        try {
+            var u = new URLSearchParams(location.search);
+            if (u.get('id') === state.sessionId) return;
+            u.set('id', state.sessionId);
+            history.replaceState(null, '', location.pathname + '?' + u.toString());
+        } catch (e) {}
+    }
+
     function kartaHTML(k) {
         if (!k) return '';
         function item(label, val, wide) {
@@ -2742,7 +2754,7 @@
     }
 
     function panelBoxHTML() {
-        return '<div class="paybox">' +
+        return '<div class="paybox" id="panel-box">' +
             '<div class="paybox__eyebrow">Projekt gotowy</div>' +
             '<h3 class="paybox__title">Twój panel projektu <em>czeka</em></h3>' +
             '<ul class="paybox__list">' +
@@ -2752,7 +2764,7 @@
             '<li><strong>Zamówienie klikalnej makiety</strong> — kiedy będziesz gotowy, jednym przyciskiem.</li>' +
             '</ul>' +
             '<a class="paybox__btn" href="' + panelURL() + '">Wchodzę do panelu <span class="btn__arrow">→</span></a>' +
-            '<p class="paybox__note">Link działa na tym urządzeniu — zapisz go sobie, jeśli chcesz wrócić później.</p>' +
+            '<p class="paybox__note">Możesz też pisać dalej — dopracujemy projekt, a każda zmiana zaktualizuje kartę w panelu.</p>' +
             '</div>';
     }
 
@@ -2761,15 +2773,17 @@
         wrap.className = 'verdict';
 
         if (color === 'zielony') {
-            wrap.innerHTML =
-                '<div class="vbanner vbanner--green">' +
-                '<div class="vbanner__title">Projekt <em>zdefiniowany.</em></div>' +
-                '<div class="vbanner__sub">Wszystko, co ustaliliśmy, jest w Karcie poniżej — <strong>na jej podstawie powstanie makieta</strong>. Dalej pracujemy w Twoim panelu projektu.</div>' +
-                '</div>' +
-                kartaHTML(karta) +
-                panelBoxHTML();
-            el('chat-msgs').appendChild(wrap);
-            lockComposer('Rozmowa zakończona — Twój projekt czeka w panelu.');
+            // Rozmowa zostaje OTWARTA — user może dopracowywać projekt dalej.
+            // Bez karty i banera w czacie (karta żyje w panelu); kolejne werdykty
+            // tylko aktualizują panel (bez dublowania boxa).
+            if (el('panel-box')) {
+                wrap.remove();
+                sysMsg('Karta projektu zaktualizowana — Twój panel ma już nową wersję.');
+            } else {
+                wrap.innerHTML = panelBoxHTML();
+                el('chat-msgs').appendChild(wrap);
+            }
+            unlockComposer();
         } else if (color === 'zolty') {
             wrap.innerHTML =
                 '<div class="vbanner vbanner--yellow">' +
@@ -2871,7 +2885,7 @@
         }
 
         // Resume: odtwórz dymki odpowiedzi z ostatniej tury AI (jeśli user jeszcze nie odpowiedział)
-        if (!regenerating && !state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
+        if (!regenerating && !el('inline-gate') && !el('qr-chips') && messages.length) {
             var lastMsg = messages[messages.length - 1];
             if (lastMsg.role === 'assistant' && !lastMsg.local) {
                 var resumeSugg = suggestionsFrom(lastMsg.content);
@@ -2881,6 +2895,7 @@
 
         updateStages();
         updateHero();
+        syncUrlId();
         scrollToBottom(true);
         // focus tylko na desktopie — na mobile klawiatura zasłoniłaby historię
         if (window.matchMedia('(hover: hover)').matches && !state.verdict && !el('inline-gate')) {
@@ -2913,11 +2928,30 @@
         bindChat();
 
         // ?p=profesja z reklamy — otwarcie skrojone pod branżę
-        var p = new URLSearchParams(window.location.search).get('p');
+        var qs = new URLSearchParams(window.location.search);
+        var p = qs.get('p');
         if (p && P_OPENERS[p]) state.pSlug = p;
 
-        // Resume sesji (mail może jeszcze nie być podany — bramka jest w rozmowie)
+        // ?id=<uuid> — powrót do konkretnej rozmowy z linka (np. z panelu
+        // albo zapisanego adresu); ma pierwszeństwo przed sesją z localStorage
+        var urlId = (qs.get('id') || '').trim();
+        var UUID_RE_URL = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         var saved = loadJSON(LS_SESSION);
+        if (urlId && UUID_RE_URL.test(urlId) && (!saved || saved.sessionId !== urlId)) {
+            // Inna rozmowa niż lokalna — wejdź w nią (historia wiadomości jest
+            // po stronie systemu; lokalnie startujemy od powitania)
+            state.sessionId = urlId;
+            state.pSlug = state.pSlug || null;
+            messages = [];
+            addOpener();
+            persistSession();
+            saveMessages();
+            enterChat(false);
+            sysMsg('Wróciłeś do zapisanej rozmowy — wcześniejsze wiadomości mam zapisane po swojej stronie. Pisz dalej.');
+            return;
+        }
+
+        // Resume sesji (mail może jeszcze nie być podany — bramka jest w rozmowie)
         if (saved && saved.sessionId) {
             state.pSlug = saved.pSlug || state.pSlug;
             state.profession = saved.profession || (state.pSlug ? P_OPENERS[state.pSlug].apiName : null);
