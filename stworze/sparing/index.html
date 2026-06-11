@@ -510,6 +510,85 @@
     .acc__item.is-open .acc__body { display: block; animation: msgIn 0.3s var(--ease); }
 
     /* ============================================================
+       KARUZELA — porównanie wariantów (przesuwane karty)
+       ============================================================ */
+    .car {
+        position: relative;
+        align-self: flex-start;
+        width: 100%;
+        max-width: min(620px, 92%);
+        margin-left: 34px;
+        animation: msgIn 0.4s var(--ease) backwards;
+    }
+    .car__track {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 84%;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+    .car__track::-webkit-scrollbar { display: none; }
+    .car__card {
+        scroll-snap-align: center;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        padding: 16px;
+    }
+    .car__title {
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: var(--text-strong);
+        padding-bottom: 9px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid var(--glass-border-soft);
+    }
+    .car__body { font-size: 14px; line-height: 1.6; color: var(--text); }
+    .car__dots { display: flex; justify-content: center; gap: 7px; margin-top: 10px; }
+    .car__dots button {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--border-strong);
+        transition: background 0.25s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    }
+    .car__dots button.is-on {
+        background: var(--accent);
+        transform: scale(1.35);
+        box-shadow: 0 0 10px rgba(77, 159, 255, 0.6);
+    }
+    .car__arr {
+        position: absolute;
+        top: 42%;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(10, 10, 16, 0.88);
+        border: 1px solid var(--glass-border);
+        color: var(--text-strong);
+        opacity: 0;
+        transition: opacity 0.25s var(--ease), border-color 0.25s var(--ease);
+        z-index: 2;
+    }
+    .car__arr svg { width: 17px; height: 17px; }
+    .car:hover .car__arr { opacity: 1; }
+    .car__arr:hover { border-color: var(--accent); }
+    .car__arr--l { left: -14px; }
+    .car__arr--r { right: -14px; }
+    @media (max-width: 640px) {
+        .car { margin-left: 0; max-width: 100%; }
+        .car__arr { display: none; }
+    }
+
+    /* ============================================================
        BŁYSK — wyróżniona obserwacja branżowa
        ============================================================ */
     .blysk {
@@ -1702,7 +1781,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -1710,7 +1789,8 @@
             .replace(/<projekt>[\s\S]*?<\/projekt>/g, '')
             .replace(/<opcje>[\s\S]*?<\/opcje>/g, '')
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
-            .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '');
+            .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
+            .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '');
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
             var i = t.indexOf(HIDDEN_MARKS[m]);
@@ -1768,6 +1848,8 @@
             if (bl) el('chat-msgs').appendChild(renderBlyskEl(bl));
             var sk = parseSekcje(content);
             if (sk) el('chat-msgs').appendChild(renderSekcjeEl(sk));
+            var kr = parseKaruzela(content);
+            if (kr) el('chat-msgs').appendChild(renderKaruzelaEl(kr));
         }
         scrollToBottom(false);
         return div;
@@ -2078,7 +2160,13 @@
                     anchor = blEl;
                 }
                 var sekcje = parseSekcje(raw);
-                if (sekcje) anchor.insertAdjacentElement('afterend', renderSekcjeEl(sekcje));
+                if (sekcje) {
+                    var skEl = renderSekcjeEl(sekcje);
+                    anchor.insertAdjacentElement('afterend', skEl);
+                    anchor = skEl;
+                }
+                var karuzela = parseKaruzela(raw);
+                if (karuzela) anchor.insertAdjacentElement('afterend', renderKaruzelaEl(karuzela));
             } else {
                 bubble.remove();
             }
@@ -2177,6 +2265,79 @@
             }).slice(0, 10);
             return arr.length ? arr : null;
         } catch (e) { return null; }
+    }
+
+    /* ============================================================
+       KARUZELA — porównanie wariantów (marker <karuzela>)
+       ============================================================ */
+    function parseKaruzela(raw) {
+        if (!raw) return null;
+        var ms = raw.match(/<karuzela>([\s\S]*?)<\/karuzela>/g);
+        if (!ms || !ms.length) return null;
+        var inner = ms[ms.length - 1].replace(/^<karuzela>/, '').replace(/<\/karuzela>$/, '');
+        try {
+            var arr = JSON.parse(inner);
+            if (!Array.isArray(arr)) return null;
+            arr = arr.filter(function (x) {
+                return x && typeof x.tytul === 'string' && x.tytul.trim() &&
+                       typeof x.tresc === 'string' && x.tresc.trim();
+            }).slice(0, 4);
+            return arr.length ? arr : null;
+        } catch (e) { return null; }
+    }
+
+    function renderKaruzelaEl(arr) {
+        var wrap = document.createElement('div');
+        wrap.className = 'car';
+        var track = document.createElement('div');
+        track.className = 'car__track';
+        arr.forEach(function (s) {
+            var c = document.createElement('div');
+            c.className = 'car__card';
+            c.innerHTML = '<div class="car__title">' + esc(s.tytul.trim().slice(0, 90)) + '</div>' +
+                '<div class="car__body">' + renderRich(s.tresc) + '</div>';
+            track.appendChild(c);
+        });
+        wrap.appendChild(track);
+
+        if (arr.length > 1) {
+            var dots = document.createElement('div');
+            dots.className = 'car__dots';
+            arr.forEach(function (_, i) {
+                var d = document.createElement('button');
+                d.type = 'button';
+                if (i === 0) d.className = 'is-on';
+                d.setAttribute('aria-label', 'Karta ' + (i + 1) + ' z ' + arr.length);
+                d.addEventListener('click', function () {
+                    track.scrollTo({ left: track.children[i].offsetLeft - 8, behavior: 'smooth' });
+                });
+                dots.appendChild(d);
+            });
+            wrap.appendChild(dots);
+
+            function mkArrow(dir) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'car__arr car__arr--' + (dir < 0 ? 'l' : 'r');
+                b.setAttribute('aria-label', dir < 0 ? 'Poprzednia karta' : 'Następna karta');
+                b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6') + '"></path></svg>';
+                b.addEventListener('click', function () {
+                    track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: 'smooth' });
+                });
+                return b;
+            }
+            wrap.appendChild(mkArrow(-1));
+            wrap.appendChild(mkArrow(1));
+
+            track.addEventListener('scroll', function () {
+                var w = track.children[0].offsetWidth + 10;
+                var i = Math.max(0, Math.min(arr.length - 1, Math.round(track.scrollLeft / w)));
+                dots.querySelectorAll('button').forEach(function (d, di) {
+                    d.classList.toggle('is-on', di === i);
+                });
+            }, { passive: true });
+        }
+        return wrap;
     }
 
     function renderSekcjeEl(arr) {
