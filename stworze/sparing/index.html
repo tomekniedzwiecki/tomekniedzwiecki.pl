@@ -280,6 +280,25 @@
     }
     .qr button:hover { border-color: var(--accent); background: var(--accent-dim); }
 
+    /* Podgląd graficzny narzędzia w czacie */
+    .msg--preview { width: 100%; max-width: 560px; }
+    .preview-img {
+        display: block;
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border-strong);
+    }
+    .preview-note { margin-top: 8px; font-size: 12.5px; color: var(--text-muted); }
+    .preview-loading { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--text-muted); }
+    .preview-retry {
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--accent);
+        background: var(--accent-dim);
+        color: var(--text-strong);
+        font-size: 13px;
+    }
+
     /* Bramka inline w rozmowie (imię + mail) */
     .msg--gate { width: 100%; max-width: 560px; }
     .msg--gate .f-row { margin: 12px 0; }
@@ -859,6 +878,7 @@
        KONFIG
        ============================================================ */
     var SPAR_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-chat';
+    var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // oferta "Pierwsza Makieta — Stworzę" (500 zł)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
@@ -1112,16 +1132,22 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
+    var HIDDEN_MARKS = ['<werdykt', '<projekt']; // bloki techniczne ukrywane przed użytkownikiem
+
     function visibleText(raw) {
-        var t = raw;
-        var i = t.indexOf(WERDYKT_MARK);
-        if (i >= 0) {
-            var close = t.indexOf('</werdykt>');
-            t = (close >= 0) ? (t.slice(0, i) + t.slice(close + 10)) : t.slice(0, i);
-        } else {
-            // częściowy marker na końcu streamu — buforuj ('<', '<w', '<we'…)
-            for (var k = WERDYKT_MARK.length - 1; k > 0; k--) {
-                if (t.slice(-k) === WERDYKT_MARK.slice(0, k)) { t = t.slice(0, t.length - k); break; }
+        var t = raw
+            .replace(/<werdykt>[\s\S]*?<\/werdykt>/g, '')
+            .replace(/<projekt>[\s\S]*?<\/projekt>/g, '');
+        // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
+        for (var m = 0; m < HIDDEN_MARKS.length; m++) {
+            var i = t.indexOf(HIDDEN_MARKS[m]);
+            if (i >= 0) t = t.slice(0, i);
+        }
+        // częściowy marker na końcu streamu — buforuj ('<', '<w', '<pr'…)
+        outer: for (var k = 8; k > 0; k--) {
+            var tail = t.slice(-k);
+            for (var m2 = 0; m2 < HIDDEN_MARKS.length; m2++) {
+                if (tail === HIDDEN_MARKS[m2].slice(0, k)) { t = t.slice(0, t.length - k); break outer; }
             }
         }
         return t.replace(/\s+$/, '');
@@ -1248,7 +1274,7 @@
         scrollToBottom(true);
 
         var raw = '';
-        var meta = { verdict: null, leadId: null };
+        var meta = { verdict: null, leadId: null, projekt: null };
         var gotText = false;
         var failedBeforeText = false;
 
@@ -1294,6 +1320,10 @@
                 if (ev === 'spar_meta') {
                     meta.verdict = obj.verdict || null;
                     meta.leadId = obj.leadId || null;
+                    return;
+                }
+                if (ev === 'spar_projekt') {
+                    meta.projekt = obj || null;
                     return;
                 }
                 if (obj.type === 'content_block_delta' && obj.delta && obj.delta.type === 'text_delta') {
@@ -1366,6 +1396,9 @@
                 bubble.remove();
             }
 
+            // Marker <projekt> → wygeneruj podgląd graficzny w czacie
+            if (meta.projekt) requestPreview();
+
             // Werdykt: spar_meta ma priorytet, fallback = parsowanie markera
             var parsed = parseWerdykt(raw);
             var verdict = meta.verdict || (parsed && parsed.kolor) || null;
@@ -1402,6 +1435,47 @@
         var m = raw.match(/<werdykt>([\s\S]*?)<\/werdykt>/);
         if (!m) return null;
         try { return JSON.parse(m[1]); } catch (e) { return null; }
+    }
+
+    /* ============================================================
+       PODGLĄD GRAFICZNY — marker <projekt> → spar-image → obraz w czacie
+       ============================================================ */
+    function requestPreview() {
+        var wrap = document.createElement('div');
+        wrap.className = 'msg msg--ai msg--preview';
+        el('chat-msgs').appendChild(wrap);
+
+        function run() {
+            wrap.innerHTML = '<div class="preview-loading"><span class="typing"><i></i><i></i><i></i></span>' +
+                '<span>Generuję podgląd narzędzia — to potrwa do minuty…</span></div>';
+            scrollToBottom(false);
+            fetch(SPAR_IMAGE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                body: JSON.stringify({ sessionId: state.sessionId })
+            }).then(function (res) {
+                if (!res.ok) {
+                    return res.json().catch(function () { return {}; }).then(function (err) {
+                        var e = new Error('img'); e.code = err && err.error; throw e;
+                    });
+                }
+                return res.json();
+            }).then(function (d) {
+                wrap.innerHTML = '<img class="preview-img" src="' + esc(d.url) + '" alt="Podgląd narzędzia" loading="lazy">' +
+                    '<div class="preview-note">Podgląd poglądowy — klikalna makieta powstanie na bazie Twoich uwag.</div>';
+                scrollToBottom(false);
+            }).catch(function (e) {
+                if (e && e.code === 'limit_podgladow') {
+                    wrap.innerHTML = '<div class="preview-loading">Limit podglądów w tej rozmowie osiągnięty — opisz uwagi słowami, uwzględnię je w makiecie.</div>';
+                    return;
+                }
+                wrap.innerHTML = '<div class="preview-loading">Nie udało się wygenerować podglądu. ' +
+                    '<button type="button" class="preview-retry">Spróbuj ponownie</button></div>';
+                var btn = wrap.querySelector('.preview-retry');
+                if (btn) btn.addEventListener('click', run);
+            });
+        }
+        run();
     }
 
     /* ============================================================
@@ -1445,15 +1519,14 @@
     function payboxHTML() {
         return '<div class="paybox">' +
             '<div class="paybox__eyebrow">Następny krok</div>' +
-            '<h3 class="paybox__title">Pierwsza Makieta — <em>500 zł</em></h3>' +
+            '<h3 class="paybox__title">Klikalna makieta — <em>500 zł zadatku</em></h3>' +
             '<ul class="paybox__list">' +
-            '<li><strong>Klikalna makieta 5–7 ekranów</strong> Twojego narzędzia. W 7 dni roboczych.</li>' +
-            '<li><strong>Plan Niszy</strong> — kto płaci, ile i którym kanałem do nich dotrzeć.</li>' +
+            '<li><strong>Dokładna, klikalna makieta</strong> Twojego narzędzia — z uwzględnieniem wszystkich uwag i wytycznych z tej rozmowy. W 7 dni roboczych.</li>' +
             '<li><strong>Wideo-walkthrough</strong> — przechodzę przez makietę ekran po ekranie i tłumaczę decyzje.</li>' +
             '<li><strong>Wycena budowy</strong> działającej wersji. Konkretna kwota, nie widełki z sufitu.</li>' +
             '</ul>' +
-            '<p class="paybox__credit"><strong>500 zł odliczam w 100% od ceny budowy.</strong> Jeśli wchodzisz dalej: budowa od 14 000 zł brutto + 20% udziałów — zarabiam wtedy, gdy narzędzie zarabia.</p>' +
-            '<a class="paybox__btn" href="' + checkoutURL() + '">Zamawiam Pierwszą Makietę → 500 zł</a>' +
+            '<p class="paybox__credit"><strong>Zadatek odliczam w 100% od ceny budowy.</strong> Jeśli wchodzisz dalej: budowa od 14 000 zł brutto + 20% udziałów — zarabiam wtedy, gdy narzędzie zarabia.</p>' +
+            '<a class="paybox__btn" href="' + checkoutURL() + '">Wpłacam zadatek → 500 zł</a>' +
             '<p class="paybox__note">Płatność online: BLIK, karta lub przelew.</p>' +
             '</div>';
     }
