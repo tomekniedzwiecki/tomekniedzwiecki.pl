@@ -530,19 +530,56 @@
     .pj-edit__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin: 0 0 11px; }
     .pj-edit--done .pj-edit__d { margin-bottom: 0; }
 
-    /* Współpraca — droga i zasady */
-    .collab-grid { display: flex; flex-direction: column; gap: 10px; }
-    .collab-step {
+    /* Współpraca — liczby, oś czasu, role (skanowalne, zero ścian tekstu) */
+    .cw-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 26px;
+    }
+    .cw-stat {
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
+        padding: 16px 14px;
+        text-align: center;
+    }
+    .cw-stat b {
+        display: block;
+        font-size: clamp(26px, 3.4vw, 34px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--accent);
+        line-height: 1.1;
+        margin-bottom: 6px;
+        text-shadow: 0 0 24px rgba(77, 159, 255, 0.35);
+    }
+    .cw-stat span { font-size: 12px; line-height: 1.5; color: var(--text); display: block; }
+    .cw-stat em { font-style: normal; color: var(--text-muted); font-size: 11px; }
+    @media (max-width: 540px) {
+        .cw-stats { gap: 7px; }
+        .cw-stat { padding: 12px 8px; }
+        .cw-stat span { font-size: 10.5px; }
+    }
+
+    .cw-tl { position: relative; padding-left: 4px; margin-bottom: 26px; }
+    .cw-tl__item {
+        position: relative;
         display: flex;
         gap: 14px;
         align-items: flex-start;
-        border: 1px solid var(--glass-border-soft);
-        border-radius: 14px;
-        padding: 14px 16px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
+        padding: 0 0 18px 0;
     }
-    .collab-step.is-now { border-color: rgba(77, 159, 255, 0.4); box-shadow: 0 0 30px -16px rgba(77, 159, 255, 0.5); }
-    .collab-step__n {
+    .cw-tl__item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 13px;
+        top: 30px;
+        bottom: 2px;
+        width: 2px;
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.3), var(--glass-border-soft));
+    }
+    .cw-tl__dot {
         width: 28px;
         height: 28px;
         flex-shrink: 0;
@@ -551,24 +588,76 @@
         place-items: center;
         font-size: 12px;
         font-weight: 800;
-        color: var(--accent);
-        border: 1px solid rgba(77, 159, 255, 0.5);
-        background: var(--accent-dim);
+        color: var(--text-muted);
+        border: 1px solid var(--border-strong);
+        background: rgba(10, 10, 16, 0.9);
+        z-index: 1;
     }
-    .collab-step__t { font-size: 14.5px; font-weight: 800; color: var(--text-strong); }
-    .collab-step__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin-top: 3px; }
-    .collab-step__d strong { color: var(--text); }
-    .collab-fin {
-        margin-top: 14px;
+    .cw-tl__item.is-done .cw-tl__dot { background: var(--accent); border-color: var(--accent); color: #061320; }
+    .cw-tl__item.is-now .cw-tl__dot {
+        border-color: rgba(77, 159, 255, 0.8);
+        color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(77, 159, 255, 0.12), 0 0 16px rgba(77, 159, 255, 0.35);
+    }
+    .cw-tl__body { padding-top: 3px; min-width: 0; }
+    .cw-tl__t { font-size: 14.5px; font-weight: 800; color: var(--text-strong); }
+    .cw-tl__item.is-now .cw-tl__t { color: var(--accent); }
+    .cw-tl__d { font-size: 13px; line-height: 1.55; color: var(--text-muted); margin-top: 2px; }
+    .cw-tl__d strong { color: var(--text); }
+
+    .cw-roles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    @media (max-width: 540px) { .cw-roles { grid-template-columns: 1fr; } }
+    .cw-role {
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.01) 100%);
+    }
+    .cw-role--tomek { border-color: rgba(77, 159, 255, 0.3); background: var(--accent-dim); }
+    .cw-role__t {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+    .cw-role--tomek .cw-role__t { color: var(--accent); }
+    .cw-role ul { list-style: none; padding: 0; margin: 0; }
+    .cw-role li {
+        position: relative;
+        padding: 3px 0 3px 18px;
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.5;
+    }
+    .cw-role li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 10px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-dim);
+        border: 1.5px solid rgba(77, 159, 255, 0.55);
+    }
+    .cw-fin {
         border-radius: 14px;
         border: 1px dashed rgba(77, 159, 255, 0.35);
         background: var(--accent-dim);
-        padding: 14px 16px;
-        font-size: 13px;
-        line-height: 1.65;
+        padding: 13px 16px;
+        font-size: 13.5px;
+        line-height: 1.6;
         color: var(--text);
+        text-align: center;
     }
-    .collab-fin strong { color: var(--text-strong); }
+    .cw-fin strong { color: var(--text-strong); }
     .collab-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 
     /* Karta zamówienia makiety inline w czacie (marker <makieta>) */
@@ -2932,19 +3021,37 @@
     function renderPaneWspolpraca() {
         var body = el('pane-wspolpraca-body');
         var done = state.verdict === 'zielony';
+        function tl(n, title, d, mark) {
+            return '<div class="cw-tl__item' + (mark || '') + '"><span class="cw-tl__dot">' + n + '</span>' +
+                '<div class="cw-tl__body"><div class="cw-tl__t">' + title + '</div><div class="cw-tl__d">' + d + '</div></div></div>';
+        }
         body.innerHTML =
             '<div class="tabpane__head"><div class="tabpane__eyebrow">Wspólny biznes</div>' +
-            '<h2 class="tabpane__title">Jak budujemy to razem z Tomkiem</h2>' +
-            '<p class="tabpane__sub">To nie jest kolejne narzędzie, które ktoś Ci zrobi i zostajesz z nim sam. Ty wnosisz znajomość branży — Tomek Niedźwiecki (15 lat e-commerce, 70 mln zł sprzedaży online) z zespołem buduje narzędzie, a potem osobiście rozkręca biznes do pierwszych 50 płacących klientów.</p></div>' +
-            '<div class="collab-grid">' +
-            '<div class="collab-step' + (done ? '' : ' is-now') + '"><span class="collab-step__n">1</span><div><div class="collab-step__t">Rozmowa — projekt</div><div class="collab-step__d">Tu, w czacie: problem, odbiorcy, ekrany i podgląd narzędzia. <strong>Karta projektu</strong> i <strong>ekrany</strong> lądują w menu obok.</div></div></div>' +
-            '<div class="collab-step' + (done ? ' is-now' : '') + '"><span class="collab-step__n">2</span><div><div class="collab-step__t">Rezerwacja — 500 zł, w pełni zwrotne</div><div class="collab-step__d">Tomek osobiście analizuje projekt, przygotowuje <strong>plan przedsięwzięcia</strong> (zakres, model przychodów, droga do pierwszych klientów) i <strong>odzywa się do Ciebie</strong>, żeby wspólnie przegadać projekt. Rezerwacja oddziela poważnie myślących od ciekawskich.</div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">3</span><div><div class="collab-step__t">Wspólna decyzja i umowa</div><div class="collab-step__d">Przegadujecie plan na żywo. Wchodzicie — 500 zł wliczane w Twoją część. <strong>Nie wchodzicie — pełny zwrot 500 zł</strong>, obojętnie z czyjej strony decyzja.</div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">4</span><div><div class="collab-step__t">Budowa — budżet 30 000 zł na pół</div><div class="collab-step__d"><strong>Połowę (15 000 zł) pokrywa Tomek.</strong> On i jego zespół budują kompletne narzędzie gotowe przyjmować klientów i płatności: konta, abonamenty, panel klienta, strona sprzedażowa, analityka, hosting.</div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">5</span><div><div class="collab-step__t">Pierwsze pół roku prowadzi Tomek</div><div class="collab-step__d">Kampanie, sprzedaż, rozwój produktu — <strong>aż do pierwszych 50 płacących klientów</strong>. Ty w tym czasie otwierasz drzwi do swojej branży: kontakty, grupy, polecenia.</div></div></div>' +
-            '<div class="collab-step"><span class="collab-step__n">6</span><div><div class="collab-step__t">Stery przechodzą do Ciebie</div><div class="collab-step__d">Rozkręcony biznes z płacącymi klientami przejmujesz Ty. Tomek zostaje <strong>doradcą strategicznym</strong> — ma 20% udziałów, więc zależy mu długoterminowo.</div></div></div>' +
+            '<h2 class="tabpane__title">Budujemy to razem</h2>' +
+            '<p class="tabpane__sub">Ty znasz branżę. Tomek buduje, finansuje połowę i rozkręca sprzedaż.</p></div>' +
+
+            '<div class="cw-stats">' +
+            '<div class="cw-stat"><b>500 zł</b><span>rezerwacja rozmowy<br><em>w pełni zwrotna</em></span></div>' +
+            '<div class="cw-stat"><b>50%</b><span>budowy finansuje Tomek<br><em>15 000 zł z 30 000 zł</em></span></div>' +
+            '<div class="cw-stat"><b>50</b><span>płacących klientów<br><em>wtedy przejmujesz stery</em></span></div>' +
             '</div>' +
-            '<div class="collab-fin"><strong>Skóra w grze:</strong> Tomek wkłada własne 15 000 zł, pół roku swojej pracy i obejmuje <strong>20% udziałów</strong> — zarabia dopiero wtedy, gdy Twoje narzędzie zarabia. Dlatego nie wchodzi w projekty, w które nie wierzy. Ta rozmowa (AI) zbiera fundamenty — od rezerwacji rozmawiasz już z Tomkiem osobiście.</div>' +
+
+            '<div class="cw-tl">' +
+            tl(done ? '✓' : '1', 'Rozmowa', 'Karta projektu i ekrany — masz je w menu obok.', done ? ' is-done' : ' is-now') +
+            tl('2', 'Rezerwacja — 500 zł', 'Tomek przygotowuje plan przedsięwzięcia i odzywa się osobiście.', done ? ' is-now' : '') +
+            tl('3', 'Decyzja i umowa', 'Nie wchodzicie? <strong>Pełny zwrot.</strong> Wchodzicie? 500 zł wliczone w budowę.') +
+            tl('4', 'Budowa', 'Tomek z zespołem — kompletne narzędzie z płatnościami i abonamentami.') +
+            tl('5', 'Pół roku sprzedaży', 'Tomek prowadzi biznes do pierwszych 50 płacących klientów.') +
+            tl('6', 'Stery dla Ciebie', 'Przejmujesz rozkręcony biznes. Tomek doradza strategicznie.') +
+            '</div>' +
+
+            '<div class="cw-roles">' +
+            '<div class="cw-role"><div class="cw-role__t">Ty wnosisz</div><ul><li>znajomość branży</li><li>kontakty i polecenia</li><li>oko praktyka przy testach</li></ul></div>' +
+            '<div class="cw-role cw-role--tomek"><div class="cw-role__t">Tomek wnosi</div><ul><li>budowę narzędzia z zespołem</li><li>15 000 zł własnego wkładu</li><li>kampanie i pierwszych 50 klientów</li></ul></div>' +
+            '</div>' +
+
+            '<div class="cw-fin">Tomek zarabia dopiero wtedy, gdy Ty zarabiasz — <strong>20% udziałów</strong> i własne pieniądze w grze.</div>' +
+
             '<div class="collab-cta">' +
             (done
                 ? '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener" style="flex:1;min-width:220px;">Rezerwuję rozmowę → 500 zł</a>'
