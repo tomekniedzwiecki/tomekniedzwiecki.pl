@@ -1562,9 +1562,8 @@
     var LS_MESSAGES = 'spar_messages';
     var LS_TRACKING = 'spar_tracking';
     var LS_PREVIEW = 'spar_preview'; // {sessionId, url} — ostatni wygenerowany podgląd (resume po refreshu)
-    var DEMO_PREVIEW_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/storage/v1/object/public/attachments/spar/aaaaaaaa-1111-4222-8333-bbbbbbbbbbbb/podglad-1.png'; // ?demo=podglad
+    var DEMO_PREVIEW_URL = '/stworze/sparing/demo-podglad.png'; // ?demo=podglad (statyczny asset w repo)
     var MAX_MSG_LEN = 2000;
-    var WERDYKT_MARK = '<werdykt';
 
     /* ============================================================
        DANE — chipy profesji + otwarcia rozmowy (?p= z reklam)
@@ -1780,7 +1779,7 @@
         div.className = 'msg msg--ai msg--gate';
         div.id = 'inline-gate';
         div.innerHTML =
-            '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — zostaw imię i mail. Dostaniesz podsumowanie rozmowy, a gdyby coś przerwało, wrócisz dokładnie w to miejsce.</p>' +
+            '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — zostaw imię i mail, żebym wiedział, dla kogo powstanie makieta, i mógł się odezwać w sprawie Twojego narzędzia.</p>' +
             '<form id="gate-form" novalidate>' +
             '<div class="f-row f-row--two">' +
             '<div><label class="f-label" for="gate-name">Imię</label>' +
@@ -2690,8 +2689,8 @@
             '<li><strong>Wycena budowy</strong> działającej wersji. Konkretna kwota, nie widełki z sufitu.</li>' +
             '</ul>' +
             '<p class="paybox__credit"><strong>Zadatek odliczam w 100% od ceny budowy.</strong> Jeśli wchodzisz dalej: budowa od 14 000 zł brutto + 20% udziałów — zarabiam wtedy, gdy narzędzie zarabia.</p>' +
-            '<a class="paybox__btn" href="' + checkoutURL() + '">Wpłacam zadatek → 500 zł</a>' +
-            '<p class="paybox__note">Płatność online: BLIK, karta lub przelew.</p>' +
+            '<a class="paybox__btn" href="' + checkoutURL() + '" target="_blank" rel="noopener">Wpłacam zadatek → 500 zł</a>' +
+            '<p class="paybox__note">Płatność online: BLIK, karta lub przelew. Otworzy się w nowej karcie — ta rozmowa zostaje.</p>' +
             '</div>';
     }
 
