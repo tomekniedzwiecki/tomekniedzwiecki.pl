@@ -1516,7 +1516,7 @@
             '<input class="f-input" type="email" id="gate-email" placeholder="ty@firma.pl" autocomplete="email" required>' +
             '<div class="f-error" id="gate-email-error">Podaj poprawny adres e-mail.</div></div>' +
             '</div>' +
-            '<button type="submit" class="btn" id="gate-submit">Gramy dalej <span class="btn__arrow">→</span></button>' +
+            '<button type="submit" class="btn" id="gate-submit">Idziemy dalej <span class="btn__arrow">→</span></button>' +
             '</form>' +
             '<p class="gate-msg__note">Zero newslettera. Mail służy tej jednej rozmowie i podsumowaniu, które z niej wyjdzie.</p>';
         el('chat-msgs').appendChild(div);
@@ -1537,8 +1537,14 @@
             state.email = email;
             persistSession();
             div.remove();
-            sysMsg('Dzięki, ' + name.split(' ')[0] + '. Gramy dalej — pisz.');
+            sysMsg('Dzięki, ' + name.split(' ')[0] + '. Wracamy do rozmowy — pisz śmiało.');
             setComposerEnabled(true);
+            // Przywróć dymki odpowiedzi z ostatniej tury AI (bramka je schowała)
+            var lastMsg = messages[messages.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant' && !state.verdict) {
+                var gateOpcje = parseOpcje(lastMsg.content);
+                if (gateOpcje) renderSuggestions(gateOpcje);
+            }
             if (window.matchMedia('(hover: hover)').matches) el('chat-input').focus();
         });
     }
