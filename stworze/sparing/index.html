@@ -4138,9 +4138,13 @@
                     return res.json();
                 }).then(function (d) {
                     // poprzednia wersja tego widoku NIE przepada — ląduje w archiwum
-                    if (state.previews[view] && state.previews[view] !== d.url) {
+                    // (lokalnie znany URL albo `archived` z serwera, np. po powrocie z linku)
+                    var replaced = (state.previews[view] && state.previews[view] !== d.url)
+                        ? state.previews[view]
+                        : (typeof d.archived === 'string' ? d.archived : null);
+                    if (replaced) {
                         if (!state.previewHistory[view]) state.previewHistory[view] = [];
-                        state.previewHistory[view].push(state.previews[view]);
+                        if (state.previewHistory[view].indexOf(replaced) < 0) state.previewHistory[view].push(replaced);
                     }
                     state.previews[view] = d.url;
                     // równoległe odpowiedzi wracają w dowolnej kolejności — liczy się najniższy stan puli
