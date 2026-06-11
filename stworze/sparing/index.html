@@ -1031,6 +1031,172 @@
     }
     .preview-retry:hover { background: var(--accent-soft); }
 
+    /* ── Siatka 4 widoków (panel / główna / dodatkowa / landing) ── */
+    .pv-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 4px 14px 0;
+    }
+    @media (max-width: 480px) { .pv-grid { grid-template-columns: 1fr; } }
+    .pv-tile {
+        position: relative;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 12px;
+        background: rgba(5, 6, 10, 0.6);
+        overflow: hidden;
+        animation: gmIn 0.5s var(--ease) backwards;
+    }
+    .pv-tile__label {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        z-index: 3;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--text-strong);
+        background: rgba(5, 6, 10, 0.78);
+        border: 1px solid var(--glass-border);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        pointer-events: none;
+    }
+    .pv-tile__body {
+        position: relative;
+        aspect-ratio: 3 / 2;
+        display: grid;
+        place-items: center;
+    }
+    .pv-tile img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: zoom-in;
+        animation: lbImgIn 0.4s var(--ease);
+    }
+    .pv-tile.is-done { border-color: rgba(77, 159, 255, 0.3); }
+    .pv-tile__skel {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+    }
+    .pv-tile__skel i {
+        position: absolute;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.055);
+        animation: gmGlow 3.2s ease-in-out infinite;
+    }
+    .pv-tile__skel i:nth-child(1) { left: 7%; top: 10%; bottom: 10%; width: 13%; }
+    .pv-tile__skel i:nth-child(2) { left: 25%; right: 7%; top: 10%; height: 14%; animation-delay: 0.4s; }
+    .pv-tile__skel i:nth-child(3) { left: 25%; right: 40%; top: 32%; height: 26%; animation-delay: 0.8s; }
+    .pv-tile__skel i:nth-child(4) { left: 64%; right: 7%; top: 32%; height: 26%; animation-delay: 1.2s; }
+    .pv-tile__skel i:nth-child(5) { left: 25%; right: 7%; top: 66%; height: 11%; animation-delay: 0.6s; }
+    .pv-tile__skel i:nth-child(6) { left: 25%; right: 22%; top: 81%; height: 9%; animation-delay: 1s; }
+    .pv-tile__scan {
+        position: absolute;
+        top: 0; bottom: 0;
+        width: 46px;
+        background: linear-gradient(90deg, transparent, rgba(77, 159, 255, 0.14), rgba(77, 159, 255, 0.4) 55%, transparent);
+        filter: blur(1px);
+        animation: gmScan 3s var(--ease) infinite;
+        pointer-events: none;
+        z-index: 2;
+    }
+    .pv-tile__err {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    .pv-tile__err .preview-retry { min-height: 32px; padding: 6px 13px; font-size: 12px; }
+
+    /* Lightbox v2 — podpis, strzałki, X */
+    .lightbox__x {
+        position: absolute;
+        top: max(14px, env(safe-area-inset-top));
+        right: 14px;
+        z-index: 3;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--text-strong);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--glass-border);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+        transition: background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+    }
+    .lightbox__x:hover { background: var(--accent-soft); border-color: var(--accent); transform: scale(1.06); }
+    .lightbox__x svg { width: 20px; height: 20px; }
+    .lightbox__nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 3;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--text-strong);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--glass-border);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+        transition: background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+    }
+    .lightbox__nav:hover { background: var(--accent-soft); border-color: var(--accent); transform: translateY(-50%) scale(1.06); }
+    .lightbox__nav svg { width: 22px; height: 22px; }
+    .lightbox__nav--l { left: max(12px, env(safe-area-inset-left)); }
+    .lightbox__nav--r { right: max(12px, env(safe-area-inset-right)); }
+    .lightbox__caption {
+        position: absolute;
+        bottom: max(18px, env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: rgba(5, 6, 10, 0.82);
+        border: 1px solid var(--glass-border);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-strong);
+        white-space: nowrap;
+        max-width: 92vw;
+    }
+    .lightbox__caption small {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+    }
+    @media (max-width: 640px) {
+        .lightbox__nav { width: 44px; height: 44px; }
+        .lightbox img { max-height: 72vh; }
+    }
+
     /* Lightbox podglądu — pełny ekran */
     .lightbox {
         position: fixed;
@@ -1610,8 +1776,19 @@
     var LS_SESSION = 'spar_session';
     var LS_MESSAGES = 'spar_messages';
     var LS_TRACKING = 'spar_tracking';
-    var LS_PREVIEW = 'spar_preview'; // {sessionId, url} — ostatni wygenerowany podgląd (resume po refreshu)
+    var LS_PREVIEW = 'spar_preview'; // {sessionId, images:{view:url}} — wygenerowane widoki (resume po refreshu; stary format {url} czytamy jako {panel:url})
     var DEMO_PREVIEW_URL = '/stworze/sparing/demo-podglad.png'; // ?demo=podglad (statyczny asset w repo)
+    // 4 widoki podglądu — kolejność = kolejność kafelków i nawigacji lightboxa
+    var VIEW_META = [
+        ['panel', 'Pulpit narzędzia'],
+        ['glowna', 'Główna funkcja'],
+        ['dodatkowa', 'Dodatkowa funkcja'],
+        ['landing', 'Strona sprzedażowa']
+    ];
+    function viewLabel(v) {
+        for (var i = 0; i < VIEW_META.length; i++) if (VIEW_META[i][0] === v) return VIEW_META[i][1];
+        return 'Podgląd';
+    }
     var MAX_MSG_LEN = 2000;
 
     /* ============================================================
@@ -1671,7 +1848,8 @@
         verdict: null,          // 'zielony'|'zolty'|'czerwony'|null
         karta: null,            // obiekt karty z markera
         leadId: null,
-        kamien: 0               // najwyższy domknięty kamień rozmowy (marker <kamien>)
+        kamien: 0,              // najwyższy domknięty kamień rozmowy (marker <kamien>)
+        previews: {}            // {view:url} — wygenerowane widoki podglądu (lightbox/resume)
     };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
@@ -1779,32 +1957,80 @@
         if (c) c.remove();
     }
 
-    // Lightbox — powiększenie podglądu (Esc / klik tła / przycisk zamyka)
-    function openLightbox(url) {
+    // Lightbox v2 — podpis widoku, strzałki między ekranami, wyraźny X
+    // (Esc / klik tła / X zamyka; ←/→ i strzałki przełączają widoki)
+    function lightboxItems() {
+        var items = [];
+        VIEW_META.forEach(function (vm) {
+            var url = state.previews && state.previews[vm[0]];
+            if (url) items.push({ view: vm[0], label: vm[1], url: url });
+        });
+        return items;
+    }
+
+    function openLightbox(startView) {
         if (el('spar-lightbox')) return;
+        var items = lightboxItems();
+        if (!items.length && typeof startView === 'string' && /^https?:/.test(startView)) {
+            // kompatybilność: stare wywołanie z gołym URL-em
+            items = [{ view: 'panel', label: 'Podgląd narzędzia', url: startView }];
+            startView = 'panel';
+        }
+        if (!items.length) return;
+        var idx = 0;
+        for (var i = 0; i < items.length; i++) if (items[i].view === startView) { idx = i; break; }
+
         var lb = document.createElement('div');
         lb.className = 'lightbox';
         lb.id = 'spar-lightbox';
         lb.setAttribute('role', 'dialog');
         lb.setAttribute('aria-label', 'Podgląd narzędzia — pełny rozmiar');
+        var nav = items.length > 1;
         lb.innerHTML =
-            '<div class="lightbox__bar">' +
-            '<a class="lightbox__btn" href="' + esc(url) + '" target="_blank" rel="noopener">Otwórz w nowej karcie</a>' +
-            '<button type="button" class="lightbox__btn" id="lb-close">Zamknij</button>' +
-            '</div>' +
-            '<img src="' + esc(url) + '" alt="Podgląd narzędzia — pełny rozmiar">';
+            '<button type="button" class="lightbox__x" id="lb-close" aria-label="Wróć do rozmowy">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>' +
+            '</button>' +
+            (nav
+                ? '<button type="button" class="lightbox__nav lightbox__nav--l" id="lb-prev" aria-label="Poprzedni ekran">' +
+                  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>' +
+                  '<button type="button" class="lightbox__nav lightbox__nav--r" id="lb-next" aria-label="Następny ekran">' +
+                  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg></button>'
+                : '') +
+            '<img src="" alt="">' +
+            '<div class="lightbox__caption"><span id="lb-cap"></span>' + (nav ? '<small id="lb-count"></small>' : '') + '</div>';
         document.body.appendChild(lb);
 
+        var img = lb.querySelector('img');
+        function paint() {
+            var it = items[idx];
+            img.src = it.url;
+            img.alt = it.label + ' — pełny rozmiar';
+            lb.querySelector('#lb-cap').textContent = it.label;
+            if (nav) lb.querySelector('#lb-count').textContent = (idx + 1) + ' / ' + items.length;
+        }
+        function step(d) {
+            idx = (idx + d + items.length) % items.length;
+            paint();
+        }
         function close() {
             lb.remove();
             document.removeEventListener('keydown', onKey);
         }
-        function onKey(e) { if (e.key === 'Escape') close(); }
+        function onKey(e) {
+            if (e.key === 'Escape') close();
+            else if (nav && e.key === 'ArrowLeft') step(-1);
+            else if (nav && e.key === 'ArrowRight') step(1);
+        }
         lb.addEventListener('click', function (e) {
             if (e.target === lb) close();
         });
         lb.querySelector('#lb-close').addEventListener('click', close);
+        if (nav) {
+            lb.querySelector('#lb-prev').addEventListener('click', function () { step(-1); });
+            lb.querySelector('#lb-next').addEventListener('click', function () { step(1); });
+        }
         document.addEventListener('keydown', onKey);
+        paint();
         lb.querySelector('#lb-close').focus();
     }
 
@@ -1877,6 +2103,7 @@
         state.sessionId = uuid4();
         state.verdict = null; state.karta = null; state.leadId = null;
         state.kamien = 0;
+        state.previews = {};
         if (!state.pSlug) state.profession = null;
         messages = [];
         el('chat-msgs').innerHTML = '';
@@ -2365,8 +2592,8 @@
             var sugg = (!el('inline-gate')) ? suggestionsFrom(raw) : null;
             if (meta.projekt) {
                 setComposerEnabled(false);
-                el('chat-input').placeholder = 'Generuję podgląd — daj mi chwilę…';
-                requestPreview(null, meta.projekt, false, function () {
+                el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
+                requestPreviews(null, meta.projekt, false, function () {
                     if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
                     updateHero(); // przywraca standardowy placeholder
                     if (sugg && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
@@ -2555,7 +2782,10 @@
     /* ============================================================
        PODGLĄD GRAFICZNY — marker <projekt> → spar-image → obraz w czacie
        ============================================================ */
-    function requestPreview(knownUrl, projekt, demo, onSettle) {
+    // v2: 4 widoki (panel/glowna/dodatkowa/landing) generowane RÓWNOLEGLE.
+    //   known   — {view:url} z localStorage (resume bez kosztu) lub null
+    //   projekt — brief z markera <projekt> (insighty, zmien[])
+    function requestPreviews(known, projekt, demo, onSettle) {
         var wrap = document.createElement('div');
         wrap.className = 'msg msg--ai msg--preview';
         el('chat-msgs').appendChild(wrap);
@@ -2564,6 +2794,75 @@
         function settle() {
             if (onSettle) { var f = onSettle; onSettle = null; f(); }
         }
+
+        if (!state.previews) state.previews = {};
+
+        function noteText(remaining) {
+            var base = 'Kliknij ekran, aby powiększyć.';
+            if (typeof remaining === 'number' && remaining > 0) {
+                var forma = remaining === 1 ? 'poprawkę' : (remaining < 5 ? 'poprawki' : 'poprawek');
+                return base + ' Masz jeszcze ' + remaining + ' ' + forma + ' — opisz, co zmienić, a pokażę nowe wersje (każdy nowy ekran to jedna poprawka).';
+            }
+            if (remaining === 0) return base + ' Pula poprawek wyczerpana — kolejne uwagi opisz słowami, trafią prosto do makiety.';
+            return base + ' Klikalna makieta powstanie na bazie Twoich uwag.';
+        }
+
+        function tileSkeletonHTML(view) {
+            return '<div class="pv-tile" data-view="' + view + '">' +
+                '<span class="pv-tile__label">' + esc(viewLabel(view)) + '</span>' +
+                '<div class="pv-tile__body">' +
+                '<div class="pv-tile__skel"><i></i><i></i><i></i><i></i><i></i><i></i></div>' +
+                '<i class="pv-tile__scan"></i>' +
+                '</div></div>';
+        }
+        function tileToImage(view, url) {
+            var tile = wrap.querySelector('.pv-tile[data-view="' + view + '"]');
+            if (!tile) return;
+            tile.classList.add('is-done');
+            var body = tile.querySelector('.pv-tile__body');
+            body.innerHTML = '<img src="' + esc(url) + '" alt="' + esc(viewLabel(view)) + ' — kliknij, aby powiększyć" loading="lazy">';
+            body.querySelector('img').addEventListener('click', function () { openLightbox(view); });
+        }
+        function tileError(view, message, retryFn) {
+            var tile = wrap.querySelector('.pv-tile[data-view="' + view + '"]');
+            if (!tile) return;
+            tile.querySelector('.pv-tile__body').innerHTML =
+                '<div class="pv-tile__err"><span>' + esc(message) + '</span>' +
+                (retryFn ? '<button type="button" class="preview-retry">Spróbuj ponownie</button>' : '') +
+                '</div>';
+            if (retryFn) tile.querySelector('.preview-retry').addEventListener('click', retryFn);
+        }
+
+        // Resume: widoki już wygenerowane — pokaż siatkę bez ponownego kosztu
+        if (known && typeof known === 'object') {
+            VIEW_META.forEach(function (vm) {
+                if (typeof known[vm[0]] === 'string') state.previews[vm[0]] = known[vm[0]];
+            });
+            var haveAny = lightboxItems().length > 0;
+            if (haveAny) {
+                var gridHtml = '';
+                VIEW_META.forEach(function (vm) {
+                    if (state.previews[vm[0]]) gridHtml += tileSkeletonHTML(vm[0]);
+                });
+                wrap.innerHTML = '<div class="gen"><div class="pv-grid">' + gridHtml + '</div>' +
+                    '<div class="preview-note">' + esc(noteText(null)) + '</div></div>';
+                VIEW_META.forEach(function (vm) {
+                    if (state.previews[vm[0]]) tileToImage(vm[0], state.previews[vm[0]]);
+                });
+                scrollToBottom(false);
+                settle();
+                return;
+            }
+        }
+
+        // Które widoki generujemy: "zmien" z markera; pierwszy podgląd = wszystkie
+        var ALL_VIEWS = VIEW_META.map(function (vm) { return vm[0]; });
+        var views = [];
+        if (projekt && Array.isArray(projekt.zmien)) {
+            views = projekt.zmien.filter(function (v) { return ALL_VIEWS.indexOf(v) >= 0; });
+        }
+        var firstRun = !lightboxItems().length;
+        if (!views.length || firstRun) views = ALL_VIEWS.slice();
 
         // Insighty z markera <projekt> — rotowane podczas generowania
         var insights = (projekt && Array.isArray(projekt.insighty))
@@ -2584,52 +2883,37 @@
             if (barTimer) { clearInterval(barTimer); barTimer = null; }
         }
 
-        function noteText(remaining) {
-            var base = 'Kliknij obrazek, aby powiększyć.';
-            if (typeof remaining === 'number' && remaining > 0) {
-                var forma = remaining === 1 ? 'darmową poprawkę' : (remaining < 5 ? 'darmowe poprawki' : 'darmowych poprawek');
-                return base + ' Masz jeszcze ' + remaining + ' ' + forma + ' — opisz uwagi, pokażę nową wersję.';
-            }
-            return base + ' Klikalna makieta powstanie na bazie Twoich uwag.';
-        }
-
-        function showImage(url, remaining) {
-            stopInsights();
-            wrap.innerHTML = '<img class="preview-img" src="' + esc(url) + '" alt="Podgląd narzędzia — kliknij, aby powiększyć" loading="lazy">' +
-                '<div class="preview-note">' + esc(noteText(remaining)) + '</div>';
-            wrap.querySelector('.preview-img').addEventListener('click', function () { openLightbox(url); });
-            scrollToBottom(false);
-            settle();
-        }
-
-        // Resume: obrazek już istnieje — pokaż bez ponownego generowania
-        if (knownUrl) { showImage(knownUrl, null); return; }
-
         var GEN_STEPS = [
             'Analizuję problem i odbiorców…',
             'Układam ekrany narzędzia…',
             'Dobieram polskie dane przykładowe…',
-            'Rysuję interfejs w wysokiej jakości…'
+            'Rysuję interfejsy w wysokiej jakości…'
         ];
 
         function run() {
             stopInsights();
+            var headTxt = views.length === 1
+                ? 'Buduję nową wersję: ' + viewLabel(views[0])
+                : 'Buduję podgląd Twojego narzędzia — ' + views.length + ' ekrany';
+            var gridHtml = '';
+            VIEW_META.forEach(function (vm) {
+                // kafelki: generowane → szkielet; pozostałe z obrazem → istniejący widok
+                if (views.indexOf(vm[0]) >= 0 || state.previews[vm[0]]) gridHtml += tileSkeletonHTML(vm[0]);
+            });
             wrap.innerHTML =
                 '<div class="gen">' +
-                '<div class="gen__head"><span class="gen__spark" aria-hidden="true"></span>Buduję podgląd Twojego narzędzia</div>' +
-                '<div class="gen-mock" aria-hidden="true">' +
-                '<i class="gm gm-side"></i><i class="gm gm-top"></i>' +
-                '<i class="gm gm-kpi gm-k1"></i><i class="gm gm-kpi gm-k2"></i><i class="gm gm-kpi gm-k3"></i>' +
-                '<span class="gm-chart"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span>' +
-                '<i class="gm gm-row gm-r1"></i><i class="gm gm-row gm-r2"></i><i class="gm gm-row gm-r3"></i>' +
-                '<i class="gm-scan"></i>' +
-                '</div>' +
+                '<div class="gen__head"><span class="gen__spark" aria-hidden="true"></span>' + esc(headTxt) + '</div>' +
+                '<div class="pv-grid">' + gridHtml + '</div>' +
                 '<div class="preview-insight" aria-live="polite"></div>' +
                 '<div class="gen__foot">' +
                 '<div class="gen__bar"><i></i></div>' +
                 '<div class="gen__step"></div>' +
                 '</div>' +
                 '</div>';
+            // widoki nie objęte tą generacją od razu dostają swój obraz
+            VIEW_META.forEach(function (vm) {
+                if (views.indexOf(vm[0]) < 0 && state.previews[vm[0]]) tileToImage(vm[0], state.previews[vm[0]]);
+            });
             var insEl = wrap.querySelector('.preview-insight');
             var stepEl = wrap.querySelector('.gen__step');
             var barEl = wrap.querySelector('.gen__bar i');
@@ -2658,7 +2942,7 @@
                 }
             }, 9000);
 
-            // Pasek postępu — asymptotycznie do ~92% (kończy się przy obrazku)
+            // Pasek postępu — asymptotycznie do ~92% (kończy się przy obrazach)
             var t = 0;
             barTimer = setInterval(function () {
                 t += 0.3;
@@ -2666,41 +2950,80 @@
                 barEl.style.width = pct.toFixed(1) + '%';
             }, 300);
             scrollToBottom(false);
+
+            var lastRemaining = null;
+            var anyLimit = false;
+
+            function persistPreviews() {
+                saveJSON(LS_PREVIEW, { sessionId: state.sessionId, images: state.previews });
+            }
+
+            function finishAll() {
+                stopInsights();
+                if (barEl) barEl.style.width = '100%';
+                var foot = wrap.querySelector('.gen__foot');
+                var ins = wrap.querySelector('.preview-insight');
+                setTimeout(function () {
+                    if (ins) ins.remove();
+                    if (foot) foot.outerHTML = '<div class="preview-note">' +
+                        esc(anyLimit ? noteText(0) : noteText(lastRemaining)) + '</div>';
+                    scrollToBottom(false);
+                }, 420);
+                settle();
+            }
+
+            function fetchView(view) {
+                return fetch(SPAR_IMAGE_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    body: JSON.stringify({ sessionId: state.sessionId, view: view })
+                }).then(function (res) {
+                    if (!res.ok) {
+                        return res.json().catch(function () { return {}; }).then(function (err) {
+                            var e = new Error('img'); e.code = err && err.error; throw e;
+                        });
+                    }
+                    return res.json();
+                }).then(function (d) {
+                    state.previews[view] = d.url;
+                    // równoległe odpowiedzi wracają w dowolnej kolejności — liczy się najniższy stan puli
+                    if (typeof d.remaining === 'number') {
+                        lastRemaining = (lastRemaining === null) ? d.remaining : Math.min(lastRemaining, d.remaining);
+                    }
+                    persistPreviews();
+                    tileToImage(view, d.url);
+                    scrollToBottom(false);
+                }).catch(function (e) {
+                    if (e && e.code === 'limit_podgladow') {
+                        anyLimit = true;
+                        tileError(view, 'Pula poprawek wyczerpana', null);
+                    } else if (e && e.code === 'limit_podgladow_dzienny') {
+                        anyLimit = true;
+                        tileError(view, 'Dzienny limit podglądów osiągnięty — wróć jutro', null);
+                    } else {
+                        tileError(view, 'Nie udało się wygenerować', function () {
+                            var tile = wrap.querySelector('.pv-tile[data-view="' + view + '"]');
+                            if (tile) tile.querySelector('.pv-tile__body').innerHTML =
+                                '<div class="pv-tile__skel"><i></i><i></i><i></i><i></i><i></i><i></i></div><i class="pv-tile__scan"></i>';
+                            fetchView(view);
+                        });
+                    }
+                });
+            }
+
             if (demo) {
-                // Tryb demo (?demo=podglad): pokaż pełny cykl bez kosztu API
-                setTimeout(function () { showImage(DEMO_PREVIEW_URL, 4); }, 20000);
+                // Tryb demo (?demo=podglad): pełny cykl bez kosztu API
+                views.forEach(function (v, i) {
+                    setTimeout(function () {
+                        state.previews[v] = DEMO_PREVIEW_URL;
+                        tileToImage(v, DEMO_PREVIEW_URL);
+                        if (i === views.length - 1) { lastRemaining = 4; finishAll(); }
+                    }, 7000 + i * 4500);
+                });
                 return;
             }
-            fetch(SPAR_IMAGE_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
-                body: JSON.stringify({ sessionId: state.sessionId })
-            }).then(function (res) {
-                if (!res.ok) {
-                    return res.json().catch(function () { return {}; }).then(function (err) {
-                        var e = new Error('img'); e.code = err && err.error; throw e;
-                    });
-                }
-                return res.json();
-            }).then(function (d) {
-                saveJSON(LS_PREVIEW, { sessionId: state.sessionId, url: d.url });
-                showImage(d.url, (typeof d.remaining === 'number') ? d.remaining : null);
-            }).catch(function (e) {
-                stopInsights();
-                settle();
-                if (e && e.code === 'limit_podgladow') {
-                    wrap.innerHTML = '<div class="preview-loading">Limit podglądów w tej rozmowie osiągnięty — opisz uwagi słowami, uwzględnię je w makiecie.</div>';
-                    return;
-                }
-                if (e && e.code === 'limit_podgladow_dzienny') {
-                    wrap.innerHTML = '<div class="preview-loading">Dzienny limit podglądów osiągnięty — wróć jutro albo opisz uwagi słowami, uwzględnię je w makiecie.</div>';
-                    return;
-                }
-                wrap.innerHTML = '<div class="preview-loading">Nie udało się wygenerować podglądu. ' +
-                    '<button type="button" class="preview-retry">Spróbuj ponownie</button></div>';
-                var btn = wrap.querySelector('.preview-retry');
-                if (btn) btn.addEventListener('click', run);
-            });
+
+            Promise.all(views.map(function (v) { return fetchView(v); })).then(finishAll);
         }
         run();
     }
@@ -2849,13 +3172,18 @@
         var regenerating = false;
         if (projektContent) {
             var savedPrev = loadJSON(LS_PREVIEW);
-            var knownPrev = (savedPrev && savedPrev.sessionId === state.sessionId) ? savedPrev.url : null;
+            // stary format {url} czytamy jako {panel: url}
+            var knownPrev = null;
+            if (savedPrev && savedPrev.sessionId === state.sessionId) {
+                if (savedPrev.images && typeof savedPrev.images === 'object') knownPrev = savedPrev.images;
+                else if (typeof savedPrev.url === 'string') knownPrev = { panel: savedPrev.url };
+            }
             regenerating = !knownPrev;
             if (regenerating) {
                 setComposerEnabled(false);
-                el('chat-input').placeholder = 'Generuję podgląd — daj mi chwilę…';
+                el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
             }
-            requestPreview(knownPrev, parseProjektJson(projektContent), false, regenerating ? function () {
+            requestPreviews(knownPrev, parseProjektJson(projektContent), false, regenerating ? function () {
                 if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
                 updateHero();
                 if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
@@ -2979,7 +3307,7 @@
 
         // Tryb demo widoku generowania (?demo=podglad) — UI bez kosztu API
         if (new URLSearchParams(window.location.search).get('demo') === 'podglad') {
-            requestPreview(null, {
+            requestPreviews(null, {
                 insighty: [
                     'Pracownie nie płacą za „kolejny program" — płacą za koniec sporów z inwestorem o to, kto co zatwierdził.',
                     'Decyzję zakupową podejmuje właściciel pracowni, ale narzędzie sprzedaje się przez ulgę jego zespołu.',
