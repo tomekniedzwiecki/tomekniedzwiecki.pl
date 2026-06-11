@@ -1210,6 +1210,7 @@
     var LS_MESSAGES = 'spar_messages';
     var LS_TRACKING = 'spar_tracking';
     var LS_PREVIEW = 'spar_preview'; // {sessionId, url} — ostatni wygenerowany podgląd (resume po refreshu)
+    var DEMO_PREVIEW_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/storage/v1/object/public/attachments/spar/aaaaaaaa-1111-4222-8333-bbbbbbbbbbbb/podglad-1.png'; // ?demo=podglad
     var MAX_MSG_LEN = 2000;
     var WERDYKT_MARK = '<werdykt';
 
@@ -1878,7 +1879,7 @@
     /* ============================================================
        PODGLĄD GRAFICZNY — marker <projekt> → spar-image → obraz w czacie
        ============================================================ */
-    function requestPreview(knownUrl, projekt) {
+    function requestPreview(knownUrl, projekt, demo) {
         var wrap = document.createElement('div');
         wrap.className = 'msg msg--ai msg--preview';
         el('chat-msgs').appendChild(wrap);
@@ -1935,6 +1936,11 @@
             cycle();
             insTimer = setInterval(cycle, 4800);
             scrollToBottom(false);
+            if (demo) {
+                // Tryb demo (?demo=podglad): pokaż pełny cykl bez kosztu API
+                setTimeout(function () { showImage(DEMO_PREVIEW_URL, 4); }, 20000);
+                return;
+            }
             fetch(SPAR_IMAGE_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
@@ -2185,6 +2191,18 @@
 
         if (state.pSlug) state.profession = P_OPENERS[state.pSlug].apiName;
         startFresh(false);
+
+        // Tryb demo widoku generowania (?demo=podglad) — UI bez kosztu API
+        if (new URLSearchParams(window.location.search).get('demo') === 'podglad') {
+            requestPreview(null, {
+                insighty: [
+                    'Pracownie nie płacą za „kolejny program" — płacą za koniec sporów z inwestorem o to, kto co zatwierdził.',
+                    'Decyzję zakupową podejmuje właściciel pracowni, ale narzędzie sprzedaje się przez ulgę jego zespołu.',
+                    'Najtańszy kanał dotarcia to społeczności branżowe — narzędzie poleca się samo, gdy widzi je inwestor.',
+                    'Jedna funkcja używana co tydzień utrzymuje abonament lepiej niż dziesięć „na kiedyś".'
+                ]
+            }, true);
+        }
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
