@@ -468,6 +468,170 @@
     .mk-card__note { font-size: 11px; color: var(--text-muted); opacity: 0.8; text-align: center; margin-top: 8px; }
     @media (max-width: 640px) { .mk-card { margin-left: 0; max-width: 100%; } }
 
+    /* ── Widgety interakcji: suwak / ranking / wybór stylu ───────── */
+    .widget {
+        align-self: flex-start;
+        width: 100%;
+        max-width: min(560px, 92%);
+        margin-left: 34px;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px solid var(--glass-border-soft);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        animation: msgIn 0.4s var(--ease) 0.08s backwards;
+    }
+    @media (max-width: 640px) { .widget { margin-left: 0; max-width: 100%; } }
+    .wg-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        min-height: 46px;
+        margin-top: 14px;
+        padding: 11px 16px;
+        border-radius: 999px;
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #061320;
+        background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 50%, var(--accent-2) 100%);
+        box-shadow: 0 8px 26px -10px rgba(77, 159, 255, 0.55);
+        transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), opacity 0.2s var(--ease);
+    }
+    .wg-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 32px -10px rgba(77, 159, 255, 0.7); }
+    .wg-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* Suwak */
+    .wg-value {
+        text-align: center;
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text-strong);
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 4px;
+    }
+    .wg-value small { font-size: 16px; font-weight: 600; color: var(--accent); margin-left: 6px; }
+    .wg-range {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 8px;
+        margin: 14px 0 6px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent) var(--fill, 50%), rgba(255, 255, 255, 0.1) var(--fill, 50%));
+        outline: none;
+        cursor: pointer;
+    }
+    .wg-range::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--accent);
+        box-shadow: 0 0 16px rgba(77, 159, 255, 0.6);
+        cursor: grab;
+        transition: transform 0.15s var(--ease);
+    }
+    .wg-range::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.15); }
+    .wg-range::-moz-range-thumb {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--accent);
+        box-shadow: 0 0 16px rgba(77, 159, 255, 0.6);
+        cursor: grab;
+    }
+    .wg-minmax {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Ranking */
+    .wg-rank { display: flex; flex-direction: column; gap: 8px; }
+    .wg-rank__hint { font-size: 12.5px; color: var(--text-muted); margin-bottom: 2px; }
+    .wg-rank button {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 48px;
+        padding: 11px 14px;
+        border-radius: 13px;
+        border: 1px solid var(--glass-border-soft);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text-strong);
+        font-size: 14px;
+        font-weight: 600;
+        text-align: left;
+        transition: border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .wg-rank button:hover { border-color: rgba(77, 159, 255, 0.45); background: var(--accent-dim); }
+    .wg-rank button.is-ranked { border-color: rgba(77, 159, 255, 0.55); background: var(--accent-dim); }
+    .wg-rank__num {
+        width: 26px;
+        height: 26px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--text-muted);
+        border: 1.5px dashed var(--border-strong);
+        transition: all 0.2s var(--ease);
+    }
+    .wg-rank button.is-ranked .wg-rank__num {
+        border: 0;
+        background: linear-gradient(135deg, #6db3ff, var(--accent-2));
+        color: #061320;
+        box-shadow: 0 0 12px rgba(77, 159, 255, 0.5);
+    }
+
+    /* Wybór stylu — karty z mini-mockupami */
+    .wg-styles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 480px) { .wg-styles { grid-template-columns: 1fr; } }
+    .wg-style {
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 14px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.02);
+        text-align: left;
+        transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+    .wg-style:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 12px 30px -14px rgba(77, 159, 255, 0.45); }
+    .wg-style__mock { position: relative; height: 74px; overflow: hidden; }
+    .wg-style__mock i { position: absolute; border-radius: 4px; }
+    .wgs-dark .wg-style__mock { background: #0b0d12; }
+    .wgs-dark .wg-style__mock i:nth-child(1) { left: 8px; top: 8px; right: 8px; height: 10px; background: rgba(255,255,255,0.08); }
+    .wgs-dark .wg-style__mock i:nth-child(2) { left: 8px; top: 24px; width: 42%; bottom: 8px; background: rgba(77,159,255,0.35); }
+    .wgs-dark .wg-style__mock i:nth-child(3) { right: 8px; top: 24px; width: 46%; bottom: 8px; background: rgba(255,255,255,0.07); }
+    .wgs-light .wg-style__mock { background: #f7f9fb; }
+    .wgs-light .wg-style__mock i:nth-child(1) { left: 8px; top: 8px; right: 8px; height: 10px; background: #e4e9ee; }
+    .wgs-light .wg-style__mock i:nth-child(2) { left: 8px; top: 24px; width: 42%; bottom: 8px; background: #bfe3d4; }
+    .wgs-light .wg-style__mock i:nth-child(3) { right: 8px; top: 24px; width: 46%; bottom: 8px; background: #fff; border: 1px solid #e4e9ee; }
+    .wgs-vivid .wg-style__mock { background: linear-gradient(135deg, #1c1040, #3a1357); }
+    .wgs-vivid .wg-style__mock i:nth-child(1) { left: 8px; top: 8px; right: 8px; height: 10px; background: rgba(255,255,255,0.16); border-radius: 999px; }
+    .wgs-vivid .wg-style__mock i:nth-child(2) { left: 8px; top: 24px; width: 42%; bottom: 8px; background: linear-gradient(135deg, #ff6b9d, #ffa44d); border-radius: 10px; }
+    .wgs-vivid .wg-style__mock i:nth-child(3) { right: 8px; top: 24px; width: 46%; bottom: 8px; background: linear-gradient(135deg, #4dd2ff, #6b5bff); border-radius: 10px; }
+    .wgs-ai .wg-style__mock {
+        background: var(--accent-dim);
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+    }
+    .wgs-ai .wg-style__mock::before { content: '✦'; color: var(--accent); filter: drop-shadow(0 0 10px rgba(77,159,255,0.8)); }
+    .wg-style__name { font-size: 13.5px; font-weight: 800; color: var(--text-strong); padding: 9px 11px 2px; }
+    .wg-style__desc { font-size: 11.5px; line-height: 1.45; color: var(--text-muted); padding: 0 11px 10px; }
+
     /* ============================================================
        HEADER — szklana belka
        ============================================================ */
@@ -2425,6 +2589,8 @@
     function removeChips() {
         var c = el('qr-chips');
         if (c) c.remove();
+        var w = el('spar-widget');
+        if (w) w.remove();
     }
 
     // Lightbox v2 — podpis widoku, strzałki między ekranami, wyraźny X
@@ -2561,8 +2727,12 @@
             // Przywróć dymki odpowiedzi z ostatniej tury AI (bramka je schowała)
             var lastMsg = messages[messages.length - 1];
             if (lastMsg && lastMsg.role === 'assistant' && !state.verdict) {
-                var gateSugg = suggestionsFrom(lastMsg.content);
-                if (gateSugg) renderSuggestions(gateSugg.opts, gateSugg.multi);
+                var gateWidget = widgetFrom(lastMsg.content);
+                if (gateWidget) renderWidget(gateWidget);
+                else {
+                    var gateSugg = suggestionsFrom(lastMsg.content);
+                    if (gateSugg) renderSuggestions(gateSugg.opts, gateSugg.multi);
+                }
             }
             if (window.matchMedia('(hover: hover)').matches) el('chat-input').focus();
         });
@@ -2589,7 +2759,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien', '<makieta']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -2599,6 +2769,10 @@
             .replace(/<opcje>[\s\S]*?<\/opcje>/g, '')
             .replace(/<makieta>[\s\S]*?<\/makieta>/g, '')
             .replace(/<makieta\s*\/?>/g, '')
+            .replace(/<suwak>[\s\S]*?<\/suwak>/g, '')
+            .replace(/<ranking>[\s\S]*?<\/ranking>/g, '')
+            .replace(/<styl_wybor>[\s\S]*?<\/styl_wybor>/g, '')
+            .replace(/<styl_wybor\s*\/?>/g, '')
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
             .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
             .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
@@ -2914,6 +3088,141 @@
         scrollToBottom(false);
     }
 
+    /* ============================================================
+       WIDGETY INTERAKCJI — suwak / ranking / wybór stylu
+       (markery zastępują <opcje> w turach, gdzie klikanie > pisanie)
+       ============================================================ */
+    function widgetFrom(raw) {
+        if (!raw) return null;
+        if (/<styl_wybor\s*>\s*<\/styl_wybor>|<styl_wybor\s*\/>/.test(raw)) return { type: 'styl' };
+        var sm = raw.match(/<suwak>([\s\S]*?)<\/suwak>/);
+        if (sm) {
+            try {
+                var d = JSON.parse(sm[1]);
+                if (typeof d.min === 'number' && typeof d.max === 'number' && d.max > d.min) {
+                    return { type: 'suwak', data: d };
+                }
+            } catch (e) { }
+        }
+        var rm = raw.match(/<ranking>([\s\S]*?)<\/ranking>/);
+        if (rm) {
+            try {
+                var a = JSON.parse(rm[1]);
+                if (Array.isArray(a)) {
+                    a = a.filter(function (x) { return typeof x === 'string' && x.trim(); })
+                        .map(function (x) { return x.trim().slice(0, 80); }).slice(0, 6);
+                    if (a.length >= 2) return { type: 'ranking', data: a };
+                }
+            } catch (e) { }
+        }
+        return null;
+    }
+
+    function widgetSend(text) {
+        if (streaming || el('inline-gate')) return;
+        chipStreak++;
+        maybeNudgeComposer();
+        removeChips();
+        sendOpening(text);
+    }
+
+    var STYLE_CARDS = [
+        ['wgs-dark', 'Ciemny premium', 'grafit, elegancki niebieski akcent', 'Ciemny premium — grafitowe tło, elegancki niebieski akcent, klimat nowoczesnej aplikacji'],
+        ['wgs-light', 'Jasny i przyjazny', 'dużo światła, miękkie pastele', 'Jasny i przyjazny — dużo bieli i światła, miękkie pastelowe akcenty'],
+        ['wgs-vivid', 'Żywy i energetyczny', 'odważne kolory, dynamiczny klimat', 'Żywy i energetyczny — odważne kolory, duże zaokrąglenia, dynamiczny klimat'],
+        ['wgs-ai', 'Dobierz za mnie', 'AI wybierze najlepszy dla branży', 'Dobierz styl za mnie — zaproponuj najlepszy dla mojej branży i odbiorców']
+    ];
+
+    function renderWidget(w) {
+        removeChips();
+        var div = document.createElement('div');
+        div.className = 'widget';
+        div.id = 'spar-widget';
+
+        if (w.type === 'suwak') {
+            var d = w.data;
+            var krok = (typeof d.krok === 'number' && d.krok > 0) ? d.krok : 1;
+            var jedn = typeof d.jednostka === 'string' ? d.jednostka.slice(0, 20) : '';
+            var start = (typeof d.start === 'number' && d.start >= d.min && d.start <= d.max)
+                ? d.start
+                : Math.round((d.min + d.max) / 2 / krok) * krok;
+            div.innerHTML =
+                '<div class="wg-value"><span id="wg-val"></span><small>' + esc(jedn) + '</small></div>' +
+                '<input type="range" class="wg-range" id="wg-range" min="' + d.min + '" max="' + d.max + '" step="' + krok + '" value="' + start + '" aria-label="Wybierz wartość">' +
+                '<div class="wg-minmax"><span>' + esc(String(d.min)) + '</span><span>' + esc(String(d.max)) + '+</span></div>' +
+                '<button type="button" class="wg-btn" id="wg-go"></button>';
+            var range = div.querySelector('#wg-range');
+            var valEl = div.querySelector('#wg-val');
+            var goBtn = div.querySelector('#wg-go');
+            function fmt(v) { return Number(v).toLocaleString('pl-PL'); }
+            function paint() {
+                var v = Number(range.value);
+                valEl.textContent = fmt(v) + (v >= d.max ? '+' : '');
+                goBtn.textContent = 'Zatwierdzam: ' + fmt(v) + (v >= d.max ? '+' : '') + (jedn ? ' ' + jedn : '') + ' →';
+                range.style.setProperty('--fill', ((v - d.min) / (d.max - d.min) * 100) + '%');
+            }
+            range.addEventListener('input', paint);
+            paint();
+            goBtn.addEventListener('click', function () {
+                var v = Number(range.value);
+                widgetSend(fmt(v) + (v >= d.max ? '+' : '') + (jedn ? ' ' + jedn : ''));
+            });
+        } else if (w.type === 'ranking') {
+            var order = []; // teksty w kolejności nadania numerów
+            div.innerHTML = '<div class="wg-rank"><div class="wg-rank__hint">Klikaj od najważniejszej — numerki ułożą kolejność:</div></div>' +
+                '<button type="button" class="wg-btn" id="wg-go" disabled>Ułóż wszystkie pozycje</button>';
+            var list = div.querySelector('.wg-rank');
+            var goBtn2 = div.querySelector('#wg-go');
+            function refresh() {
+                list.querySelectorAll('button').forEach(function (b) {
+                    var i = order.indexOf(b.dataset.txt);
+                    b.classList.toggle('is-ranked', i >= 0);
+                    b.querySelector('.wg-rank__num').textContent = i >= 0 ? (i + 1) : '';
+                });
+                var done = order.length === w.data.length;
+                goBtn2.disabled = !done;
+                goBtn2.textContent = done ? 'Zatwierdzam kolejność →' : ('Ułóż wszystkie pozycje (' + order.length + '/' + w.data.length + ')');
+            }
+            w.data.forEach(function (txt) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.dataset.txt = txt;
+                b.innerHTML = '<span class="wg-rank__num"></span>' + esc(txt);
+                b.addEventListener('click', function () {
+                    if (streaming || el('inline-gate')) return;
+                    var i = order.indexOf(txt);
+                    if (i >= 0) order.splice(i, 1); else order.push(txt);
+                    refresh();
+                });
+                list.appendChild(b);
+            });
+            refresh();
+            goBtn2.addEventListener('click', function () {
+                if (order.length !== w.data.length) return;
+                widgetSend(order.map(function (t, i) { return (i + 1) + '. ' + t; }).join(', '));
+            });
+        } else if (w.type === 'styl') {
+            var grid = document.createElement('div');
+            grid.className = 'wg-styles';
+            STYLE_CARDS.forEach(function (c) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'wg-style ' + c[0];
+                b.innerHTML = '<div class="wg-style__mock"><i></i><i></i><i></i></div>' +
+                    '<div class="wg-style__name">' + esc(c[1]) + '</div>' +
+                    '<div class="wg-style__desc">' + esc(c[2]) + '</div>';
+                b.addEventListener('click', function () { widgetSend(c[3]); });
+                grid.appendChild(b);
+            });
+            div.appendChild(grid);
+        } else {
+            return;
+        }
+
+        el('chat-msgs').appendChild(div);
+        scrollToBottom(false);
+    }
+
     function streamReply(text, isFirst) {
         streaming = true;
         setComposerEnabled(false);
@@ -3094,6 +3403,7 @@
             // (inaczej user klika dalej i nigdy nie widzi podglądu); dymki tej
             // tury renderują się dopiero POD obrazkiem.
             var sugg = (!el('inline-gate')) ? suggestionsFrom(raw) : null;
+            var widget = (!el('inline-gate')) ? widgetFrom(raw) : null;
             if (meta.projekt) {
                 setComposerEnabled(false);
                 el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
@@ -3103,6 +3413,8 @@
                     if (sugg && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
                     else if (gatePending() && !el('inline-gate')) renderInlineGate();
                 });
+            } else if (widget) {
+                renderWidget(widget);
             } else if (sugg) {
                 renderSuggestions(sugg.opts, sugg.multi);
             }
@@ -3697,8 +4009,12 @@
                 if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
                     var lm = messages[messages.length - 1];
                     if (lm.role === 'assistant' && !lm.local) {
-                        var rs = suggestionsFrom(lm.content);
-                        if (rs) renderSuggestions(rs.opts, rs.multi);
+                        var rw = widgetFrom(lm.content);
+                        if (rw) renderWidget(rw);
+                        else {
+                            var rs = suggestionsFrom(lm.content);
+                            if (rs) renderSuggestions(rs.opts, rs.multi);
+                        }
                     }
                 }
             } : null);
@@ -3724,8 +4040,12 @@
         if (!regenerating && !el('inline-gate') && !el('qr-chips') && messages.length) {
             var lastMsg = messages[messages.length - 1];
             if (lastMsg.role === 'assistant' && !lastMsg.local) {
-                var resumeSugg = suggestionsFrom(lastMsg.content);
-                if (resumeSugg) renderSuggestions(resumeSugg.opts, resumeSugg.multi);
+                var resumeWidget = widgetFrom(lastMsg.content);
+                if (resumeWidget) renderWidget(resumeWidget);
+                else {
+                    var resumeSugg = suggestionsFrom(lastMsg.content);
+                    if (resumeSugg) renderSuggestions(resumeSugg.opts, resumeSugg.multi);
+                }
             }
         }
 
