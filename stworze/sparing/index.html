@@ -1073,6 +1073,7 @@
 
     function renderInlineGate() {
         if (el('inline-gate') || state.email) return;
+        removeChips();
         setComposerEnabled(false);
         var div = document.createElement('div');
         div.className = 'msg msg--ai msg--gate';
@@ -1132,12 +1133,13 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<projekt']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
             .replace(/<werdykt>[\s\S]*?<\/werdykt>/g, '')
-            .replace(/<projekt>[\s\S]*?<\/projekt>/g, '');
+            .replace(/<projekt>[\s\S]*?<\/projekt>/g, '')
+            .replace(/<opcje>[\s\S]*?<\/opcje>/g, '');
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
             var i = t.indexOf(HIDDEN_MARKS[m]);
@@ -1252,14 +1254,53 @@
         streamReply(text, priorUser === 0);
     }
 
-    // Auto-wysyłka problemu wpisanego w kroku 2 jako otwarcie rozmowy
+    // Wysyłka programowa (chip profesji / dymek odpowiedzi) — jak sendMessage, bez composera
     function sendOpening(text) {
         if (streaming) return;
+        var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
         messages.push({ role: 'user', content: text });
         saveMessages();
         appendMessage('user', text);
         updateStages();
-        streamReply(text, true);
+        streamReply(text, priorUser === 0);
+    }
+
+    /* ============================================================
+       DYMKI ODPOWIEDZI — marker <opcje> z każdej tury AI
+       ============================================================ */
+    function parseOpcje(raw) {
+        if (!raw) return null;
+        var ms = raw.match(/<opcje>([\s\S]*?)<\/opcje>/g);
+        if (!ms || !ms.length) return null;
+        var inner = ms[ms.length - 1].replace(/^<opcje>/, '').replace(/<\/opcje>$/, '');
+        try {
+            var arr = JSON.parse(inner);
+            if (!Array.isArray(arr)) return null;
+            arr = arr.filter(function (x) { return typeof x === 'string' && x.trim(); })
+                .map(function (x) { return x.trim().slice(0, 120); })
+                .slice(0, 4);
+            return arr.length ? arr : null;
+        } catch (e) { return null; }
+    }
+
+    function renderSuggestions(opts) {
+        removeChips();
+        var div = document.createElement('div');
+        div.className = 'qr';
+        div.id = 'qr-chips';
+        opts.forEach(function (label) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = label;
+            b.addEventListener('click', function () {
+                if (streaming || el('inline-gate')) return;
+                removeChips();
+                sendOpening(label);
+            });
+            div.appendChild(b);
+        });
+        el('chat-msgs').appendChild(div);
+        scrollToBottom(false);
     }
 
     function streamReply(text, isFirst) {
@@ -1410,6 +1451,12 @@
                 renderVerdict(verdict, state.karta);
             } else if (gatePending() && !el('inline-gate')) {
                 renderInlineGate();
+            }
+
+            // Dymki proponowanych odpowiedzi z tej tury (marker <opcje>)
+            if (!state.verdict && !el('inline-gate')) {
+                var opcje = parseOpcje(raw);
+                if (opcje) renderSuggestions(opcje);
             }
             updateStages();
             scrollToBottom(false);
@@ -1614,6 +1661,15 @@
             renderInlineGate();
         } else if (isResume && messages.length > 1) {
             sysMsg('Rozmowa przywrócona. Piszemy dalej.');
+        }
+
+        // Resume: odtwórz dymki odpowiedzi z ostatniej tury AI (jeśli user jeszcze nie odpowiedział)
+        if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
+            var lastMsg = messages[messages.length - 1];
+            if (lastMsg.role === 'assistant' && !lastMsg.local) {
+                var resumeOpcje = parseOpcje(lastMsg.content);
+                if (resumeOpcje) renderSuggestions(resumeOpcje);
+            }
         }
 
         updateStages();
