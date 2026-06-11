@@ -674,6 +674,7 @@
     .qr button.qr-tog.is-sel .qr-check svg { opacity: 1; transform: scale(1); }
     .qr button.qr-go {
         flex-basis: 100%;
+        width: 100%;
         margin-top: 8px;
         min-height: 50px;
         display: inline-flex;
@@ -2346,9 +2347,6 @@
                 bubble.remove();
             }
 
-            // Marker <projekt> → wygeneruj podgląd graficzny w czacie
-            if (meta.projekt) requestPreview(null, meta.projekt);
-
             // Werdykt: spar_meta ma priorytet, fallback = parsowanie markera
             var parsed = parseWerdykt(raw);
             var verdict = meta.verdict || (parsed && parsed.kolor) || null;
@@ -2358,14 +2356,25 @@
                 if (meta.leadId) state.leadId = meta.leadId;
                 persistSession();
                 renderVerdict(verdict, state.karta);
-            } else if (gatePending() && !el('inline-gate')) {
+            } else if (!meta.projekt && gatePending() && !el('inline-gate')) {
                 renderInlineGate();
             }
 
-            // Dymki proponowanych odpowiedzi z tej tury (<opcje> / <opcje_multi>)
-            if (!state.verdict && !el('inline-gate')) {
-                var sugg = suggestionsFrom(raw);
-                if (sugg) renderSuggestions(sugg.opts, sugg.multi);
+            // Marker <projekt> → generowanie BLOKUJE rozmowę do pokazania efektu
+            // (inaczej user klika dalej i nigdy nie widzi podglądu); dymki tej
+            // tury renderują się dopiero POD obrazkiem.
+            var sugg = (!state.verdict && !el('inline-gate')) ? suggestionsFrom(raw) : null;
+            if (meta.projekt) {
+                setComposerEnabled(false);
+                el('chat-input').placeholder = 'Generuję podgląd — daj mi chwilę…';
+                requestPreview(null, meta.projekt, false, function () {
+                    if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
+                    updateHero(); // przywraca standardowy placeholder
+                    if (sugg && !state.verdict && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
+                    else if (gatePending() && !el('inline-gate')) renderInlineGate();
+                });
+            } else if (sugg) {
+                renderSuggestions(sugg.opts, sugg.multi);
             }
             updateStages();
             scrollToBottom(false);
@@ -2547,10 +2556,15 @@
     /* ============================================================
        PODGLĄD GRAFICZNY — marker <projekt> → spar-image → obraz w czacie
        ============================================================ */
-    function requestPreview(knownUrl, projekt, demo) {
+    function requestPreview(knownUrl, projekt, demo, onSettle) {
         var wrap = document.createElement('div');
         wrap.className = 'msg msg--ai msg--preview';
         el('chat-msgs').appendChild(wrap);
+
+        // Jednorazowe odblokowanie rozmowy po zakończeniu (sukces/limit/błąd)
+        function settle() {
+            if (onSettle) { var f = onSettle; onSettle = null; f(); }
+        }
 
         // Insighty z markera <projekt> — rotowane podczas generowania
         var insights = (projekt && Array.isArray(projekt.insighty))
@@ -2586,6 +2600,7 @@
                 '<div class="preview-note">' + esc(noteText(remaining)) + '</div>';
             wrap.querySelector('.preview-img').addEventListener('click', function () { openLightbox(url); });
             scrollToBottom(false);
+            settle();
         }
 
         // Resume: obrazek już istnieje — pokaż bez ponownego generowania
@@ -2673,6 +2688,7 @@
                 showImage(d.url, (typeof d.remaining === 'number') ? d.remaining : null);
             }).catch(function (e) {
                 stopInsights();
+                settle();
                 if (e && e.code === 'limit_podgladow') {
                     wrap.innerHTML = '<div class="preview-loading">Limit podglądów w tej rozmowie osiągnięty — opisz uwagi słowami, uwzględnię je w makiecie.</div>';
                     return;
@@ -2819,12 +2835,26 @@
         for (var pi = messages.length - 1; pi >= 0; pi--) {
             if (messages[pi].role === 'assistant' && messages[pi].content.indexOf('<projekt>') >= 0) { projektContent = messages[pi].content; break; }
         }
+        var regenerating = false;
         if (projektContent) {
             var savedPrev = loadJSON(LS_PREVIEW);
-            requestPreview(
-                (savedPrev && savedPrev.sessionId === state.sessionId) ? savedPrev.url : null,
-                parseProjektJson(projektContent)
-            );
+            var knownPrev = (savedPrev && savedPrev.sessionId === state.sessionId) ? savedPrev.url : null;
+            regenerating = !knownPrev;
+            if (regenerating) {
+                setComposerEnabled(false);
+                el('chat-input').placeholder = 'Generuję podgląd — daj mi chwilę…';
+            }
+            requestPreview(knownPrev, parseProjektJson(projektContent), false, regenerating ? function () {
+                if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
+                updateHero();
+                if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
+                    var lm = messages[messages.length - 1];
+                    if (lm.role === 'assistant' && !lm.local) {
+                        var rs = suggestionsFrom(lm.content);
+                        if (rs) renderSuggestions(rs.opts, rs.multi);
+                    }
+                }
+            } : null);
         }
 
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
@@ -2844,7 +2874,7 @@
         }
 
         // Resume: odtwórz dymki odpowiedzi z ostatniej tury AI (jeśli user jeszcze nie odpowiedział)
-        if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
+        if (!regenerating && !state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
             var lastMsg = messages[messages.length - 1];
             if (lastMsg.role === 'assistant' && !lastMsg.local) {
                 var resumeSugg = suggestionsFrom(lastMsg.content);
