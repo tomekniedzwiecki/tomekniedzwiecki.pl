@@ -2416,6 +2416,7 @@
        ============================================================ */
     var SPAR_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-chat';
     var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
+    var SPAR_PROJECT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-project';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Pierwsza Makieta — Stworzę" (500 zł)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
@@ -2623,6 +2624,51 @@
             }
         });
     }
+    // Ekrany i archiwum z SERWERA (źródło prawdy) — localStorage bywa w tyle,
+    // gdy generacje szły ze starszej karty albo z innego urządzenia
+    function syncProjectFromServer() {
+        if (!state.sessionId) return;
+        var sid = state.sessionId;
+        fetch(SPAR_PROJECT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, action: 'get' })
+        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (!d || !d.projekt || state.sessionId !== sid) return;
+            var p = d.projekt;
+            var changed = false;
+            function archive(view, u) {
+                if (!u) return;
+                if (!state.previewHistory[view]) state.previewHistory[view] = [];
+                if (state.previews[view] !== u && state.previewHistory[view].indexOf(u) < 0) {
+                    state.previewHistory[view].push(u);
+                    changed = true;
+                }
+            }
+            if (p.preview_images && typeof p.preview_images === 'object') {
+                VIEW_META.forEach(function (vm) {
+                    var v = vm[0];
+                    var su = p.preview_images[v];
+                    if (typeof su === 'string' && state.previews[v] !== su) {
+                        if (state.previews[v]) archive(v, state.previews[v]);
+                        state.previews[v] = su;
+                        changed = true;
+                    }
+                });
+            }
+            if (p.preview_history && typeof p.preview_history === 'object') {
+                Object.keys(p.preview_history).forEach(function (v) {
+                    (Array.isArray(p.preview_history[v]) ? p.preview_history[v] : []).forEach(function (u) { archive(v, u); });
+                });
+            }
+            if (changed) {
+                saveJSON(previewKey(sid), { images: state.previews, history: state.previewHistory });
+                updateSideBadges();
+                if (activeTab === 'projekt') renderPaneProjekt();
+            }
+        }).catch(function () { });
+    }
+
     function loadConvo(sid) {
         var saved = loadJSON(sessionKey(sid));
         if (!saved || !saved.sessionId) return;
@@ -4388,6 +4434,7 @@
         updateStages();
         updateHero();
         syncUrlId();
+        syncProjectFromServer();
         scrollToBottom(true);
         // focus tylko na desktopie — na mobile klawiatura zasłoniłaby historię
         if (window.matchMedia('(hover: hover)').matches && !state.verdict && !el('inline-gate')) {
