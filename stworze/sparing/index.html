@@ -3899,8 +3899,8 @@
             '<li><strong>Karta projektu</strong> i <strong>ekrany narzędzia</strong> czekają w menu obok — wszystko, co ustaliliśmy.</li>' +
             '<li>Teraz najważniejsze: <strong>jak budujemy to razem z Tomkiem</strong> — on wkłada w ten projekt własne pieniądze i czas.</li>' +
             '</ul>' +
-            '<button type="button" class="paybox__btn" id="btn-collab-talk">Pogadajmy o współpracy <span class="btn__arrow">→</span></button>' +
-            '<p class="paybox__note">Możesz też pisać dalej i dopracowywać projekt — każda zmiana zaktualizuje kartę.</p>' +
+            '<button type="button" class="paybox__btn" id="btn-collab-tab">Zobacz, jak budujemy to razem <span class="btn__arrow">→</span></button>' +
+            '<p class="paybox__note">Masz pytania? Pisz śmiało — a projekt możesz dalej dopracowywać, każda zmiana zaktualizuje kartę.</p>' +
             '</div>';
     }
 
@@ -3918,11 +3918,9 @@
             } else {
                 wrap.innerHTML = cardBoxHTML();
                 el('chat-msgs').appendChild(wrap);
-                var talkBtn = wrap.querySelector('#btn-collab-talk');
-                if (talkBtn) talkBtn.addEventListener('click', function () {
-                    if (streaming) return;
-                    talkBtn.disabled = true;
-                    sendOpening('Jak dokładnie działa współpraca z Tomkiem?');
+                var tabBtn = wrap.querySelector('#btn-collab-tab');
+                if (tabBtn) tabBtn.addEventListener('click', function () {
+                    switchTab('wspolpraca');
                 });
             }
             if (activeTab === 'karta' || activeTab === 'wspolpraca') switchTab(activeTab); // odśwież otwartą zakładkę
