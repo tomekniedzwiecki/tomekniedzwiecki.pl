@@ -1015,6 +1015,21 @@
     }
     .typing i:nth-child(2) { animation-delay: 0.18s; }
     .typing i:nth-child(3) { animation-delay: 0.36s; }
+
+    /* Wskaźnik pracy w trakcie streamu ukrytych bloków (karta/ekrany/opcje) —
+       bez niego po ostatnim widocznym zdaniu jest „martwa cisza" */
+    .msg__work {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 10px;
+        padding-top: 9px;
+        border-top: 1px solid var(--glass-border-soft);
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--accent);
+    }
+    .msg__work .typing i { width: 5px; height: 5px; }
     @keyframes typingPulse {
         0%, 100% { opacity: 0.3; transform: translateY(0); }
         40%      { opacity: 1; transform: translateY(-3px); }
@@ -3218,6 +3233,26 @@
         return /<makieta\s*(\/\s*)?>/.test(raw || '');
     }
 
+    // Co model „robi" w niewidocznej części streamu — etykieta wskaźnika pracy
+    var WORK_LABELS = [
+        ['projekt', 'Przygotowuję ekrany narzędzia…'],
+        ['werdykt', 'Zapisuję kartę projektu…'],
+        ['sekcje', 'Układam szczegóły…'],
+        ['karuzela', 'Układam porównanie…'],
+        ['opcje_multi', 'Przygotowuję odpowiedzi do wyboru…'],
+        ['opcje', 'Przygotowuję odpowiedzi do wyboru…'],
+        ['suwak', 'Przygotowuję suwak…'],
+        ['ranking', 'Przygotowuję listę do ułożenia…']
+    ];
+    function workingLabel(raw) {
+        if (!raw) return null;
+        for (var i = 0; i < WORK_LABELS.length; i++) {
+            var m = WORK_LABELS[i][0];
+            if (raw.lastIndexOf('<' + m + '>') > raw.lastIndexOf('</' + m + '>')) return WORK_LABELS[i][1];
+        }
+        return null;
+    }
+
     // Karta rezerwacji wspólnej rozmowy inline w czacie (marker <makieta>)
     function mkCardEl() {
         var div = document.createElement('div');
@@ -3672,6 +3707,12 @@
                     raw += obj.delta.text;
                     if (!gotText) { gotText = true; }
                     bubble.innerHTML = renderRich(visibleText(raw)) || '<span class="typing"><i></i><i></i><i></i></span>';
+                    // stream pracuje w ukrytym bloku — pokaż, że coś się dzieje
+                    var work = workingLabel(raw);
+                    if (work) {
+                        bubble.insertAdjacentHTML('beforeend',
+                            '<div class="msg__work"><span class="typing"><i></i><i></i><i></i></span>' + esc(work) + '</div>');
+                    }
                     scrollToBottom(false);
                 } else if (obj.type === 'error' || ev === 'error') {
                     var e2 = new Error('stream');
