@@ -1622,7 +1622,8 @@
         sessionId: null,
         verdict: null,          // 'zielony'|'zolty'|'czerwony'|null
         karta: null,            // obiekt karty z markera
-        leadId: null
+        leadId: null,
+        kamien: 0               // najwyższy domknięty kamień rozmowy (marker <kamien>)
     };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
@@ -1656,7 +1657,8 @@
             sessionId: state.sessionId,
             verdict: state.verdict,
             karta: state.karta,
-            leadId: state.leadId
+            leadId: state.leadId,
+            kamien: state.kamien || 0
         });
     }
     function saveMessages() { saveJSON(LS_MESSAGES, messages); }
@@ -1826,6 +1828,7 @@
         if (!keepContact) { state.email = null; state.name = null; }
         state.sessionId = uuid4();
         state.verdict = null; state.karta = null; state.leadId = null;
+        state.kamien = 0;
         if (!state.pSlug) state.profession = null;
         messages = [];
         el('chat-msgs').innerHTML = '';
@@ -1838,7 +1841,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -1848,7 +1851,8 @@
             .replace(/<opcje>[\s\S]*?<\/opcje>/g, '')
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
             .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
-            .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '');
+            .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
+            .replace(/<kamien>[\s\S]*?<\/kamien>/g, '');
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
             var i = t.indexOf(HIDDEN_MARKS[m]);
@@ -1930,12 +1934,18 @@
        PASEK ETAPÓW — heurystyka: liczba tur + spar_meta
        ============================================================ */
     function updateStages() {
-        var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
         var stage;
+        var k = state.kamien || 0;
         if (state.verdict) stage = 4;
-        else if (userCount <= 3) stage = 1;
-        else if (userCount <= 6) stage = 2;
-        else stage = 3;
+        else if (k >= 6) stage = 4;
+        else if (k === 5) stage = 3;
+        else if (k >= 3) stage = 2;
+        else if (k >= 1) stage = 1;
+        else {
+            // fallback (stare rozmowy bez markera): heurystyka po liczbie wiadomości
+            var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
+            stage = userCount <= 3 ? 1 : (userCount <= 6 ? 2 : 3);
+        }
         document.querySelectorAll('#stages .stage').forEach(function (li) {
             var n = parseInt(li.dataset.stage, 10);
             li.classList.toggle('is-done', n < stage || (state.verdict && n === 4));
@@ -2265,6 +2275,9 @@
                 bubble.innerHTML = renderRich(visibleText(raw)) || '';
                 messages.push({ role: 'assistant', content: raw });
                 saveMessages();
+                // Postęp kamieni z tej tury
+                var kam = parseKamien(raw);
+                if (kam > (state.kamien || 0)) { state.kamien = kam; persistSession(); }
                 // Błysk + sekcje z tej tury — karty zaraz pod dymkiem (w tej kolejności)
                 var anchor = bubble;
                 var blysk = parseBlysk(raw);
@@ -2346,6 +2359,15 @@
     /* ============================================================
        BŁYSK — wyróżniona obserwacja branżowa (marker <blysk>)
        ============================================================ */
+    // Marker postępu: <kamien>N</kamien> — najwyższy DOMKNIĘTY kamień (1-6)
+    function parseKamien(raw) {
+        if (!raw) return 0;
+        var ms = raw.match(/<kamien>\s*(\d)\s*<\/kamien>/g);
+        if (!ms || !ms.length) return 0;
+        var n = parseInt(ms[ms.length - 1].replace(/\D/g, ''), 10);
+        return (n >= 1 && n <= 6) ? n : 0;
+    }
+
     function parseBlysk(raw) {
         if (!raw) return null;
         var m = raw.match(/<blysk>([\s\S]*?)<\/blysk>/);
@@ -2830,7 +2852,15 @@
             state.verdict = saved.verdict || null;
             state.karta = saved.karta || null;
             state.leadId = saved.leadId || null;
+            state.kamien = saved.kamien || 0;
             messages = loadJSON(LS_MESSAGES) || [];
+            // Odtwórz postęp kamieni z historii (odporne na brak w LS)
+            messages.forEach(function (m) {
+                if (m.role === 'assistant') {
+                    var mk = parseKamien(m.content);
+                    if (mk > state.kamien) state.kamien = mk;
+                }
+            });
             enterChat(true);
             return;
         }
