@@ -1601,13 +1601,12 @@
     .rk-window__label svg { width: 14px; height: 14px; }
     .rk-window p {
         position: relative;
-        font-family: var(--serif);
-        font-style: italic;
-        font-size: clamp(17px, 2.4vw, 22px);
-        line-height: 1.6;
+        font-size: 14.5px;
+        line-height: 1.75;
         color: var(--text-strong);
-        max-width: 58ch;
-        margin: 14px auto 0;
+        text-align: left;
+        max-width: 62ch;
+        margin: 16px auto 0;
         overflow-wrap: break-word;
     }
     /* Trendy: karty z numerem-duchem */
@@ -1665,17 +1664,6 @@
         line-height: 1.45;
         flex-shrink: 0;
     }
-    /* Uczciwe ryzyka */
-    .rk-warn {
-        border: 1px dashed rgba(255, 197, 61, 0.35);
-        border-radius: 16px;
-        padding: 16px 18px;
-        background: rgba(255, 197, 61, 0.03);
-    }
-    .rk-warn__t { font-size: 11.5px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--yellow); margin-bottom: 9px; }
-    .rk-warn ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-    .rk-warn li { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; padding-left: 14px; position: relative; overflow-wrap: break-word; }
-    .rk-warn li::before { content: '–'; position: absolute; left: 0; color: var(--yellow); }
     /* Przypisy źródłowe */
     .rk-refs { display: inline-flex; gap: 3px; margin-left: 5px; vertical-align: super; }
     .rk-ref {
@@ -5634,7 +5622,6 @@
         var konk = Array.isArray(r.konkurenci) ? r.konkurenci.filter(function (c) { return c && typeof c === 'object'; }).slice(0, 6) : [];
         var trendy = Array.isArray(r.trendy) ? r.trendy.filter(function (t) { return t && typeof t === 'object'; }).slice(0, 4) : [];
         var wnioski = Array.isArray(r.co_to_oznacza) ? r.co_to_oznacza.slice(0, 6) : [];
-        var ryzyka = Array.isArray(r.zastrzezenia) ? r.zastrzezenia.slice(0, 4) : [];
         var srcs = Array.isArray(r.zrodla) ? r.zrodla.filter(function (s) { return s && s.url; }) : [];
 
         // Pasek rozdziałów (sticky, scroll-spy) — tylko sekcje obecne w danych
@@ -5644,7 +5631,6 @@
         if (r.luka_rynkowa) chapters.push(['okno', 'Okno rynkowe']);
         if (trendy.length) chapters.push(['trendy', 'Trendy']);
         if (wnioski.length) chapters.push(['wnioski', 'Wnioski']);
-        if (ryzyka.length) chapters.push(['ryzyka', 'Ryzyka']);
         if (srcs.length) chapters.push(['zrodla', 'Źródła']);
 
         var html = '<nav class="rk-rail" aria-label="Rozdziały raportu">' + chapters.map(function (c, i) {
@@ -5740,15 +5726,7 @@
                 '<ul class="rk-means">' + wnioski.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>');
         }
 
-        // 7. RYZYKA — uczciwie, bez lukru
-        if (ryzyka.length) {
-            html += '<section class="rk-sec rk-reveal" id="rk-sec-ryzyka"><div class="rk-warn">' +
-                '<div class="rk-warn__t">Uczciwie o ryzykach</div><ul>' +
-                ryzyka.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
-                '</ul></div></section>';
-        }
-
-        // 8. ŹRÓDŁA
+        // 7. ŹRÓDŁA
         if (srcs.length) {
             html += '<section class="rk-sec" id="rk-sec-zrodla"><details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
                 srcs.map(function (s) {
