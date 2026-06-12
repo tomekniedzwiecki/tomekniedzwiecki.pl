@@ -553,15 +553,19 @@
     }
     .pj-quote::before { content: '„'; color: var(--accent); }
     .pj-quote::after { content: '"'; color: var(--accent); }
-    /* Ekrany: desktop = kompozycja 1 duży + reszta; mobile = karuzela snap */
+    /* Ekrany: desktop = główny ekran full-width + rząd mniejszych pod spodem
+       (grafiki zawsze poziome 3:2 — kadry też 3:2, zero przycinania);
+       mobile = karuzela snap */
     .pj2-shots {
         display: grid;
-        grid-template-columns: 1.8fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
         gap: 12px;
         margin-bottom: 24px;
     }
+    .pj2-shots .pv-tile--main { grid-column: 1 / -1; }
     .pj2-shots.n1 { grid-template-columns: 1fr; }
-    .pj2-shots .pv-tile--main .pv-tile__body { aspect-ratio: auto; height: 100%; min-height: 260px; }
+    .pj2-shots.n2 { grid-template-columns: 1fr 1fr; }
+    .pj2-shots.n2 .pv-tile--main { grid-column: auto; }
     @media (max-width: 1023.98px) {
         .pj2-shots {
             display: flex;
@@ -574,7 +578,6 @@
         }
         .pj2-shots::-webkit-scrollbar { display: none; }
         .pj2-shots .pv-tile { flex: 0 0 80%; scroll-snap-align: center; }
-        .pj2-shots .pv-tile--main .pv-tile__body { aspect-ratio: 3 / 2; height: auto; min-height: 0; }
     }
 
     /* Karta: desktop = 2 kolumny otwartych sekcji; mobile = akordeony */
@@ -3147,11 +3150,12 @@
             }
         }
 
-        // Ekrany narzędzia — desktop: kompozycja 1 duży + reszta; mobile: karuzela snap
+        // Ekrany narzędzia — desktop: główny full-width + rząd mniejszych
+        // (wszystkie grafiki są poziome 3:2 — żadnych pionowych kadrów!);
+        // mobile: karuzela snap
         if (items.length) {
             html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
-                return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '"' +
-                    (i === 0 && items.length > 1 ? ' style="grid-row: span ' + (items.length - 1) + '"' : '') + '>' +
+                return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                     '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
                     '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
             }).join('') + '</div>';
