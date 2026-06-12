@@ -264,6 +264,15 @@
         background: var(--border-strong);
     }
     .side__convo-dot.is-done { background: var(--green, #00d97e); box-shadow: 0 0 8px rgba(0, 217, 126, 0.5); }
+    .side__convo-img {
+        width: 32px;
+        height: 22px;
+        flex-shrink: 0;
+        border-radius: 5px;
+        object-fit: cover;
+        border: 1px solid var(--glass-border);
+    }
+    .side__convo-img.is-done { border-color: rgba(0, 217, 126, 0.6); box-shadow: 0 0 8px rgba(0, 217, 126, 0.3); }
     .side__item {
         position: relative;
         display: flex;
@@ -450,6 +459,49 @@
     .shots--old .pv-tile__label { font-size: 10px; padding: 3px 8px; }
 
     /* Zakładka Projekt — karta w blokach narracyjnych + wersje + poprawki */
+    .pj-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+    .pj-head__txt { min-width: 0; }
+    .pj-share {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        min-height: 44px;
+        padding: 10px 16px;
+        margin-top: 4px;
+        border-radius: 999px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass);
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 600;
+        transition: border-color 0.25s var(--ease), color 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .pj-share svg { width: 15px; height: 15px; color: var(--accent); }
+    .pj-share:hover { border-color: var(--accent); color: var(--text-strong); background: var(--accent-dim); }
+
+    .toast {
+        position: fixed;
+        left: 50%;
+        bottom: max(26px, env(safe-area-inset-bottom));
+        transform: translateX(-50%);
+        z-index: 300;
+        padding: 12px 22px;
+        border-radius: 999px;
+        background: rgba(10, 10, 16, 0.94);
+        border: 1px solid rgba(77, 159, 255, 0.45);
+        color: var(--text-strong);
+        font-size: 13.5px;
+        font-weight: 600;
+        box-shadow: 0 14px 40px -12px rgba(0, 0, 0, 0.8), 0 0 30px -12px rgba(77, 159, 255, 0.5);
+        animation: msgIn 0.35s var(--ease);
+        white-space: nowrap;
+        max-width: 92vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .toast.is-out { opacity: 0; transform: translateX(-50%) translateY(8px); transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); }
+
     .pj-vers { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 14px; }
     .pj-ver {
         padding: 8px 14px;
@@ -2704,7 +2756,15 @@
     /* ── Indeks rozmów (max CONVOS_MAX darmowych projektów) ────────── */
     function convoIndex() { return loadJSON(LS_INDEX) || []; }
     function convoTitle() {
-        return (state.lastBrief && state.lastBrief.nazwa) || state.profession || 'Nowy pomysł';
+        if (state.lastBrief && state.lastBrief.nazwa) return state.lastBrief.nazwa;
+        // zanim padnie nazwa narzędzia — pierwsza wiadomość rozmówcy mówi najwięcej
+        for (var i = 0; i < messages.length; i++) {
+            if (messages[i].role === 'user') {
+                var t = messages[i].content.trim();
+                return t.length > 34 ? t.slice(0, 33).trim() + '…' : t;
+            }
+        }
+        return state.profession || 'Nowy pomysł';
     }
     function updateConvoMeta() {
         var idx = convoIndex();
@@ -2714,6 +2774,7 @@
             id: state.sessionId,
             title: convoTitle(),
             verdict: state.verdict || null,
+            thumb: (state.previews && (state.previews.panel || state.previews.glowna)) || null,
             ts: i >= 0 ? idx[i].ts : Date.now()
         };
         if (i >= 0) idx[i] = meta; else idx.push(meta);
@@ -2736,7 +2797,10 @@
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'side__convo' + (c.id === state.sessionId ? ' is-active' : '');
-            b.innerHTML = '<i class="side__convo-dot' + (c.verdict === 'zielony' ? ' is-done' : '') + '"></i><span>' + esc(c.title || 'Rozmowa') + '</span>';
+            var lead = c.thumb
+                ? '<img class="side__convo-img' + (c.verdict === 'zielony' ? ' is-done' : '') + '" src="' + esc(c.thumb) + '" alt="" loading="lazy">'
+                : '<i class="side__convo-dot' + (c.verdict === 'zielony' ? ' is-done' : '') + '"></i>';
+            b.innerHTML = lead + '<span>' + esc(c.title || 'Rozmowa') + '</span>';
             b.addEventListener('click', function () {
                 if (c.id !== state.sessionId) loadConvo(c.id);
                 else { switchTab('chat'); closeSide(); }
@@ -2814,6 +2878,7 @@
             if (changed) {
                 saveJSON(previewKey(sid), { images: state.previews, history: state.previewHistory });
                 updateSideBadges();
+                updateConvoMeta();
                 if (activeTab === 'projekt') renderPaneProjekt();
             }
         }).catch(function () { });
@@ -2928,6 +2993,31 @@
         return vers;
     }
 
+    // Toast — krótkie potwierdzenie akcji (np. skopiowano link)
+    function showToast(text) {
+        var old = el('spar-toast');
+        if (old) old.remove();
+        var t = document.createElement('div');
+        t.className = 'toast';
+        t.id = 'spar-toast';
+        t.textContent = text;
+        document.body.appendChild(t);
+        setTimeout(function () { t.classList.add('is-out'); }, 2300);
+        setTimeout(function () { t.remove(); }, 2800);
+    }
+
+    function shareProject() {
+        var url = location.origin + location.pathname + '?id=' + encodeURIComponent(state.sessionId);
+        function done() { showToast('Link skopiowany — pokaż projekt komu chcesz'); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(function () {
+                window.prompt('Skopiuj link do projektu:', url);
+            });
+        } else {
+            window.prompt('Skopiuj link do projektu:', url);
+        }
+    }
+
     function pjChips(arr, dim) {
         return '<div class="chips' + (dim ? ' chips--dim' : '') + '">' +
             arr.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>';
@@ -2965,9 +3055,13 @@
             return;
         }
 
-        var html = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój projekt</div>' +
+        var html = '<div class="tabpane__head pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Twój projekt</div>' +
             '<h2 class="tabpane__title">' + esc(nazwa) + '</h2>' +
             (brief.opis ? '<p class="tabpane__sub">' + esc(brief.opis) + '</p>' : '') +
+            '</div>' +
+            '<button type="button" class="pj-share" id="pj-share" title="Skopiuj link do projektu">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>' +
+            'Udostępnij</button>' +
             '</div>';
 
         // Przełącznik wersji karty
@@ -3056,6 +3150,8 @@
         body.querySelectorAll('.pj-ver').forEach(function (b) {
             b.addEventListener('click', function () { renderPaneProjekt(parseInt(b.dataset.ver, 10)); });
         });
+        var shareBtn = body.querySelector('#pj-share');
+        if (shareBtn) shareBtn.addEventListener('click', shareProject);
         var editBtn = body.querySelector('#pj-edit-btn');
         if (editBtn) editBtn.addEventListener('click', function () {
             if (streaming) return;
@@ -3194,9 +3290,28 @@
         document.body.appendChild(lb);
 
         var img = lb.querySelector('img');
-        img.style.transition = 'opacity 0.22s ease';
+        img.style.transition = 'opacity 0.22s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1)';
+        // Zoom: klik powiększa 2.2x w miejscu kliknięcia, drugi klik wraca
+        var zoomed = false;
+        function unzoom() {
+            zoomed = false;
+            img.style.transform = '';
+            img.style.cursor = 'zoom-in';
+        }
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', function (e) {
+            if (zoomed) { unzoom(); return; }
+            var r = img.getBoundingClientRect();
+            var ox = ((e.clientX - r.left) / r.width * 100).toFixed(1);
+            var oy = ((e.clientY - r.top) / r.height * 100).toFixed(1);
+            img.style.transformOrigin = ox + '% ' + oy + '%';
+            img.style.transform = 'scale(2.2)';
+            img.style.cursor = 'zoom-out';
+            zoomed = true;
+        });
         function paint() {
             var it = items[idx];
+            unzoom();
             img.style.opacity = '0';
             img.onload = function () { img.style.opacity = '1'; };
             img.src = it.url;
@@ -4360,6 +4475,7 @@
             function persistPreviews() {
                 saveJSON(previewKey(state.sessionId), { images: state.previews, history: state.previewHistory });
                 updateSideBadges();
+                updateConvoMeta(); // miniatura projektu na liście rozmów
             }
 
             function finishAll() {
