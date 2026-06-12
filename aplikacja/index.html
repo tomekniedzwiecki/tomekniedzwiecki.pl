@@ -939,9 +939,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
    SCENE 4 — MOTTO
    ============================================================ */
 .scene--motto .scene__aurora {
+    width: clamp(600px, 90vw, 1300px);
     background: radial-gradient(circle at center,
-        rgba(77, 159, 255, 0.13) 0%,
-        rgba(77, 159, 255, 0.04) 40%,
+        rgba(77, 159, 255, 0.22) 0%,
+        rgba(77, 159, 255, 0.07) 42%,
         transparent 72%);
     animation-duration: 30s;
 }
@@ -1005,15 +1006,6 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     color: var(--text-strong);
     font-size: 0.88em;
     letter-spacing: -0.025em;
-}
-.motto__word--punch {
-    font-family: var(--sans);
-    font-style: normal;
-    font-weight: 800;
-    color: var(--accent);
-    font-size: 0.88em;
-    letter-spacing: -0.025em;
-    text-shadow: 0 0 80px rgba(77, 159, 255, 0.35);
 }
 .motto__attribution {
     margin-top: clamp(32px, 5vh, 56px);
@@ -1540,9 +1532,9 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                     <span class="motto__word motto__word--accent" style="--wi:1">zarabia</span>
                     <span class="motto__word motto__word--accent" style="--wi:2">dopiero</span>
                     <span class="motto__word motto__word--accent" style="--wi:3">wtedy,</span>
-                    <span class="motto__word motto__word--punch" style="--wi:4">gdy</span>
-                    <span class="motto__word motto__word--punch" style="--wi:5">Ty</span>
-                    <span class="motto__word motto__word--punch" style="--wi:6">zarabiasz.</span>
+                    <span class="motto__word motto__word--accent" style="--wi:4">gdy</span>
+                    <span class="motto__word motto__word--accent" style="--wi:5">Ty</span>
+                    <span class="motto__word motto__word--accent" style="--wi:6">zarabiasz.</span>
                 </span>
             </blockquote>
 
