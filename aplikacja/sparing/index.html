@@ -7362,12 +7362,19 @@
 
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
 
-        if (state.verdict) {
+        if (state.verdict && userCount > 0) {
             // odtwórz blok werdyktu po historii
             renderVerdict(state.verdict, state.karta);
             if (isResume && state.verdict === 'zolty') {
                 sysMsg('Wróciłeś do rozmowy. Werdykt na ten moment: żółty — doprecyzuj i pisz dalej.');
             }
+        } else if (state.verdict) {
+            // werdykt jest, ale lokalnie nie ma historii (sesja adoptowana
+            // linkiem ?id= bez logowania — sync dociągnął werdykt z serwera).
+            // Paybox „Karta gotowa" pod samym openerem wyglądał jak błąd
+            // (zgłoszenie Tomka 2026-06-12) — kierujemy do zakładek dyskretnie.
+            var resumedName = (state.lastBrief && state.lastBrief.nazwa) ? '„' + state.lastBrief.nazwa + '"' : '';
+            sysMsg('Wróciłeś do projektu ' + resumedName + ' — karta, ekrany i cała reszta czekają w menu obok. Pełna historia rozmowy wróci po zalogowaniu.');
         } else if (userCount === 0) {
             renderChips();
         } else if (gatePending()) {
