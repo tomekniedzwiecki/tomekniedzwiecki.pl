@@ -151,7 +151,13 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     transition: opacity 0.25s var(--ease);
 }
 .nav__brand:hover { opacity: 0.78; }
-.nav__logo { height: 100%; width: auto; display: block; user-select: none; }
+.nav__logo { height: 100%; width: auto; display: block; user-select: none; flex-shrink: 0; }
+.nav__logo--icon { display: none; }
+/* wąski nav: pełne logo nie mieści się obok CTA — przełączamy na ikonę */
+@media (max-width: 560px) {
+    .nav__logo--full { display: none; }
+    .nav__logo--icon { display: block; }
+}
 .nav__suffix {
     font-size: 15px;
     font-weight: 700;
@@ -1428,7 +1434,8 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 <nav class="nav">
     <div class="nav__inner">
         <a class="nav__brand" href="https://tomekniedzwiecki.pl/" aria-label="tomekniedzwiecki.pl — strona główna">
-            <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" width="244" height="32">
+            <img class="nav__logo nav__logo--full" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" width="244" height="32">
+            <img class="nav__logo nav__logo--icon" src="/img/logo/tn-logo-icon-88.png" alt="tomekniedzwiecki.pl" width="32" height="32">
             <span class="nav__suffix">aplikacja.</span>
         </a>
         <div class="nav__right">
