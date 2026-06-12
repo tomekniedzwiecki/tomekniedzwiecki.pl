@@ -264,15 +264,33 @@
         background: var(--border-strong);
     }
     .side__convo-dot.is-done { background: var(--green, #00d97e); box-shadow: 0 0 8px rgba(0, 217, 126, 0.5); }
-    .side__convo-img {
-        width: 32px;
-        height: 22px;
+    .side__convo-avatar {
+        position: relative;
+        width: 26px;
+        height: 26px;
         flex-shrink: 0;
-        border-radius: 5px;
-        object-fit: cover;
-        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 800;
+        font-style: normal;
+        color: hsl(var(--h) 85% 74%);
+        background: linear-gradient(145deg, hsl(var(--h) 70% 55% / 0.28), hsl(var(--h) 70% 45% / 0.12));
+        border: 1px solid hsl(var(--h) 70% 60% / 0.4);
     }
-    .side__convo-img.is-done { border-color: rgba(0, 217, 126, 0.6); box-shadow: 0 0 8px rgba(0, 217, 126, 0.3); }
+    .side__convo-avatar.is-done::after {
+        content: '';
+        position: absolute;
+        right: -3px;
+        bottom: -3px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--green, #00d97e);
+        border: 2px solid #0a0b0f;
+        box-shadow: 0 0 7px rgba(0, 217, 126, 0.6);
+    }
     .side__item {
         position: relative;
         display: flex;
@@ -2796,10 +2814,13 @@
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'side__convo' + (c.id === state.sessionId ? ' is-active' : '');
-            var lead = c.thumb
-                ? '<img class="side__convo-img' + (c.verdict === 'zielony' ? ' is-done' : '') + '" src="' + esc(c.thumb) + '" alt="" loading="lazy">'
-                : '<i class="side__convo-dot' + (c.verdict === 'zielony' ? ' is-done' : '') + '"></i>';
-            b.innerHTML = lead + '<span>' + esc(c.title || 'Rozmowa') + '</span>';
+            // monogram: litera + stały kolor z ID — czytelne w małej skali
+            // (miniatura UI w 32px to nierozpoznawalna plamka)
+            var hue = 0;
+            for (var h = 0; h < c.id.length; h++) hue = (hue * 31 + c.id.charCodeAt(h)) % 360;
+            var letter = (c.title || 'R').trim().charAt(0).toUpperCase();
+            b.innerHTML = '<i class="side__convo-avatar' + (c.verdict === 'zielony' ? ' is-done' : '') + '" style="--h:' + hue + 'deg">' + esc(letter) + '</i>' +
+                '<span>' + esc(c.title || 'Rozmowa') + '</span>';
             b.addEventListener('click', function () {
                 if (c.id !== state.sessionId) loadConvo(c.id);
                 else { switchTab('chat'); closeSide(); }
