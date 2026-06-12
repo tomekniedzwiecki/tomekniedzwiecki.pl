@@ -1367,62 +1367,100 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .talk__chips {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
+    gap: 9px;
 }
+/* ── ścieżki wejścia: pełnowymiarowe karty wyboru ──
+   ikona w gradientowym kaflu (spektrum błękit → fiolet → magenta
+   przez trzy opcje), tytuł + mikrocopy, strzałka.
+   Hover = wirująca aura AI (ten sam język co focus composera). */
 .cta__path {
     position: relative;
-    z-index: 0; /* własny stacking context — aura ::before (z-index:-1) zostaje przy dymku, nie pod kartą */
-    display: inline-flex;
+    z-index: 0; /* własny stacking context — aura ::before (z-index:-1) zostaje przy karcie */
+    display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 13px 20px;
-    border: 0;
-    border-radius: 16px 16px 5px 16px;
-    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, #2f7fe6 100%);
-    font-size: 14.5px;
+    gap: 14px;
+    width: 100%;
+    padding: 11px 16px 11px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+    text-align: left;
+    transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.cta__path-ico {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    transition: transform 0.3s var(--ease);
+}
+.cta__path-ico svg { width: 20px; height: 20px; }
+.cta__path:nth-child(1) .cta__path-ico { background: linear-gradient(135deg, #6db3ff, #2f7fe6); box-shadow: 0 8px 20px -8px rgba(77, 159, 255, 0.7); }
+.cta__path:nth-child(2) .cta__path-ico { background: linear-gradient(135deg, #9d8bff, #5b46e8); box-shadow: 0 8px 20px -8px rgba(125, 107, 255, 0.7); }
+.cta__path:nth-child(3) .cta__path-ico { background: linear-gradient(135deg, #d07dff, #9b3fe0); box-shadow: 0 8px 20px -8px rgba(196, 107, 255, 0.7); }
+.cta__path-txt {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.cta__path-title {
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: var(--accent-ink);
-    box-shadow: 0 12px 32px -10px rgba(77, 159, 255, 0.55);
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    line-height: 1.25;
+    color: var(--text-strong);
 }
-.cta__path::after { content: '→'; color: var(--accent-ink); opacity: 0.75; transition: transform 0.25s var(--ease); }
-/* AI-aura: opalizująca obwódka wirująca wokół dymka (język Apple
+.cta__path-sub {
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+.cta__path-go {
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-faint);
+    transition: transform 0.25s var(--ease), color 0.25s var(--ease);
+}
+.cta__path:active { transform: scale(0.985); }
+/* AI-aura: opalizująca obwódka wirująca wokół karty (język Apple
    Intelligence / Gemini) — pojawia się przy najechaniu */
 @property --aiAng { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 .cta__path::before {
     content: '';
     position: absolute;
-    inset: -4px;
-    border-radius: 20px 20px 9px 20px;
+    inset: -3px;
+    border-radius: 19px;
     background: conic-gradient(from var(--aiAng),
         #4d9fff, #7d6bff, #c46bff, #4dd2ff, #4d9fff);
-    /* ring: maska wycina środek — aura świeci tylko WOKÓŁ dymka */
-    padding: 4px;
+    /* ring: maska wycina środek — aura świeci tylko WOKÓŁ karty */
+    padding: 3px;
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
             mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             mask-composite: exclude;
-    filter: blur(2px);
+    filter: blur(1.5px);
     opacity: 0;
     transition: opacity 0.35s var(--ease);
     pointer-events: none;
 }
 @keyframes aiSpin { to { --aiAng: 360deg; } }
-@keyframes sparklePop {
-    0% { transform: scale(0) rotate(-90deg); }
-    70% { transform: scale(1.3) rotate(12deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .cta__path { overflow: visible; }
     .cta__path:hover {
         transform: translateY(-2px);
-        box-shadow: 0 18px 44px -12px rgba(124, 107, 255, 0.55);
+        border-color: rgba(125, 107, 255, 0.45);
+        background: linear-gradient(150deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+        box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
     }
-    .cta__path:hover::before { opacity: 0.85; animation: aiSpin 2.4s linear infinite; }
-    .cta__path:hover::after { content: '✦'; animation: sparklePop 0.5s var(--ease); }
+    .cta__path:hover::before { opacity: 0.9; animation: aiSpin 2.4s linear infinite; }
+    .cta__path:hover .cta__path-go { transform: translateX(4px); color: var(--accent); }
+    .cta__path:hover .cta__path-ico { transform: scale(1.08) rotate(-4deg); }
 }
 /* focus pola = ta sama aura wokół composera */
 .cta__bar { position: relative; z-index: 0; }
@@ -1449,11 +1487,15 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 @media (prefers-reduced-motion: reduce) {
     .cta__bar:focus-within::before { opacity: 0.55; }
 }
-/* chipy wjeżdżają po dopisaniu openera */
-.talk__chips .cta__path { opacity: 0; transform: translateY(8px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
-.talk.is-ready .talk__chips .cta__path { opacity: 1; transform: none; }
-.talk.is-ready .talk__chips .cta__path:nth-child(2) { transition-delay: 0.12s; }
-.talk.is-ready .talk__chips .cta__path:nth-child(3) { transition-delay: 0.24s; }
+/* karty wjeżdżają po dopisaniu openera — animation zamiast transition,
+   żeby delaye nth-child nie opóźniały później hovera */
+.talk__chips .cta__path { opacity: 0; }
+/* fill backwards (NIE forwards) — po animacji style wracają do naturalnych,
+   inaczej keyframe blokowałby hover transform */
+.talk.is-ready .talk__chips .cta__path { opacity: 1; animation: pathIn 0.5s var(--ease) backwards; }
+.talk.is-ready .talk__chips .cta__path:nth-child(2) { animation-delay: 0.12s; }
+.talk.is-ready .talk__chips .cta__path:nth-child(3) { animation-delay: 0.24s; }
+@keyframes pathIn { from { opacity: 0; transform: translateY(10px); } }
 .talk__or {
     text-align: center;
     font-size: 11px;
@@ -1560,7 +1602,13 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     .talk { margin-top: 18px; }
     .talk__body { padding: 14px 14px 12px; gap: 9px; }
     .talk__ai { font-size: 13.5px; padding: 11px 13px; min-height: 0; }
-    .talk__chips .cta__path { padding: 9px 14px; font-size: 13px; }
+    .talk__chips { gap: 8px; }
+    .talk__chips .cta__path { padding: 8px 12px 8px 8px; gap: 11px; }
+    .cta__path-ico { width: 34px; height: 34px; border-radius: 10px; }
+    .cta__path-ico svg { width: 17px; height: 17px; }
+    .cta__path-title { font-size: 13.5px; }
+    /* mikrocopy znika — scena musi mieścić się w 100dvh (snap na iOS) */
+    .cta__path-sub { display: none; }
     .cta__bar { padding: 6px 6px 6px 14px; }
     .cta__bar textarea { padding: 8px 0; }
     .cta__send { width: 38px; height: 38px; font-size: 17px; }
@@ -1863,9 +1911,30 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                 <div class="talk__body">
                     <div class="talk__ai"><span id="talk-opener"></span><span class="talk__caret" id="talk-caret"></span></div>
                     <div class="talk__chips">
-                        <button type="button" class="cta__path" data-path="Mam już pomysł na narzędzie">Mam już pomysł na narzędzie</button>
-                        <button type="button" class="cta__path" data-path="Znam problem, który warto rozwiązać">Znam problem, który warto rozwiązać</button>
-                        <button type="button" class="cta__path" data-path="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
+                        <button type="button" class="cta__path" data-path="Mam już pomysł na narzędzie">
+                            <span class="cta__path-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21h6"/><path d="M12 3a6.5 6.5 0 0 1 3.6 11.9c-.4.3-.6.7-.6 1.1v1.5H9v-1.5c0-.4-.2-.8-.6-1.1A6.5 6.5 0 0 1 12 3z"/></svg></span>
+                            <span class="cta__path-txt">
+                                <span class="cta__path-title">Mam już pomysł na narzędzie</span>
+                                <span class="cta__path-sub">Opowiedz o nim, a AI od razu zacznie projektować</span>
+                            </span>
+                            <span class="cta__path-go" aria-hidden="true">→</span>
+                        </button>
+                        <button type="button" class="cta__path" data-path="Znam problem, który warto rozwiązać">
+                            <span class="cta__path-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12h.01"/></svg></span>
+                            <span class="cta__path-txt">
+                                <span class="cta__path-title">Znam problem, który warto rozwiązać</span>
+                                <span class="cta__path-sub">Zamienimy go w narzędzie, za które ludzie płacą</span>
+                            </span>
+                            <span class="cta__path-go" aria-hidden="true">→</span>
+                        </button>
+                        <button type="button" class="cta__path" data-path="Nie mam pomysłu — poszukajmy razem">
+                            <span class="cta__path-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5 8.5 13.7 13.7 8.5 15.5 10.3 10.3 15.5 8.5"/></svg></span>
+                            <span class="cta__path-txt">
+                                <span class="cta__path-title">Nie mam pomysłu — poszukajmy razem</span>
+                                <span class="cta__path-sub">Kilka pytań i AI znajdzie okazję w Twojej branży</span>
+                            </span>
+                            <span class="cta__path-go" aria-hidden="true">→</span>
+                        </button>
                     </div>
                     <div class="talk__or">albo napisz po swojemu</div>
                     <div class="cta__bar">
