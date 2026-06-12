@@ -1010,24 +1010,58 @@
         animation: msgIn 0.4s var(--ease) both;
     }
     .others__t { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
-    .others__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-    .others__card {
-        border: 1px solid var(--glass-border-soft);
-        border-radius: 11px;
+    /* jeden DUŻY ekran (pełna szerokość dymku, całe 3:2 — czytelny) + rotacja */
+    .others__frame {
+        position: relative;
+        aspect-ratio: 3 / 2;
+        border-radius: 13px;
         overflow: hidden;
+        border: 1px solid var(--glass-border-soft);
         background: var(--bg-elev);
     }
-    .others__card img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; }
-    .others__card span {
-        display: block;
-        font-size: 10.5px;
-        font-weight: 600;
-        color: var(--text-muted);
-        padding: 5px 8px;
+    .others__frame img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* źródła natywnie 3:2 — pełny ekran bez kadrowania */
+        opacity: 0;
+        transition: opacity 0.55s var(--ease);
+    }
+    .others__frame img.is-on { opacity: 1; }
+    .others__cap {
+        position: absolute;
+        left: 10px;
+        bottom: 10px;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        max-width: calc(100% - 20px);
+        padding: 6px 13px;
+        border-radius: 999px;
+        background: rgba(5, 5, 7, 0.82);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--text-strong);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .others__cap i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 9px var(--green); flex-shrink: 0; }
+    .others__dots { display: flex; gap: 7px; justify-content: center; margin-top: 10px; }
+    .others__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        padding: 0;
+        transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+    }
+    .others__dot.is-on { background: var(--accent); transform: scale(1.25); box-shadow: 0 0 8px rgba(77, 159, 255, 0.7); }
     .others__sub { margin-top: 9px; font-size: 11px; color: var(--text-faint); }
     @media (max-width: 540px) { .others { margin-left: 0; max-width: 100%; } }
 
@@ -5892,18 +5926,47 @@
             var own = ((state.lastBrief && state.lastBrief.nazwa) || '').toLowerCase();
             var items = (list || []).filter(function (p) {
                 return p && p.nazwa && p.img && p.nazwa.toLowerCase() !== own;
-            }).slice(0, 3);
+            }).slice(0, 4);
             if (items.length < 2) return; // bez fejków — pasek dopiero przy realnych projektach
             var div = document.createElement('div');
             div.className = 'others';
             div.id = 'spar-others';
+            // jeden DUŻY, pełny ekran z rotacją — miniatury były nieczytelne
             div.innerHTML = '<div class="others__t">W tym samym czasie inni budują swoje narzędzia:</div>' +
-                '<div class="others__row">' + items.map(function (p) {
-                    var img = String(p.img).replace('/object/public/', '/render/image/public/') + '?format=webp&width=240&quality=70';
-                    return '<div class="others__card"><img src="' + esc(img) + '" alt="" loading="lazy"><span>' + esc(p.nazwa) + '</span></div>';
-                }).join('') + '</div>' +
+                '<div class="others__frame">' + items.map(function (p, i) {
+                    var img = String(p.img).replace('/object/public/', '/render/image/public/') + '?format=webp&width=900&quality=72';
+                    return '<img src="' + esc(img) + '" alt="' + esc(p.nazwa) + '"' + (i ? ' loading="lazy"' : '') + ' decoding="async">';
+                }).join('') +
+                '<span class="others__cap"><i></i><span data-others-cap></span></span></div>' +
+                (items.length > 1
+                    ? '<div class="others__dots">' + items.map(function (_, i) {
+                        return '<button type="button" class="others__dot" data-i="' + i + '" aria-label="Projekt ' + (i + 1) + '"></button>';
+                    }).join('') + '</div>'
+                    : '') +
                 '<div class="others__sub">Po starcie współpracy dołączasz do społeczności, która buduje razem z Tomkiem — spotkania online i na żywo.</div>';
             el('chat-msgs').appendChild(div);
+
+            var imgs = div.querySelectorAll('.others__frame img');
+            var dots = div.querySelectorAll('.others__dot');
+            var cap = div.querySelector('[data-others-cap]');
+            var oi = -1;
+            function go(i) {
+                oi = (i + items.length) % items.length;
+                imgs.forEach(function (im, j) { im.classList.toggle('is-on', j === oi); });
+                dots.forEach(function (d, j) { d.classList.toggle('is-on', j === oi); });
+                cap.textContent = items[oi].nazwa;
+            }
+            go(0);
+            if (items.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                var timer = setInterval(function () {
+                    // czat bywa przerysowywany (nowa rozmowa) — nie kręć zombie
+                    if (!document.body.contains(div)) { clearInterval(timer); return; }
+                    go(oi + 1);
+                }, 4000);
+                dots.forEach(function (d) {
+                    d.addEventListener('click', function () { go(parseInt(d.getAttribute('data-i'), 10)); });
+                });
+            }
         }
         if (othersCache) { paint(othersCache); return; }
         fetch(SPAR_FEED_ENDPOINT).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
