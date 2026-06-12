@@ -341,97 +341,135 @@ img { max-width: 100%; display: block; }
 .feed { padding-left: 0; padding-right: 0; max-width: none; }
 .feed .section__head { padding: 0 var(--pad-x); max-width: 1280px; margin-left: auto; margin-right: auto; }
 .feed .section__head-wrap { max-width: 1280px; margin: 0 auto; }
-/* Showcase generowań: JEDNA duża scena (pełny ekran 3:2, zero przycinania —
-   grafiki są sercem sekcji) + rotacja projektów + pasek miniatur */
-.show__stage {
-    max-width: 1100px;
+/* Showcase generowań: lista projektów (tekst, nie miniatury) + OKNO APLIKACJI
+   z pełnym ekranem 3:2. Grafika w całości, nazwa w pasku okna — nic jej nie
+   zasłania. Auto-rotacja z paskiem postępu na aktywnym wierszu. */
+.show {
+    display: grid;
+    grid-template-columns: minmax(260px, 350px) minmax(0, 1fr);
+    gap: clamp(28px, 4.5vw, 64px);
+    align-items: center;
+    max-width: 1220px;
     margin: 0 auto;
     padding: 0 var(--pad-x);
 }
-.show__frame {
+.show__list { display: flex; flex-direction: column; gap: 6px; }
+.show__item {
     position: relative;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px 15px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.show__item:hover { background: rgba(255, 255, 255, 0.03); }
+.show__item.is-on {
+    background: var(--accent-dim);
+    border-color: rgba(77, 159, 255, 0.28);
+}
+.show__num {
     display: block;
-    aspect-ratio: 3 / 2;
-    border-radius: 22px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--text-faint);
+    margin-bottom: 3px;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.25s var(--ease);
+}
+.show__item.is-on .show__num { color: var(--accent); }
+.show__name {
+    display: block;
+    font-size: clamp(15.5px, 1.6vw, 17.5px);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--text-muted);
+    transition: color 0.25s var(--ease);
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+}
+.show__item.is-on .show__name { color: var(--text-strong); }
+.show__prog {
+    height: 2px;
+    margin-top: 11px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+}
+.show__prog i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+.show__item.is-on .show__prog i { animation: showProg var(--t, 5s) linear forwards; }
+.show.is-paused .show__prog i { animation-play-state: paused; }
+@keyframes showProg { to { width: 100%; } }
+.show__hint { margin-top: 16px; padding: 0 16px; font-size: 12px; color: var(--text-faint); line-height: 1.6; }
+
+/* Okno aplikacji — rama przeglądarki nadaje kontekst „to działa" */
+.show__win {
+    border-radius: 18px;
     border: 1px solid var(--glass-border);
     background: var(--bg-card);
+    overflow: hidden;
     box-shadow:
-        0 60px 140px -60px rgba(0, 0, 0, 0.95),
-        0 0 90px -30px rgba(77, 159, 255, 0.25),
+        0 70px 150px -60px rgba(0, 0, 0, 0.95),
+        0 30px 70px -40px rgba(77, 159, 255, 0.3),
         0 0 0 1px rgba(77, 159, 255, 0.05);
 }
-.show__frame img {
+.show__topbar {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--glass-border-soft);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
+}
+.show__lights { display: inline-flex; gap: 7px; flex-shrink: 0; }
+.show__lights i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
+.show__url {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto;
+    max-width: min(420px, 70%);
+    padding: 6px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border-soft);
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+}
+.show__url svg { width: 10px; height: 10px; color: var(--green); flex-shrink: 0; }
+.show__url b { color: var(--text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+.show__screen {
+    position: relative;
+    display: block;
+    aspect-ratio: 3 / 2; /* źródła natywnie 3:2 — pełny ekran, zero kadrowania */
+    background: var(--bg-elev);
+}
+.show__screen img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* źródła są natywnie 3:2 — pełny ekran, bez kadrowania */
+    object-fit: cover;
     opacity: 0;
-    transform: scale(1.012);
-    transition: opacity 0.7s var(--ease), transform 1.2s var(--ease);
+    transition: opacity 0.65s var(--ease);
 }
-.show__frame img.is-on { opacity: 1; transform: scale(1); }
-.show__cap {
-    position: absolute;
-    left: 16px;
-    bottom: 16px;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    max-width: calc(100% - 32px);
-    padding: 10px 18px;
-    border-radius: 999px;
-    background: rgba(5, 5, 7, 0.82);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    font-size: 13.5px;
-    font-weight: 800;
-    color: var(--text-strong);
-}
-.show__cap i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); flex-shrink: 0; animation: pulse 1.8s ease-in-out infinite; }
-.show__cap span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.show__thumbs {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 18px;
-    overflow-x: auto;
-    padding: 4px 2px 8px;
-    scrollbar-width: none;
-}
-.show__thumbs::-webkit-scrollbar { display: none; }
-.show__thumb {
-    flex: 0 0 auto;
-    width: clamp(92px, 10.5vw, 148px);
-    border-radius: 11px;
-    overflow: hidden;
-    border: 1px solid var(--glass-border-soft);
-    background: var(--bg-card);
-    opacity: 0.5;
-    cursor: pointer;
-    padding: 0;
-    transition: opacity 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
-}
-.show__thumb:hover { opacity: 0.85; transform: translateY(-2px); }
-.show__thumb.is-on {
-    opacity: 1;
-    border-color: rgba(77, 159, 255, 0.65);
-    box-shadow: 0 0 20px -5px rgba(77, 159, 255, 0.55);
-}
-.show__thumb img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
-.feed__note { text-align: center; margin-top: 22px; font-size: 12.5px; color: var(--text-faint); padding: 0 var(--pad-x); }
-@media (max-width: 760px) {
-    .show__frame { border-radius: 16px; }
-    .show__cap { left: 10px; bottom: 10px; padding: 8px 14px; font-size: 12px; }
-    .show__thumbs { justify-content: flex-start; }
+.show__screen img.is-on { opacity: 1; }
+.feed__note { text-align: center; margin-top: 26px; font-size: 12.5px; color: var(--text-faint); padding: 0 var(--pad-x); }
+@media (max-width: 940px) {
+    .show { grid-template-columns: 1fr; gap: 22px; }
+    .show__win { order: -1; }
+    .show__item { padding: 11px 14px 12px; }
+    .show__prog { margin-top: 8px; }
+    .show__hint { padding: 0 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .show__frame img { transition: opacity 0.3s ease; transform: none; }
+    .show__screen img { transition: opacity 0.3s ease; }
+    .show__item.is-on .show__prog i { animation: none; width: 100%; }
     .chatcard::before, .step--final::before { animation: none; }
-    .show__cap i { animation: none; }
 }
 
 /* ── MODEL (gramy do jednej bramki) ── */
@@ -672,9 +710,18 @@ img { max-width: 100%; display: block; }
         <h2 class="section__h2">Ostatnio <span class="ser">zaprojektowane</span> narzędzia</h2>
         <p class="section__sub">Każdy z tych ekranów powstał w rozmowie z AI — z czyjegoś pomysłu: czasem z pracy, czasem z pasji, czasem z samej obserwacji. Następny może być Twój.</p>
     </div>
-    <div class="show__stage">
-        <a class="show__frame" id="show-frame" href="/stworze/sparing/" data-cta aria-label="Zobacz przykładowe narzędzie i zacznij własną rozmowę"></a>
-        <div class="show__thumbs" id="show-thumbs" role="tablist" aria-label="Przykładowe projekty"></div>
+    <div class="show" id="show">
+        <div class="show__list" id="show-list" role="tablist" aria-label="Przykładowe projekty"></div>
+        <div class="show__win">
+            <div class="show__topbar">
+                <span class="show__lights" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="show__url">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <b id="show-url-name"></b>
+                </span>
+            </div>
+            <a class="show__screen" id="show-screen" href="/stworze/sparing/" data-cta aria-label="Zobacz przykładową aplikację i zacznij własną rozmowę"></a>
+        </div>
     </div>
     <p class="feed__note">Pełne ekrany wygenerowane w prawdziwych rozmowach — bez danych ich autorów.</p>
 </section>
@@ -914,52 +961,71 @@ img { max-width: 100%; display: block; }
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
         if (!items.length) return; // sekcja ukryta tylko przy CAŁKIEM pustym feedzie
+        items = items.slice(0, 6);
         demoFeedImg = lightImg(items[0].img, 480);
         var section = document.getElementById('projekty');
         section.hidden = false;
 
-        // JEDNA duża scena (pełny ekran 3:2, bez kadrowania) + rotacja + miniatury.
-        // Scena ~1100px → obraz width=1400 (retina) z render API.
-        var frame = document.getElementById('show-frame');
-        var thumbs = document.getElementById('show-thumbs');
+        // Lista projektów (tekst) + okno aplikacji z pełnym ekranem 3:2.
+        // Rotacja co 5 s sterowana paskiem postępu na aktywnym wierszu.
+        var ROT_MS = 5000;
+        var wrap = document.getElementById('show');
+        var list = document.getElementById('show-list');
+        var screen = document.getElementById('show-screen');
+        var urlName = document.getElementById('show-url-name');
         var escA = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
-        frame.innerHTML = items.map(function (p, i) {
-            return '<img src="' + escA(lightImg(p.img, 1400)) + '" alt="' + escA(p.nazwa) + ' — pełny ekran narzędzia"' +
+
+        screen.innerHTML = items.map(function (p, i) {
+            return '<img src="' + escA(lightImg(p.img, 1400)) + '" alt="' + escA(p.nazwa) + ' — pełny ekran aplikacji"' +
                 (i < 2 ? '' : ' loading="lazy"') + ' decoding="async">';
-        }).join('') + '<span class="show__cap"><i></i><span id="show-cap-name"></span></span>';
-        if (items.length > 1) {
-            thumbs.innerHTML = items.map(function (p, i) {
-                return '<button type="button" class="show__thumb" role="tab" data-i="' + i + '" aria-label="' + escA(p.nazwa) + '">' +
-                    '<img src="' + escA(lightImg(p.img, 300)) + '" alt="" loading="lazy" decoding="async"></button>';
-            }).join('');
-        }
-        var imgs = frame.querySelectorAll('img');
-        var tBtns = thumbs.querySelectorAll('.show__thumb');
-        var capName = document.getElementById('show-cap-name');
+        }).join('');
+        list.innerHTML = items.map(function (p, i) {
+            return '<button type="button" class="show__item" role="tab" data-i="' + i + '" style="--t:' + ROT_MS + 'ms">' +
+                '<span class="show__num">' + String(i + 1).padStart(2, '0') + '</span>' +
+                '<span class="show__name">' + escA(p.nazwa) + '</span>' +
+                (items.length > 1 ? '<span class="show__prog"><i></i></span>' : '') +
+                '</button>';
+        }).join('') + '<p class="show__hint">Każdy z tych ekranów powstał w kilkanaście minut rozmowy. Kliknij okno, żeby zacząć własną.</p>';
+
+        var imgs = screen.querySelectorAll('img');
+        var rows = list.querySelectorAll('.show__item');
         var idx = -1;
+        var timer = null;
+        var noAuto = items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches;
+
         function go(i) {
             idx = (i + items.length) % items.length;
             imgs.forEach(function (im, j) { im.classList.toggle('is-on', j === idx); });
-            tBtns.forEach(function (b, j) {
-                b.classList.toggle('is-on', j === idx);
-                b.setAttribute('aria-selected', j === idx ? 'true' : 'false');
+            rows.forEach(function (b, j) {
+                b.classList.remove('is-on');
+                b.setAttribute('aria-selected', 'false');
             });
-            capName.textContent = items[idx].nazwa;
+            void rows[idx].offsetWidth; // restart animacji paska postępu
+            rows[idx].classList.add('is-on');
+            rows[idx].setAttribute('aria-selected', 'true');
+            urlName.textContent = items[idx].nazwa;
+            if (timer) clearTimeout(timer);
+            if (!noAuto && !wrap.classList.contains('is-paused') && !document.hidden) {
+                timer = setTimeout(function () { go(idx + 1); }, ROT_MS);
+            }
         }
         go(0);
-        // auto-rotacja: pauza na hover i gdy karta w tle; wyłączona przy reduce-motion
-        var timer = null;
-        function start() {
-            if (timer || items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            timer = setInterval(function () { go(idx + 1); }, 4500);
-        }
-        function stop() { if (timer) { clearInterval(timer); timer = null; } }
-        start();
-        frame.addEventListener('mouseenter', stop);
-        frame.addEventListener('mouseleave', start);
-        document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
-        tBtns.forEach(function (b) {
-            b.addEventListener('click', function () { stop(); go(parseInt(b.dataset.i, 10)); start(); });
+
+        // hover = pauza (pasek postępu zamiera); zejście = pełny cykl od nowa
+        wrap.addEventListener('mouseenter', function () {
+            wrap.classList.add('is-paused');
+            if (timer) { clearTimeout(timer); timer = null; }
+        });
+        wrap.addEventListener('mouseleave', function () {
+            wrap.classList.remove('is-paused');
+            go(idx);
+        });
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) { if (timer) { clearTimeout(timer); timer = null; } }
+            else go(idx);
+        });
+        rows.forEach(function (b) {
+            b.addEventListener('click', function () { go(parseInt(b.dataset.i, 10)); });
         });
 
         section.querySelectorAll('[data-cta]').forEach(function (a) {
