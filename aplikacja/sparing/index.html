@@ -3810,6 +3810,22 @@
             }
             var p = d.projekt;
             var changed = false;
+            // Świeże urządzenie (?id= bez LS): werdykt/karta/brief z serwera,
+            // żeby sekcje po-werdyktowe (plan, marka, rynek) nie były puste —
+            // lokalny stan (z markerów rozmowy) ma pierwszeństwo
+            if (!state.verdict && typeof p.verdict === 'string' && p.verdict) {
+                state.verdict = p.verdict;
+                changed = true;
+            }
+            if (!state.karta && p.karta && typeof p.karta === 'object') {
+                state.karta = p.karta;
+                changed = true;
+            }
+            if (!state.lastBrief && (p.nazwa || p.opis)) {
+                state.lastBrief = { nazwa: p.nazwa || null, opis: p.opis || null };
+                changed = true;
+            }
+            if (changed) persistSession();
             function archive(view, u) {
                 if (!u) return;
                 if (!state.previewHistory[view]) state.previewHistory[view] = [];
