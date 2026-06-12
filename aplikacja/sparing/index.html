@@ -402,8 +402,11 @@
     .chat-top__menu svg { width: 19px; height: 19px; }
     .chat-top__spacer { width: 40px; flex-shrink: 0; }
     @media (min-width: 1024px) {
-        /* Desktop: brand i nawigacja żyją w sidebarze — belka zbędna (konwencja paneli AI) */
-        .chat-top { display: none; }
+        /* Desktop: brand żyje w sidebarze — w belce zostaje tylko logowanie.
+           Uwaga: `.chat-top { display: none }` nie zadziała — późniejsza reguła
+           `.chat-top { display: flex }` wygrywa kaskadą. */
+        .chat-top__brand, .chat-top__spacer { display: none; }
+        .chat-top { justify-content: flex-end; }
     }
     @media (max-width: 1023.98px) {
         .side {
