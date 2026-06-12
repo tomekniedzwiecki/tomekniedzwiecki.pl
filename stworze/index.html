@@ -4,611 +4,888 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#050507">
-    <title>Stworzę — zamienię Twój pomysł w produkt cyfrowy | Tomek Niedźwiecki</title>
-    <meta name="description" content="Znasz swoją branżę od środka? Zamienię problem z Twojej praktyki w produkt cyfrowy — narzędzie, za które inni płacą co miesiąc. Podgląd zobaczysz w kilkanaście minut — za darmo.">
+    <title>Stworzę — zbuduję aplikację na Twoim pomyśle i oddam Ci stery | Tomek Niedźwiecki</title>
+    <meta name="description" content="Ty znasz branżę, ja buduję biznes: aplikacja na Twój pomysł, moi ludzie, moje pieniądze w połowie budżetu. Pozyskuję pierwszych 50 płacących klientów i przekazuję Ci stery. Sprawdź pomysł w rozmowie z AI — za darmo.">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
     <link rel="canonical" href="https://tomekniedzwiecki.pl/stworze/">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tomekniedzwiecki.pl/stworze/">
-    <meta property="og:title" content="Stworzę — zamienię Twój pomysł w produkt cyfrowy">
-    <meta property="og:description" content="Ty znasz branżę. AI sprawdzi pomysł i pokaże podgląd narzędzia. Ja je zbuduję — i zarabiamy razem.">
+    <meta property="og:title" content="Stworzę — zbuduję aplikację na Twoim pomyśle i oddam Ci stery">
+    <meta property="og:description" content="Aplikacja na Twój pomysł. Buduję, finansuję połowę, pozyskuję 50 pierwszych klientów — potem przejmujesz rozkręcony biznes. Sprawdź pomysł w rozmowie z AI.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- ===================== POMIAR / TRACKING ===================== -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+        });
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var s = document.createElement('script');
+            s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
+            document.head.appendChild(s);
+            s.onload = function() {
+                gtag('js', new Date());
+                gtag('set', 'user_properties', { persona: 'stworze' });
+                gtag('config', 'G-W8CLDSHVFC', {
+                    'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
+                });
+            };
+        });
+    </script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init','1668188210820080'); fbq('track','PageView');
+    });
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1" alt=""></noscript>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
 
-    <style>
-    /* ============================================================
-       TOMEK NIEDŹWIECKI / STWORZĘ — landing (story → sparing)
-       DNA rodziny: Inter 800-900 + Instrument Serif italic, dark,
-       sceny snap ≤100svh. Persona "stworzę" = NIEBIESKI #4d9fff.
-       ============================================================ */
-    :root {
-        --bg: #050507;
-        --bg-elev: #0a0a0e;
-        --glass: rgba(255, 255, 255, 0.035);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --glass-border-soft: rgba(255, 255, 255, 0.055);
-        --border-strong: #2d2d34;
-        --text: #e9e9ee;
-        --text-strong: #ffffff;
-        --text-muted: #8b8b96;
-        --text-faint: #5a5a64;
-        --accent: #4d9fff;
-        --accent-2: #2f7fe6;
-        --accent-soft: rgba(77, 159, 255, 0.14);
-        --accent-dim: rgba(77, 159, 255, 0.06);
-        --accent-ink: #061320;
-        --green: #00d97e;
-        --serif: 'Instrument Serif', Georgia, serif;
-        --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-        font-family: var(--sans);
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.6;
-        font-size: 16px;
-        -webkit-font-smoothing: antialiased;
-        overflow: hidden;
-    }
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-    ::selection { background: var(--accent); color: var(--accent-ink); }
-    :focus-visible { outline: 2px solid rgba(77, 159, 255, 0.75); outline-offset: 3px; border-radius: 6px; }
+<style>
+/* ============================================================
+   STWORZĘ — strona główna v2 (2026-06-13)
+   Narracja: pomysł → buduję → pozyskuję klientów → oddaję stery.
+   DNA marki: Inter 800-900 + Instrument Serif italic, dark
+   #050507, persona NIEBIESKA #4d9fff. Normalny scroll + reveal
+   (bez snap — sekcje są bogatsze niż 100dvh: feed, społeczność).
+   Smaczki AI-grade: grid-pattern, aurora, conic border beam,
+   marquee generowań, animowany czat w hero, liczniki rAF.
+   ============================================================ */
+:root {
+    --bg: #050507;
+    --bg-elev: #0a0a0e;
+    --bg-card: #0c0c12;
+    --glass: rgba(255, 255, 255, 0.035);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-soft: rgba(255, 255, 255, 0.055);
+    --border-strong: #2d2d34;
+    --text: #e9e9ee;
+    --text-strong: #ffffff;
+    --text-muted: #8b8b96;
+    --text-faint: #5a5a64;
+    --accent: #4d9fff;
+    --accent-2: #2f7fe6;
+    --accent-soft: rgba(77, 159, 255, 0.14);
+    --accent-dim: rgba(77, 159, 255, 0.06);
+    --accent-ink: #061320;
+    --green: #00d97e;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --pad-x: clamp(20px, 5vw, 48px);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; border: 0; background: none; cursor: pointer; color: inherit; }
+img { max-width: 100%; display: block; }
+::selection { background: rgba(77, 159, 255, 0.3); color: #fff; }
 
-    /* Tło: aurora + ziarno */
-    .bg-aurora {
-        position: fixed; inset: 0; z-index: 0; pointer-events: none;
-        background:
-            radial-gradient(ellipse 52% 38% at 18% -6%, rgba(77, 159, 255, 0.13) 0%, transparent 65%),
-            radial-gradient(ellipse 46% 34% at 88% 110%, rgba(99, 91, 255, 0.07) 0%, transparent 70%),
-            radial-gradient(ellipse 30% 22% at 70% 18%, rgba(77, 159, 255, 0.05) 0%, transparent 70%);
-        animation: auroraPulse 22s ease-in-out infinite;
-    }
-    @keyframes auroraPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.78; } }
-    body::after {
-        content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.05;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    }
+/* ── NAV ── */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px var(--pad-x);
+    background: rgba(5, 5, 7, 0.72);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+}
+.nav.is-scrolled { border-bottom-color: var(--glass-border-soft); }
+.nav__brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; color: var(--text-strong); letter-spacing: -0.01em; }
+.nav__brand img { width: 26px; height: 26px; border-radius: 7px; }
+.nav__brand span em { font-style: normal; color: var(--accent); }
+.nav__links { display: flex; align-items: center; gap: 26px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); }
+.nav__links a:hover { color: var(--text-strong); }
+.nav__cta {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-weight: 800; font-size: 13px;
+    box-shadow: 0 8px 28px -10px rgba(77, 159, 255, 0.55);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.nav__cta:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -10px rgba(77, 159, 255, 0.7); }
+@media (max-width: 760px) { .nav__links a:not(.nav__cta) { display: none; } }
 
-    /* ============================================================
-       INTRO OVERLAY — „Cześć."
-       ============================================================ */
-    .intro {
-        position: fixed; inset: 0; z-index: 50;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 18px; padding: 24px; text-align: center;
-        background: var(--bg);
-        transition: opacity 0.7s var(--ease), visibility 0.7s;
-    }
-    .intro.is-out { opacity: 0; visibility: hidden; pointer-events: none; }
-    .intro__hi {
-        font-size: clamp(44px, 9vw, 84px);
-        font-weight: 900; letter-spacing: -0.04em; color: var(--text-strong);
-        animation: introIn 0.9s var(--ease) backwards;
-    }
-    .intro__hi i {
-        font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent);
-    }
-    .intro__q {
-        font-family: var(--serif); font-style: italic;
-        font-size: clamp(19px, 3.4vw, 28px); color: var(--text);
-        max-width: 22ch; line-height: 1.35;
-        animation: introIn 0.9s var(--ease) 0.25s backwards;
-    }
-    .intro__go {
-        margin-top: 10px; padding: 13px 26px; min-height: 48px;
-        border: 1px solid var(--glass-border); border-radius: 999px;
-        background: var(--glass); color: var(--text-strong);
-        font-size: 14.5px; font-weight: 600;
-        animation: introIn 0.9s var(--ease) 0.5s backwards;
-        transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease);
-    }
-    .intro__go:hover { border-color: var(--accent); background: var(--accent-dim); transform: translateY(-2px); }
-    @keyframes introIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+/* ── HERO ── */
+.hero {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: center;
+    gap: clamp(32px, 5vw, 72px);
+    padding: calc(72px + 6vh) var(--pad-x) 9vh;
+    max-width: 1280px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+/* siatka inżynierska + aurora — podpis wizualny AI-stron */
+.hero::before {
+    content: '';
+    position: absolute; inset: 0; z-index: -2;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
+}
+.hero::after {
+    content: '';
+    position: absolute; z-index: -1;
+    top: -20%; left: 50%; transform: translateX(-50%);
+    width: min(1100px, 130vw); height: 70vh;
+    background: radial-gradient(ellipse at center, rgba(77, 159, 255, 0.16) 0%, rgba(77, 159, 255, 0.05) 40%, transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+}
+.eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 22px;
+}
+.eyebrow::before { content: ''; width: 22px; height: 1.5px; background: var(--accent); }
+.hero h1 {
+    font-size: clamp(38px, 5.4vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    font-weight: 900;
+    color: var(--text-strong);
+    margin-bottom: 24px;
+}
+.hero h1 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; color: var(--accent); }
+.hero__lead {
+    font-size: clamp(15.5px, 1.7vw, 18px);
+    color: var(--text-muted);
+    max-width: 54ch;
+    margin-bottom: 34px;
+}
+.hero__lead strong { color: var(--text); font-weight: 600; }
+.hero__ctas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 30px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-weight: 800; font-size: 15px;
+    box-shadow: 0 10px 36px -10px rgba(77, 159, 255, 0.6);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 18px 48px -12px rgba(77, 159, 255, 0.75); }
+.btn .arr { transition: transform 0.25s var(--ease); }
+.btn:hover .arr { transform: translateX(3px); }
+.btn--ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    box-shadow: none;
+    font-weight: 700;
+}
+.btn--ghost:hover { border-color: var(--border-strong); background: var(--glass); box-shadow: none; }
+.hero__note { margin-top: 16px; font-size: 12.5px; color: var(--text-faint); }
+.hero__note b { color: var(--text-muted); font-weight: 600; }
 
-    /* ============================================================
-       SNAP CONTAINER + SCENY (każda MUSI mieścić się w 100svh)
-       ============================================================ */
-    .snap {
-        position: relative; z-index: 2;
-        height: 100vh; height: 100svh;
-        overflow-y: auto;
-        scroll-snap-type: y mandatory;
-        scroll-behavior: smooth;
-    }
-    .scene {
-        height: 100vh; height: 100svh;
-        scroll-snap-align: start;
-        display: flex; align-items: center; justify-content: center;
-        padding: max(20px, env(safe-area-inset-top)) clamp(18px, 5vw, 48px) max(20px, env(safe-area-inset-bottom));
-        position: relative;
-    }
-    .scene__inner { width: 100%; max-width: 980px; }
+/* Hero: okno czatu (produkt od pierwszej sekundy) */
+.chatcard {
+    position: relative;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    padding: 18px;
+    box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(77, 159, 255, 0.04);
+}
+.chatcard::before {
+    content: '';
+    position: absolute; inset: -1px; z-index: -1; border-radius: 21px;
+    background: conic-gradient(from var(--beam, 0deg), transparent 0 70%, rgba(77,159,255,0.5) 82%, transparent 94%);
+    animation: beamSpin 7s linear infinite;
+}
+@property --beam { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes beamSpin { to { --beam: 360deg; } }
+.chatcard__top { display: flex; align-items: center; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-border-soft); margin-bottom: 14px; }
+.chatcard__dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+.chatcard__title { margin-left: 6px; font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em; }
+.chatcard__live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); }
+.chatcard__live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+.chatcard__msgs { display: flex; flex-direction: column; gap: 10px; min-height: 300px; }
+.cmsg {
+    max-width: 86%;
+    padding: 11px 15px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+.cmsg.is-in { opacity: 1; transform: none; }
+.cmsg--ai { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border-soft); color: var(--text); border-bottom-left-radius: 6px; }
+.cmsg--user { align-self: flex-end; background: var(--accent-soft); border: 1px solid rgba(77,159,255,0.3); color: var(--text-strong); border-bottom-right-radius: 6px; }
+.cmsg--shot { padding: 6px; max-width: 70%; }
+.cmsg--shot img { border-radius: 11px; aspect-ratio: 3/2; object-fit: cover; }
+.cmsg--shot span { display: block; font-size: 10.5px; color: var(--text-muted); padding: 6px 6px 2px; }
+.chatcard__typing { display: inline-flex; gap: 4px; padding: 12px 16px; }
+.chatcard__typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: tdot 1.1s ease-in-out infinite; }
+.chatcard__typing i:nth-child(2) { animation-delay: 0.15s; }
+.chatcard__typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes tdot { 40% { transform: translateY(-4px); opacity: 1; } 0%, 100% { transform: none; opacity: 0.45; } }
+@media (max-width: 960px) {
+    .hero { grid-template-columns: 1fr; padding-top: calc(64px + 4vh); min-height: auto; }
+    .chatcard { max-width: 480px; }
+    .chatcard__msgs { min-height: 250px; }
+}
 
-    /* Progress dock (desktop) */
-    .dock {
-        position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
-        z-index: 20; display: flex; flex-direction: column; gap: 12px;
-    }
-    .dock a {
-        width: 9px; height: 9px; border-radius: 50%;
-        background: var(--border-strong);
-        transition: background 0.3s var(--ease), transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
-    }
-    .dock a.is-on {
-        background: var(--accent);
-        transform: scale(1.35);
-        box-shadow: 0 0 12px rgba(77, 159, 255, 0.6);
-    }
-    @media (max-width: 820px) { .dock { display: none; } }
+/* ── PASEK LICZB ── */
+.proof {
+    border-top: 1px solid var(--glass-border-soft);
+    border-bottom: 1px solid var(--glass-border-soft);
+    background: rgba(255, 255, 255, 0.012);
+}
+.proof__inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 26px var(--pad-x);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+}
+.proof__item { text-align: center; }
+.proof__num { font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; letter-spacing: -0.03em; color: var(--text-strong); }
+.proof__num em { font-style: normal; color: var(--accent); }
+.proof__label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); margin-top: 3px; }
+@media (max-width: 720px) { .proof__inner { grid-template-columns: repeat(2, 1fr); } }
 
-    /* Reveals */
-    [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); transition-delay: var(--d, 0ms); }
-    [data-reveal].in { opacity: 1; transform: none; }
+/* ── SEKCJE WSPÓLNE ── */
+.section { position: relative; padding: clamp(80px, 12vh, 130px) var(--pad-x); max-width: 1280px; margin: 0 auto; }
+.section__head { max-width: 720px; margin-bottom: clamp(40px, 6vh, 64px); }
+.section__h2 {
+    font-size: clamp(30px, 4vw, 50px);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+    font-weight: 900;
+    color: var(--text-strong);
+}
+.section__h2 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.section__sub { margin-top: 16px; font-size: 16px; color: var(--text-muted); max-width: 58ch; }
+[data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+[data-reveal].is-in { opacity: 1; transform: none; }
 
-    /* Typowe klocki */
-    .eyebrow {
-        font-size: 11.5px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
-        color: var(--accent); margin-bottom: 18px;
-    }
-    .h1 {
-        font-size: clamp(34px, 6.4vw, 64px); font-weight: 900;
-        letter-spacing: -0.035em; line-height: 1.04; color: var(--text-strong);
-    }
-    .h1 .serif, .h2 .serif {
-        font-family: var(--serif); font-style: italic; font-weight: 400;
-        letter-spacing: -0.01em; color: var(--accent);
-    }
-    .h2 {
-        font-size: clamp(27px, 4.6vw, 44px); font-weight: 900;
-        letter-spacing: -0.03em; line-height: 1.1; color: var(--text-strong);
-    }
-    .lead { margin-top: 18px; font-size: clamp(15.5px, 2vw, 18px); color: var(--text-muted); max-width: 56ch; }
-    .lead strong { color: var(--text); font-weight: 600; }
+/* ── PROCES (4 kroki do sterów) ── */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.step {
+    position: relative;
+    border: 1px solid var(--glass-border-soft);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%);
+    padding: clamp(22px, 2.6vw, 30px) clamp(18px, 2vw, 24px);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), background 0.35s var(--ease);
+}
+.step:hover { transform: translateY(-4px); border-color: rgba(77, 159, 255, 0.35); background: var(--bg-card); }
+.step__pov {
+    display: inline-block;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-muted);
+    border: 1px solid var(--glass-border); border-radius: 999px;
+    padding: 4px 11px; margin-bottom: 18px;
+}
+.step--ja .step__pov { color: var(--accent); border-color: rgba(77,159,255,0.4); }
+.step__num { font-size: 13px; font-weight: 900; color: var(--accent); letter-spacing: 0.06em; margin-bottom: 8px; }
+.step__t { font-size: clamp(17px, 1.6vw, 20px); font-weight: 800; letter-spacing: -0.02em; color: var(--text-strong); line-height: 1.25; margin-bottom: 9px; }
+.step__d { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
+.step__d strong { color: var(--text); font-weight: 600; }
+.step--final { border-color: transparent; }
+.step--final::before {
+    content: '';
+    position: absolute; inset: -1px; z-index: -1; border-radius: 19px;
+    background: conic-gradient(from var(--beam, 0deg), rgba(77,159,255,0.08) 0 60%, rgba(77,159,255,0.75) 80%, rgba(77,159,255,0.08) 100%);
+    animation: beamSpin 5s linear infinite;
+}
+.step--final { background: var(--bg-elev); }
+.steps__bridge {
+    margin-top: 22px;
+    text-align: center;
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(17px, 2vw, 21px);
+    color: var(--text-muted);
+}
+.steps__bridge b { color: var(--text-strong); font-weight: 400; }
+@media (max-width: 960px) { .steps { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
 
-    .btn {
-        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-        min-height: 52px; padding: 15px 28px; border-radius: 999px;
-        font-size: 15.5px; font-weight: 800; letter-spacing: -0.01em;
-        color: var(--accent-ink);
-        background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 50%, var(--accent-2) 100%);
-        box-shadow: 0 8px 32px -8px rgba(77, 159, 255, 0.45);
-        transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
-        will-change: transform;
-    }
-    .btn:hover { box-shadow: 0 16px 48px -10px rgba(77, 159, 255, 0.6); }
-    .btn .arr { transition: transform 0.25s var(--ease); }
-    .btn:hover .arr { transform: translateX(3px); }
-    .btn--ghost {
-        color: var(--text-strong); background: var(--glass);
-        border: 1px solid var(--glass-border); box-shadow: none;
-    }
-    .btn--ghost:hover { border-color: var(--accent); background: var(--accent-dim); box-shadow: none; }
+/* ── FEED GENEROWAŃ (marquee) ── */
+.feed { padding-left: 0; padding-right: 0; max-width: none; }
+.feed .section__head { padding: 0 var(--pad-x); max-width: 1280px; margin-left: auto; margin-right: auto; }
+.feed .section__head-wrap { max-width: 1280px; margin: 0 auto; }
+.feed__rows { display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+.feed__track {
+    display: flex; gap: 16px; width: max-content;
+    animation: feedScroll var(--dur, 60s) linear infinite;
+}
+.feed__track--rev { animation-direction: reverse; }
+.feed__rows:hover .feed__track { animation-play-state: paused; }
+@keyframes feedScroll { to { transform: translateX(-50%); } }
+.feedcard {
+    position: relative;
+    width: clamp(240px, 26vw, 330px);
+    border-radius: 16px;
+    border: 1px solid var(--glass-border-soft);
+    background: var(--bg-card);
+    overflow: hidden;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.feedcard:hover { border-color: rgba(77, 159, 255, 0.45); transform: translateY(-3px); }
+.feedcard img { aspect-ratio: 3/2; object-fit: cover; width: 100%; }
+.feedcard__bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 13px;
+    font-size: 12.5px; font-weight: 700; color: var(--text);
+    border-top: 1px solid var(--glass-border-soft);
+}
+.feedcard__bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); flex-shrink: 0; }
+.feedcard__bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.feed__note { text-align: center; margin-top: 26px; font-size: 12.5px; color: var(--text-faint); padding: 0 var(--pad-x); }
+@media (prefers-reduced-motion: reduce) {
+    .feed__track { animation: none; flex-wrap: wrap; width: auto; }
+    .chatcard::before, .step--final::before { animation: none; }
+}
 
-    /* ============================================================
-       AKT 1 — HERO
-       ============================================================ */
-    .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-    .hero__refren { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-    .refren__chip {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 9px 15px; border-radius: 999px;
-        border: 1px solid var(--glass-border); background: var(--glass);
-        font-size: 13.5px; font-weight: 600; color: var(--text);
-    }
-    .refren__chip b { color: var(--accent); font-weight: 800; }
-    .hero__me { margin-top: 26px; font-size: 13px; color: var(--text-faint); }
-    .hero__me strong { color: var(--text-muted); font-weight: 600; }
+/* ── MODEL (gramy do jednej bramki) ── */
+.model { }
+.model__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.mcard {
+    border: 1px solid var(--glass-border-soft);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%);
+    padding: clamp(24px, 3vw, 34px) clamp(20px, 2.4vw, 28px);
+    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+.mcard:hover { transform: translateY(-4px); border-color: rgba(77,159,255,0.35); }
+.mcard__num { font-size: clamp(30px, 3.6vw, 44px); font-weight: 900; letter-spacing: -0.04em; color: var(--text-strong); line-height: 1; }
+.mcard__num em { font-style: normal; color: var(--accent); }
+.mcard__t { margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--text); }
+.mcard__d { margin-top: 7px; font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
+.model__line {
+    margin-top: 36px;
+    text-align: center;
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(19px, 2.6vw, 26px);
+    color: var(--text);
+}
+.model__line b { font-weight: 400; color: var(--accent); }
+@media (max-width: 880px) { .model__grid { grid-template-columns: 1fr; } }
 
-    /* ============================================================
-       AKT 2 — TRZY DROGI
-       ============================================================ */
-    .cards {
-        display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px;
-    }
-    .card {
-        padding: 22px 20px; border-radius: 18px;
-        border: 1px solid var(--glass-border-soft);
-        background: linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%);
-        -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-        transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
-    }
-    .card:hover { transform: translateY(-4px); border-color: rgba(77, 159, 255, 0.4); box-shadow: 0 18px 50px -20px rgba(77, 159, 255, 0.35); }
-    .card__ico {
-        width: 40px; height: 40px; border-radius: 12px; margin-bottom: 14px;
-        display: grid; place-items: center;
-        background: var(--accent-soft); border: 1px solid rgba(77, 159, 255, 0.35);
-    }
-    .card__ico svg { width: 20px; height: 20px; color: var(--accent); }
-    .card h3 { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-strong); margin-bottom: 6px; }
-    .card p { font-size: 14px; color: var(--text-muted); }
-    @media (max-width: 720px) {
-        .cards {
-            grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 78%;
-            overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px;
-            margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px;
-        }
-        .card { scroll-snap-align: center; }
-    }
+/* ── SPOŁECZNOŚĆ ── */
+.community { }
+.community__wrap {
+    position: relative;
+    border: 1px solid var(--glass-border-soft);
+    border-radius: 26px;
+    background:
+        radial-gradient(ellipse 60% 90% at 85% 10%, rgba(77,159,255,0.1) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.008) 100%);
+    padding: clamp(32px, 5vw, 64px);
+    overflow: hidden;
+}
+.community__wrap::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 80% 20%, #000 20%, transparent 70%);
+    mask-image: radial-gradient(ellipse 70% 80% at 80% 20%, #000 20%, transparent 70%);
+    pointer-events: none;
+}
+.community__inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
+.community__cards { display: grid; gap: 12px; }
+.ccard {
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1px solid var(--glass-border-soft);
+    border-radius: 15px;
+    background: rgba(5, 5, 7, 0.55);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    padding: 16px 18px;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.ccard:hover { border-color: rgba(77,159,255,0.35); transform: translateX(4px); }
+.ccard__ico {
+    width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+    display: grid; place-items: center;
+    background: var(--accent-dim); border: 1px solid rgba(77,159,255,0.25); color: var(--accent);
+}
+.ccard__ico svg { width: 18px; height: 18px; }
+.ccard b { display: block; font-size: 14.5px; font-weight: 800; color: var(--text-strong); margin-bottom: 2px; }
+.ccard span { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.community__quote {
+    margin-top: 22px;
+    display: flex; gap: 14px; align-items: center;
+}
+.community__quote img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(77,159,255,0.4); }
+.community__quote p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
+.community__quote p b { color: var(--text); font-weight: 700; }
+@media (max-width: 920px) { .community__inner { grid-template-columns: 1fr; } }
 
-    /* ============================================================
-       AKT 3 — DOWÓD (liczniki)
-       ============================================================ */
-    .ledger { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 34px; }
-    .ledger__item {
-        padding: 20px; border-radius: 16px; text-align: center;
-        border: 1px solid var(--glass-border-soft); background: var(--glass);
-    }
-    .ledger__num {
-        font-size: clamp(30px, 5vw, 46px); font-weight: 900; letter-spacing: -0.03em;
-        color: var(--text-strong); font-variant-numeric: tabular-nums; line-height: 1.1;
-    }
-    .ledger__num i { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
-    .ledger__lbl { margin-top: 6px; font-size: 12.5px; color: var(--text-muted); }
-    .proof__line {
-        margin-top: 26px; padding: 16px 18px; border-radius: 14px;
-        border: 1px solid rgba(0, 217, 126, 0.3);
-        background: linear-gradient(180deg, rgba(0, 217, 126, 0.08), transparent);
-        font-size: 15px; color: var(--text);
-    }
-    .proof__line strong { color: var(--green); }
-    @media (max-width: 600px) { .ledger { grid-template-columns: 1fr; gap: 10px; } .ledger__item { padding: 14px; } }
+/* ── FAQ ── */
+.faq__list { max-width: 760px; }
+.faq__item { border-bottom: 1px solid var(--glass-border-soft); }
+.faq__item summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 20px 4px;
+    cursor: pointer; list-style: none;
+    font-size: clamp(15px, 1.6vw, 17px); font-weight: 700; color: var(--text-strong);
+    transition: color 0.2s;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after {
+    content: '+';
+    font-size: 22px; font-weight: 400; color: var(--accent);
+    transition: transform 0.3s var(--ease);
+    flex-shrink: 0;
+}
+.faq__item[open] summary::after { transform: rotate(45deg); }
+.faq__item p { padding: 0 4px 22px; font-size: 14.5px; color: var(--text-muted); line-height: 1.75; max-width: 64ch; }
+.faq__item p b { color: var(--text); font-weight: 600; }
 
-    /* ============================================================
-       AKT 4 — PROCES
-       ============================================================ */
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 34px; }
-    .step {
-        padding: 18px 16px; border-radius: 16px;
-        border: 1px solid var(--glass-border-soft);
-        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.012));
-    }
-    .step--hot { border-color: rgba(77, 159, 255, 0.45); box-shadow: 0 0 44px -16px rgba(77, 159, 255, 0.4); }
-    .step__who {
-        font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
-        color: var(--accent); margin-bottom: 8px;
-    }
-    .step h3 { font-size: 15.5px; font-weight: 700; color: var(--text-strong); line-height: 1.35; margin-bottom: 8px; }
-    .step__time {
-        display: inline-block; padding: 4px 10px; border-radius: 999px;
-        background: var(--accent-dim); border: 1px solid rgba(77, 159, 255, 0.25);
-        font-size: 11.5px; font-weight: 600; color: var(--text-muted);
-    }
-    .steps__note { margin-top: 22px; font-size: 13.5px; color: var(--text-muted); max-width: 62ch; }
-    .steps__note strong { color: var(--text); }
-    @media (max-width: 820px) {
-        .steps {
-            grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 70%;
-            overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px;
-            margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px;
-        }
-        .step { scroll-snap-align: center; }
-    }
+/* ── FINAL CTA ── */
+.final {
+    position: relative;
+    text-align: center;
+    padding: clamp(90px, 14vh, 150px) var(--pad-x);
+    overflow: hidden;
+}
+.final::before {
+    content: '';
+    position: absolute; left: 50%; bottom: -40%; transform: translateX(-50%);
+    width: min(900px, 120vw); height: 80%;
+    background: radial-gradient(ellipse at center, rgba(77,159,255,0.18) 0%, transparent 65%);
+    filter: blur(30px);
+    pointer-events: none;
+}
+.final h2 {
+    position: relative;
+    font-size: clamp(34px, 5.4vw, 64px);
+    line-height: 1.05; letter-spacing: -0.045em; font-weight: 900;
+    color: var(--text-strong);
+    max-width: 880px; margin: 0 auto 18px;
+}
+.final h2 .cycler {
+    display: inline-block;
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    color: var(--accent);
+    min-width: 5ch;
+    transition: opacity 0.3s, transform 0.3s;
+}
+.final h2 .cycler.is-out { opacity: 0; transform: translateY(10px); }
+.final p { position: relative; color: var(--text-muted); font-size: 15.5px; max-width: 52ch; margin: 0 auto 36px; }
+.final .btn { position: relative; }
+.final__micro { position: relative; margin-top: 16px; font-size: 12px; color: var(--text-faint); }
 
-    /* ============================================================
-       AKT 5 — MOTTO (per-word)
-       ============================================================ */
-    .motto {
-        font-family: var(--serif); font-style: italic; font-weight: 400;
-        font-size: clamp(26px, 4.8vw, 46px); line-height: 1.3; color: var(--text-strong);
-        max-width: 24ch;
-    }
-    .motto .w { opacity: 0; filter: blur(8px); display: inline-block; transition: opacity 0.6s var(--ease), filter 0.6s var(--ease); transition-delay: var(--wd, 0ms); }
-    .motto.in .w { opacity: 1; filter: blur(0); }
-    .motto .hot { color: var(--accent); }
-    .motto__sign { margin-top: 22px; font-size: 13.5px; color: var(--text-faint); }
-
-    /* ============================================================
-       AKT 6 — CTA FINAL
-       ============================================================ */
-    .final { text-align: center; }
-    .final .h2 { margin-bottom: 6px; }
-    .cycler {
-        display: block; min-height: 1.25em;
-        font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent);
-    }
-    .cycler span { display: inline-block; animation: cyc 0.5s var(--ease); }
-    @keyframes cyc { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-    .final__cta { margin-top: 30px; display: flex; justify-content: center; }
-    .final__sub { margin-top: 18px; font-size: 13px; color: var(--text-muted); }
-    .final__sub b { color: var(--text); font-weight: 600; }
-    .footer-mini {
-        position: absolute; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom));
-        text-align: center; font-size: 12px; color: var(--text-faint);
-    }
-    .footer-mini a:hover { color: var(--text-muted); }
-
-    /* Mobile / motion */
-    @media (max-width: 820px) {
-        .bg-aurora { animation: none; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-        .snap { scroll-behavior: auto; }
-        [data-reveal] { opacity: 1; transform: none; }
-        .motto .w { opacity: 1; filter: none; }
-    }
-    </style>
+/* ── FOOTER ── */
+.footer {
+    border-top: 1px solid var(--glass-border-soft);
+    padding: 30px var(--pad-x);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    max-width: 1280px; margin: 0 auto;
+    font-size: 12.5px; color: var(--text-faint);
+}
+.footer a:hover { color: var(--text); }
+.footer__links { display: flex; gap: 20px; flex-wrap: wrap; }
+</style>
 </head>
 <body>
 
-<div class="bg-aurora" aria-hidden="true"></div>
-
-<!-- INTRO -->
-<div class="intro" id="intro">
-    <div class="intro__hi">Cześć<i>.</i></div>
-    <div class="intro__q">Masz w głowie narzędzie, którego brakuje Twojej branży?</div>
-    <button type="button" class="intro__go" id="intro-go">Sprawdźmy to ↓</button>
-</div>
-
-<!-- DOCK -->
-<nav class="dock" id="dock" aria-label="Postęp">
-    <a href="#act-1" data-dot="act-1" aria-label="Początek"></a>
-    <a href="#act-2" data-dot="act-2" aria-label="Trzy drogi"></a>
-    <a href="#act-3" data-dot="act-3" aria-label="Dowód"></a>
-    <a href="#act-4" data-dot="act-4" aria-label="Proces"></a>
-    <a href="#act-5" data-dot="act-5" aria-label="Motto"></a>
-    <a href="#act-6" data-dot="act-6" aria-label="Start"></a>
+<nav class="nav" id="nav">
+    <a class="nav__brand" href="https://tomekniedzwiecki.pl/">
+        <img src="/img/logo/tn-logo-icon-88.png" alt="">
+        <span>Tomek Niedźwiecki <em>/ Stworzę</em></span>
+    </a>
+    <div class="nav__links">
+        <a href="#proces">Jak to działa</a>
+        <a href="#projekty">Projekty</a>
+        <a href="#spolecznosc">Społeczność</a>
+        <a href="#faq">FAQ</a>
+        <a class="nav__cta" href="/stworze/sparing/" data-cta>Zacznij rozmowę</a>
+    </div>
 </nav>
 
-<main class="snap" id="snap">
-
-    <!-- AKT 1 — HERO -->
-    <section class="scene" id="act-1">
-        <div class="scene__inner">
-            <p class="eyebrow" data-reveal>Tomek Niedźwiecki · Stworzę</p>
-            <h1 class="h1" data-reveal style="--d:80ms">
-                Nie musisz umieć kodować.<br>
-                <span class="serif">Wystarczy, że znasz swoją branżę.</span>
-            </h1>
-            <p class="lead" data-reveal style="--d:160ms">
-                Zamienię problem, który znasz z własnej praktyki, w produkt cyfrowy —
-                narzędzie, za które <strong>inni z Twojej branży płacą co miesiąc</strong>.
-            </p>
-            <div class="hero__refren" data-reveal style="--d:240ms">
-                <span class="refren__chip"><b>TY</b> znasz branżę</span>
-                <span class="refren__chip"><b>AI</b> sprawdza pomysł i pokazuje podgląd</span>
-                <span class="refren__chip"><b>JA</b> buduję narzędzie</span>
-            </div>
-            <div class="hero__cta" data-reveal style="--d:320ms">
-                <a class="btn js-magnet" data-cta href="sparing/">Sprawdź swój pomysł — za darmo <span class="arr">→</span></a>
-                <a class="btn btn--ghost" href="#act-4">Zobacz, jak to działa ↓</a>
-            </div>
-            <p class="hero__me" data-reveal style="--d:400ms"><strong>15 lat w e-commerce · 70 mln zł sprzedaży · trzy firmy</strong></p>
+<!-- ════════ HERO ════════ -->
+<header class="hero">
+    <div>
+        <div class="eyebrow">Wspólny biznes, nie usługa</div>
+        <h1>Zbuduję aplikację na <span class="ser">Twoim pomyśle</span>.<br>Rozkręcę. Oddam Ci stery.</h1>
+        <p class="hero__lead">Ty znasz swoją branżę od środka. Ja wnoszę zespół, połowę budżetu
+        i <strong>15 lat budowania biznesów online</strong>. Buduję narzędzie, osobiście pozyskuję
+        pierwszych 50 płacących klientów — i przekazuję Ci rozkręcony biznes.</p>
+        <div class="hero__ctas">
+            <a class="btn" href="/stworze/sparing/" data-cta>Sprawdź swój pomysł z AI <span class="arr">→</span></a>
+            <a class="btn btn--ghost" href="#proces">Jak to działa</a>
         </div>
-    </section>
+        <p class="hero__note"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy, a zobaczysz pierwsze ekrany swojego narzędzia.</p>
+    </div>
 
-    <!-- AKT 2 — TRZY DROGI -->
-    <section class="scene" id="act-2">
-        <div class="scene__inner">
-            <p class="eyebrow" data-reveal>Od czego zaczynasz?</p>
-            <h2 class="h2" data-reveal style="--d:80ms">Obojętnie. <span class="serif">Każda droga prowadzi do narzędzia.</span></h2>
-            <div class="cards">
-                <div class="card" data-reveal style="--d:160ms">
-                    <div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3z"/></svg></div>
-                    <h3>Mam pomysł na narzędzie</h3>
-                    <p>Skonkretyzujemy go i ubierzemy w produkt, który da się sprzedawać.</p>
-                </div>
-                <div class="card" data-reveal style="--d:240ms">
-                    <div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a5 5 0 1 0 3 3L21 6l-3-3-3.3 3.3z"/><path d="M9 15l-5.5 5.5"/></svg></div>
-                    <h3>Znam problem branży</h3>
-                    <p>Zamienimy go w narzędzie, za które płacą ci, których ten problem boli.</p>
-                </div>
-                <div class="card" data-reveal style="--d:320ms">
-                    <div class="card__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg></div>
-                    <h3>Nie mam pomysłu</h3>
-                    <p>Znajdziemy go w tym, co robisz na co dzień — i w ludziach, których znasz.</p>
+    <div class="chatcard" aria-hidden="true">
+        <div class="chatcard__top">
+            <span class="chatcard__dot"></span><span class="chatcard__dot"></span><span class="chatcard__dot"></span>
+            <span class="chatcard__title">stworze / sparing</span>
+            <span class="chatcard__live"><i></i>na żywo</span>
+        </div>
+        <div class="chatcard__msgs" id="chat-demo"></div>
+    </div>
+</header>
+
+<!-- ════════ PASEK LICZB ════════ -->
+<div class="proof" data-reveal>
+    <div class="proof__inner">
+        <div class="proof__item"><div class="proof__num" data-count="15">0</div><div class="proof__label">lat w e-commerce</div></div>
+        <div class="proof__item"><div class="proof__num"><span data-count="70">0</span><em> mln zł</em></div><div class="proof__label">obrotu zbudowanych biznesów</div></div>
+        <div class="proof__item"><div class="proof__num"><em>50</em>/<em>50</em></div><div class="proof__label">tak dzielimy budżet budowy</div></div>
+        <div class="proof__item"><div class="proof__num" data-count="50">0</div><div class="proof__label">klientów — wtedy oddaję stery</div></div>
+    </div>
+</div>
+
+<!-- ════════ PROCES ════════ -->
+<section class="section" id="proces">
+    <div class="section__head" data-reveal>
+        <div class="eyebrow">Jak to działa</div>
+        <h2 class="section__h2">Od pomysłu do <span class="ser">Twojego biznesu</span> — w 4 krokach</h2>
+        <p class="section__sub">Nie sprzedaję Ci „aplikacji i powodzenia". Wchodzę w to z Tobą — moimi ludźmi, moimi pieniędzmi i moją sprzedażą — aż biznes stanie na nogi.</p>
+    </div>
+    <div class="steps">
+        <article class="step" data-reveal>
+            <span class="step__pov">Ty</span>
+            <div class="step__num">01</div>
+            <h3 class="step__t">Przynosisz pomysł</h3>
+            <p class="step__d">Problem, który znasz z własnej pracy albo pasji. AI sprawdza go z Tobą w rozmowie i <strong>od razu pokazuje ekrany narzędzia</strong> + wstępny plan przychodu. Za darmo.</p>
+        </article>
+        <article class="step step--ja" data-reveal>
+            <span class="step__pov">Ja</span>
+            <div class="step__num">02</div>
+            <h3 class="step__t">Buduję narzędzie</h3>
+            <p class="step__d">Mój zespół buduje kompletną aplikację — konta, płatności, abonamenty, panel. Budżet 30 000 zł dzielimy <strong>pół na pół</strong>: gram własnymi pieniędzmi.</p>
+        </article>
+        <article class="step step--ja" data-reveal>
+            <span class="step__pov">Ja</span>
+            <div class="step__num">03</div>
+            <h3 class="step__t">Pozyskuję klientów</h3>
+            <p class="step__d">Przez około pół roku osobiście prowadzę sprzedaż i kampanie — aż do <strong>pierwszych 50 płacących klientów</strong>. Ty w tym czasie uczysz się biznesu od środka.</p>
+        </article>
+        <article class="step step--final" data-reveal>
+            <span class="step__pov">Ty</span>
+            <div class="step__num">04</div>
+            <h3 class="step__t">Przejmujesz stery</h3>
+            <p class="step__d">Dostajesz rozkręcony, przychodowy biznes. Ja zostaję doradcą strategicznym z 20% udziałów — <strong>zarabiam dopiero wtedy, gdy Ty zarabiasz</strong>.</p>
+        </article>
+    </div>
+    <p class="steps__bridge" data-reveal>Pierwszy krok nic nie kosztuje — <b>rozmowa z AI sprawdzi pomysł szybciej, niż zdążysz o nim opowiedzieć wspólnikowi.</b></p>
+</section>
+
+<!-- ════════ FEED GENEROWAŃ ════════ -->
+<section class="section feed" id="projekty" hidden>
+    <div class="section__head" data-reveal>
+        <div class="eyebrow">Powstają tu naprawdę</div>
+        <h2 class="section__h2">Ostatnio <span class="ser">zaprojektowane</span> narzędzia</h2>
+        <p class="section__sub">Każdy z tych ekranów powstał w rozmowie z AI — z pomysłu kogoś, kto po prostu zna swoją branżę. Następny może być Twój.</p>
+    </div>
+    <div class="feed__rows" id="feed-rows"></div>
+    <p class="feed__note">Podglądy wygenerowane w prawdziwych rozmowach — bez danych ich autorów.</p>
+</section>
+
+<!-- ════════ MODEL ════════ -->
+<section class="section model" id="model">
+    <div class="section__head" data-reveal>
+        <div class="eyebrow">Gramy do jednej bramki</div>
+        <h2 class="section__h2">Model, w którym <span class="ser">nie zostajesz sam</span></h2>
+    </div>
+    <div class="model__grid">
+        <div class="mcard" data-reveal>
+            <div class="mcard__num">500 <em>zł</em></div>
+            <div class="mcard__t">Rezerwacja — w pełni zwrotna</div>
+            <div class="mcard__d">Rezerwujesz wspólną rozmowę. Przygotowuję osobiście plan przedsięwzięcia. Nie wchodzimy we współpracę — z dowolnego powodu — oddaję całość.</div>
+        </div>
+        <div class="mcard" data-reveal>
+            <div class="mcard__num">50<em>%</em></div>
+            <div class="mcard__t">Budowy finansuję ja</div>
+            <div class="mcard__d">Z 30 000 zł budżetu Ty wnosisz 15 000 zł (rezerwacja się wlicza). Drugą połowę dokładam ja — bo wierzę w projekt, w który wchodzę.</div>
+        </div>
+        <div class="mcard" data-reveal>
+            <div class="mcard__num">20<em>%</em></div>
+            <div class="mcard__t">Udziałów — za rozkręcenie</div>
+            <div class="mcard__d">Stery i większość zysków są Twoje. Moje 20% to motywacja, żeby biznes działał długo po przekazaniu — zostaję Twoim doradcą strategicznym.</div>
+        </div>
+    </div>
+    <p class="model__line" data-reveal>Zarabiam dopiero wtedy, <b>gdy Ty zarabiasz.</b></p>
+</section>
+
+<!-- ════════ SPOŁECZNOŚĆ ════════ -->
+<section class="section community" id="spolecznosc">
+    <div class="community__wrap" data-reveal>
+        <div class="community__inner">
+            <div>
+                <div class="eyebrow">Społeczność</div>
+                <h2 class="section__h2" style="font-size: clamp(26px, 3.4vw, 42px);">Budujesz swoje — <span class="ser">ale nie sam</span></h2>
+                <p class="section__sub">Każdy projekt Stworzę dołącza do społeczności ludzi, którzy budują własne produkty cyfrowe. Wymieniamy się tym, co działa: pomysłami, liczbami, kontaktami.</p>
+                <div class="community__quote">
+                    <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat.png" alt="Tomek Niedźwiecki" loading="lazy">
+                    <p><b>Jestem tam aktywnie.</b> Nie jako „mentor z nagrań" — siedzę w tych samych okopach, bo w każdym projekcie mam własne pieniądze i udziały.</p>
                 </div>
             </div>
-            <p class="lead" data-reveal style="--d:400ms; margin-top:26px">
-                Rozmowę prowadzi AI — <strong>głównie klikasz, nie piszesz</strong>.
-                Po kilkunastu minutach zobaczysz pierwszy podgląd swojego narzędzia.
-            </p>
-        </div>
-    </section>
-
-    <!-- AKT 3 — DOWÓD -->
-    <section class="scene" id="act-3">
-        <div class="scene__inner">
-            <p class="eyebrow" data-reveal>Dlaczego ze mną</p>
-            <h2 class="h2" data-reveal style="--d:80ms">Buduję biznesy online <span class="serif">od 15 lat.</span></h2>
-            <div class="ledger">
-                <div class="ledger__item" data-reveal style="--d:160ms">
-                    <div class="ledger__num"><span class="js-count" data-to="70">0</span><i> mln zł</i></div>
-                    <div class="ledger__lbl">sprzedaży wygenerowanej online</div>
+            <div class="community__cards">
+                <div class="ccard" data-reveal>
+                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg></span>
+                    <div><b>Spotkania online</b><span>Regularne sesje robocze: przegląd liczb, blokerów i następnych kroków każdego projektu.</span></div>
                 </div>
-                <div class="ledger__item" data-reveal style="--d:240ms">
-                    <div class="ledger__num"><span class="js-count" data-to="15">0</span><i> lat</i></div>
-                    <div class="ledger__lbl">w e-commerce — od sklepów po narzędzia cyfrowe</div>
+                <div class="ccard" data-reveal>
+                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                    <div><b>Zloty na żywo</b><span>Spotkania stacjonarne — bo najlepsze pomysły i partnerstwa rodzą się przy jednym stole.</span></div>
                 </div>
-                <div class="ledger__item" data-reveal style="--d:320ms">
-                    <div class="ledger__num"><span class="js-count" data-to="3">0</span><i> firmy</i></div>
-                    <div class="ledger__lbl">zbudowane od zera</div>
+                <div class="ccard" data-reveal>
+                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                    <div><b>Wymiana doświadczeń</b><span>Ktoś już rozwiązał Twój problem z cennikiem, reklamą albo churnem — i podzieli się tym wprost.</span></div>
+                </div>
+                <div class="ccard" data-reveal>
+                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg></span>
+                    <div><b>Wsparcie w rozwoju</b><span>Dołączasz w dniu startu współpracy — i zostajesz także po przejęciu sterów.</span></div>
                 </div>
             </div>
-            <p class="proof__line" data-reveal style="--d:400ms">
-                Czwartą firmę zbuduję na pomyśle, który <strong>Ty przyniesiesz</strong>.
-                Buduję, rozkręcam do pierwszych 50 płacących klientów i przekazuję Ci stery — za 20% udziałów.
-                <strong>Zarabiam dopiero wtedy, gdy Twoje narzędzie zarabia</strong>.
-            </p>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- AKT 4 — PROCES -->
-    <section class="scene" id="act-4">
-        <div class="scene__inner">
-            <p class="eyebrow" data-reveal>Jak to działa</p>
-            <h2 class="h2" data-reveal style="--d:80ms">Cztery kroki. <span class="serif">Zero rozmów handlowych.</span></h2>
-            <div class="steps">
-                <div class="step" data-reveal style="--d:160ms">
-                    <div class="step__who">Ty</div>
-                    <h3>Opowiadasz, co robisz i co chcesz stworzyć. Głównie klikasz.</h3>
-                    <span class="step__time">≈ 15 minut</span>
-                </div>
-                <div class="step" data-reveal style="--d:240ms">
-                    <div class="step__who">AI</div>
-                    <h3>Dopytuje jak praktyk i pokazuje podgląd Twojego narzędzia.</h3>
-                    <span class="step__time">w trakcie rozmowy</span>
-                </div>
-                <div class="step" data-reveal style="--d:320ms">
-                    <div class="step__who">Ja</div>
-                    <h3>Przygotowuję plan przedsięwzięcia i odzywam się osobiście.</h3>
-                    <span class="step__time">rezerwacja 500 zł · w pełni zwrotna</span>
-                </div>
-                <div class="step step--hot" data-reveal style="--d:400ms">
-                    <div class="step__who">Razem</div>
-                    <h3>Buduję i rozkręcam biznes do pierwszych 50 klientów. Potem stery przejmujesz Ty.</h3>
-                    <span class="step__time">budżet 30 000 zł — pół na pół</span>
-                </div>
-            </div>
-            <p class="steps__note" data-reveal style="--d:480ms">
-                Do momentu rezerwacji nie rozmawiasz z żadnym handlowcem — <strong>cały proces jest samoobsługowy</strong>.
-                Nie nawiążemy współpracy? <strong>500 zł wraca w całości.</strong>
-            </p>
-        </div>
-    </section>
+<!-- ════════ FAQ ════════ -->
+<section class="section" id="faq">
+    <div class="section__head" data-reveal>
+        <div class="eyebrow">Pytania</div>
+        <h2 class="section__h2">Zanim <span class="ser">zapytasz</span></h2>
+    </div>
+    <div class="faq__list" data-reveal>
+        <details class="faq__item">
+            <summary>Ile to kosztuje i co dokładnie płacę?</summary>
+            <p>Rozmowa z AI, ekrany narzędzia i plan przychodu — <b>za darmo</b>. Rezerwacja wspólnej rozmowy to <b>500 zł, w pełni zwrotne</b>. Jeśli wchodzimy we współpracę: budżet budowy 30 000 zł dzielimy pół na pół (Twoje 500 zł się wlicza). Żadnych ukrytych kosztów po drodze.</p>
+        </details>
+        <details class="faq__item">
+            <summary>Czyj jest pomysł i czyja jest firma?</summary>
+            <p><b>Twoje.</b> Firma i większość udziałów należą do Ciebie. Ja obejmuję 20% za budowę, finansowanie połowy i rozkręcenie sprzedaży — i zostaję doradcą strategicznym, nie szefem.</p>
+        </details>
+        <details class="faq__item">
+            <summary>Co jeśli AI uzna, że pomysł się nie spina?</summary>
+            <p>Usłyszysz to wprost — z konkretnym uzasadnieniem. AI jest strażnikiem, nie sprzedawcą: lepiej skorygować pomysł w kilkanaście minut, niż utopić rok i oszczędności. Możesz sprawdzić do trzech pomysłów.</p>
+        </details>
+        <details class="faq__item">
+            <summary>Nie znam się na technologii. To problem?</summary>
+            <p>Nie — to wręcz założenie tego modelu. Technologię, płatności, serwery i kampanie biorę na siebie. Od Ciebie potrzebuję wiedzy o branży: kto ma problem, ile za niego zapłaci i gdzie tych ludzi szukać.</p>
+        </details>
+        <details class="faq__item">
+            <summary>Skąd pewność, że pozyskasz tych 50 klientów?</summary>
+            <p>Pewności nie sprzedaję — sprzedaję skórę w grze. W każdy projekt wkładam własne 15 000 zł i pół roku własnej pracy, a moje wynagrodzenie to udziały w zyskach. Jeśli biznes nie zarabia — ja też nie.</p>
+        </details>
+    </div>
+</section>
 
-    <!-- AKT 5 — MOTTO -->
-    <section class="scene" id="act-5">
-        <div class="scene__inner">
-            <p class="motto js-motto" data-reveal>
-                Wyobraź sobie narzędzie, którego używa cała Twoja branża. Zaprojektowane z praktyki. <span class="hot">Z Twojej praktyki.</span>
-            </p>
-            <p class="motto__sign" data-reveal style="--d:300ms">— Tomek Niedźwiecki</p>
-        </div>
-    </section>
+<!-- ════════ FINAL CTA ════════ -->
+<section class="final">
+    <h2>Stworzę je z<br><span class="cycler" id="cycler">Tobą.</span></h2>
+    <p>Księgowa, groomerka, trener, architekt — każdy zna problem, za którego rozwiązanie ktoś zapłaci. Sprawdź swój w kilkanaście minut.</p>
+    <a class="btn" href="/stworze/sparing/" data-cta>Zaczynam rozmowę z AI <span class="arr">→</span></a>
+    <div class="final__micro">Bez karty. Bez zobowiązań. Pierwsze ekrany zobaczysz dziś.</div>
+</section>
 
-    <!-- AKT 6 — CTA -->
-    <section class="scene final" id="act-6">
-        <div class="scene__inner">
-            <h2 class="h2" data-reveal>Stworzę je z…</h2>
-            <span class="cycler h2" id="cycler" data-reveal style="--d:80ms"><span>Tobą.</span></span>
-            <div class="final__cta" data-reveal style="--d:200ms">
-                <a class="btn js-magnet" data-cta href="sparing/">Zaczynamy — sprawdź pomysł <span class="arr">→</span></a>
-            </div>
-            <p class="final__sub" data-reveal style="--d:280ms">
-                <b>15 minut rozmowy</b> · podgląd narzędzia w trakcie · <b>za darmo</b> — rezerwacja dopiero, gdy zobaczysz kierunek
-            </p>
-        </div>
-        <div class="footer-mini">© 2026 <a href="https://tomekniedzwiecki.pl/">tomekniedzwiecki.pl</a> · Zbuduję · Zwolnię · Stworzę</div>
-    </section>
-
-</main>
+<footer class="footer">
+    <span>© 2026 Tomek Niedźwiecki</span>
+    <div class="footer__links">
+        <a href="https://tomekniedzwiecki.pl/zbuduje/">Zbuduję</a>
+        <a href="https://tomekniedzwiecki.pl/zwolnie/">Zwolnię</a>
+        <a href="/stworze/regulamin/">Regulamin rezerwacji</a>
+    </div>
+</footer>
 
 <script>
 (function () {
     'use strict';
 
-    /* Tracking → ten sam klucz, którego używa sparing (przepływa do czatu) */
-    try {
-        var KEYS = ['gclid', 'fbclid', 'ttclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-        var u = new URLSearchParams(location.search);
-        var stored = JSON.parse(localStorage.getItem('spar_tracking') || '{}');
-        KEYS.forEach(function (k) { var v = u.get(k); if (v) stored[k] = v; });
-        var fbp = ('; ' + document.cookie).split('; _fbp=').pop().split(';').shift();
-        if (fbp) stored.fbp = fbp;
-        if (!stored.landing_page) stored.landing_page = location.href;
-        if (!stored.referrer && document.referrer) stored.referrer = document.referrer;
-        localStorage.setItem('spar_tracking', JSON.stringify(stored));
-    } catch (e) {}
+    /* ── Nav scroll state ── */
+    var nav = document.getElementById('nav');
+    addEventListener('scroll', function () {
+        nav.classList.toggle('is-scrolled', scrollY > 30);
+    }, { passive: true });
 
-    /* CTA → przekaż query (?p=, utm) dalej do sparingu */
-    if (location.search) {
-        document.querySelectorAll('[data-cta]').forEach(function (a) {
-            a.href = 'sparing/' + location.search;
+    /* ── Query passthrough: ?p= itd. wędrują do sparingu ── */
+    var q = location.search;
+    if (q) {
+        document.querySelectorAll('a[href="/stworze/sparing/"]').forEach(function (a) {
+            a.href = '/stworze/sparing/' + q;
         });
     }
 
-    /* Intro */
-    var intro = document.getElementById('intro');
-    function closeIntro() { intro.classList.add('is-out'); }
-    document.getElementById('intro-go').addEventListener('click', closeIntro);
-    setTimeout(closeIntro, 4200);
-    document.getElementById('snap').addEventListener('scroll', closeIntro, { once: true, passive: true });
-
-    /* Reveals */
-    var ro = new IntersectionObserver(function (es) {
-        es.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('in'); });
-    }, { threshold: 0.25 });
-    document.querySelectorAll('[data-reveal]').forEach(function (el) { ro.observe(el); });
-
-    /* Dock — aktywna kropka */
-    var so = new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-            if (!e.isIntersecting) return;
-            document.querySelectorAll('.dock a').forEach(function (d) {
-                d.classList.toggle('is-on', d.dataset.dot === e.target.id);
-            });
+    /* ── CTA events ── */
+    document.querySelectorAll('[data-cta]').forEach(function (a) {
+        a.addEventListener('click', function () {
+            try {
+                if (window.gtag) gtag('event', 'stworze_cta_click');
+                if (window.fbq) fbq('trackCustom', 'StworzeCTA');
+            } catch (e) { }
         });
-    }, { threshold: 0.6 });
-    document.querySelectorAll('.scene').forEach(function (s) { so.observe(s); });
-
-    /* Liczniki */
-    var co = new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-            if (!e.isIntersecting) return;
-            co.unobserve(e.target);
-            var to = parseInt(e.target.dataset.to, 10), t0 = null;
-            function tick(ts) {
-                if (!t0) t0 = ts;
-                var p = Math.min((ts - t0) / 1200, 1);
-                e.target.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
-                if (p < 1) requestAnimationFrame(tick);
-            }
-            requestAnimationFrame(tick);
-        });
-    }, { threshold: 0.6 });
-    document.querySelectorAll('.js-count').forEach(function (el) { co.observe(el); });
-
-    /* Motto — per-word blur */
-    document.querySelectorAll('.js-motto').forEach(function (m) {
-        var hot = m.querySelector('.hot');
-        var hotText = hot ? hot.textContent : '';
-        var base = m.textContent.replace(hotText, '').trim();
-        var html = base.split(/\s+/).map(function (w, i) {
-            return '<span class="w" style="--wd:' + (i * 70) + 'ms">' + w + '</span>';
-        }).join(' ');
-        if (hotText) {
-            var off = base.split(/\s+/).length;
-            html += ' ' + hotText.split(/\s+/).map(function (w, i) {
-                return '<span class="w hot" style="--wd:' + ((off + i) * 70) + 'ms">' + w + '</span>';
-            }).join(' ');
-        }
-        m.innerHTML = html;
-        new IntersectionObserver(function (es, o) {
-            es.forEach(function (e) { if (e.isIntersecting) { m.classList.add('in'); o.disconnect(); } });
-        }, { threshold: 0.5 }).observe(m);
     });
 
-    /* Cycler */
-    var WORDS = ['księgową.', 'architektem.', 'agentem nieruchomości.', 'fizjoterapeutką.', 'szkoleniowcem.', 'Tobą.'];
-    var cyc = document.getElementById('cycler'), ci = 0;
-    setInterval(function () {
-        ci = (ci + 1) % WORDS.length;
-        cyc.innerHTML = '<span>' + WORDS[ci] + '</span>';
-    }, 2200);
-
-    /* Magnetic button (desktop) */
-    if (window.matchMedia('(hover: hover)').matches) {
-        document.querySelectorAll('.js-magnet').forEach(function (b) {
-            b.addEventListener('mousemove', function (e) {
-                var r = b.getBoundingClientRect();
-                b.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * 0.14) + 'px,' + ((e.clientY - r.top - r.height / 2) * 0.2) + 'px)';
-            });
-            b.addEventListener('mouseleave', function () { b.style.transform = ''; });
+    /* ── Reveal on scroll ── */
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
         });
+    }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+
+    /* ── Liczniki ── */
+    function countUp(el) {
+        var target = parseInt(el.getAttribute('data-count'), 10);
+        var t0 = null;
+        function tick(t) {
+            if (!t0) t0 = t;
+            var p = Math.min(1, (t - t0) / 1300);
+            var eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(target * eased);
+            if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
     }
+    var cio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+            if (en.isIntersecting) { countUp(en.target); cio.unobserve(en.target); }
+        });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('[data-count]').forEach(function (el) { cio.observe(el); });
+
+    /* ── Hero: animowany czat (loop) ── */
+    var DEMO_IMG = '/stworze/sparing/demo-podglad.png'; // lokalny asset (fallback, gdy feed pusty)
+    var SCRIPT = [
+        { who: 'user', text: 'Prowadzę salon groomerski. Klienci notorycznie zapominają o wizytach…' },
+        { who: 'ai', text: 'Czyli puste okienka w grafiku i SMS-y wysyłane ręcznie wieczorami. Kto u Ciebie pilnuje rezerwacji?' },
+        { who: 'user', text: 'Ja i recepcjonistka. Zeszyt + telefon.' },
+        { who: 'ai', text: 'Mam to. Projektuję narzędzie: pulpit wizyt + automatyczne przypomnienia SMS. Generuję ekrany…' },
+        { who: 'shot' },
+        { who: 'ai', text: 'Werdykt: ✅ zielony. Salony płacą 100–200 zł/mies. za rezerwacje — przy 50 salonach to ok. 7 450 zł/mies. przychodu.' }
+    ];
+    var demoBox = document.getElementById('chat-demo');
+    var demoFeedImg = null; // podmieniane realnym podglądem z feedu
+    function playDemo() {
+        demoBox.innerHTML = '';
+        var i = 0;
+        function next() {
+            if (i >= SCRIPT.length) { setTimeout(playDemo, 6000); return; }
+            var m = SCRIPT[i++];
+            var typing = null;
+            if (m.who === 'ai' || m.who === 'shot') {
+                typing = document.createElement('div');
+                typing.className = 'cmsg cmsg--ai chatcard__typing is-in';
+                typing.innerHTML = '<i></i><i></i><i></i>';
+                demoBox.appendChild(typing);
+            }
+            setTimeout(function () {
+                if (typing) typing.remove();
+                var div = document.createElement('div');
+                if (m.who === 'shot') {
+                    div.className = 'cmsg cmsg--ai cmsg--shot';
+                    var src = demoFeedImg || DEMO_IMG;
+                    div.innerHTML = '<img src="' + src + '" alt="" loading="lazy"><span>Pulpit narzędzia — wygenerowany</span>';
+                } else {
+                    div.className = 'cmsg cmsg--' + m.who;
+                    div.textContent = m.text;
+                }
+                demoBox.appendChild(div);
+                requestAnimationFrame(function () { div.classList.add('is-in'); });
+                while (demoBox.children.length > 5) demoBox.removeChild(demoBox.firstChild);
+                next();
+            }, m.who === 'user' ? 900 : 1500);
+        }
+        next();
+    }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        // statyczny zrzut rozmowy
+        SCRIPT.forEach(function (m) {
+            var div = document.createElement('div');
+            if (m.who === 'shot') {
+                div.className = 'cmsg cmsg--ai cmsg--shot is-in';
+                div.innerHTML = '<img src="' + DEMO_IMG + '" alt="" loading="lazy"><span>Pulpit narzędzia — wygenerowany</span>';
+            } else {
+                div.className = 'cmsg cmsg--' + m.who + ' is-in';
+                div.textContent = m.text;
+            }
+            demoBox.appendChild(div);
+        });
+    } else {
+        playDemo();
+    }
+
+    /* ── Feed ostatnich generowań (lekkie webp przez render API) ── */
+    var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
+    function lightImg(url, w) {
+        // storage object URL -> render API z transformacją (webp, szerokość)
+        return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
+            '?format=webp&width=' + (w || 480) + '&quality=70';
+    }
+    fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        var items = (d && d.projekty) || [];
+        if (items.length < 3) return; // sekcja zostaje ukryta przy pustym feedzie
+        demoFeedImg = lightImg(items[0].img, 480);
+        var section = document.getElementById('projekty');
+        section.hidden = false;
+        function card(p) {
+            return '<a class="feedcard" href="/stworze/sparing/" data-cta>' +
+                '<img src="' + lightImg(p.img) + '" alt="' + p.nazwa.replace(/"/g, '&quot;') + ' — podgląd narzędzia" loading="lazy" decoding="async">' +
+                '<div class="feedcard__bar"><i></i><span>' + p.nazwa.replace(/</g, '&lt;') + '</span></div></a>';
+        }
+        // dwa przeciwbieżne rzędy marquee; zawartość duplikowana dla pętli
+        var half = Math.ceil(items.length / 2);
+        var rows = [items.slice(0, half), items.length > 3 ? items.slice(half) : items.slice(0, half)];
+        document.getElementById('feed-rows').innerHTML = rows.map(function (row, ri) {
+            var doubled = row.concat(row).concat(row.length < 4 ? row : []); // min szerokość pętli
+            var dur = Math.max(36, doubled.length * 9);
+            return '<div class="feed__track' + (ri === 1 ? ' feed__track--rev' : '') + '" style="--dur:' + dur + 's">' +
+                doubled.map(card).join('') + '</div>';
+        }).join('');
+        section.querySelectorAll('[data-cta]').forEach(function (a) {
+            if (q) a.href = '/stworze/sparing/' + q;
+        });
+    }).catch(function () { });
+
+    /* ── Cycler w final CTA ── */
+    var WORDS = ['Tobą.', 'księgową.', 'trenerem.', 'architektem.', 'groomerką.', 'agentem.', 'Tobą.'];
+    var cyc = document.getElementById('cycler');
+    var wi = 0;
+    setInterval(function () {
+        cyc.classList.add('is-out');
+        setTimeout(function () {
+            wi = (wi + 1) % WORDS.length;
+            cyc.textContent = WORDS[wi];
+            cyc.classList.remove('is-out');
+        }, 300);
+    }, 2600);
 })();
 </script>
-
 </body>
 </html>
