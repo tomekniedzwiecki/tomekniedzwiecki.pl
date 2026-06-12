@@ -445,7 +445,7 @@ img { max-width: 100%; display: block; }
 .show__screen {
     position: relative;
     display: block;
-    aspect-ratio: 3 / 2; /* źródła natywnie 3:2 — pełny ekran, zero kadrowania */
+    aspect-ratio: 3 / 2;
     background: var(--bg-elev);
 }
 .show__screen img {
@@ -453,11 +453,38 @@ img { max-width: 100%; display: block; }
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* contain, nie cover: grafika ZAWSZE w całości — nawet gdyby źródło
+       miało inną proporcję niż okno, nic nie zostanie ucięte */
+    object-fit: contain;
     opacity: 0;
-    transition: opacity 0.65s var(--ease);
+    transition: opacity 0.55s var(--ease);
 }
 .show__screen img.is-on { opacity: 1; }
+/* przełącznik widoków aktywnego projektu (pulpit/funkcja/landing…) */
+.show__views { display: inline-flex; gap: 7px; flex-shrink: 0; margin-left: 12px; }
+.show__view {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    padding: 0;
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.show__view:hover { background: rgba(255, 255, 255, 0.35); }
+.show__view.is-on { background: var(--accent); transform: scale(1.25); box-shadow: 0 0 8px rgba(77, 159, 255, 0.7); }
+.show__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transition: color 0.2s var(--ease);
+}
+.show__more:hover { color: var(--text-strong); }
+.show__more .arr { transition: transform 0.25s var(--ease); }
+.show__more:hover .arr { transform: translateX(3px); }
 .feed__note { text-align: center; margin-top: 26px; font-size: 12.5px; color: var(--text-faint); padding: 0 var(--pad-x); }
 @media (max-width: 940px) {
     .show { grid-template-columns: 1fr; gap: 22px; }
@@ -625,7 +652,7 @@ img { max-width: 100%; display: block; }
     </a>
     <div class="nav__links">
         <a href="#proces">Jak to działa</a>
-        <a href="#projekty">Projekty</a>
+        <a href="/aplikacja/inspiracje/">Inspiracje</a>
         <a href="#spolecznosc">Społeczność</a>
         <a href="#faq">FAQ</a>
         <a class="nav__cta" href="/aplikacja/sparing/" data-cta>Zacznij rozmowę</a>
@@ -719,11 +746,16 @@ img { max-width: 100%; display: block; }
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     <b id="show-url-name"></b>
                 </span>
+                <span class="show__views" id="show-views" aria-label="Ekrany tego projektu"></span>
             </div>
-            <a class="show__screen" id="show-screen" href="/aplikacja/sparing/" data-cta aria-label="Zobacz przykładową aplikację i zacznij własną rozmowę"></a>
+            <a class="show__screen" id="show-screen" href="/aplikacja/sparing/" data-cta aria-label="Zobacz przykładową aplikację i zacznij własną rozmowę">
+                <img id="show-buf-a" alt="" decoding="async">
+                <img id="show-buf-b" alt="" decoding="async">
+            </a>
         </div>
     </div>
-    <p class="feed__note">Pełne ekrany wygenerowane w prawdziwych rozmowach — bez danych ich autorów.</p>
+    <p class="feed__note">Pełne ekrany wygenerowane w prawdziwych rozmowach — bez danych ich autorów.<br>
+        <a class="show__more" href="/aplikacja/inspiracje/">Zobacz wszystkie inspiracje — aktualizowane na żywo <span class="arr">→</span></a></p>
 </section>
 
 <!-- ════════ MODEL ════════ -->
@@ -966,19 +998,19 @@ img { max-width: 100%; display: block; }
         var section = document.getElementById('projekty');
         section.hidden = false;
 
-        // Lista projektów (tekst) + okno aplikacji z pełnym ekranem 3:2.
-        // Rotacja co 5 s sterowana paskiem postępu na aktywnym wierszu.
+        // Lista projektów (tekst) + okno aplikacji. Każdy projekt ma KILKA
+        // ekranów (pulpit/funkcja/landing…) — kropki w pasku okna je przełączają.
+        // Obraz przez double-buffer (2 <img>, crossfade) zamiast dziesiątek node'ów.
         var ROT_MS = 5000;
         var wrap = document.getElementById('show');
         var list = document.getElementById('show-list');
-        var screen = document.getElementById('show-screen');
         var urlName = document.getElementById('show-url-name');
+        var viewsBox = document.getElementById('show-views');
+        var bufA = document.getElementById('show-buf-a');
+        var bufB = document.getElementById('show-buf-b');
         var escA = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
+        var imgsOf = function (p) { return (p.imgs && p.imgs.length) ? p.imgs : [{ view: 'panel', label: 'Pulpit', url: p.img }]; };
 
-        screen.innerHTML = items.map(function (p, i) {
-            return '<img src="' + escA(lightImg(p.img, 1400)) + '" alt="' + escA(p.nazwa) + ' — pełny ekran aplikacji"' +
-                (i < 2 ? '' : ' loading="lazy"') + ' decoding="async">';
-        }).join('');
         list.innerHTML = items.map(function (p, i) {
             return '<button type="button" class="show__item" role="tab" data-i="' + i + '" style="--t:' + ROT_MS + 'ms">' +
                 '<span class="show__num">' + String(i + 1).padStart(2, '0') + '</span>' +
@@ -987,42 +1019,83 @@ img { max-width: 100%; display: block; }
                 '</button>';
         }).join('') + '<p class="show__hint">Każdy z tych ekranów powstał w kilkanaście minut rozmowy. Kliknij okno, żeby zacząć własną.</p>';
 
-        var imgs = screen.querySelectorAll('img');
         var rows = list.querySelectorAll('.show__item');
-        var idx = -1;
+        var pIdx = -1, vIdx = 0, frontA = false;
         var timer = null;
         var noAuto = items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        function go(i) {
-            idx = (i + items.length) % items.length;
-            imgs.forEach(function (im, j) { im.classList.toggle('is-on', j === idx); });
-            rows.forEach(function (b, j) {
-                b.classList.remove('is-on');
-                b.setAttribute('aria-selected', 'false');
+        function paintImg(url, alt) {
+            frontA = !frontA;
+            var front = frontA ? bufA : bufB;
+            var back = frontA ? bufB : bufA;
+            front.alt = alt;
+            front.onload = function () {
+                front.classList.add('is-on');
+                back.classList.remove('is-on');
+            };
+            front.src = lightImg(url, 1400);
+            if (front.complete && front.naturalWidth) {
+                front.classList.add('is-on');
+                back.classList.remove('is-on');
+            }
+        }
+        function paintViews() {
+            var vs = imgsOf(items[pIdx]);
+            viewsBox.innerHTML = vs.length > 1 ? vs.map(function (v, i) {
+                return '<button type="button" class="show__view' + (i === vIdx ? ' is-on' : '') + '" data-v="' + i + '" aria-label="' + escA(v.label) + '" title="' + escA(v.label) + '"></button>';
+            }).join('') : '';
+            viewsBox.querySelectorAll('.show__view').forEach(function (d) {
+                d.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    goView(parseInt(d.dataset.v, 10), true);
+                });
             });
-            void rows[idx].offsetWidth; // restart animacji paska postępu
-            rows[idx].classList.add('is-on');
-            rows[idx].setAttribute('aria-selected', 'true');
-            urlName.textContent = items[idx].nazwa;
+        }
+        function goView(v, manual) {
+            var vs = imgsOf(items[pIdx]);
+            vIdx = (v + vs.length) % vs.length;
+            paintImg(vs[vIdx].url, items[pIdx].nazwa + ' — ' + vs[vIdx].label);
+            viewsBox.querySelectorAll('.show__view').forEach(function (d, i) {
+                d.classList.toggle('is-on', i === vIdx);
+            });
+            if (manual) holdAuto(); // ręczne oglądanie ekranów wstrzymuje rotację
+        }
+        function go(i) {
+            pIdx = (i + items.length) % items.length;
+            vIdx = 0;
+            rows.forEach(function (b) { b.classList.remove('is-on'); b.setAttribute('aria-selected', 'false'); });
+            void rows[pIdx].offsetWidth; // restart animacji paska postępu
+            rows[pIdx].classList.add('is-on');
+            rows[pIdx].setAttribute('aria-selected', 'true');
+            urlName.textContent = items[pIdx].nazwa;
+            paintViews();
+            paintImg(imgsOf(items[pIdx])[0].url, items[pIdx].nazwa);
+            // preload pierwszego ekranu następnego projektu
+            var nx = new Image();
+            nx.src = lightImg(imgsOf(items[(pIdx + 1) % items.length])[0].url, 1400);
+            schedule();
+        }
+        function schedule() {
             if (timer) clearTimeout(timer);
             if (!noAuto && !wrap.classList.contains('is-paused') && !document.hidden) {
-                timer = setTimeout(function () { go(idx + 1); }, ROT_MS);
+                timer = setTimeout(function () { go(pIdx + 1); }, ROT_MS);
             }
+        }
+        function holdAuto() {
+            wrap.classList.add('is-paused');
+            if (timer) { clearTimeout(timer); timer = null; }
         }
         go(0);
 
         // hover = pauza (pasek postępu zamiera); zejście = pełny cykl od nowa
-        wrap.addEventListener('mouseenter', function () {
-            wrap.classList.add('is-paused');
-            if (timer) { clearTimeout(timer); timer = null; }
-        });
+        wrap.addEventListener('mouseenter', holdAuto);
         wrap.addEventListener('mouseleave', function () {
             wrap.classList.remove('is-paused');
-            go(idx);
+            go(pIdx);
         });
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) { if (timer) { clearTimeout(timer); timer = null; } }
-            else go(idx);
+            else { wrap.classList.remove('is-paused'); go(pIdx); }
         });
         rows.forEach(function (b) {
             b.addEventListener('click', function () { go(parseInt(b.dataset.i, 10)); });

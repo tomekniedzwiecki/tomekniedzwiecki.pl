@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#050507">
+    <title>Inspiracje — aplikacje, które właśnie powstają | Tomek Niedźwiecki</title>
+    <meta name="description" content="Galeria aplikacji projektowanych na żywo w rozmowach z AI — z godziną wygenerowania. Zobacz, co budują inni, i stwórz swój projekt za darmo w kilkanaście minut.">
+    <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
+    <link rel="canonical" href="https://tomekniedzwiecki.pl/aplikacja/inspiracje/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tomekniedzwiecki.pl/aplikacja/inspiracje/">
+    <meta property="og:title" content="Inspiracje — aplikacje, które właśnie powstają">
+    <meta property="og:description" content="Projekty z prawdziwych rozmów z AI, aktualizowane na żywo. Stwórz swój za darmo.">
+    <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
+    <meta property="og:locale" content="pl_PL">
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', { 'ad_storage': 'granted', 'ad_user_data': 'granted', 'ad_personalization': 'granted', 'analytics_storage': 'granted' });
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var s = document.createElement('script');
+            s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
+            document.head.appendChild(s);
+            s.onload = function() {
+                gtag('js', new Date());
+                gtag('set', 'user_properties', { persona: 'stworze' });
+                gtag('config', 'G-W8CLDSHVFC', { 'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true } });
+            };
+        });
+    </script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init','1668188210820080'); fbq('track','PageView');
+    });
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1" alt=""></noscript>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+
+<style>
+/* ============================================================
+   APLIKACJA / INSPIRACJE — galeria projektów na żywo
+   Karty = okna aplikacji z PEŁNYMI ekranami (contain — zero
+   przycinania), czas generacji, przełącznik widoków, lightbox.
+   Auto-odświeżanie co 60 s; nowe projekty wchodzą z animacją.
+   ============================================================ */
+:root {
+    --bg: #050507;
+    --bg-elev: #0a0a0e;
+    --bg-card: #0c0c12;
+    --glass: rgba(255, 255, 255, 0.035);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-soft: rgba(255, 255, 255, 0.055);
+    --border-strong: #2d2d34;
+    --text: #e9e9ee;
+    --text-strong: #ffffff;
+    --text-muted: #8b8b96;
+    --text-faint: #5a5a64;
+    --accent: #4d9fff;
+    --accent-2: #2f7fe6;
+    --accent-soft: rgba(77, 159, 255, 0.14);
+    --accent-dim: rgba(77, 159, 255, 0.06);
+    --accent-ink: #061320;
+    --green: #00d97e;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --pad-x: clamp(20px, 5vw, 48px);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; border: 0; background: none; cursor: pointer; color: inherit; }
+img { max-width: 100%; display: block; }
+::selection { background: rgba(77, 159, 255, 0.3); color: #fff; }
+
+/* NAV (jak na stronie głównej) */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px var(--pad-x);
+    background: rgba(5, 5, 7, 0.72);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border-soft);
+}
+.nav__brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; color: var(--text-strong); letter-spacing: -0.01em; }
+.nav__brand img { width: 26px; height: 26px; border-radius: 7px; }
+.nav__brand span em { font-style: normal; color: var(--accent); }
+.nav__links { display: flex; align-items: center; gap: 26px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); }
+.nav__links a:hover { color: var(--text-strong); }
+.nav__cta {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-weight: 800; font-size: 13px;
+    box-shadow: 0 8px 28px -10px rgba(77, 159, 255, 0.55);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.nav__cta:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -10px rgba(77, 159, 255, 0.7); }
+@media (max-width: 760px) { .nav__links a:not(.nav__cta) { display: none; } }
+
+/* HEADER */
+.head {
+    position: relative;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: calc(76px + 7vh) var(--pad-x) clamp(36px, 6vh, 60px);
+    text-align: center;
+    overflow: hidden;
+}
+.head::before {
+    content: '';
+    position: absolute; inset: 0; z-index: -2;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at 50% 0%, #000 25%, transparent 72%);
+    mask-image: radial-gradient(ellipse 80% 90% at 50% 0%, #000 25%, transparent 72%);
+}
+.head::after {
+    content: '';
+    position: absolute; z-index: -1;
+    top: -30%; left: 50%; transform: translateX(-50%);
+    width: min(900px, 120vw); height: 60vh;
+    background: radial-gradient(ellipse at center, rgba(77, 159, 255, 0.15) 0%, transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+}
+.live {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 217, 126, 0.3);
+    background: rgba(0, 217, 126, 0.07);
+    font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 22px;
+}
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+.head h1 {
+    font-size: clamp(34px, 5.4vw, 62px);
+    line-height: 1.03; letter-spacing: -0.045em; font-weight: 900;
+    color: var(--text-strong);
+    margin-bottom: 18px;
+}
+.head h1 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.head p { color: var(--text-muted); font-size: clamp(15px, 1.7vw, 17px); max-width: 56ch; margin: 0 auto 30px; }
+.btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 32px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-weight: 800; font-size: 15px;
+    box-shadow: 0 10px 36px -10px rgba(77, 159, 255, 0.6);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 18px 48px -12px rgba(77, 159, 255, 0.75); }
+.btn .arr { transition: transform 0.25s var(--ease); }
+.btn:hover .arr { transform: translateX(3px); }
+.head__micro { margin-top: 13px; font-size: 12px; color: var(--text-faint); }
+
+/* GRID PROJEKTÓW */
+.grid {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 var(--pad-x) 30px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(18px, 2.6vw, 30px);
+}
+@media (max-width: 980px) { .grid { grid-template-columns: 1fr; max-width: 680px; } }
+.card {
+    border-radius: 16px;
+    border: 1px solid var(--glass-border-soft);
+    background: var(--bg-card);
+    overflow: hidden;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.card:hover {
+    border-color: rgba(77, 159, 255, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.9), 0 0 50px -20px rgba(77, 159, 255, 0.25);
+}
+.card.is-new { animation: cardIn 0.7s var(--ease) both; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(22px) scale(0.985); } to { opacity: 1; transform: none; } }
+.card__bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--glass-border-soft);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.012) 100%);
+}
+.card__lights { display: inline-flex; gap: 6px; flex-shrink: 0; }
+.card__lights i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
+.card__name {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    font-size: 12.5px; font-weight: 800;
+    color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding: 4px 12px;
+    border-radius: 7px;
+    border: 1px solid var(--glass-border-soft);
+    background: rgba(0, 0, 0, 0.3);
+}
+.card__time {
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.card__time svg { width: 11px; height: 11px; }
+.card__time.is-fresh { color: var(--green); }
+.card__screen {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    background: var(--bg-elev);
+    cursor: zoom-in;
+}
+.card__screen img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain; /* pełny ekran, NIGDY nie przycinamy */
+    opacity: 0;
+    transition: opacity 0.45s var(--ease);
+}
+.card__screen img.is-on { opacity: 1; }
+.card__foot {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--glass-border-soft);
+}
+.card__viewlabel { font-size: 11px; color: var(--text-faint); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card__views { display: inline-flex; gap: 7px; flex-shrink: 0; }
+.card__view {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    padding: 0;
+    transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.card__view:hover { background: rgba(255, 255, 255, 0.35); }
+.card__view.is-on { background: var(--accent); transform: scale(1.25); box-shadow: 0 0 8px rgba(77, 159, 255, 0.7); }
+
+/* CTA między wierszami i na końcu */
+.midcta {
+    grid-column: 1 / -1;
+    text-align: center;
+    border: 1px dashed rgba(77, 159, 255, 0.35);
+    border-radius: 16px;
+    background: var(--accent-dim);
+    padding: clamp(22px, 4vw, 34px);
+}
+.midcta b { display: block; font-size: clamp(17px, 2.2vw, 22px); font-weight: 800; letter-spacing: -0.02em; color: var(--text-strong); margin-bottom: 6px; }
+.midcta b .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.midcta p { font-size: 13px; color: var(--text-muted); max-width: 52ch; margin: 0 auto 18px; }
+.final {
+    position: relative;
+    text-align: center;
+    padding: clamp(60px, 10vh, 110px) var(--pad-x) clamp(70px, 11vh, 120px);
+    overflow: hidden;
+}
+.final::before {
+    content: '';
+    position: absolute; left: 50%; bottom: -45%; transform: translateX(-50%);
+    width: min(800px, 120vw); height: 80%;
+    background: radial-gradient(ellipse at center, rgba(77,159,255,0.18) 0%, transparent 65%);
+    filter: blur(30px);
+    pointer-events: none;
+}
+.final h2 { position: relative; font-size: clamp(28px, 4.6vw, 52px); line-height: 1.05; letter-spacing: -0.045em; font-weight: 900; color: var(--text-strong); margin-bottom: 14px; }
+.final h2 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.final p { position: relative; color: var(--text-muted); font-size: 15px; max-width: 50ch; margin: 0 auto 30px; }
+.final .btn { position: relative; }
+
+/* LIGHTBOX — pełny ekran ze strzałkami po widokach */
+.lb {
+    position: fixed; inset: 0; z-index: 200;
+    display: none;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    background: rgba(3, 3, 5, 0.94);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    padding: clamp(14px, 3vw, 40px);
+}
+.lb.is-open { display: flex; animation: lbIn 0.25s ease; }
+@keyframes lbIn { from { opacity: 0; } to { opacity: 1; } }
+.lb img {
+    max-width: min(1400px, 96vw);
+    max-height: 78vh;
+    object-fit: contain;
+    border-radius: 14px;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
+}
+.lb__cap { margin-top: 16px; font-size: 13.5px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
+.lb__cap span { color: var(--text-faint); font-weight: 600; font-size: 12px; }
+.lb__x {
+    position: absolute; top: max(16px, env(safe-area-inset-top)); right: 18px;
+    width: 46px; height: 46px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
+    color: var(--text-strong);
+    transition: background 0.2s;
+}
+.lb__x:hover { background: rgba(255, 255, 255, 0.16); }
+.lb__nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 50px; height: 50px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--glass-border);
+    color: var(--text-strong);
+    transition: background 0.2s;
+}
+.lb__nav:hover { background: rgba(255, 255, 255, 0.15); }
+.lb__nav--l { left: 16px; }
+.lb__nav--r { right: 16px; }
+.lb__nav svg, .lb__x svg { width: 20px; height: 20px; }
+@media (max-width: 700px) { .lb__nav { display: none; } }
+
+.foot {
+    border-top: 1px solid var(--glass-border-soft);
+    padding: 28px var(--pad-x);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    max-width: 1240px; margin: 0 auto;
+    font-size: 12.5px; color: var(--text-faint);
+}
+.foot a:hover { color: var(--text); }
+.foot__links { display: flex; gap: 20px; flex-wrap: wrap; }
+[data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity 0.65s var(--ease), transform 0.65s var(--ease); }
+[data-reveal].is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal] { transition: none; opacity: 1; transform: none; }
+    .live i { animation: none; }
+    .card.is-new { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+    <a class="nav__brand" href="/aplikacja/">
+        <img src="/img/logo/tn-logo-icon-88.png" alt="">
+        <span>Tomek Niedźwiecki <em>/ Aplikacja</em></span>
+    </a>
+    <div class="nav__links">
+        <a href="/aplikacja/">Jak to działa</a>
+        <a href="/aplikacja/#spolecznosc">Społeczność</a>
+        <a class="nav__cta" href="/aplikacja/sparing/" data-cta>Stwórz swój projekt</a>
+    </div>
+</nav>
+
+<header class="head">
+    <div class="live"><i></i>Aktualizowane na żywo</div>
+    <h1>Aplikacje, które <span class="ser">właśnie powstają</span></h1>
+    <p>Każdy z tych projektów zaczął się od czyjegoś pomysłu i kilkunastu minut rozmowy z AI.
+    Przeglądaj pełne ekrany, łap inspirację — i sprawdź własny pomysł.</p>
+    <a class="btn" href="/aplikacja/sparing/" data-cta>Stwórz swój projekt za darmo <span class="arr">→</span></a>
+    <div class="head__micro">Bez karty i bez zobowiązań. Pierwsze ekrany zobaczysz dziś.</div>
+</header>
+
+<main class="grid" id="grid" aria-live="polite"></main>
+
+<section class="final">
+    <h2>Twój pomysł może być <span class="ser">następny</span></h2>
+    <p>Kilkanaście minut rozmowy — karta projektu, pełne ekrany aplikacji i wstępny plan przychodu. Za darmo.</p>
+    <a class="btn" href="/aplikacja/sparing/" data-cta>Stwórz swój projekt za darmo <span class="arr">→</span></a>
+</section>
+
+<footer class="foot">
+    <span>© 2026 Tomek Niedźwiecki</span>
+    <div class="foot__links">
+        <a href="/aplikacja/">Aplikacja</a>
+        <a href="https://tomekniedzwiecki.pl/zbuduje/">Zbuduję</a>
+        <a href="https://tomekniedzwiecki.pl/zwolnie/">Zwolnię</a>
+    </div>
+</footer>
+
+<!-- Lightbox -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Pełny ekran projektu">
+    <button type="button" class="lb__x" id="lb-x" aria-label="Zamknij">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+    </button>
+    <button type="button" class="lb__nav lb__nav--l" id="lb-prev" aria-label="Poprzedni ekran">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+    </button>
+    <button type="button" class="lb__nav lb__nav--r" id="lb-next" aria-label="Następny ekran">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+    </button>
+    <img id="lb-img" src="" alt="">
+    <div class="lb__cap"><b id="lb-name"></b><span id="lb-view"></span></div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+    var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
+    var REFRESH_MS = 60000;
+    var grid = document.getElementById('grid');
+    var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+    function lightImg(url, w) {
+        return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
+            '?format=webp&width=' + (w || 900) + '&quality=72';
+    }
+    var q = location.search;
+    if (q) document.querySelectorAll('a[href="/aplikacja/sparing/"]').forEach(function (a) { a.href = '/aplikacja/sparing/' + q; });
+    document.querySelectorAll('[data-cta]').forEach(function (a) {
+        a.addEventListener('click', function () {
+            try { if (window.gtag) gtag('event', 'inspiracje_cta_click'); if (window.fbq) fbq('trackCustom', 'InspiracjeCTA'); } catch (e) { }
+        });
+    });
+
+    /* czas generacji: „przed chwilą / 14:32 / wczoraj 18:05 / 11 cze, 09:15" */
+    var MIES = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
+    function fmtTime(iso) {
+        var d = new Date(iso);
+        if (isNaN(d)) return '';
+        var now = new Date();
+        var diffMin = Math.round((now - d) / 60000);
+        var hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        if (diffMin < 2) return 'przed chwilą';
+        if (diffMin < 60) return diffMin + ' min temu';
+        var sameDay = d.toDateString() === now.toDateString();
+        if (sameDay) return 'dziś ' + hm;
+        var yest = new Date(now); yest.setDate(now.getDate() - 1);
+        if (d.toDateString() === yest.toDateString()) return 'wczoraj ' + hm;
+        return d.getDate() + ' ' + MIES[d.getMonth()] + ', ' + hm;
+    }
+    var isFresh = function (iso) { return (Date.now() - new Date(iso).getTime()) < 3600e3; };
+
+    var items = [];          // aktualny feed
+    var known = {};          // nazwa -> true (wykrywanie nowych przy refreshu)
+    var first = true;
+
+    function cardHTML(p, isNew) {
+        var imgs = p.imgs || [];
+        var views = imgs.length > 1
+            ? imgs.map(function (v, i) {
+                return '<button type="button" class="card__view' + (i === 0 ? ' is-on' : '') + '" data-v="' + i + '" aria-label="' + esc(v.label) + '" title="' + esc(v.label) + '"></button>';
+            }).join('')
+            : '';
+        return '<article class="card' + (isNew ? ' is-new' : '') + '" data-name="' + esc(p.nazwa) + '">' +
+            '<div class="card__bar">' +
+            '<span class="card__lights" aria-hidden="true"><i></i><i></i><i></i></span>' +
+            '<span class="card__name">' + esc(p.nazwa) + '</span>' +
+            '<span class="card__time' + (isFresh(p.generated_at) ? ' is-fresh' : '') + '" title="Czas wygenerowania">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' +
+            esc(fmtTime(p.generated_at)) + '</span>' +
+            '</div>' +
+            '<div class="card__screen" data-open>' +
+            imgs.map(function (v, i) {
+                return '<img src="' + esc(lightImg(v.url)) + '" alt="' + esc(p.nazwa + ' — ' + v.label) + '"' +
+                    (i === 0 ? ' class="is-on"' : ' loading="lazy"') + ' decoding="async">';
+            }).join('') +
+            '</div>' +
+            '<div class="card__foot">' +
+            '<span class="card__viewlabel" data-viewlabel>' + esc(imgs.length ? imgs[0].label : '') + '</span>' +
+            '<span class="card__views">' + views + '</span>' +
+            '</div></article>';
+    }
+
+    function bindCard(card, p) {
+        var imgs = card.querySelectorAll('.card__screen img');
+        var dots = card.querySelectorAll('.card__view');
+        var label = card.querySelector('[data-viewlabel]');
+        var vi = 0;
+        function goV(i) {
+            vi = (i + imgs.length) % imgs.length;
+            imgs.forEach(function (im, j) { im.classList.toggle('is-on', j === vi); });
+            dots.forEach(function (d, j) { d.classList.toggle('is-on', j === vi); });
+            label.textContent = (p.imgs[vi] || {}).label || '';
+        }
+        dots.forEach(function (d) {
+            d.addEventListener('click', function () { goV(parseInt(d.dataset.v, 10)); });
+        });
+        card.querySelector('[data-open]').addEventListener('click', function () { openLb(p, vi); });
+    }
+
+    var MID_CTA = '<div class="midcta" data-reveal><b>Wszystkie powstały <span class="ser">z czyjegoś pomysłu</span></b>' +
+        '<p>Z pracy, z pasji albo z samej obserwacji. Twój może być następny — rozmowa nic nie kosztuje.</p>' +
+        '<a class="btn" href="/aplikacja/sparing/' + (q || '') + '" data-cta-mid>Stwórz swój projekt za darmo <span class="arr">→</span></a></div>';
+
+    function render(newNames) {
+        grid.innerHTML = items.map(function (p, i) {
+            var html = cardHTML(p, newNames && newNames[p.nazwa]);
+            // CTA wpleciony po 4. projekcie (i potem co 8)
+            if (i === 3 || (i > 3 && (i - 3) % 8 === 0)) html += MID_CTA;
+            return html;
+        }).join('');
+        grid.querySelectorAll('.card').forEach(function (card, i) {
+            // index karty != index items przy wplecionych CTA — mapuj po nazwie
+            var p = items.find(function (x) { return x.nazwa === card.getAttribute('data-name'); });
+            if (p) bindCard(card, p);
+        });
+        grid.querySelectorAll('[data-cta-mid]').forEach(function (a) {
+            a.addEventListener('click', function () {
+                try { if (window.gtag) gtag('event', 'inspiracje_cta_click'); if (window.fbq) fbq('trackCustom', 'InspiracjeCTA'); } catch (e) { }
+            });
+        });
+        document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } });
+    }, { threshold: 0.15 });
+
+    function load() {
+        fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            var list = (d && d.projekty) || [];
+            if (!list.length) {
+                if (first) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:60px 0;">Pierwsze projekty pojawią się tu lada moment.</div>';
+                return;
+            }
+            var newNames = {};
+            if (!first) {
+                list.forEach(function (p) { if (!known[p.nazwa]) newNames[p.nazwa] = true; });
+                // bez zmian → nie przerysowuj (scroll/lightbox zostają nietknięte)
+                if (!Object.keys(newNames).length && list.length === items.length) return;
+            }
+            items = list;
+            known = {};
+            items.forEach(function (p) { known[p.nazwa] = true; });
+            render(first ? null : newNames);
+            first = false;
+        }).catch(function () { });
+    }
+    load();
+    setInterval(function () { if (!document.hidden) load(); }, REFRESH_MS);
+
+    /* lightbox */
+    var lb = document.getElementById('lb');
+    var lbImg = document.getElementById('lb-img');
+    var lbName = document.getElementById('lb-name');
+    var lbView = document.getElementById('lb-view');
+    var lbP = null, lbV = 0;
+    function paintLb() {
+        var v = lbP.imgs[lbV];
+        lbImg.src = lightImg(v.url, 1600);
+        lbImg.alt = lbP.nazwa + ' — ' + v.label;
+        lbName.textContent = lbP.nazwa;
+        lbView.textContent = v.label + (lbP.imgs.length > 1 ? ' · ' + (lbV + 1) + '/' + lbP.imgs.length : '');
+    }
+    function openLb(p, v) {
+        lbP = p; lbV = v || 0;
+        paintLb();
+        lb.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLb() {
+        lb.classList.remove('is-open');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+    }
+    function stepLb(d) {
+        if (!lbP || lbP.imgs.length < 2) return;
+        lbV = (lbV + d + lbP.imgs.length) % lbP.imgs.length;
+        paintLb();
+    }
+    document.getElementById('lb-x').addEventListener('click', closeLb);
+    document.getElementById('lb-prev').addEventListener('click', function () { stepLb(-1); });
+    document.getElementById('lb-next').addEventListener('click', function () { stepLb(1); });
+    lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
+    document.addEventListener('keydown', function (e) {
+        if (!lb.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeLb();
+        else if (e.key === 'ArrowLeft') stepLb(-1);
+        else if (e.key === 'ArrowRight') stepLb(1);
+    });
+    // swipe na mobile
+    var tx = null;
+    lbImg.addEventListener('touchstart', function (e) { if (e.touches.length === 1) tx = e.touches[0].clientX; }, { passive: true });
+    lbImg.addEventListener('touchend', function (e) {
+        if (tx === null) return;
+        var dx = e.changedTouches[0].clientX - tx;
+        if (Math.abs(dx) > 50) stepLb(dx > 0 ? -1 : 1);
+        tx = null;
+    }, { passive: true });
+
+    /* odświeżanie etykiet czasu co minutę („5 min temu" żyje) */
+    setInterval(function () {
+        grid.querySelectorAll('.card').forEach(function (card) {
+            var p = items.find(function (x) { return x.nazwa === card.getAttribute('data-name'); });
+            if (!p) return;
+            var t = card.querySelector('.card__time');
+            if (t) {
+                t.lastChild.textContent = fmtTime(p.generated_at);
+                t.classList.toggle('is-fresh', isFresh(p.generated_at));
+            }
+        });
+    }, 60000);
+})();
+</script>
+</body>
+</html>
