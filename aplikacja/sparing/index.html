@@ -9,10 +9,10 @@
     <meta name="robots" content="noindex, follow">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
-    <link rel="canonical" href="https://tomekniedzwiecki.pl/stworze/sparing/">
+    <link rel="canonical" href="https://tomekniedzwiecki.pl/aplikacja/sparing/">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tomekniedzwiecki.pl/stworze/sparing/">
+    <meta property="og:url" content="https://tomekniedzwiecki.pl/aplikacja/sparing/">
     <meta property="og:title" content="Aplikacja — zamień pomysł w produkt cyfrowy">
     <meta property="og:description" content="Kilka minut rozmowy, podgląd Twojego narzędzia — a potem wspólna budowa biznesu z Tomkiem.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
@@ -3090,7 +3090,7 @@
     ===================================================== -->
     <div class="side-backdrop" id="side-backdrop" hidden></div>
     <aside class="side" id="side" aria-label="Menu projektu">
-        <a class="side__brand" href="/stworze/">
+        <a class="side__brand" href="/aplikacja/">
             <img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">
             <span>Aplikacja</span>
         </a>
@@ -3195,7 +3195,7 @@
     function sessionKey(sid) { return 'spar_session:' + sid; }
     function messagesKey(sid) { return 'spar_messages:' + sid; }
     function previewKey(sid) { return 'spar_preview:' + sid; } // {images:{view:url}}
-    var DEMO_PREVIEW_URL = '/stworze/sparing/demo-podglad.png'; // ?demo=podglad (statyczny asset w repo)
+    var DEMO_PREVIEW_URL = '/aplikacja/sparing/demo-podglad.png'; // ?demo=podglad (statyczny asset w repo)
     // 4 widoki podglądu — kolejność = kolejność kafelków i nawigacji lightboxa
     var VIEW_META = [
         ['panel', 'Pulpit narzędzia'],
@@ -3676,7 +3676,7 @@
         var isOwner = !!loadJSON(sessionKey(sid));
         function topBar() {
             return '<div class="share__top">' +
-                '<a class="share__brand" href="/stworze/"><img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">Aplikacja</a>' +
+                '<a class="share__brand" href="/aplikacja/"><img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">Aplikacja</a>' +
                 (isOwner ? '<a class="share__owner" href="' + location.pathname + '?id=' + encodeURIComponent(sid) + '">To Twój projekt — wróć do rozmowy</a>' : '') +
                 '</div>';
         }
@@ -3689,7 +3689,7 @@
         function fail(msg) {
             body.innerHTML = topBar() +
                 '<div class="tabpane__empty" style="margin-top:8vh">' + msg + '<br>' +
-                '<a class="preview-retry" href="/stworze/sparing/">Stwórz własny projekt</a></div>';
+                '<a class="preview-retry" href="/aplikacja/sparing/">Stwórz własny projekt</a></div>';
         }
 
         fetch(SPAR_PROJECT_ENDPOINT, {
@@ -3741,8 +3741,8 @@
             html += '<div class="share-cta">' +
                 '<div class="share-cta__t">Ten projekt powstał w kilkanaście minut rozmowy z AI.</div>' +
                 '<p>Opowiadasz o swoim pomyśle — z pracy, z pasji albo z czystej obserwacji — a AI projektuje z Tobą aplikację, pokazuje pierwsze ekrany i mówi wprost, czy to się spina. Za darmo.</p>' +
-                '<a class="side-cta__btn" href="/stworze/sparing/">Stwórz aplikację ze swojego pomysłu</a>' +
-                '<a class="share-cta__more" href="/stworze/">Zobacz, jak działa współpraca z Tomkiem →</a>' +
+                '<a class="side-cta__btn" href="/aplikacja/sparing/">Stwórz aplikację ze swojego pomysłu</a>' +
+                '<a class="share-cta__more" href="/aplikacja/">Zobacz, jak działa współpraca z Tomkiem →</a>' +
                 '</div>';
             body.innerHTML = html;
             var pjDesktop = window.matchMedia('(min-width: 1024px)').matches;

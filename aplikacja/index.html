@@ -8,10 +8,10 @@
     <meta name="description" content="Masz pomysł na aplikację? Buduję ją z moim zespołem, finansuję połowę budżetu, pozyskuję pierwszych 50 płacących klientów — i przekazuję Ci stery gotowego biznesu. Sprawdź pomysł w rozmowie z AI — za darmo.">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
-    <link rel="canonical" href="https://tomekniedzwiecki.pl/stworze/">
+    <link rel="canonical" href="https://tomekniedzwiecki.pl/aplikacja/">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tomekniedzwiecki.pl/stworze/">
+    <meta property="og:url" content="https://tomekniedzwiecki.pl/aplikacja/">
     <meta property="og:title" content="Aplikacja — zbuduję ją na Twoim pomyśle i oddam Ci stery">
     <meta property="og:description" content="Aplikacja na Twój pomysł. Buduję, finansuję połowę, pozyskuję 50 pierwszych klientów — potem przejmujesz rozkręcony biznes. Sprawdź pomysł w rozmowie z AI.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
@@ -628,7 +628,7 @@ img { max-width: 100%; display: block; }
         <a href="#projekty">Projekty</a>
         <a href="#spolecznosc">Społeczność</a>
         <a href="#faq">FAQ</a>
-        <a class="nav__cta" href="/stworze/sparing/" data-cta>Zacznij rozmowę</a>
+        <a class="nav__cta" href="/aplikacja/sparing/" data-cta>Zacznij rozmowę</a>
     </div>
 </nav>
 
@@ -641,7 +641,7 @@ img { max-width: 100%; display: block; }
         połowę budżetu i <strong>15 lat budowania biznesów online</strong>. Buduję aplikację, osobiście
         pozyskuję pierwszych 50 płacących klientów — i przekazuję Ci rozkręcony biznes.</p>
         <div class="hero__ctas">
-            <a class="btn" href="/stworze/sparing/" data-cta>Sprawdź swój pomysł z AI <span class="arr">→</span></a>
+            <a class="btn" href="/aplikacja/sparing/" data-cta>Sprawdź swój pomysł z AI <span class="arr">→</span></a>
             <a class="btn btn--ghost" href="#proces">Jak to działa</a>
         </div>
         <p class="hero__note"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy, a zobaczysz pierwsze ekrany swojego narzędzia.</p>
@@ -720,7 +720,7 @@ img { max-width: 100%; display: block; }
                     <b id="show-url-name"></b>
                 </span>
             </div>
-            <a class="show__screen" id="show-screen" href="/stworze/sparing/" data-cta aria-label="Zobacz przykładową aplikację i zacznij własną rozmowę"></a>
+            <a class="show__screen" id="show-screen" href="/aplikacja/sparing/" data-cta aria-label="Zobacz przykładową aplikację i zacznij własną rozmowę"></a>
         </div>
     </div>
     <p class="feed__note">Pełne ekrany wygenerowane w prawdziwych rozmowach — bez danych ich autorów.</p>
@@ -821,7 +821,7 @@ img { max-width: 100%; display: block; }
 <section class="final">
     <h2>Zbuduję ją z<br><span class="cycler" id="cycler">Tobą.</span></h2>
     <p>Księgowa, groomerka, trener, architekt — albo po prostu ktoś z pomysłem. Każdy może mieć aplikację, za którą inni płacą co miesiąc. Sprawdź swoją w kilkanaście minut.</p>
-    <a class="btn" href="/stworze/sparing/" data-cta>Zaczynam rozmowę z AI <span class="arr">→</span></a>
+    <a class="btn" href="/aplikacja/sparing/" data-cta>Zaczynam rozmowę z AI <span class="arr">→</span></a>
     <div class="final__micro">Bez karty. Bez zobowiązań. Pierwsze ekrany zobaczysz dziś.</div>
 </section>
 
@@ -830,7 +830,7 @@ img { max-width: 100%; display: block; }
     <div class="footer__links">
         <a href="https://tomekniedzwiecki.pl/zbuduje/">Zbuduję</a>
         <a href="https://tomekniedzwiecki.pl/zwolnie/">Zwolnię</a>
-        <a href="/stworze/regulamin/">Regulamin rezerwacji</a>
+        <a href="/aplikacja/regulamin/">Regulamin rezerwacji</a>
     </div>
 </footer>
 
@@ -847,8 +847,8 @@ img { max-width: 100%; display: block; }
     /* ── Query passthrough: ?p= itd. wędrują do sparingu ── */
     var q = location.search;
     if (q) {
-        document.querySelectorAll('a[href="/stworze/sparing/"]').forEach(function (a) {
-            a.href = '/stworze/sparing/' + q;
+        document.querySelectorAll('a[href="/aplikacja/sparing/"]').forEach(function (a) {
+            a.href = '/aplikacja/sparing/' + q;
         });
     }
 
@@ -891,7 +891,7 @@ img { max-width: 100%; display: block; }
     document.querySelectorAll('[data-count]').forEach(function (el) { cio.observe(el); });
 
     /* ── Hero: animowany czat (loop) ── */
-    var DEMO_IMG = '/stworze/sparing/demo-podglad.png'; // lokalny asset (fallback, gdy feed pusty)
+    var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png'; // lokalny asset (fallback, gdy feed pusty)
     var SCRIPT = [
         { who: 'user', text: 'Prowadzę salon groomerski. Klienci notorycznie zapominają o wizytach…' },
         { who: 'ai', text: 'Czyli puste okienka w grafiku i SMS-y wysyłane ręcznie wieczorami. Kto u Ciebie pilnuje rezerwacji?' },
@@ -1029,7 +1029,7 @@ img { max-width: 100%; display: block; }
         });
 
         section.querySelectorAll('[data-cta]').forEach(function (a) {
-            if (q) a.href = '/stworze/sparing/' + q;
+            if (q) a.href = '/aplikacja/sparing/' + q;
         });
     }).catch(function () { });
 
