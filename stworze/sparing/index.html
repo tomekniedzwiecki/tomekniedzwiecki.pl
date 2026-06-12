@@ -160,6 +160,8 @@
         flex-direction: column;
         height: 100vh;
         height: 100dvh;
+        /* klawiatura ekranowa: visualViewport ustawia --vvh, composer zostaje widoczny */
+        height: var(--vvh, 100dvh);
         flex: 1;
         min-width: 0;
     }
@@ -337,6 +339,7 @@
         border-radius: 999px;
         font-size: 13px;
         font-weight: 800;
+        white-space: nowrap;
         color: #061320;
         background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 50%, var(--accent-2) 100%);
         box-shadow: 0 8px 26px -10px rgba(77, 159, 255, 0.55);
@@ -2462,7 +2465,7 @@
             <div class="side-cta" id="side-cta" hidden>
                 <div class="side-cta__t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Karta projektu gotowa</div>
                 <div class="side-cta__d">Zarezerwuj wspólną rozmowę — Tomek przygotuje plan przedsięwzięcia i odezwie się osobiście. 500 zł, w pełni zwrotne.</div>
-                <a class="side-cta__btn" id="side-cta-btn" href="#" target="_blank" rel="noopener">Rezerwuję rozmowę → 500 zł</a>
+                <a class="side-cta__btn" id="side-cta-btn" href="#" target="_blank" rel="noopener">Rezerwuję → 500 zł</a>
             </div>
             <p class="side__note">AI Tomka Niedźwieckiego — zbiera fundamenty projektu, dalej rozmawiasz z Tomkiem osobiście.</p>
         </div>
@@ -4615,6 +4618,21 @@
         });
         el('btn-side').addEventListener('click', openSide);
         el('side-backdrop').addEventListener('click', closeSide);
+
+        // Klawiatura ekranowa (iOS/Android): layout kurczy się do realnie
+        // widocznego viewportu, composer nie znika pod klawiaturą
+        if (window.visualViewport) {
+            var vv = window.visualViewport;
+            var onVV = function () {
+                document.documentElement.style.setProperty('--vvh', vv.height + 'px');
+                scrollToBottom(false);
+            };
+            vv.addEventListener('resize', onVV);
+            onVV();
+        }
+        ta.addEventListener('focus', function () {
+            setTimeout(function () { scrollToBottom(true); }, 300);
+        });
     }
 
     // Migracja starych pojedynczych kluczy LS na format listy rozmów
