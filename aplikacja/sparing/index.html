@@ -22,6 +22,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+    <!-- Supabase Auth (konta: Google / Facebook / kod e-mail) — trwała sesja w localStorage -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
     /* ============================================================
@@ -1030,6 +1032,218 @@
     .pj-wait__txt b { display: block; font-size: 13.5px; color: var(--text-strong); }
     .pj-wait__txt span { font-size: 12px; color: var(--text-muted); }
     .pj-wait--fail { border-style: solid; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .pj-wait--tile { margin-top: 0; min-height: 120px; }
+
+    /* ── Sekcja „Twoja marka": sklep + telefon + działająca strona ── */
+    .pj-brand {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+    }
+    @media (max-width: 700px) { .pj-brand { grid-template-columns: 1fr; } }
+    .pj-brand .pv-tile { cursor: zoom-in; }
+    .pj-land {
+        margin-top: 16px;
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .pj-land__bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .pj-land__dots { display: inline-flex; gap: 5px; }
+    .pj-land__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); }
+    .pj-land__addr {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 8px;
+        padding: 5px 10px;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .pj-land__addr svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .pj-land__open {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--accent);
+        text-decoration: none;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(77, 159, 255, 0.35);
+    }
+    .pj-land__open:hover { background: rgba(77, 159, 255, 0.12); }
+    .pj-land__frame {
+        display: block;
+        position: relative;
+        aspect-ratio: 16 / 10;
+        background: #fff;
+    }
+    .pj-land__frame iframe {
+        width: 200%;
+        height: 200%;
+        border: 0;
+        transform: scale(0.5);
+        transform-origin: 0 0;
+        pointer-events: none; /* podgląd — klik otwiera pełny ekran */
+    }
+    .pj-land__note {
+        padding: 10px 14px;
+        font-size: 12px;
+        color: var(--text-muted);
+        border-top: 1px solid var(--glass-border);
+    }
+    .share-land {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 16px;
+        padding: 16px 18px;
+        border: 1px solid rgba(77, 159, 255, 0.35);
+        border-radius: 16px;
+        text-decoration: none;
+        color: inherit;
+        background: rgba(77, 159, 255, 0.07);
+        transition: background 0.15s ease;
+    }
+    .share-land:hover { background: rgba(77, 159, 255, 0.14); }
+    .share-land svg { width: 26px; height: 26px; color: var(--accent); flex-shrink: 0; }
+    .share-land span { flex: 1; min-width: 0; }
+    .share-land b { display: block; font-size: 14.5px; color: var(--text-strong); }
+    .share-land small { font-size: 12px; color: var(--text-muted); }
+    .share-land em { font-style: normal; font-size: 18px; color: var(--accent); }
+
+    /* ── Zakładka „Potencjał rynku" (raport z web-searchu) ── */
+    .rk-verdict {
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        padding: 20px 22px;
+        margin-bottom: 22px;
+        background: linear-gradient(135deg, rgba(77, 159, 255, 0.08), rgba(255, 255, 255, 0.02));
+    }
+    .rk-verdict__badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        border: 1px solid rgba(77, 159, 255, 0.4);
+        border-radius: 99px;
+        padding: 4px 12px;
+        margin-bottom: 12px;
+    }
+    .rk-verdict--wysoki .rk-verdict__badge { color: #5dd39e; border-color: rgba(93, 211, 158, 0.45); }
+    .rk-verdict__teza { font-size: 16px; line-height: 1.55; color: var(--text-strong); font-weight: 600; }
+    .rk-verdict__why { margin-top: 8px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .rk-market {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 20px;
+        align-items: center;
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 18px 20px;
+    }
+    @media (max-width: 700px) { .rk-market { grid-template-columns: 1fr; gap: 10px; } }
+    .rk-market__num { font-size: clamp(26px, 4vw, 38px); font-weight: 800; color: var(--text-strong); line-height: 1.1; white-space: nowrap; }
+    .rk-market__num span { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 4px; white-space: normal; max-width: 220px; }
+    .rk-market__desc { font-size: 13px; color: var(--text-soft, var(--text-muted)); line-height: 1.65; }
+    .rk-comps { display: flex; flex-direction: column; gap: 10px; }
+    .rk-comp {
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+    .rk-comp__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .rk-comp__top b { font-size: 14.5px; color: var(--text-strong); }
+    .rk-comp__kraj {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+        border: 1px solid var(--glass-border);
+        border-radius: 99px;
+        padding: 2px 9px;
+    }
+    .rk-comp__price { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--text-strong); white-space: nowrap; }
+    .rk-comp__what { margin-top: 7px; font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+    .rk-comp__gap { margin-top: 7px; font-size: 12.5px; color: #5dd39e; line-height: 1.55; }
+    .rk-comp__gap::before { content: '→ '; font-weight: 700; }
+    .rk-gap {
+        border: 1px solid rgba(77, 159, 255, 0.4);
+        border-radius: 18px;
+        padding: 20px 22px;
+        margin: 26px 0;
+        background: rgba(77, 159, 255, 0.06);
+    }
+    .rk-gap__t {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+    }
+    .rk-gap__t svg { width: 17px; height: 17px; }
+    .rk-gap p { font-size: 14px; line-height: 1.7; color: var(--text-strong); }
+    .rk-trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 700px) { .rk-trends { grid-template-columns: 1fr; } }
+    .rk-trend { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; }
+    .rk-trend b { font-size: 13.5px; color: var(--text-strong); }
+    .rk-trend p { margin-top: 6px; font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+    .rk-means { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .rk-means li {
+        position: relative;
+        padding-left: 26px;
+        font-size: 13.5px;
+        color: var(--text-soft, var(--text-muted));
+        line-height: 1.6;
+    }
+    .rk-means li::before { content: '✓'; position: absolute; left: 2px; top: 0; color: #5dd39e; font-weight: 800; }
+    .rk-warn {
+        border: 1px dashed var(--glass-border);
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin-top: 22px;
+    }
+    .rk-warn__t { font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .rk-warn ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .rk-warn li { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; padding-left: 14px; position: relative; }
+    .rk-warn li::before { content: '–'; position: absolute; left: 0; }
+    .rk-refs { display: inline-flex; gap: 3px; margin-left: 5px; vertical-align: super; }
+    .rk-ref {
+        font-size: 9.5px;
+        font-weight: 700;
+        color: var(--accent);
+        text-decoration: none;
+        border: 1px solid rgba(77, 159, 255, 0.35);
+        border-radius: 5px;
+        padding: 0 4px;
+        line-height: 1.5;
+    }
+    .rk-ref:hover { background: rgba(77, 159, 255, 0.15); }
+    .rk-srcs { margin: 10px 0 0 18px; display: flex; flex-direction: column; gap: 6px; }
+    .rk-srcs li { font-size: 12px; color: var(--text-muted); }
+    .rk-srcs a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; word-break: break-all; }
+    .rk-srcs a:hover { color: var(--accent); }
 
     /* Widok udostępnionego projektu (?projekt=<id>) — read-only wizytówka:
        bez czatu i sidebara, dane z serwera, na dole CTA „stwórz własny” */
@@ -2132,6 +2346,85 @@
     }
     .gate-oauth-done svg { width: 15px; height: 15px; color: var(--green, #00d97e); flex-shrink: 0; }
 
+    /* ── Konto: przycisk w top barze + modal logowania ── */
+    .auth-top { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .auth-top__login {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 7px 14px; border-radius: 999px; cursor: pointer;
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+        color: inherit; font: inherit; font-size: 13.5px; font-weight: 600;
+        transition: background .15s, border-color .15s;
+    }
+    .auth-top__login:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.28); }
+    .auth-top__login svg { width: 15px; height: 15px; }
+    .auth-top__user {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 5px 12px 5px 5px; border-radius: 999px; cursor: pointer;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+        color: inherit; font: inherit; font-size: 13px; font-weight: 600; max-width: 200px;
+    }
+    .auth-top__user:hover { background: rgba(255,255,255,0.09); }
+    .auth-top__avatar {
+        width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #2d6cdf, #6d4ddf); color: #fff;
+        font-size: 12px; font-weight: 800; font-style: normal;
+    }
+    .auth-top__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .auth-top__menu {
+        position: absolute; top: 54px; right: 12px; z-index: 60; min-width: 210px;
+        background: var(--card, #15161c); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 14px; padding: 6px; box-shadow: 0 18px 50px rgba(0,0,0,0.5);
+    }
+    .auth-top__menu button {
+        display: flex; align-items: center; gap: 9px; width: 100%;
+        padding: 10px 12px; border: 0; background: none; border-radius: 9px;
+        color: inherit; font: inherit; font-size: 13.5px; cursor: pointer; text-align: left;
+    }
+    .auth-top__menu button:hover { background: rgba(255,255,255,0.07); }
+    .auth-top__menu svg { width: 15px; height: 15px; opacity: .7; }
+
+    .auth-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 18px; }
+    .auth-modal[hidden] { display: none; }
+    .auth-modal__backdrop { position: absolute; inset: 0; background: rgba(5,6,10,0.72); backdrop-filter: blur(6px); }
+    .auth-modal__card {
+        position: relative; width: 100%; max-width: 420px;
+        background: var(--card, #15161c); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 20px; padding: 28px 26px 22px;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+        animation: authIn .22s ease both;
+    }
+    @keyframes authIn { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+    .auth-modal__close {
+        position: absolute; top: 14px; right: 14px; width: 32px; height: 32px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 9px; border: 1px solid rgba(255,255,255,0.12);
+        background: none; color: inherit; cursor: pointer; opacity: .7;
+    }
+    .auth-modal__close:hover { opacity: 1; }
+    .auth-modal__close svg { width: 15px; height: 15px; }
+    .auth-modal__title { margin: 0 0 6px; font-size: 21px; font-weight: 800; letter-spacing: -0.01em; }
+    .auth-modal__sub { margin: 0 0 18px; font-size: 13.5px; opacity: .75; line-height: 1.5; }
+    .auth-modal__note { margin: 16px 0 0; font-size: 11.5px; opacity: .5; line-height: 1.5; }
+    .auth-modal .gate-oauth-row { margin-top: 0; grid-template-columns: 1fr; }
+    .auth-otp-sent { font-size: 13px; line-height: 1.5; opacity: .85; margin: 0 0 10px; }
+    .auth-error { font-size: 12.5px; color: #ff7a7a; margin: 8px 0 0; display: none; }
+    .auth-error.is-shown { display: block; }
+
+    /* Pasek „masz konto — wróć do rozmów" na ekranie startowym */
+    .auth-banner {
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        flex-wrap: wrap; margin: 0 auto 14px; max-width: 560px;
+        padding: 10px 16px; border-radius: 999px;
+        background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.1);
+        font-size: 13px; opacity: .92;
+    }
+    .auth-banner[hidden] { display: none; }
+    .auth-banner button {
+        border: 0; background: none; color: var(--accent, #6ea8ff); font: inherit;
+        font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+    }
+
     .f-row { display: flex; flex-direction: column; gap: 14px; }
     .f-row--two { display: grid; grid-template-columns: 1fr 1.4fr; gap: 12px; }
     @media (max-width: 540px) { .f-row--two { grid-template-columns: 1fr; } }
@@ -3113,6 +3406,11 @@
                 Twój projekt
                 <i class="side__dot" id="dot-projekt" hidden></i>
             </button>
+            <button type="button" class="side__item" data-tab="rynek">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
+                Potencjał rynku
+                <i class="side__dot" id="dot-rynek" hidden></i>
+            </button>
             <button type="button" class="side__item" data-tab="wspolpraca">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17a5 5 0 0 1-5 5H3v-3a5 5 0 0 1 5-5"></path><path d="M13 7a5 5 0 0 1 5-5h3v3a5 5 0 0 1-5 5"></path><path d="M8 16l8-8"></path></svg>
                 Współpraca
@@ -3140,6 +3438,7 @@
                 <span>Aplikacja</span>
             </div>
             <span class="chat-top__spacer" aria-hidden="true"></span>
+            <div class="auth-top" id="auth-top"></div>
         </header>
 
         <div class="chat-scroll" id="chat-scroll">
@@ -3147,6 +3446,9 @@
         </div>
 
         <div class="chat-composer" id="composer">
+            <div class="auth-banner" id="auth-banner" hidden>
+                Masz już konto? <button type="button" id="auth-banner-btn">Zaloguj się i wróć do swoich rozmów →</button>
+            </div>
             <div class="composer__inner">
                 <div class="composer__bar">
                     <span class="composer__spark" aria-hidden="true"></span>
@@ -3163,10 +3465,25 @@
         </div>
         <div class="chat-locked" id="chat-locked" hidden><span id="chat-locked-text"></span></div>
 
-        <!-- Zakładki projektu (projekt = karta + ekrany / współpraca) -->
+        <!-- Zakładki projektu (projekt = karta + ekrany / potencjał rynku / współpraca) -->
         <div class="tabpane" id="pane-projekt"><div class="tabpane__inner" id="pane-projekt-body"></div></div>
+        <div class="tabpane" id="pane-rynek"><div class="tabpane__inner" id="pane-rynek-body"></div></div>
         <div class="tabpane" id="pane-wspolpraca"><div class="tabpane__inner" id="pane-wspolpraca-body"></div></div>
     </section>
+
+    <!-- Modal logowania / zakładania konta (Google / Facebook / kod e-mail) -->
+    <div class="auth-modal" id="auth-modal" hidden>
+        <div class="auth-modal__backdrop" id="auth-modal-backdrop"></div>
+        <div class="auth-modal__card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+            <button type="button" class="auth-modal__close" id="auth-modal-close" aria-label="Zamknij">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+            <h2 class="auth-modal__title" id="auth-modal-title">Zaloguj się</h2>
+            <p class="auth-modal__sub" id="auth-modal-sub">Wróć do swoich rozmów i projektów — na każdym urządzeniu.</p>
+            <div class="auth-modal__body" id="auth-modal-body"></div>
+            <p class="auth-modal__note">Konto służy wyłącznie Twoim projektom w tej aplikacji. Zero newslettera.</p>
+        </div>
+    </div>
 
 </main>
 
@@ -3181,10 +3498,17 @@
     var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
     var SPAR_PROJECT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-project';
     var SPAR_PLAN_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-plan';
+    var SPAR_RAPORT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-raport';
+    var SPAR_LANDING_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-landing';
     var SB_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Rezerwacja współpracy — Aplikacja" (500 zł, zwrotne)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
+    // Cloudflare Turnstile (anty-bot na pierwszą wiadomość bez konta).
+    // Pusty sitekey = wyłączony; po założeniu widgetu w Cloudflare wpisać klucz
+    // tu ORAZ TURNSTILE_SECRET_KEY w sekretach Supabase Edge Functions.
+    var TURNSTILE_SITEKEY = '';
+    var LS_HAS_ACCOUNT = 'spar_has_account'; // '1' = ktoś na tym urządzeniu logował się kiedyś
 
     // Multi-rozmowy: stan każdej rozmowy żyje pod kluczem per-sesja,
     // indeks rozmów w LS_INDEX, aktywna w LS_ACTIVE (max CONVOS_MAX darmowych)
@@ -3206,6 +3530,12 @@
     // Infografika karty — osobny widok spar-image: nie wchodzi do VIEW_META
     // (pętle ekranów/skeletonów/limitów jej nie dotyczą), sync i archiwum tak
     var SUMMARY_META = ['podsumowanie', 'Projekt w pigułce'];
+    // Zestaw „marka istnieje" — widoki extra spar-image (poza pulą ekranów),
+    // generowane po zielonym werdykcie do sekcji „Twoja marka"
+    var BRAND_META = [
+        ['sklep', 'Twoja aplikacja w sklepie'],
+        ['telefon', 'W rękach klienta']
+    ];
     function viewLabel(v) {
         for (var i = 0; i < VIEW_META.length; i++) if (VIEW_META[i][0] === v) return VIEW_META[i][1];
         return 'Podgląd';
@@ -3277,19 +3607,23 @@
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
         editPending: false,     // runda poprawki w toku (kliknięto „Poprawiam projekt", czekamy na nowy werdykt)
         bizplan: null,          // wstępny plan przychodu z spar-plan (JSON; liczony po zielonym werdykcie)
+        raport: null,           // raport potencjału rynku z spar-raport (web search; po zielonym werdykcie)
+        landingUrl: null,       // adres działającej strony narzędzia (spar-landing → /aplikacja/podglad/)
         phone: null,            // telefon z bramki rejestracji (Tomek dzwoni po rezerwacji)
         authUserId: null,       // Supabase Auth user id (rejestracja Google/Facebook)
         authProvider: null      // 'google' | 'facebook' | null
     };
     // Dane z powrotu OAuth (implicit flow) — czekają na bramkę z telefonem
     var pendingAuth = null; // {userId, provider, email, name}
-    // Dogrywane elementy karty (pigułka graficzna + plan przychodu):
+    // Dogrywane elementy projektu (pigułka, plan, raport rynku, marka, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', sklep: 'idle', telefon: 'idle', landing: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
     var pjNewPlan = false;
+    // Kropka na zakładce „Potencjał rynku", gdy raport policzył się w tle
+    var rkNew = false;
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -3334,7 +3668,9 @@
             lastBrief: state.lastBrief || null,
             editsUsed: state.editsUsed || 0,
             editPending: !!state.editPending,
-            bizplan: state.bizplan || null
+            bizplan: state.bizplan || null,
+            raport: state.raport || null,
+            landingUrl: state.landingUrl || null
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -3418,9 +3754,16 @@
         state.editsUsed = saved.editsUsed || 0;
         state.editPending = !!saved.editPending;
         state.bizplan = saved.bizplan || null;
+        state.raport = saved.raport || null;
+        state.landingUrl = saved.landingUrl || null;
         extras.summary = 'idle';
         extras.plan = 'idle';
+        extras.raport = 'idle';
+        extras.sklep = 'idle';
+        extras.telefon = 'idle';
+        extras.landing = 'idle';
         pjNewPlan = false;
+        rkNew = false;
         state.previews = {};
         state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
@@ -3438,16 +3781,33 @@
         });
     }
     // Ekrany i archiwum z SERWERA (źródło prawdy) — localStorage bywa w tyle,
-    // gdy generacje szły ze starszej karty albo z innego urządzenia
+    // gdy generacje szły ze starszej karty albo z innego urządzenia.
+    // Z JWT właściciela serwer zwraca też pełną historię rozmowy (d.historia) —
+    // odtwarzamy ją, gdy lokalnie mamy mniej (zalogowany wrócił na innym urządzeniu).
+    var historySynced = {}; // sid -> true (odtworzenie historii tylko raz na wejście)
     function syncProjectFromServer() {
         if (!state.sessionId) return;
         var sid = state.sessionId;
         fetch(SPAR_PROJECT_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, action: 'get' })
         }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
             if (!d || !d.projekt || state.sessionId !== sid) return;
+            if (Array.isArray(d.historia) && !historySynced[sid]) {
+                var localReal = messages.filter(function (m) { return !m.local; }).length;
+                if (d.historia.length > localReal) {
+                    historySynced[sid] = true;
+                    var opener = (messages.length && messages[0].local && messages[0].role === 'assistant') ? [messages[0]] : [];
+                    messages = opener.concat(d.historia.map(function (m) {
+                        return { role: m.role === 'user' ? 'user' : 'assistant', content: String(m.content || '') };
+                    }));
+                    saveMessages();
+                    enterChat(true);
+                    return; // enterChat woła syncProjectFromServer ponownie — obrazy dociągną się tam
+                }
+                historySynced[sid] = true;
+            }
             var p = d.projekt;
             var changed = false;
             function archive(view, u) {
@@ -3459,7 +3819,7 @@
                 }
             }
             if (p.preview_images && typeof p.preview_images === 'object') {
-                VIEW_META.concat([SUMMARY_META]).forEach(function (vm) {
+                VIEW_META.concat([SUMMARY_META], BRAND_META).forEach(function (vm) {
                     var v = vm[0];
                     var su = p.preview_images[v];
                     if (typeof su === 'string' && state.previews[v] !== su) {
@@ -3468,6 +3828,19 @@
                         changed = true;
                     }
                 });
+            }
+            if (p.market_report && typeof p.market_report === 'object'
+                && JSON.stringify(p.market_report) !== JSON.stringify(state.raport)) {
+                state.raport = p.market_report;
+                if (activeTab !== 'rynek') rkNew = true;
+                persistSession();
+                changed = true;
+            }
+            if (typeof p.landing_url === 'string' && p.landing_url && p.landing_url !== state.landingUrl) {
+                state.landingUrl = p.landing_url;
+                extras.landing = 'idle';
+                persistSession();
+                changed = true;
             }
             if (p.business_plan && typeof p.business_plan === 'object'
                 && JSON.stringify(p.business_plan) !== JSON.stringify(state.bizplan)) {
@@ -3486,6 +3859,7 @@
                 updateSideBadges();
                 updateConvoMeta();
                 if (activeTab === 'projekt') renderPaneProjekt();
+                if (activeTab === 'rynek') renderPaneRynek();
             }
         }).catch(function () { });
     }
@@ -3564,10 +3938,11 @@
         });
         var isPane = tab !== 'chat';
         el('view-chat').classList.toggle('is-pane', isPane);
-        ['projekt', 'wspolpraca'].forEach(function (t) {
+        ['projekt', 'rynek', 'wspolpraca'].forEach(function (t) {
             el('pane-' + t).classList.toggle('is-active', tab === t);
         });
         if (tab === 'projekt') { renderPaneProjekt(); el('dot-projekt').hidden = true; }
+        if (tab === 'rynek') { renderPaneRynek(); rkNew = false; el('dot-rynek').hidden = true; }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
         if (tab === 'chat') scrollToBottom(true);
         setTabHash(tab === 'chat' ? '' : tab);
@@ -3582,7 +3957,7 @@
         } catch (e) { }
     }
     function applyHashTab() {
-        var m = (location.hash || '').slice(1).match(/^(projekt|wspolpraca)(?:-(ekrany|karta|plan))?$/);
+        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|marka|karta|plan))?$/);
         if (!m) return;
         switchTab(m[1]); // nadpisze hash samą zakładką…
         if (m[1] === 'projekt' && m[2]) {
@@ -3598,6 +3973,7 @@
         // kropka = jest nowa zawartość, a user nie patrzy na tę zakładkę
         var hasProjekt = (state.verdict === 'zielony' && !!state.karta) || lightboxItems().length > 0;
         el('dot-projekt').hidden = !(hasProjekt && activeTab !== 'projekt');
+        el('dot-rynek').hidden = !(state.raport && rkNew && activeTab !== 'rynek');
         var cta = el('side-cta');
         var show = state.verdict === 'zielony';
         if (show && cta.hidden) cta.classList.add('is-in'); // animacja momentu odblokowania
@@ -3728,6 +4104,22 @@
                         '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
+            // Marka (sklep + telefon) i działająca strona — jeśli już istnieją
+            var brandTiles = '';
+            BRAND_META.forEach(function (vm) {
+                var burl = state.previews[vm[0]];
+                if (!burl) return;
+                brandTiles += '<div class="pv-tile is-done" data-burl="' + esc(burl) + '" data-blabel="' + esc(vm[1]) + '">' +
+                    '<span class="pv-tile__label">' + esc(vm[1]) + '</span>' +
+                    '<div class="pv-tile__body"><img src="' + esc(burl) + '" alt="' + esc(vm[1]) + '" loading="lazy"></div></div>';
+            });
+            if (brandTiles) html += '<div class="pj-brand">' + brandTiles + '</div>';
+            if (pr.landing_url) {
+                html += '<a class="share-land" href="' + esc(pr.landing_url) + '" target="_blank" rel="noopener">' +
+                    pjIco('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>') +
+                    '<span><b>Zobacz działającą stronę narzędzia</b><small>prawdziwa strona w przeglądarce — nie grafika</small></span>' +
+                    '<em aria-hidden="true">↗</em></a>';
+            }
             if (k) html += kartaGridHTML(k, '');
             if (!items.length && !k) {
                 fail('Ten projekt nie jest jeszcze gotowy albo link jest nieaktualny.');
@@ -3752,6 +4144,7 @@
             body.querySelectorAll('.pv-tile').forEach(function (t) {
                 t.addEventListener('click', function () {
                     if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
+                    else if (t.dataset.burl !== undefined) openLightbox({ url: t.dataset.burl, label: t.dataset.blabel || 'Twoja marka' });
                     else openLightbox(t.dataset.view);
                 });
             });
@@ -3837,7 +4230,9 @@
         fetch(SPAR_IMAGE_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
-            body: JSON.stringify({ sessionId: sid, view: SUMMARY_META[0] })
+            // force w body: bez niego serwer zwraca istniejącą pigułkę z cache
+            // (ochrona przed wyścigiem ensure↔sync na czystym urządzeniu)
+            body: JSON.stringify({ sessionId: sid, view: SUMMARY_META[0], force: !!force })
         }).then(function (r) {
             return r.json().then(function (d) { return { ok: r.ok, d: d }; });
         }).then(function (res) {
@@ -3891,9 +4286,145 @@
         });
     }
 
+    // Raport potencjału rynku — realny web search po stronie spar-raport
+    // (1-2 min); generuje się raz, kolejne wejścia czytają zapisany
+    function ensureRaport(force) {
+        if (extras.raport === 'gen') return;
+        if (!force && state.raport) return;
+        if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
+        extras.raport = 'gen';
+        var sid = state.sessionId;
+        if (activeTab === 'rynek') renderPaneRynek();
+        fetch(SPAR_RAPORT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, force: !!force })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.raport) {
+                state.raport = res.d.raport;
+                persistSession();
+                extras.raport = 'idle';
+                if (activeTab !== 'rynek') rkNew = true;
+            } else {
+                extras.raport = 'fail';
+            }
+            updateSideBadges();
+            if (activeTab === 'rynek') renderPaneRynek();
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.raport = 'fail';
+            if (activeTab === 'rynek') renderPaneRynek();
+        });
+    }
+
+    // Zestaw „marka istnieje": sklep + telefon (widoki extra spar-image).
+    // Generują się raz po werdykcie; brak regeneracji przy poprawkach
+    // (limit 3 wersji/widok po stronie serwera — szkoda puli na automat).
+    function ensureBrandImage(view) {
+        if (extras[view] === 'gen' || state.previews[view]) return;
+        if (state.verdict !== 'zielony' || !state.sessionId) return;
+        extras[view] = 'gen';
+        var sid = state.sessionId;
+        fetch(SPAR_IMAGE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, view: view })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.url) {
+                state.previews[view] = res.d.url;
+                saveJSON(previewKey(sid), { images: state.previews, history: state.previewHistory });
+                extras[view] = 'idle';
+            } else {
+                extras[view] = (res.d && res.d.error === 'limit_podsumowan') ? 'idle' : 'fail';
+            }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras[view] = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
+    // Działająca strona narzędzia: spar-landing odpowiada 202 i buduje w tle
+    // (1-4 min) — gotowość poznajemy po landing_url w spar-project (poll)
+    function ensureLanding() {
+        if (extras.landing === 'gen' || state.landingUrl) return;
+        if (state.verdict !== 'zielony' || !state.sessionId) return;
+        extras.landing = 'gen';
+        var sid = state.sessionId;
+        function pollReady(triesLeft) {
+            if (state.sessionId !== sid) return;
+            if (triesLeft <= 0) {
+                // generacja mogła się udać po naszym oknie — sync dociągnie URL
+                extras.landing = 'fail';
+                if (activeTab === 'projekt') renderPaneProjekt();
+                return;
+            }
+            setTimeout(function () {
+                if (state.sessionId !== sid) return;
+                fetch(SPAR_PROJECT_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    body: JSON.stringify({ sessionId: sid, action: 'get' })
+                }).then(function (r) { return r.json(); }).then(function (d) {
+                    if (state.sessionId !== sid) return;
+                    var url = d && d.projekt && d.projekt.landing_url;
+                    if (typeof url === 'string' && url) {
+                        state.landingUrl = url;
+                        extras.landing = 'idle';
+                        persistSession();
+                        if (activeTab === 'projekt') renderPaneProjekt();
+                    } else {
+                        pollReady(triesLeft - 1);
+                    }
+                }).catch(function () { pollReady(triesLeft - 1); });
+            }, 20000);
+        }
+        fetch(SPAR_LANDING_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; });
+        }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.status === 'exists' && res.d.viewUrl) {
+                // strona już istnieje (powrót na czystym urządzeniu) — bez budowy
+                state.landingUrl = res.d.viewUrl;
+                extras.landing = 'idle';
+                persistSession();
+                if (activeTab === 'projekt') renderPaneProjekt();
+            } else if (res.ok && res.d && res.d.status === 'started') {
+                pollReady(15); // ~5 min okna na generację
+            } else if (res.status === 429) {
+                // limit — jeśli strona istnieje, sync przyniesie landing_url
+                extras.landing = 'idle';
+            } else {
+                extras.landing = 'fail';
+                if (activeTab === 'projekt') renderPaneProjekt();
+            }
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.landing = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
     function ensureKartaExtras(force) {
         ensureSummaryImage(force);
         ensureBizplan(force);
+        // raport / marka / strona: generują się raz (bez force przy poprawkach —
+        // rynek się nie zmienia, a brand i landing mają twarde limity wersji)
+        ensureRaport(false);
+        ensureBrandImage('sklep');
+        ensureBrandImage('telefon');
+        ensureLanding();
     }
 
     function fmtZl(n) {
@@ -4092,6 +4623,7 @@
         // płynnie przewija do sekcji.
         var hasShots = items.length > 0 || oldShots.length > 0;
         var hasPlanSec = hasKarta && state.verdict === 'zielony';
+        var hasBrandSec = state.verdict === 'zielony';
 
         // Generacje planu i pigułki startują od razu (niezależnie od scrolla)
         if (hasPlanSec) ensureKartaExtras(false);
@@ -4100,11 +4632,12 @@
         // ekranów w tle, kwota planu na wierzchu. Klik = płynny scroll.
         var NAV_ICONS = {
             ekrany: '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
+            marka: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path>',
             karta: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
             plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>'
         };
         var GO_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M19 12l-7 7-7-7"></path></svg>';
-        var secCount = (hasShots ? 1 : 0) + 1 + (hasPlanSec ? 1 : 0);
+        var secCount = (hasShots ? 1 : 0) + (hasBrandSec ? 1 : 0) + 1 + (hasPlanSec ? 1 : 0);
         if (secCount > 1) {
             var cards = '';
             if (hasShots) {
@@ -4114,6 +4647,14 @@
                     '<span class="pj-card__ico">' + pjIco(NAV_ICONS.ekrany) + '</span>' +
                     '<span class="pj-card__go">' + GO_ICON + '</span>' +
                     '<b>Ekrany narzędzia</b><span>' + (items.length ? items.length + ' ' + (items.length === 1 ? 'widok' : 'widoki') : 'wcześniejsze wersje') + '</span></button>';
+            }
+            if (hasBrandSec) {
+                var brandThumb = state.previews.sklep || state.previews.telefon || '';
+                cards += '<button type="button" class="pj-card" data-anchor="pjsec-marka"' +
+                    (brandThumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.55) 0%, rgba(5,5,7,0.93) 80%), url(\'' + esc(brandThumb) + '\')"' : '') + '>' +
+                    '<span class="pj-card__ico">' + pjIco(NAV_ICONS.marka) + '</span>' +
+                    '<span class="pj-card__go">' + GO_ICON + '</span>' +
+                    '<b>Twoja marka</b><span>' + (state.landingUrl ? 'sklep, telefon i działająca strona' : 'sklep, telefon — strona w budowie') + '</span></button>';
             }
             var kartaSub = hasKarta
                 ? (versions.length > 1 ? 'Wersja ' + versions.length + ' · aktualna' : 'problem, klienci, zakres')
@@ -4166,6 +4707,49 @@
                     }).join('') + '</div>';
             }
             html += '</section>';
+        }
+
+        // ── SEKCJA: Twoja marka (sklep + telefon + działająca strona) ──
+        if (hasBrandSec) {
+            html += '<section class="pj-section" id="pjsec-marka" data-spy="marka">' +
+                sechead(NAV_ICONS.marka, 'Twoja marka', 'tak „' + esc(nazwa) + '" wygląda w świecie — w sklepie, w rękach klienta i w przeglądarce');
+            // Działająca strona: żywy podgląd w ramce + otwarcie na pełnym ekranie
+            if (state.landingUrl) {
+                html += '<div class="pj-land">' +
+                    '<div class="pj-land__bar"><span class="pj-land__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
+                    '<span class="pj-land__addr">' + pjIco('<rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>') + esc(nazwa.toLowerCase().replace(/[^a-ząćęłńóśźż0-9]+/gi, '')) + '.pl</span>' +
+                    '<a class="pj-land__open" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener">Otwórz stronę ↗</a></div>' +
+                    '<a class="pj-land__frame" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener" aria-label="Otwórz stronę narzędzia">' +
+                    '<iframe src="' + esc(state.landingUrl) + '" loading="lazy" tabindex="-1" title="Podgląd strony narzędzia"></iframe></a>' +
+                    '<div class="pj-land__note">To nie jest grafika — to działająca strona Twojego narzędzia. Kliknij, przewiń, pokaż znajomym.</div>' +
+                    '</div>';
+            } else if (extras.landing === 'fail') {
+                html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować strony narzędzia.</b>' +
+                    '<span>Spróbuj jeszcze raz — budowa trwa około 3 minut.</span></div>' +
+                    '<button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>';
+            } else {
+                html += '<div class="pj-wait"><span class="share__spin" aria-hidden="true"></span>' +
+                    '<div class="pj-wait__txt"><b>Buduję działającą stronę narzędzia…</b>' +
+                    '<span>prawdziwa strona w przeglądarce, nie grafika — około 3 minut</span></div></div>';
+            }
+            // Sklep + telefon
+            html += '<div class="pj-brand">';
+            BRAND_META.forEach(function (vm) {
+                var v = vm[0], burl = state.previews[v];
+                if (burl) {
+                    html += '<div class="pv-tile is-done" data-burl="' + esc(burl) + '" data-blabel="' + esc(vm[1]) + '">' +
+                        '<span class="pv-tile__label">' + esc(vm[1]) + '</span>' +
+                        '<div class="pv-tile__body"><img src="' + esc(burl) + '" alt="' + esc(vm[1]) + '" loading="lazy"></div></div>';
+                } else if (extras[v] === 'fail') {
+                    html += '<div class="pj-wait pj-wait--fail pj-wait--tile"><div class="pj-wait__txt"><b>' + esc(vm[1]) + '</b>' +
+                        '<span>nie udało się wygenerować</span></div>' +
+                        '<button type="button" class="preview-retry" data-retry="' + v + '">Ponów</button></div>';
+                } else {
+                    html += '<div class="pj-wait pj-wait--tile"><span class="share__spin" aria-hidden="true"></span>' +
+                        '<div class="pj-wait__txt"><b>' + esc(vm[1]) + '</b><span>generuję — około minuty</span></div></div>';
+                }
+            });
+            html += '</div></section>';
         }
 
         // ── SEKCJA: Karta projektu (+ pigułka) ──
@@ -4234,6 +4818,7 @@
         if (dock) {
             dock.innerHTML = secCount > 1
                 ? (hasShots ? '<button type="button" class="pj-dock__btn" data-spy="ekrany" data-anchor="pjsec-ekrany">' + pjIco(NAV_ICONS.ekrany) + 'Ekrany</button>' : '') +
+                  (hasBrandSec ? '<button type="button" class="pj-dock__btn" data-spy="marka" data-anchor="pjsec-marka">' + pjIco(NAV_ICONS.marka) + 'Marka</button>' : '') +
                   '<button type="button" class="pj-dock__btn" data-spy="karta" data-anchor="pjsec-karta">' + pjIco(NAV_ICONS.karta) + 'Karta</button>' +
                   (hasPlanSec ? '<button type="button" class="pj-dock__btn" data-spy="plan" data-anchor="pjsec-plan">' + pjIco(NAV_ICONS.plan) + 'Przychody' + (pjNewPlan ? '<i class="pj-dock__dot" aria-hidden="true"></i>' : '') + '</button>' : '')
                 : '';
@@ -4268,6 +4853,7 @@
         body.querySelectorAll('.pv-tile').forEach(function (t) {
             t.addEventListener('click', function () {
                 if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
+                else if (t.dataset.burl !== undefined) openLightbox({ url: t.dataset.burl, label: t.dataset.blabel || 'Twoja marka' });
                 else if (t.dataset.old !== undefined) openLightbox(oldList[parseInt(t.dataset.old, 10)].url);
                 else openLightbox(t.dataset.view);
             });
@@ -4276,6 +4862,8 @@
             b.addEventListener('click', function () {
                 var kind = b.getAttribute('data-retry');
                 if (kind === 'plan') { extras.plan = 'idle'; ensureBizplan(false); }
+                else if (kind === 'sklep' || kind === 'telefon') { extras[kind] = 'idle'; ensureBrandImage(kind); }
+                else if (kind === 'landing') { extras.landing = 'idle'; ensureLanding(); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
                 renderPaneProjekt();
             });
@@ -4336,6 +4924,154 @@
             '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Dokończ projekt w rozmowie') + '</button>' +
             '</div>';
         body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
+    }
+
+    /* ── Zakładka POTENCJAŁ RYNKU: raport z realnego web-searchu ───────
+       Ton analityczny — potencjał pokazują liczby i podlinkowane źródła,
+       nie przymiotniki. Uczciwe zastrzeżenia budują wiarygodność. */
+    function rkRefs(arr, srcMap) {
+        if (!Array.isArray(arr) || !arr.length) return '';
+        var out = '';
+        arr.slice(0, 4).forEach(function (n) {
+            var src = srcMap[n];
+            if (!src || !src.url) return;
+            out += '<a class="rk-ref" href="' + esc(src.url) + '" target="_blank" rel="noopener nofollow"' +
+                (src.tytul ? ' title="' + esc(src.tytul) + '"' : '') + '>' + esc(String(n)) + '</a>';
+        });
+        return out ? '<span class="rk-refs">' + out + '</span>' : '';
+    }
+
+    function renderPaneRynek() {
+        var body = el('pane-rynek-body');
+        var nazwa = (state.lastBrief && state.lastBrief.nazwa) || 'Twoje narzędzie';
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Potencjał rynku</div>' +
+            '<h2 class="tabpane__title">' + esc(nazwa) + ' na tle rynku</h2>' +
+            '<p class="tabpane__sub">Realny research z internetu: wielkość niszy, konkurenci z cenami, trendy. Każda liczba ma podlinkowane źródło.</p></div>';
+
+        if (state.verdict !== 'zielony' || !state.karta) {
+            body.innerHTML = head +
+                '<div class="tabpane__empty">Raport przygotuje się automatycznie, gdy domkniemy projekt w rozmowie.<br>' +
+                '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
+            body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
+            return;
+        }
+        var r = state.raport;
+        if (!r) {
+            if (extras.raport === 'fail') {
+                body.innerHTML = head +
+                    '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować raportu.</b>' +
+                    '<span>Spróbuj jeszcze raz — research trwa około 2 minut.</span></div>' +
+                    '<button type="button" class="preview-retry" id="rk-retry">Spróbuj ponownie</button></div>';
+                el('rk-retry').addEventListener('click', function () { extras.raport = 'idle'; ensureRaport(false); });
+            } else {
+                ensureRaport(false);
+                body.innerHTML = head +
+                    '<div class="pj-wait"><span class="share__spin" aria-hidden="true"></span>' +
+                    '<div class="pj-wait__txt"><b>Sprawdzam Twój rynek w internecie…</b>' +
+                    '<span>konkurenci i ich ceny, wielkość niszy, trendy — to realne wyszukiwanie, około 2 minut</span></div></div>';
+            }
+            return;
+        }
+
+        var srcMap = {};
+        (Array.isArray(r.zrodla) ? r.zrodla : []).forEach(function (s) {
+            if (s && s.nr != null) srcMap[s.nr] = s;
+        });
+        function rkHead(icon, title, sub) {
+            return '<div class="pj-sechead"><span class="pj-sechead__ico">' + pjIco(icon) + '</span>' +
+                '<div><h3>' + title + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>';
+        }
+
+        var html = head;
+
+        // Werdykt analityka — teza całego researchu
+        var oc = typeof r.ocena_potencjalu === 'string' ? r.ocena_potencjalu : '';
+        html += '<div class="rk-verdict rk-verdict--' + esc(oc) + '">' +
+            '<span class="rk-verdict__badge">Potencjał: ' + esc(oc || 'w ocenie') + '</span>' +
+            '<p class="rk-verdict__teza">' + esc(r.teza || '') + '</p>' +
+            (r.ocena_uzasadnienie ? '<p class="rk-verdict__why">' + esc(r.ocena_uzasadnienie) + '</p>' : '') +
+            '</div>';
+
+        // Wielkość niszy
+        if (r.rynek && typeof r.rynek === 'object') {
+            html += '<section class="pj-section">' +
+                rkHead('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
+                    'Wielkość niszy', 'ilu potencjalnych klientów działa w Polsce') +
+                '<div class="rk-market">' +
+                '<div class="rk-market__num">' + esc(r.rynek.liczba || '—') + '<span>' + esc(r.rynek.kogo || '') + '</span></div>' +
+                (r.rynek.opis ? '<p class="rk-market__desc">' + esc(r.rynek.opis) + rkRefs(r.rynek.zrodla, srcMap) + '</p>' : '') +
+                '</div></section>';
+        }
+
+        // Konkurencja
+        if (Array.isArray(r.konkurenci) && r.konkurenci.length) {
+            html += '<section class="pj-section">' +
+                rkHead('<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>',
+                    'Konkurencja', 'istniejące narzędzia — i czego im brakuje') +
+                '<div class="rk-comps">';
+            r.konkurenci.slice(0, 6).forEach(function (c) {
+                if (!c || typeof c !== 'object') return;
+                html += '<div class="rk-comp">' +
+                    '<div class="rk-comp__top"><b>' + esc(c.nazwa || '') + '</b>' +
+                    (c.kraj ? '<span class="rk-comp__kraj">' + esc(c.kraj) + '</span>' : '') +
+                    (c.cena ? '<span class="rk-comp__price">' + esc(c.cena) + '</span>' : '') + '</div>' +
+                    (c.czym_jest ? '<p class="rk-comp__what">' + esc(c.czym_jest) + '</p>' : '') +
+                    (c.luka ? '<p class="rk-comp__gap">' + esc(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
+                    '</div>';
+            });
+            html += '</div></section>';
+        }
+
+        // Okno rynkowe — serce raportu
+        if (r.luka_rynkowa) {
+            html += '<div class="rk-gap"><div class="rk-gap__t">' +
+                pjIco('<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>') +
+                'Okno rynkowe</div><p>' + esc(r.luka_rynkowa) + '</p></div>';
+        }
+
+        // Trendy
+        if (Array.isArray(r.trendy) && r.trendy.length) {
+            html += '<section class="pj-section">' +
+                rkHead('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
+                    'Trendy wokół projektu', 'co się dzieje na rynku — z liczbami') +
+                '<div class="rk-trends">';
+            r.trendy.slice(0, 4).forEach(function (t) {
+                if (!t || typeof t !== 'object') return;
+                html += '<div class="rk-trend"><b>' + esc(t.tytul || '') + '</b>' +
+                    (t.opis ? '<p>' + esc(t.opis) + rkRefs(t.zrodla, srcMap) + '</p>' : '') + '</div>';
+            });
+            html += '</div></section>';
+        }
+
+        // Wnioski dla projektu
+        if (Array.isArray(r.co_to_oznacza) && r.co_to_oznacza.length) {
+            html += '<section class="pj-section">' +
+                rkHead('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>',
+                    'Co to oznacza dla projektu', 'wnioski z researchu — dla pierwszej wersji i sprzedaży') +
+                '<ul class="rk-means">' +
+                r.co_to_oznacza.slice(0, 6).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
+                '</ul></section>';
+        }
+
+        // Uczciwe zastrzeżenia
+        if (Array.isArray(r.zastrzezenia) && r.zastrzezenia.length) {
+            html += '<div class="rk-warn"><div class="rk-warn__t">Uczciwie o ryzykach</div><ul>' +
+                r.zastrzezenia.slice(0, 4).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
+                '</ul></div>';
+        }
+
+        // Źródła
+        var srcs = Array.isArray(r.zrodla) ? r.zrodla.filter(function (s) { return s && s.url; }) : [];
+        if (srcs.length) {
+            html += '<details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
+                srcs.map(function (s) {
+                    return '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener nofollow">' + esc(s.tytul || s.url) + '</a></li>';
+                }).join('') + '</ol></details>';
+        }
+
+        html += '<div class="pj-plan__note">Wstępny research przygotowany automatycznie na podstawie publicznych źródeł. Pełną analizę rynku i plan przedsięwzięcia przygotowuje Tomek po rezerwacji rozmowy.</div>';
+
+        body.innerHTML = html;
     }
 
     // Hero state: przed pierwszą wiadomością usera wszystko (powitanie + pasek)
@@ -4493,63 +5229,336 @@
        BRAMKA INLINE — w rozmowie, po GATE_AFTER_USER_MSGS
        wiadomościach rozmówcy (server-side backstop: wymagany_email)
        ============================================================ */
-    var GATE_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    /* ============================================================
+       KONTO (Supabase Auth) — prawdziwe logowanie: Google / Facebook /
+       kod e-mail. Sesja auth trwała (localStorage, auto-refresh); token JWT
+       idzie w Authorization do spar-chat/spar-project — to on, nie pola
+       z body, decyduje o tożsamości po stronie serwera.
+       ============================================================ */
+    var sbAuth = (window.supabase && window.supabase.createClient)
+        ? window.supabase.createClient(SB_URL, SB_PUBLISHABLE, {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' }
+        })
+        : null;
+    var authState = { user: null, token: null, ready: false };
 
-    function gatePending() {
-        // emailKnown: serwer ma już maila tej sesji (powrót z linku ?id=) — nie pytamy drugi raz
-        if (state.email || state.emailKnown || state.verdict) return false;
-        var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
-        return userCount >= GATE_AFTER_USER_MSGS;
+    function authHeaders(extra) {
+        var h = { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE };
+        if (authState.token) h['Authorization'] = 'Bearer ' + authState.token;
+        if (extra) for (var k in extra) h[k] = extra[k];
+        return h;
     }
-
-    // Rejestracja przez Google/Facebook (Supabase Auth, implicit flow):
-    // redirect → powrót z #access_token → /auth/v1/user → prefill bramki.
-    // Sesja sparingu przeżywa redirect w LS + ?id= w redirect_to.
-    function startOAuth(provider) {
-        persistSession();
-        var redirect = location.origin + location.pathname + '?id=' + encodeURIComponent(state.sessionId);
-        location.href = SB_URL + '/auth/v1/authorize?provider=' + provider +
-            '&redirect_to=' + encodeURIComponent(redirect);
+    function authFirstName() {
+        if (!authState.user) return null;
+        var meta = authState.user.user_metadata || {};
+        var n = meta.full_name || meta.name || '';
+        if (n && n.trim()) return n.trim().split(' ')[0];
+        return (authState.user.email || '').split('@')[0] || null;
     }
-
-    function handleOAuthReturn() {
-        var h = location.hash || '';
-        if (h.indexOf('access_token=') < 0) return;
-        var params = new URLSearchParams(h.slice(1));
-        var token = params.get('access_token');
-        // hash z tokenami nie może zostać w URL (ani trafić do hash-routingu)
-        try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { }
-        if (!token) return;
-        fetch(SB_URL + '/auth/v1/user', {
-            headers: { 'Authorization': 'Bearer ' + token, 'apikey': SB_PUBLISHABLE }
-        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (u) {
-            if (!u || !u.email) return;
-            var meta = u.user_metadata || {};
-            pendingAuth = {
-                userId: u.id,
-                provider: (u.app_metadata && u.app_metadata.provider) || 'oauth',
-                email: u.email,
-                name: meta.full_name || meta.name || ''
-            };
-            state.authUserId = pendingAuth.userId;
-            state.authProvider = pendingAuth.provider;
+    function setAuthSession(session) {
+        var was = !!authState.user;
+        authState.user = session && session.user ? session.user : null;
+        authState.token = session ? (session.access_token || null) : null;
+        authState.ready = true;
+        if (authState.user) {
+            try { localStorage.setItem(LS_HAS_ACCOUNT, '1'); } catch (e) { }
+            // konto = znany kontakt: uzupełnij stan rozmowy (serwer i tak bierze z JWT)
+            if (!state.email && authState.user.email) state.email = authState.user.email;
+            if (!state.name && authFirstName()) state.name = authFirstName();
             persistSession();
-            // bramka czeka na telefon — prefill, jeśli już widoczna
-            var gn = el('gate-name'), ge = el('gate-email');
-            if (gn && !gn.value) gn.value = pendingAuth.name;
-            if (ge && !ge.value) { ge.value = pendingAuth.email; ge.readOnly = true; }
-            var box = el('gate-oauth-row');
-            if (box) box.outerHTML = oauthDoneHTML(pendingAuth);
-            var ph = el('gate-phone');
-            if (ph) ph.focus();
+        }
+        renderAuthUI();
+        if (!was && authState.user) {
+            onSignedIn();
+        }
+    }
+    function onSignedIn() {
+        closeAuthModal();
+        // otwarta bramka rejestracji → przeskocz na tryb „konto połączone"
+        var gateBox = el('inline-gate');
+        if (gateBox) { gateBox.remove(); renderInlineGate(); }
+        syncAccountConvos();
+    }
+    function initAuth() {
+        if (!sbAuth) { authState.ready = true; renderAuthUI(); return; }
+        sbAuth.auth.getSession().then(function (r) {
+            setAuthSession(r && r.data ? r.data.session : null);
+        }).catch(function () { authState.ready = true; renderAuthUI(); });
+        sbAuth.auth.onAuthStateChange(function (_evt, session) {
+            setAuthSession(session);
+        });
+    }
+    function signOutAccount() {
+        if (sbAuth) sbAuth.auth.signOut().catch(function () { });
+        authState.user = null; authState.token = null;
+        renderAuthUI();
+        sysMsg('Wylogowano. Rozmowy zapisane na koncie wrócą po ponownym zalogowaniu.');
+    }
+
+    /* ── UI: top bar + baner + modal ── */
+    function renderAuthUI() {
+        var top = el('auth-top');
+        if (top) {
+            if (authState.user) {
+                var fn = authFirstName() || 'Konto';
+                top.innerHTML = '<button type="button" class="auth-top__user" id="auth-user-btn" aria-haspopup="true">' +
+                    '<i class="auth-top__avatar">' + esc(fn.charAt(0).toUpperCase()) + '</i>' +
+                    '<span class="auth-top__name">' + esc(fn) + '</span></button>';
+                el('auth-user-btn').addEventListener('click', toggleAuthMenu);
+            } else {
+                top.innerHTML = '<button type="button" class="auth-top__login" id="auth-login-btn">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' +
+                    'Zaloguj się</button>';
+                el('auth-login-btn').addEventListener('click', function () { openAuthModal(); });
+            }
+        }
+        var banner = el('auth-banner');
+        if (banner) {
+            var hasAccountFlag = false;
+            try { hasAccountFlag = localStorage.getItem(LS_HAS_ACCOUNT) === '1'; } catch (e) { }
+            var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
+            banner.hidden = !(authState.ready && !authState.user && hasAccountFlag && userCount === 0 && !state.verdict);
+        }
+    }
+    function toggleAuthMenu() {
+        var existing = el('auth-menu');
+        if (existing) { existing.remove(); return; }
+        var menu = document.createElement('div');
+        menu.className = 'auth-top__menu';
+        menu.id = 'auth-menu';
+        menu.innerHTML =
+            '<button type="button" id="auth-menu-convos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Twoje rozmowy</button>' +
+            '<button type="button" id="auth-menu-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Wyloguj</button>';
+        document.body.appendChild(menu);
+        el('auth-menu-convos').addEventListener('click', function () {
+            menu.remove();
+            syncAccountConvos();
+            openSide();
+        });
+        el('auth-menu-logout').addEventListener('click', function () { menu.remove(); signOutAccount(); });
+        setTimeout(function () {
+            document.addEventListener('click', function closeMenu(e) {
+                if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener('click', closeMenu); }
+            });
+        }, 0);
+    }
+
+    var AUTH_GOOGLE_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.93-2.91l-3.87-3a7.24 7.24 0 0 1-10.8-3.8H1.27v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.26 14.29a7.2 7.2 0 0 1 0-4.58v-3.1H1.27a12 12 0 0 0 0 10.78l3.99-3.1z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.43-3.43A11.97 11.97 0 0 0 1.27 6.61l3.99 3.1A7.17 7.17 0 0 1 12 4.75z"/></svg>';
+    var AUTH_FB_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.67 4.53-4.67 1.31 0 2.68.24 2.68.24v2.95H15.8c-1.49 0-1.95.93-1.95 1.88V12h3.32l-.53 3.47h-2.79v8.38A12 12 0 0 0 24 12z"/></svg>';
+
+    function startOAuthLogin(provider) {
+        if (!sbAuth) return;
+        persistSession();
+        var redirect = location.origin + location.pathname + (state.sessionId ? '?id=' + encodeURIComponent(state.sessionId) : '');
+        sbAuth.auth.signInWithOAuth({
+            provider: provider,
+            options: { redirectTo: redirect }
+        }).catch(function () {
+            var err = el('auth-modal-error') || el('gate-auth-error');
+            if (err) { err.textContent = 'Nie udało się rozpocząć logowania — spróbuj ponownie.'; err.classList.add('is-shown'); }
+        });
+    }
+
+    // E-mail + 6-cyfrowy kod (OTP). Działa też w przeglądarkach in-app (FB/IG),
+    // gdzie magic-linki potrafią otwierać się w innej przeglądarce.
+    function sendOtp(email) {
+        if (!sbAuth) return Promise.reject(new Error('brak_auth'));
+        return sbAuth.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } });
+    }
+    function verifyOtp(email, code) {
+        if (!sbAuth) return Promise.reject(new Error('brak_auth'));
+        return sbAuth.auth.verifyOtp({ email: email, token: code, type: 'email' });
+    }
+
+    // Wspólny markup logowania (modal + bramka): OAuth + e-mail z kodem.
+    // prefix rozróżnia id-ki obu osadzeń.
+    function authFormHTML(prefix, ctaText) {
+        return '<div class="gate-oauth-row">' +
+            '<button type="button" class="gate-oauth" id="' + prefix + '-google">' + AUTH_GOOGLE_ICO + 'Kontynuuj z Google</button>' +
+            '<button type="button" class="gate-oauth" id="' + prefix + '-fb">' + AUTH_FB_ICO + 'Kontynuuj z Facebookiem</button>' +
+            '</div>' +
+            '<div class="gate-divider"><span>albo przez e-mail</span></div>' +
+            '<form id="' + prefix + '-otp-form" novalidate>' +
+            '<div id="' + prefix + '-otp-step1">' +
+            '<label class="f-label" for="' + prefix + '-email">E-mail</label>' +
+            '<input class="f-input" type="email" id="' + prefix + '-email" placeholder="ty@firma.pl" autocomplete="email">' +
+            '<button type="submit" class="btn" id="' + prefix + '-otp-send">' + esc(ctaText || 'Wyślij kod') + ' <span class="btn__arrow">→</span></button>' +
+            '</div>' +
+            '<div id="' + prefix + '-otp-step2" hidden>' +
+            '<p class="auth-otp-sent">Wysłałem 6-cyfrowy kod na <strong id="' + prefix + '-otp-mail"></strong>. Wpisz go poniżej.</p>' +
+            '<label class="f-label" for="' + prefix + '-code">Kod z e-maila</label>' +
+            '<input class="f-input" type="text" inputmode="numeric" autocomplete="one-time-code" id="' + prefix + '-code" placeholder="123456" maxlength="8">' +
+            '<button type="submit" class="btn" id="' + prefix + '-otp-verify">Potwierdzam <span class="btn__arrow">→</span></button>' +
+            '</div>' +
+            '</form>' +
+            '<p class="auth-error" id="' + prefix + '-auth-error"></p>';
+    }
+    function bindAuthForm(prefix, onDone) {
+        var step = 1;
+        var emailVal = '';
+        function showError(msg) {
+            var e = el(prefix + '-auth-error');
+            if (e) { e.textContent = msg; e.classList.add('is-shown'); }
+        }
+        function clearError() {
+            var e = el(prefix + '-auth-error');
+            if (e) e.classList.remove('is-shown');
+        }
+        var g = el(prefix + '-google'), f = el(prefix + '-fb');
+        if (g) g.addEventListener('click', function () { startOAuthLogin('google'); });
+        if (f) f.addEventListener('click', function () { startOAuthLogin('facebook'); });
+        el(prefix + '-otp-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearError();
+            if (step === 1) {
+                emailVal = el(prefix + '-email').value.trim().toLowerCase();
+                if (!GATE_EMAIL_RE.test(emailVal)) { showError('Podaj poprawny adres e-mail.'); return; }
+                var sendBtn = el(prefix + '-otp-send');
+                sendBtn.disabled = true;
+                sendOtp(emailVal).then(function (r) {
+                    sendBtn.disabled = false;
+                    if (r && r.error) {
+                        showError(/rate/i.test(r.error.message || '') ? 'Za dużo prób — odczekaj minutę i spróbuj ponownie.' : 'Nie udało się wysłać kodu. Sprawdź adres i spróbuj ponownie.');
+                        return;
+                    }
+                    step = 2;
+                    el(prefix + '-otp-step1').hidden = true;
+                    el(prefix + '-otp-step2').hidden = false;
+                    el(prefix + '-otp-mail').textContent = emailVal;
+                    el(prefix + '-code').focus();
+                }).catch(function () { sendBtn.disabled = false; showError('Błąd sieci — spróbuj ponownie.'); });
+            } else {
+                var code = el(prefix + '-code').value.replace(/\D/g, '');
+                if (code.length < 6) { showError('Wpisz 6-cyfrowy kod z e-maila.'); return; }
+                var vBtn = el(prefix + '-otp-verify');
+                vBtn.disabled = true;
+                verifyOtp(emailVal, code).then(function (r) {
+                    vBtn.disabled = false;
+                    if (r && r.error) { showError('Kod nieprawidłowy albo wygasł. Sprawdź e-mail i spróbuj jeszcze raz.'); return; }
+                    // setAuthSession poleci z onAuthStateChange; onDone = dodatkowe kroki osadzenia
+                    if (onDone) onDone();
+                }).catch(function () { vBtn.disabled = false; showError('Błąd sieci — spróbuj ponownie.'); });
+            }
+        });
+    }
+
+    function openAuthModal(reason) {
+        var modal = el('auth-modal');
+        if (!modal) return;
+        el('auth-modal-sub').textContent = reason || 'Wróć do swoich rozmów i projektów — na każdym urządzeniu.';
+        el('auth-modal-body').innerHTML = authFormHTML('am', 'Wyślij kod');
+        bindAuthForm('am', null);
+        modal.hidden = false;
+    }
+    function closeAuthModal() {
+        var modal = el('auth-modal');
+        if (modal) modal.hidden = true;
+    }
+
+    /* ── Rozmowy konta z serwera (cross-device) ── */
+    function syncAccountConvos() {
+        if (!authState.token) return;
+        fetch(SPAR_PROJECT_ENDPOINT, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ action: 'list' })
+        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (!d || !Array.isArray(d.sessions) || !d.sessions.length) return;
+            var idx = convoIndex();
+            var changed = false;
+            d.sessions.forEach(function (s) {
+                var known = idx.some(function (c) { return c.id === s.id; });
+                if (!known) {
+                    idx.push({
+                        id: s.id,
+                        title: s.nazwa || 'Rozmowa',
+                        verdict: s.verdict || null,
+                        thumb: s.thumb || null,
+                        ts: s.updated_at ? new Date(s.updated_at).getTime() : Date.now()
+                    });
+                    changed = true;
+                }
+                // minimalny stan lokalny — loadConvo musi mieć co wczytać;
+                // historia wiadomości dociągnie się z serwera w syncProjectFromServer
+                if (!loadJSON(sessionKey(s.id))) {
+                    saveJSON(sessionKey(s.id), {
+                        sessionId: s.id,
+                        verdict: s.verdict || null,
+                        emailKnown: true,
+                        lastBrief: s.nazwa ? { nazwa: s.nazwa } : null
+                    });
+                }
+            });
+            if (changed) {
+                idx.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
+                saveJSON(LS_INDEX, idx);
+                renderConvoList();
+            }
         }).catch(function () { });
     }
 
-    function oauthDoneHTML(pa) {
+    /* ── Cloudflare Turnstile (lazy) — token do pierwszej wiadomości anonima ── */
+    var turnstileScriptLoading = null;
+    function loadTurnstileScript() {
+        if (window.turnstile) return Promise.resolve();
+        if (turnstileScriptLoading) return turnstileScriptLoading;
+        turnstileScriptLoading = new Promise(function (resolve, reject) {
+            var s = document.createElement('script');
+            s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            s.async = true;
+            s.onload = function () { resolve(); };
+            s.onerror = function () { reject(new Error('turnstile_load')); };
+            document.head.appendChild(s);
+        });
+        return turnstileScriptLoading;
+    }
+    function getTurnstileToken() {
+        if (!TURNSTILE_SITEKEY) return Promise.resolve(null);
+        return loadTurnstileScript().then(function () {
+            return new Promise(function (resolve) {
+                var holder = document.createElement('div');
+                holder.style.cssText = 'position:fixed;bottom:8px;left:8px;z-index:300;';
+                document.body.appendChild(holder);
+                var settled = false;
+                var timer = setTimeout(function () {
+                    if (!settled) { settled = true; holder.remove(); resolve(null); }
+                }, 20000);
+                try {
+                    window.turnstile.render(holder, {
+                        sitekey: TURNSTILE_SITEKEY,
+                        callback: function (token) {
+                            if (settled) return;
+                            settled = true; clearTimeout(timer); holder.remove(); resolve(token);
+                        },
+                        'error-callback': function () {
+                            if (settled) return;
+                            settled = true; clearTimeout(timer); holder.remove(); resolve(null);
+                        }
+                    });
+                } catch (e) {
+                    if (!settled) { settled = true; clearTimeout(timer); holder.remove(); resolve(null); }
+                }
+            });
+        }).catch(function () { return null; });
+    }
+
+    var GATE_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    function gatePending() {
+        if (state.verdict) return false;
+        var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
+        if (userCount < GATE_AFTER_USER_MSGS) return false;
+        // Zalogowany: konto jest, bramka tylko dobiera telefon (raz)
+        if (authState.user) return !state.phone;
+        // emailKnown: serwer ma już kontakt tej sesji (powrót z linku ?id=) — nie pytamy drugi raz
+        return !(state.email || state.emailKnown);
+    }
+
+    function accountDoneHTML() {
+        var label = authState.user ? (authState.user.email || authFirstName() || 'konto') : 'konto';
         return '<div class="gate-oauth-done">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
-            'Połączono konto ' + (pa.provider === 'google' ? 'Google' : pa.provider === 'facebook' ? 'Facebook' : esc(pa.provider)) +
-            ' — dorzuć jeszcze numer telefonu.</div>';
+            'Konto połączone: ' + esc(label) + '</div>';
     }
 
     // telefon: min 9 cyfr + CAŁY string w dozwolonym formacie (kotwice ^$ —
@@ -4559,33 +5568,39 @@
         return digits.length >= 9 && digits.length <= 15 && /^[+]?[\d\s\-().]{9,20}$/.test(s);
     }
 
+    // Bramka = założenie PRAWDZIWEGO konta (Google / Facebook / kod e-mail).
+    // Dwa kroki: (1) niezalogowany widzi logowanie; po zalogowaniu bramka
+    // przerenderowuje się (onSignedIn) na krok (2): imię (gdy konto go nie ma)
+    // + telefon. Kontakt po stronie serwera i tak idzie z JWT.
     function renderInlineGate() {
-        if (el('inline-gate') || state.email || state.emailKnown) return;
+        if (el('inline-gate') || !gatePending()) return;
         removeChips();
         setComposerEnabled(false);
-        var GOOGLE_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.93-2.91l-3.87-3a7.24 7.24 0 0 1-10.8-3.8H1.27v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.26 14.29a7.2 7.2 0 0 1 0-4.58v-3.1H1.27a12 12 0 0 0 0 10.78l3.99-3.1z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.43-3.43A11.97 11.97 0 0 0 1.27 6.61l3.99 3.1A7.17 7.17 0 0 1 12 4.75z"/></svg>';
-        var FB_ICO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.67 4.53-4.67 1.31 0 2.68.24 2.68.24v2.95H15.8c-1.49 0-1.95.93-1.95 1.88V12h3.32l-.53 3.47h-2.79v8.38A12 12 0 0 0 24 12z"/></svg>';
         var div = document.createElement('div');
         div.className = 'msg msg--ai msg--gate';
         div.id = 'inline-gate';
-        var pa = pendingAuth;
+
+        if (!authState.user) {
+            div.innerHTML =
+                '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — załóż konto (albo zaloguj się), żeby ten projekt był Twój: wrócisz do niego z każdego urządzenia, a Tomek będzie wiedział, z kim buduje.</p>' +
+                authFormHTML('gate', 'Wyślij kod') +
+                '<p class="gate-msg__note">Zero newslettera i zero telefonów sprzedażowych. Konto służy tej rozmowie i projektowi, który z niej wyjdzie.</p>';
+            el('chat-msgs').appendChild(div);
+            scrollToBottom(true);
+            bindAuthForm('gate', null);
+            return;
+        }
+
+        var needName = !authFirstName();
         div.innerHTML =
-            '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — zarejestruj się, żebym wiedział, dla kogo budujemy ten projekt, i żeby Tomek mógł się odezwać w sprawie Twojego narzędzia.</p>' +
-            (pa ? oauthDoneHTML(pa)
-                : '<div class="gate-oauth-row" id="gate-oauth-row">' +
-                  '<button type="button" class="gate-oauth" id="gate-google">' + GOOGLE_ICO + 'Kontynuuj z Google</button>' +
-                  '<button type="button" class="gate-oauth" id="gate-fb">' + FB_ICO + 'Kontynuuj z Facebookiem</button>' +
-                  '</div>' +
-                  '<div class="gate-divider"><span>albo wpisz ręcznie</span></div>') +
+            '<p>Świetnie — konto gotowe. Ostatnia rzecz: numer telefonu, żeby Tomek mógł się odezwać w sprawie Twojego narzędzia.</p>' +
+            accountDoneHTML() +
             '<form id="gate-form" novalidate>' +
-            '<div class="f-row f-row--two">' +
-            '<div><label class="f-label" for="gate-name">Imię</label>' +
-            '<input class="f-input" type="text" id="gate-name" placeholder="Jan" autocomplete="given-name" maxlength="80" required value="' + esc((pa && pa.name) || '') + '">' +
-            '<div class="f-error" id="gate-name-error">Podaj imię.</div></div>' +
-            '<div><label class="f-label" for="gate-email">E-mail</label>' +
-            '<input class="f-input" type="email" id="gate-email" placeholder="ty@firma.pl" autocomplete="email" required value="' + esc((pa && pa.email) || '') + '"' + (pa ? ' readonly' : '') + '>' +
-            '<div class="f-error" id="gate-email-error">Podaj poprawny adres e-mail.</div></div>' +
-            '</div>' +
+            (needName
+                ? '<div><label class="f-label" for="gate-name">Imię</label>' +
+                  '<input class="f-input" type="text" id="gate-name" placeholder="Jan" autocomplete="given-name" maxlength="80" required>' +
+                  '<div class="f-error" id="gate-name-error">Podaj imię.</div></div>'
+                : '') +
             '<div><label class="f-label" for="gate-phone">Telefon</label>' +
             '<input class="f-input" type="tel" id="gate-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20" required>' +
             '<div class="f-error" id="gate-phone-error">Podaj numer telefonu (min. 9 cyfr).</div></div>' +
@@ -4595,32 +5610,29 @@
         el('chat-msgs').appendChild(div);
         scrollToBottom(true);
 
-        var gBtn = el('gate-google'), fBtn = el('gate-fb');
-        if (gBtn) gBtn.addEventListener('click', function () { startOAuth('google'); });
-        if (fBtn) fBtn.addEventListener('click', function () { startOAuth('facebook'); });
-
         el('gate-form').addEventListener('submit', function (e) {
             e.preventDefault();
-            var name = el('gate-name').value.trim();
-            var email = el('gate-email').value.trim();
+            var name = needName ? el('gate-name').value.trim() : (authFirstName() || '');
             var phone = el('gate-phone').value.trim();
             var ok = true;
-            el('gate-name-error').classList.toggle('is-shown', !name);
-            if (!name) ok = false;
-            var emailOk = GATE_EMAIL_RE.test(email);
-            el('gate-email-error').classList.toggle('is-shown', !emailOk);
-            if (!emailOk) ok = false;
+            if (needName) {
+                el('gate-name-error').classList.toggle('is-shown', !name);
+                if (!name) ok = false;
+            }
             var phoneOk = phoneValid(phone);
             el('gate-phone-error').classList.toggle('is-shown', !phoneOk);
             if (!phoneOk) ok = false;
             if (!ok) return;
-            state.name = name;
-            state.email = email;
+            state.name = name || state.name;
+            state.email = (authState.user && authState.user.email) || state.email;
             state.phone = phone;
-            if (pa) { state.authUserId = pa.userId; state.authProvider = pa.provider; }
             persistSession();
+            // imię wpisane ręcznie → dopisz do konta (OAuth ma je z profilu)
+            if (needName && name && sbAuth) {
+                sbAuth.auth.updateUser({ data: { full_name: name } }).catch(function () { });
+            }
             div.remove();
-            sysMsg('Dzięki, ' + name.split(' ')[0] + '. Wracamy do rozmowy — pisz śmiało.');
+            sysMsg('Dzięki, ' + (name || 'super').split(' ')[0] + '. Wracamy do rozmowy — pisz śmiało.');
             setComposerEnabled(true);
             // Przywróć dymki odpowiedzi z ostatniej tury AI (bramka je schowała)
             var lastMsg = messages[messages.length - 1];
@@ -4632,6 +5644,7 @@
                     if (gateSugg) renderSuggestions(gateSugg.opts, gateSugg.multi);
                 }
             }
+            renderAuthUI();
             if (window.matchMedia('(hover: hover)').matches) el('chat-input').focus();
         });
     }
@@ -5155,19 +6168,23 @@
             email: state.email,
             name: state.name,
             phone: state.phone || null,
-            authUserId: state.authUserId || null,
-            authProvider: state.authProvider || null,
             message: text,
             tracking: isFirst ? getTracking() : null
         };
 
-        fetch(SPAR_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': SB_PUBLISHABLE
-            },
-            body: JSON.stringify(body)
+        // Pierwsza wiadomość bez konta = nowa sesja na serwerze → token anty-bot.
+        // Zalogowani są zweryfikowani kontem; brak sitekey = od razu null.
+        var tokenPromise = (isFirst && !authState.user)
+            ? getTurnstileToken()
+            : Promise.resolve(null);
+
+        tokenPromise.then(function (tsToken) {
+            if (tsToken) body.turnstileToken = tsToken;
+            return fetch(SPAR_ENDPOINT, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify(body)
+            });
         }).then(function (res) {
             if (!res.ok) {
                 return res.json().catch(function () { return {}; }).then(function (err) {
@@ -5243,11 +6260,20 @@
             }
             return pump();
         }).catch(function (err) {
-            if (err && err.code === 'wymagany_email') {
-                // server-side backstop bramki — pokaż formularz, przywróć wiadomość
+            if (err && (err.code === 'wymagany_email' || err.code === 'wymagane_konto')) {
+                // server-side backstop bramki — pokaż rejestrację, przywróć wiadomość
                 failedBeforeText = !gotText;
                 restoreFailedMessage(text);
                 renderInlineGate();
+            } else if (err && err.code === 'wymagane_logowanie') {
+                // rozmowa przypięta do konta — zaloguj się, żeby pisać dalej
+                failedBeforeText = !gotText;
+                restoreFailedMessage(text);
+                openAuthModal('Ta rozmowa jest połączona z kontem. Zaloguj się, żeby pisać dalej.');
+            } else if (err && err.code === 'weryfikacja_bot') {
+                failedBeforeText = !gotText;
+                restoreFailedMessage(text);
+                sysMsg('Nie udało się potwierdzić, że nie jesteś botem. Odśwież stronę i spróbuj ponownie — albo zaloguj się, wtedy weryfikacja nie jest potrzebna.', true);
             } else if (err && err.status === 429 && err.code === 'limit_tur') {
                 failedBeforeText = !gotText;
                 sysMsg('Dobiliśmy do limitu 30 tur tej rozmowy. Sparing tyle nie potrzebuje — jeśli werdykt nie padł, zacznij nową rozmowę z węższym problemem.', true);
@@ -5988,6 +7014,7 @@
 
         updateStages();
         updateHero();
+        renderAuthUI(); // baner „masz konto" zależy od stanu hero
         syncUrlId();
         updateConvoMeta(); // odśwież listę projektów + tytuł karty przeglądarki
         syncProjectFromServer();
@@ -6065,9 +7092,13 @@
     }
 
     function init() {
-        // Powrót z OAuth (Google/Facebook): #access_token w hashu — obsłuż
-        // i wyczyść ZANIM hash-routing zakładek cokolwiek zinterpretuje
-        handleOAuthReturn();
+        // Konto: trwała sesja Supabase Auth (localStorage) + powrót z OAuth
+        // (PKCE ?code= — supabase-js obsługuje przez detectSessionInUrl)
+        initAuth();
+        var amClose = el('auth-modal-close'), amBack = el('auth-modal-backdrop'), abBtn = el('auth-banner-btn');
+        if (amClose) amClose.addEventListener('click', closeAuthModal);
+        if (amBack) amBack.addEventListener('click', closeAuthModal);
+        if (abBtn) abBtn.addEventListener('click', function () { openAuthModal(); });
 
         // ?projekt=<uuid> — publiczny podgląd udostępnionego projektu;
         // zastępuje całą appkę widokiem read-only, więc sprawdzamy pierwszy
