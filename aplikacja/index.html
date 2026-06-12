@@ -1291,20 +1291,11 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     font-style: italic;
     font-size: clamp(20px, 2.4vw, 32px);
     color: var(--text-muted);
-    margin-bottom: clamp(20px, 3vh, 36px);
-}
-.cta__lead {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: clamp(24px, 3.4vw, 48px);
-    color: var(--text);
-    letter-spacing: -0.01em;
-    line-height: 1.25;
-    margin-bottom: clamp(10px, 1.5vh, 18px);
+    margin-bottom: clamp(16px, 2.5vh, 28px);
 }
 .cta__h2 {
     font-family: var(--sans);
-    font-size: clamp(40px, 7vw, 120px);
+    font-size: clamp(36px, 5.6vw, 92px);
     font-weight: 900;
     line-height: 0.96;
     letter-spacing: -0.05em;
@@ -1321,32 +1312,6 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     color: var(--accent);
     text-shadow: 0 0 90px rgba(77, 159, 255, 0.35);
 }
-/* gigant flip — czyj będzie następny pomysł (wzorzec cta-flip /zwolnie) */
-.cta-flip {
-    position: relative;
-    display: block;
-    margin-top: 0.05em;
-    color: var(--accent);
-    text-shadow: 0 0 90px rgba(77, 159, 255, 0.35);
-    min-height: 1.05em;
-}
-.cta-flip__word {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%) translateY(0.3em);
-    opacity: 0;
-    filter: blur(8px);
-    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), filter 0.55s var(--ease);
-    white-space: nowrap;
-}
-.cta-flip__word.is-active {
-    position: relative;
-    left: auto;
-    transform: none;
-    opacity: 1;
-    filter: blur(0);
-}
 .cta__actions {
     margin-top: clamp(32px, 5vh, 56px);
     display: flex;
@@ -1354,24 +1319,105 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     align-items: center;
     gap: 18px;
 }
-/* composer — to samo pole, w którym za chwilę będziesz pisać w sparingu */
-.cta__composer { width: min(680px, 100%); margin: 0 auto; }
+/* ── okno rozmowy — JEDEN focal point sceny ──
+   To jest sparing w miniaturze: opener AI pisze się na żywo,
+   trzy odpowiedzi do kliknięcia, pole — wszystko w jednej karcie. */
+.talk {
+    width: min(620px, 100%);
+    margin: clamp(26px, 4vh, 44px) auto 0;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: #0a0a10;
+    overflow: hidden;
+    box-shadow:
+        0 70px 140px -60px rgba(0, 0, 0, 0.95),
+        0 30px 90px -40px rgba(77, 159, 255, 0.2),
+        0 0 0 1px rgba(77, 159, 255, 0.05);
+    text-align: left;
+}
+.talk__body {
+    padding: 20px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.talk__ai {
+    align-self: flex-start;
+    max-width: 88%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass, rgba(255, 255, 255, 0.07));
+    border-radius: 16px 16px 16px 5px;
+    padding: 13px 16px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--text);
+    min-height: 70px;
+}
+.talk__ai b { color: var(--text-strong); }
+.talk__caret {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--accent);
+    margin-left: 2px;
+    vertical-align: -2px;
+    border-radius: 1px;
+    animation: talkCaret 0.9s steps(1) infinite;
+}
+@keyframes talkCaret { 50% { opacity: 0; } }
+.talk__chips {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+.cta__path {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid rgba(77, 159, 255, 0.35);
+    border-radius: 16px 16px 5px 16px;
+    background: var(--accent-soft);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-strong);
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.cta__path::after { content: '→'; color: var(--accent); transition: transform 0.25s var(--ease); }
+.cta__path:hover {
+    border-color: rgba(77, 159, 255, 0.7);
+    background: rgba(77, 159, 255, 0.22);
+    transform: translateX(-3px);
+}
+.cta__path:hover::after { transform: translateX(3px); }
+/* chipy wjeżdżają po dopisaniu openera */
+.talk__chips .cta__path { opacity: 0; transform: translateY(8px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
+.talk.is-ready .talk__chips .cta__path { opacity: 1; transform: none; }
+.talk.is-ready .talk__chips .cta__path:nth-child(2) { transition-delay: 0.12s; }
+.talk.is-ready .talk__chips .cta__path:nth-child(3) { transition-delay: 0.24s; }
+.talk__or {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-top: 2px;
+}
 .cta__bar {
     display: flex;
     align-items: flex-end;
     gap: 10px;
-    padding: 12px 12px 12px 24px;
-    border-radius: 28px;
+    padding: 8px 8px 8px 18px;
+    border-radius: 22px;
     border: 1px solid var(--border-strong);
-    background: rgba(13, 13, 16, 0.92);
-    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(77, 159, 255, 0.06);
+    background: rgba(255, 255, 255, 0.035);
     transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
     cursor: text;
-    text-align: left;
 }
 .cta__bar:focus-within {
     border-color: rgba(77, 159, 255, 0.55);
-    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 4px rgba(77, 159, 255, 0.12);
+    box-shadow: 0 0 0 4px rgba(77, 159, 255, 0.12);
 }
 .cta__bar textarea {
     flex: 1;
@@ -1381,79 +1427,37 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     resize: none;
     overflow: hidden;
     font-family: var(--sans);
-    font-size: 16.5px;
+    font-size: 16px;
     line-height: 1.5;
     color: var(--text-strong);
     caret-color: var(--accent);
-    padding: 10px 0;
-    max-height: 140px;
+    padding: 9px 0;
+    max-height: 120px;
     outline: none;
 }
 .cta__bar textarea::placeholder { color: var(--text-faint); }
 .cta__send {
     flex-shrink: 0;
-    width: 46px;
-    height: 46px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: grid;
     place-items: center;
     background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, #2f7fe6 100%);
     color: var(--accent-ink);
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 800;
-    box-shadow: 0 10px 30px -8px rgba(77, 159, 255, 0.6);
+    box-shadow: 0 10px 26px -8px rgba(77, 159, 255, 0.6);
     transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
-.cta__send:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(77, 159, 255, 0.75); }
+.cta__send:hover { transform: translateY(-2px); box-shadow: 0 14px 34px -10px rgba(77, 159, 255, 0.75); }
 .cta__note {
-    margin-top: 14px;
+    margin-top: 16px;
     font-size: 13px;
     color: var(--text-faint);
     text-align: center;
 }
 .cta__note b { color: var(--text-muted); font-weight: 600; }
-/* trzy drogi wejścia — klik od razu zaczyna rozmowę w sparingu */
-.cta__paths {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: clamp(18px, 2.5vh, 28px);
-}
-.cta__paths-label {
-    width: 100%;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 2px;
-}
-.cta__path {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border: 1px solid var(--border-strong);
-    border-radius: 999px;
-    background: rgba(13, 13, 16, 0.85);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease);
-}
-.cta__path::after { content: '→'; color: var(--accent); transition: transform 0.25s var(--ease); }
-.cta__path:hover {
-    border-color: rgba(77, 159, 255, 0.55);
-    background: var(--accent-dim);
-    transform: translateY(-2px);
-}
-.cta__path:hover::after { transform: translateX(3px); }
-@media (max-width: 700px) {
-    .cta__paths { flex-direction: column; }
-    .cta__path { width: 100%; max-width: 420px; justify-content: center; }
-}
 
 /* ============================================================
    FOOTER MINI
@@ -1495,8 +1499,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     .market__punch { font-size: clamp(18px, 4.8vw, 26px); }
     .motto__quote { font-size: clamp(27px, 6.6vw, 40px); }
     .how__title, .crew__title { font-size: clamp(34px, 8.6vw, 52px); }
-    .cta__lead { font-size: clamp(22px, 5.6vw, 32px); }
-    .cta__h2 { font-size: clamp(44px, 11vw, 72px); }
+    .cta__h2 { font-size: clamp(38px, 9.6vw, 60px); }
 }
 </style>
 </head>
@@ -1781,36 +1784,32 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         <div class="scene__inner">
             <p class="cta__eyebrow" data-reveal>Twoja kolej.</p>
 
-            <p class="cta__lead" data-reveal data-delay="100">
-                <em>Następna aplikacja powstanie z pomysłu...</em>
-            </p>
-
-            <h2 class="cta__h2" data-reveal data-delay="250">
-                <span class="cta-flip" id="cta-flip">
-                    <span class="cta-flip__word is-active">Twojego.</span>
-                    <span class="cta-flip__word">księgowej.</span>
-                    <span class="cta-flip__word">trenera.</span>
-                    <span class="cta-flip__word">florystki.</span>
-                    <span class="cta-flip__word">elektryka.</span>
-                    <span class="cta-flip__word">Twojego.</span>
-                </span>
+            <h2 class="cta__h2" data-reveal data-delay="100">
+                Masz <em class="cta__h2-italic">pomysł?</em><br>
+                <span class="cta__h2-accent">Rozmowa już czeka.</span>
             </h2>
 
-            <div class="cta__actions" data-reveal data-delay="350">
-                <form class="cta__composer" id="idea-form">
-                    <div class="cta__bar">
-                        <textarea id="idea-input" rows="1" maxlength="600" placeholder="Opisz swój pomysł — jedno zdanie wystarczy…" aria-label="Opisz swój pomysł"></textarea>
-                        <button type="submit" class="cta__send" aria-label="Zacznij rozmowę z AI">→</button>
-                    </div>
-                    <p class="cta__note"><b>Za darmo i bez zobowiązań</b> — wciśnij Enter, a AI zacznie projektować z Tobą. Za kilkanaście minut zobaczysz pierwsze ekrany.</p>
-                    <div class="cta__paths">
-                        <span class="cta__paths-label">albo zacznij jednym kliknięciem</span>
+            <form class="talk" id="idea-form" data-reveal data-delay="300">
+                <div class="live__bar">
+                    <span class="live__dot"></span><span class="live__dot"></span><span class="live__dot"></span>
+                    <span class="live__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja/sparing</span>
+                    <span class="live__badge"><i></i>AI online</span>
+                </div>
+                <div class="talk__body">
+                    <div class="talk__ai"><span id="talk-opener"></span><span class="talk__caret" id="talk-caret"></span></div>
+                    <div class="talk__chips">
                         <button type="button" class="cta__path" data-path="Mam już pomysł na narzędzie">Mam już pomysł na narzędzie</button>
                         <button type="button" class="cta__path" data-path="Znam problem, który warto rozwiązać">Znam problem, który warto rozwiązać</button>
                         <button type="button" class="cta__path" data-path="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
                     </div>
-                </form>
-            </div>
+                    <div class="talk__or">albo napisz po swojemu</div>
+                    <div class="cta__bar">
+                        <textarea id="idea-input" rows="1" maxlength="600" placeholder="Opisz swój pomysł — jedno zdanie wystarczy…" aria-label="Opisz swój pomysł"></textarea>
+                        <button type="submit" class="cta__send" aria-label="Zacznij rozmowę z AI">→</button>
+                    </div>
+                </div>
+            </form>
+            <p class="cta__note" data-reveal data-delay="500"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy i zobaczysz pierwsze ekrany swojego narzędzia.</p>
         </div>
     </section>
 
@@ -2207,17 +2206,39 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     }
 
     // ============================================================
-    //  SCENA 8 — CTA flip (czyj pomysł będzie następny)
+    //  SCENA 8 — opener AI pisze się przy wejściu w scenę,
+    //  potem wjeżdżają trzy odpowiedzi (talk.is-ready)
     // ============================================================
-    var ctaFlip = document.getElementById('cta-flip');
-    if (ctaFlip && !reduceMotion) {
-        var ctaWords = ctaFlip.querySelectorAll('.cta-flip__word');
-        var ci = 0;
-        setInterval(function () {
-            if (document.hidden) return;
-            ci = (ci + 1) % ctaWords.length;
-            ctaWords.forEach(function (w, i) { w.classList.toggle('is-active', i === ci); });
-        }, 2200);
+    var talkBox = document.getElementById('idea-form');
+    var talkOpener = document.getElementById('talk-opener');
+    var talkCaret = document.getElementById('talk-caret');
+    var OPENER_TXT = 'Cześć! Tu AI Tomka. Zamienię Twój pomysł w aplikację, za którą ludzie płacą co miesiąc. Od czego zaczynamy?';
+    if (talkBox && talkOpener) {
+        if (reduceMotion) {
+            talkOpener.textContent = OPENER_TXT;
+            talkCaret.style.display = 'none';
+            talkBox.classList.add('is-ready');
+        } else {
+            var openerStarted = false;
+            var talkObs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) {
+                    if (!en.isIntersecting || openerStarted) return;
+                    openerStarted = true;
+                    talkObs.unobserve(en.target);
+                    var oc = 0;
+                    (function typeOpener() {
+                        if (oc <= OPENER_TXT.length) {
+                            talkOpener.textContent = OPENER_TXT.slice(0, oc++);
+                            setTimeout(typeOpener, 16);
+                            return;
+                        }
+                        talkCaret.style.display = 'none';
+                        talkBox.classList.add('is-ready');
+                    })();
+                });
+            }, { threshold: 0.4 });
+            talkObs.observe(talkBox);
+        }
     }
 
     // ============================================================
