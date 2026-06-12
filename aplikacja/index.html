@@ -1354,30 +1354,61 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     align-items: center;
     gap: 18px;
 }
-.cta__magnetic { display: inline-block; transition: transform 0.3s var(--ease); will-change: transform; }
-.cta__primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 44px;
-    border-radius: 999px;
+/* composer — to samo pole, w którym za chwilę będziesz pisać w sparingu */
+.cta__composer { width: min(680px, 100%); margin: 0 auto; }
+.cta__bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 12px 12px 12px 24px;
+    border-radius: 28px;
+    border: 1px solid var(--border-strong);
+    background: rgba(13, 13, 16, 0.92);
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(77, 159, 255, 0.06);
+    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    cursor: text;
+    text-align: left;
+}
+.cta__bar:focus-within {
+    border-color: rgba(77, 159, 255, 0.55);
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 4px rgba(77, 159, 255, 0.12);
+}
+.cta__bar textarea {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: none;
+    resize: none;
+    font-family: var(--sans);
+    font-size: 16.5px;
+    line-height: 1.5;
+    color: var(--text-strong);
+    caret-color: var(--accent);
+    padding: 10px 0;
+    max-height: 140px;
+    outline: none;
+}
+.cta__bar textarea::placeholder { color: var(--text-faint); }
+.cta__send {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
     background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, #2f7fe6 100%);
     color: var(--accent-ink);
-    font-size: clamp(16px, 1.8vw, 20px);
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: -0.01em;
-    box-shadow: 0 18px 60px -16px rgba(77, 159, 255, 0.6);
-    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+    box-shadow: 0 10px 30px -8px rgba(77, 159, 255, 0.6);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
-.cta__primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 26px 80px -18px rgba(77, 159, 255, 0.75);
-}
-.cta__primary-arrow { transition: transform 0.25s var(--ease); }
-.cta__primary:hover .cta__primary-arrow { transform: translateX(4px); }
+.cta__send:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -10px rgba(77, 159, 255, 0.75); }
 .cta__note {
+    margin-top: 14px;
     font-size: 13px;
     color: var(--text-faint);
+    text-align: center;
 }
 .cta__note b { color: var(--text-muted); font-weight: 600; }
 
@@ -1723,13 +1754,13 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             </h2>
 
             <div class="cta__actions" data-reveal data-delay="350">
-                <span class="cta__magnetic">
-                    <a href="/aplikacja/sparing/" class="cta__primary" data-cta data-cta-loc="final">
-                        Sprawdź swój pomysł z AI
-                        <span class="cta__primary-arrow" aria-hidden="true">→</span>
-                    </a>
-                </span>
-                <p class="cta__note"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy i zobaczysz pierwsze ekrany swojego narzędzia.</p>
+                <form class="cta__composer" id="idea-form">
+                    <div class="cta__bar">
+                        <textarea id="idea-input" rows="1" maxlength="600" placeholder="Opisz swój pomysł — jedno zdanie wystarczy…" aria-label="Opisz swój pomysł"></textarea>
+                        <button type="submit" class="cta__send" aria-label="Zacznij rozmowę z AI">→</button>
+                    </div>
+                    <p class="cta__note"><b>Za darmo i bez zobowiązań</b> — wciśnij Enter, a AI zacznie projektować z Tobą. Za kilkanaście minut zobaczysz pierwsze ekrany.</p>
+                </form>
             </div>
         </div>
     </section>
@@ -2138,6 +2169,54 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             ci = (ci + 1) % ctaWords.length;
             ctaWords.forEach(function (w, i) { w.classList.toggle('is-active', i === ci); });
         }, 2200);
+    }
+
+    // ============================================================
+    //  SCENA 8 — composer: pomysł wpisany TUTAJ ląduje w polu
+    //  rozmowy sparingu (sessionStorage, odczytywany po wejściu)
+    // ============================================================
+    var ideaForm = document.getElementById('idea-form');
+    var ideaInput = document.getElementById('idea-input');
+    if (ideaForm && ideaInput) {
+        ideaInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 140) + 'px';
+        });
+        ideaInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ideaForm.requestSubmit(); }
+        });
+        ideaForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var v = ideaInput.value.trim();
+            try { if (v) sessionStorage.setItem('spar_prefill_idea', v); } catch (err) {}
+            try {
+                if (typeof gtag === 'function') gtag('event', 'cta_click', { cta_location: 'idea_composer', destination: 'sparing', persona: 'stworze', has_idea: v ? 1 : 0 });
+                if (window.fbq) fbq('trackCustom', 'AplikacjaCTA', { location: 'idea_composer' });
+            } catch (err) {}
+            location.href = '/aplikacja/sparing/' + (q || '');
+        });
+        // placeholder pisze przykładowe pomysły (pauza, gdy user pisze)
+        if (!reduceMotion) {
+            var HINTS = [
+                'Prowadzę salon groomerski i klienci zapominają o wizytach…',
+                'Jestem elektrykiem — protokoły pomiarów robię po nocach…',
+                'Uczę matematyki i tonę w zeszytach z zaległościami…',
+                'Mam pasiekę — zamówienia na miód notuję na karteczkach…'
+            ];
+            var hi = 0, hch = 0, hDel = false;
+            setInterval(function () {
+                if (document.hidden || document.activeElement === ideaInput || ideaInput.value) return;
+                var word = HINTS[hi];
+                if (!hDel) {
+                    hch++;
+                    if (hch >= word.length + 28) hDel = true; // hold po dopisaniu
+                } else {
+                    hch -= 4;
+                    if (hch <= 0) { hch = 0; hDel = false; hi = (hi + 1) % HINTS.length; }
+                }
+                ideaInput.placeholder = word.slice(0, Math.min(hch, word.length)) || 'Opisz swój pomysł…';
+            }, 55);
+        }
     }
 })();
 </script>

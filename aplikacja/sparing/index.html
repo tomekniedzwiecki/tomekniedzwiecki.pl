@@ -7035,6 +7035,17 @@
         updateConvoMeta(); // odśwież listę projektów + tytuł karty przeglądarki
         syncProjectFromServer();
         scrollToBottom(true);
+        // pomysł wpisany na stronie głównej (/aplikacja/) — wstaw do pola rozmowy
+        try {
+            var prefillIdea = sessionStorage.getItem('spar_prefill_idea');
+            if (prefillIdea && !state.verdict && !el('inline-gate') && !el('chat-input').value &&
+                messages.filter(function (m) { return m.role === 'user'; }).length === 0) {
+                el('chat-input').value = prefillIdea.slice(0, 2000);
+                autosize();
+                updateCharCount();
+                sessionStorage.removeItem('spar_prefill_idea');
+            }
+        } catch (e) { /* sessionStorage niedostępny — pomijamy */ }
         // focus tylko na desktopie — na mobile klawiatura zasłoniłaby historię
         if (window.matchMedia('(hover: hover)').matches && !state.verdict && !el('inline-gate')) {
             el('chat-input').focus();
