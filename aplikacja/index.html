@@ -136,7 +136,7 @@ img { max-width: 100%; display: block; }
     position: relative;
     min-height: 100svh;
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
     align-items: center;
     gap: clamp(32px, 5vw, 72px);
     padding: calc(72px + 6vh) var(--pad-x) 9vh;
@@ -165,12 +165,16 @@ img { max-width: 100%; display: block; }
     pointer-events: none;
 }
 .eyebrow {
-    display: inline-flex; align-items: center; gap: 9px;
+    display: inline-flex; align-items: baseline; gap: 8px;
     font-size: 11.5px; font-weight: 800; letter-spacing: 0.18em;
     text-transform: uppercase; color: var(--accent);
     margin-bottom: 22px;
 }
-.eyebrow::before { content: ''; width: 22px; height: 1.5px; background: var(--accent); }
+.eyebrow .ser {
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: 15px; letter-spacing: 0; text-transform: none;
+    color: var(--text-muted);
+}
 .hero h1 {
     font-size: clamp(38px, 5.4vw, 68px);
     line-height: 1.02;
@@ -211,56 +215,144 @@ img { max-width: 100%; display: block; }
 .hero__note { margin-top: 16px; font-size: 12.5px; color: var(--text-faint); }
 .hero__note b { color: var(--text-muted); font-weight: 600; }
 
-/* Hero: okno czatu (produkt od pierwszej sekundy) */
-.chatcard {
-    position: relative;
-    border-radius: 20px;
-    border: 1px solid var(--glass-border);
-    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%);
-    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-    padding: 18px;
-    box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(77, 159, 255, 0.04);
+/* ── Hero: scena „pomysł → aplikacja" ──
+   Nie mockup obok tekstu, tylko linia produkcyjna produktu:
+   dymek z pomysłem (typewriter) → nić z iskrą → okno, w którym
+   rysuje się wireframe i materializuje PRAWDZIWY ekran z feedu. */
+.hero__noise {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
 }
-.chatcard::before {
+.hero__scene { position: relative; perspective: 1500px; min-width: 0; }
+.scene__idea {
+    position: relative; z-index: 2;
+    max-width: 480px;
+    border: 1px solid rgba(77, 159, 255, 0.32);
+    background: linear-gradient(180deg, rgba(77,159,255,0.13) 0%, rgba(77,159,255,0.05) 100%);
+    border-radius: 16px 16px 16px 5px;
+    padding: 12px 16px 13px;
+    box-shadow: 0 18px 50px -24px rgba(77, 159, 255, 0.35);
+}
+.scene__idea-label {
+    display: block;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 5px;
+}
+.scene__idea-text { font-size: 14px; line-height: 1.5; color: var(--text-strong); min-height: 42px; display: block; }
+.scene__caret {
+    display: inline-block; width: 7px; height: 14px;
+    background: var(--accent); margin-left: 3px; vertical-align: -2px; border-radius: 1px;
+    animation: caretBlink 0.9s steps(1) infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
+.scene__link { position: relative; height: 52px; margin-left: 34px; z-index: 1; }
+.scene__link::before {
     content: '';
-    position: absolute; inset: -1px; z-index: -1; border-radius: 21px;
-    background: conic-gradient(from var(--beam, 0deg), transparent 0 70%, rgba(77,159,255,0.5) 82%, transparent 94%);
-    animation: beamSpin 7s linear infinite;
+    position: absolute; left: 0; top: -8px; bottom: -8px; width: 2px;
+    background: linear-gradient(180deg, rgba(77,159,255,0), rgba(77,159,255,0.75) 28%, rgba(77,159,255,0.75) 72%, rgba(77,159,255,0));
 }
-@property --beam { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
-@keyframes beamSpin { to { --beam: 360deg; } }
-.chatcard__top { display: flex; align-items: center; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--glass-border-soft); margin-bottom: 14px; }
-.chatcard__dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); }
-.chatcard__title { margin-left: 6px; font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.04em; }
-.chatcard__live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); }
-.chatcard__live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.8s ease-in-out infinite; }
-@keyframes pulse { 50% { opacity: 0.35; } }
-.chatcard__msgs { display: flex; flex-direction: column; gap: 10px; min-height: 300px; }
-.cmsg {
-    max-width: 86%;
-    padding: 11px 15px;
-    border-radius: 16px;
-    font-size: 13.5px;
-    line-height: 1.55;
+.scene__spark {
+    position: absolute; left: -3px; top: 0;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 14px var(--accent);
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
 }
-.cmsg.is-in { opacity: 1; transform: none; }
-.cmsg--ai { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border-soft); color: var(--text); border-bottom-left-radius: 6px; }
-.cmsg--user { align-self: flex-end; background: var(--accent-soft); border: 1px solid rgba(77,159,255,0.3); color: var(--text-strong); border-bottom-right-radius: 6px; }
-.cmsg--shot { padding: 6px; max-width: 70%; }
-.cmsg--shot img { border-radius: 11px; aspect-ratio: 3/2; object-fit: cover; }
-.cmsg--shot span { display: block; font-size: 10.5px; color: var(--text-muted); padding: 6px 6px 2px; }
-.chatcard__typing { display: inline-flex; gap: 4px; padding: 12px 16px; }
-.chatcard__typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: tdot 1.1s ease-in-out infinite; }
-.chatcard__typing i:nth-child(2) { animation-delay: 0.15s; }
-.chatcard__typing i:nth-child(3) { animation-delay: 0.3s; }
-@keyframes tdot { 40% { transform: translateY(-4px); opacity: 1; } 0%, 100% { transform: none; opacity: 0.45; } }
+.scene__link.is-on .scene__spark { animation: sparkFlow 1.1s var(--ease) infinite; }
+@keyframes sparkFlow { 0% { opacity: 0; transform: translateY(-6px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(48px); } }
+.scene__node {
+    position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-faint);
+    transition: color 0.4s;
+}
+.scene__node i {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-faint); transition: background 0.4s, box-shadow 0.4s;
+}
+.scene__link.is-on .scene__node { color: var(--accent); }
+.scene__link.is-on .scene__node i { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+.scene__win {
+    position: relative; z-index: 2;
+    width: min(660px, 100%);
+    border-radius: 18px;
+    border: 1px solid var(--glass-border);
+    background: #0a0a10;
+    overflow: hidden;
+    box-shadow:
+        0 70px 140px -60px rgba(0, 0, 0, 0.95),
+        0 30px 90px -40px rgba(77, 159, 255, 0.18),
+        0 0 0 1px rgba(77, 159, 255, 0.05);
+    transform: rotateY(-6.5deg) rotateX(2deg);
+    transform-origin: 85% 40%;
+    transition: transform 0.9s var(--ease);
+}
+.hero__scene:hover .scene__win { transform: none; }
+.scene__bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--glass-border-soft);
+    background: rgba(255, 255, 255, 0.02);
+}
+.scene__dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); flex-shrink: 0; }
+.scene__url {
+    margin: 0 auto;
+    display: inline-flex; align-items: center; gap: 6px;
+    max-width: 60%;
+    padding: 4px 14px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.045);
+    font-size: 11.5px; font-weight: 600; color: var(--text-muted);
+    white-space: nowrap; overflow: hidden;
+}
+.scene__url svg { width: 10px; height: 10px; flex-shrink: 0; opacity: 0.7; }
+.scene__live {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--green); flex-shrink: 0;
+}
+.scene__live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.8s ease-in-out infinite; }
+.scene__screen { position: relative; aspect-ratio: 3 / 2; background: #0b0b11; }
+.scene__screen img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.65s var(--ease), filter 0.65s var(--ease);
+}
+.scene__screen img.is-on { opacity: 1; }
+/* podczas „projektowania" poprzedni ekran zostaje przygaszony pod wireframe'em */
+.scene__screen img.is-dim { opacity: 0.13; filter: saturate(0.2); }
+/* wireframe „szkic ekranu" rysujący się przed materializacją */
+.scene__wire { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.4s; }
+.scene__wire.is-draw { opacity: 1; }
+.scene__wire rect, .scene__wire line {
+    fill: none; stroke: rgba(77, 159, 255, 0.5); stroke-width: 1.3;
+    stroke-dasharray: 900; stroke-dashoffset: 900;
+}
+.scene__wire.is-draw rect, .scene__wire.is-draw line { animation: wireDraw 0.9s var(--ease) forwards; }
+.scene__wire rect:nth-of-type(2), .scene__wire line:nth-of-type(1) { animation-delay: 0.12s !important; }
+.scene__wire rect:nth-of-type(3), .scene__wire line:nth-of-type(2) { animation-delay: 0.24s !important; }
+.scene__wire rect:nth-of-type(4), .scene__wire line:nth-of-type(3) { animation-delay: 0.36s !important; }
+.scene__wire rect:nth-of-type(5) { animation-delay: 0.46s !important; }
+.scene__wire rect:nth-of-type(6) { animation-delay: 0.56s !important; }
+@keyframes wireDraw { to { stroke-dashoffset: 0; } }
+.scene__cap {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 11px 16px;
+    border-top: 1px solid var(--glass-border-soft);
+}
+.scene__cap b { font-size: 13.5px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scene__cap span { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
+.scene__cap span em { font-style: normal; color: var(--text-muted); }
 @media (max-width: 960px) {
     .hero { grid-template-columns: 1fr; padding-top: calc(64px + 4vh); min-height: auto; }
-    .chatcard { max-width: 480px; }
-    .chatcard__msgs { min-height: 250px; }
+    .hero__scene { max-width: 540px; }
+    .scene__win { transform: none; width: 100%; }
+    .scene__idea { max-width: 100%; }
 }
 
 /* ── PASEK LICZB ── */
@@ -496,7 +588,10 @@ img { max-width: 100%; display: block; }
 @media (prefers-reduced-motion: reduce) {
     .show__screen img { transition: opacity 0.3s ease; }
     .show__item.is-on .show__prog i { animation: none; width: 100%; }
-    .chatcard::before, .step--final::before { animation: none; }
+    .step--final::before { animation: none; }
+    .scene__link.is-on .scene__spark { animation: none; opacity: 0; }
+    .scene__link.is-on .scene__node i { animation: none; }
+    .scene__win { transform: none; }
 }
 
 /* ── MODEL (gramy do jednej bramki) ── */
@@ -661,8 +756,9 @@ img { max-width: 100%; display: block; }
 
 <!-- ════════ HERO ════════ -->
 <header class="hero">
+    <div class="hero__noise" aria-hidden="true"></div>
     <div>
-        <div class="eyebrow">Wspólny biznes, nie usługa</div>
+        <div class="eyebrow">Wspólny biznes <span class="ser">— nie usługa</span></div>
         <h1>Zbuduję aplikację na <span class="ser">Twoim pomyśle</span>.<br>Rozkręcę. Oddam Ci stery.</h1>
         <p class="hero__lead">Ty wnosisz pomysł i chęć poprowadzenia tego dalej. Ja wnoszę zespół,
         połowę budżetu i <strong>15 lat budowania biznesów online</strong>. Buduję aplikację, osobiście
@@ -674,13 +770,40 @@ img { max-width: 100%; display: block; }
         <p class="hero__note"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy, a zobaczysz pierwsze ekrany swojego narzędzia.</p>
     </div>
 
-    <div class="chatcard" aria-hidden="true">
-        <div class="chatcard__top">
-            <span class="chatcard__dot"></span><span class="chatcard__dot"></span><span class="chatcard__dot"></span>
-            <span class="chatcard__title">stworze / sparing</span>
-            <span class="chatcard__live"><i></i>na żywo</span>
+    <div class="hero__scene">
+        <div class="scene__idea">
+            <span class="scene__idea-label">Pomysł — tak to się zaczyna</span>
+            <span class="scene__idea-text"><span id="idea-text"></span><span class="scene__caret" id="idea-caret"></span></span>
         </div>
-        <div class="chatcard__msgs" id="chat-demo"></div>
+        <div class="scene__link" id="scene-link">
+            <span class="scene__spark"></span>
+            <span class="scene__node"><i></i>AI projektuje ekrany</span>
+        </div>
+        <div class="scene__win">
+            <div class="scene__bar">
+                <span class="scene__dot"></span><span class="scene__dot"></span><span class="scene__dot"></span>
+                <span class="scene__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja</span>
+                <span class="scene__live"><i></i>feed na żywo</span>
+            </div>
+            <div class="scene__screen">
+                <svg class="scene__wire" id="scene-wire" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true">
+                    <rect x="18" y="16" width="564" height="34" rx="6"/>
+                    <rect x="18" y="66" width="172" height="78" rx="6"/>
+                    <rect x="214" y="66" width="172" height="78" rx="6"/>
+                    <rect x="410" y="66" width="172" height="78" rx="6"/>
+                    <rect x="18" y="160" width="564" height="180" rx="6"/>
+                    <rect x="18" y="356" width="180" height="28" rx="6"/>
+                    <line x1="40" y1="206" x2="560" y2="206"/>
+                    <line x1="40" y1="250" x2="560" y2="250"/>
+                    <line x1="40" y1="294" x2="560" y2="294"/>
+                </svg>
+                <img id="scene-img" alt="Ekran aplikacji wygenerowany w rozmowie z AI" decoding="async">
+            </div>
+            <div class="scene__cap">
+                <b id="scene-name">&nbsp;</b>
+                <span id="scene-meta"></span>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -922,65 +1045,106 @@ img { max-width: 100%; display: block; }
     }, { threshold: 0.6 });
     document.querySelectorAll('[data-count]').forEach(function (el) { cio.observe(el); });
 
-    /* ── Hero: animowany czat (loop) ── */
-    var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png'; // lokalny asset (fallback, gdy feed pusty)
-    var SCRIPT = [
-        { who: 'user', text: 'Prowadzę salon groomerski. Klienci notorycznie zapominają o wizytach…' },
-        { who: 'ai', text: 'Czyli puste okienka w grafiku i SMS-y wysyłane ręcznie wieczorami. Kto u Ciebie pilnuje rezerwacji?' },
-        { who: 'user', text: 'Ja i recepcjonistka. Zeszyt + telefon.' },
-        { who: 'ai', text: 'Mam to. Projektuję narzędzie: pulpit wizyt + automatyczne przypomnienia SMS. Generuję ekrany…' },
-        { who: 'shot' },
-        { who: 'ai', text: 'Werdykt: ✅ zielony. Salony płacą 100–200 zł/mies. za rezerwacje — przy 50 salonach to ok. 7 450 zł/mies. przychodu.' }
+    /* ── Hero: scena „pomysł → aplikacja" ──
+       Pomysły to przykładowe punkty startu; ekran i nazwa są PRAWDZIWE
+       (z publicznego feedu generowań, z godziną). Scenariusz gra tylko,
+       jeśli jego projekt faktycznie jest w feedzie. */
+    var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png'; // fallback, gdy feed pusty
+    var SCENE_DEFS = [
+        { idea: 'Prowadzę hodowlę kotów rasowych. Terminy kryć i porodów trzymam w zeszycie — i co miesiąc coś mi umyka…', name: 'LitterPlan' },
+        { idea: 'Jestem elektrykiem. Pomiary robię w godzinę, a protokoły dla klientów klepię po nocach…', name: 'RaportElektryk' },
+        { idea: 'Jeżdżę zawodowo TIR-em. Osiem godzin za kółkiem dziennie i plecy powoli wysiadają…', name: 'Pauza dla Pleców' },
+        { idea: 'Hurtowe zamówienia w moim sklepie giną między mailem a Excelem. Nie widzę, które są po terminie…', name: 'OrderVault 18+' }
     ];
-    var demoBox = document.getElementById('chat-demo');
-    var demoFeedImg = null; // podmieniane realnym podglądem z feedu
-    function playDemo() {
-        demoBox.innerHTML = '';
-        var i = 0;
-        function next() {
-            if (i >= SCRIPT.length) { setTimeout(playDemo, 6000); return; }
-            var m = SCRIPT[i++];
-            var typing = null;
-            if (m.who === 'ai' || m.who === 'shot') {
-                typing = document.createElement('div');
-                typing.className = 'cmsg cmsg--ai chatcard__typing is-in';
-                typing.innerHTML = '<i></i><i></i><i></i>';
-                demoBox.appendChild(typing);
-            }
-            setTimeout(function () {
-                if (typing) typing.remove();
-                var div = document.createElement('div');
-                if (m.who === 'shot') {
-                    div.className = 'cmsg cmsg--ai cmsg--shot';
-                    var src = demoFeedImg || DEMO_IMG;
-                    div.innerHTML = '<img src="' + src + '" alt="" loading="lazy"><span>Pulpit narzędzia — wygenerowany</span>';
-                } else {
-                    div.className = 'cmsg cmsg--' + m.who;
-                    div.textContent = m.text;
-                }
-                demoBox.appendChild(div);
-                requestAnimationFrame(function () { div.classList.add('is-in'); });
-                while (demoBox.children.length > 5) demoBox.removeChild(demoBox.firstChild);
-                next();
-            }, m.who === 'user' ? 900 : 1500);
-        }
-        next();
+    var ideaText = document.getElementById('idea-text');
+    var ideaCaret = document.getElementById('idea-caret');
+    var sceneLink = document.getElementById('scene-link');
+    var sceneWire = document.getElementById('scene-wire');
+    var sceneImg = document.getElementById('scene-img');
+    var sceneName = document.getElementById('scene-name');
+    var sceneMeta = document.getElementById('scene-meta');
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function sceneTime(iso) {
+        var d = new Date(iso);
+        if (isNaN(d)) return '';
+        var now = new Date();
+        var sameDay = d.toDateString() === now.toDateString();
+        var hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        if (sameDay) return 'dziś ' + hm;
+        var y = new Date(now - 864e5);
+        if (d.toDateString() === y.toDateString()) return 'wczoraj ' + hm;
+        return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ', ' + hm;
     }
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        // statyczny zrzut rozmowy
-        SCRIPT.forEach(function (m) {
-            var div = document.createElement('div');
-            if (m.who === 'shot') {
-                div.className = 'cmsg cmsg--ai cmsg--shot is-in';
-                div.innerHTML = '<img src="' + DEMO_IMG + '" alt="" loading="lazy"><span>Pulpit narzędzia — wygenerowany</span>';
-            } else {
-                div.className = 'cmsg cmsg--' + m.who + ' is-in';
-                div.textContent = m.text;
+
+    function startScene(scenes) {
+        var si = 0, typeTimer = null, loopTimer = null;
+        function showShot(s) {
+            var paint = function () {
+                sceneWire.classList.remove('is-draw');
+                sceneImg.classList.remove('is-dim');
+                sceneImg.classList.add('is-on');
+                sceneName.textContent = s.name;
+                sceneMeta.innerHTML = s.real
+                    ? 'prawdziwy projekt · <em>' + s.when + '</em>'
+                    : 'ekrany prosto z rozmowy';
+            };
+            if (sceneImg.src === s.img || sceneImg.getAttribute('src') === s.img) { paint(); return; }
+            sceneImg.onload = paint;
+            sceneImg.src = s.img;
+            if (sceneImg.complete && sceneImg.naturalWidth) paint();
+        }
+        if (reduced) {
+            // wersja statyczna: pełny pomysł + ekran od razu, bez pętli
+            var s0 = scenes[0];
+            ideaText.textContent = s0.idea;
+            ideaCaret.style.display = 'none';
+            sceneLink.classList.add('is-on');
+            showShot(s0);
+            return;
+        }
+        function play() {
+            var s = scenes[si];
+            // reset — poprzedni ekran zostaje przygaszony, nie znika do zera
+            sceneLink.classList.remove('is-on');
+            if (sceneImg.classList.contains('is-on')) {
+                sceneImg.classList.remove('is-on');
+                sceneImg.classList.add('is-dim');
             }
-            demoBox.appendChild(div);
+            ideaText.textContent = '';
+            ideaCaret.style.display = '';
+            // preload obrazu tej i następnej sceny
+            var pre = new Image(); pre.src = s.img;
+            var nx = new Image(); nx.src = scenes[(si + 1) % scenes.length].img;
+            // 1) typewriter
+            var ch = 0;
+            (function type() {
+                if (ch <= s.idea.length) {
+                    ideaText.textContent = s.idea.slice(0, ch++);
+                    typeTimer = setTimeout(type, 24);
+                    return;
+                }
+                // 2) iskra płynie, węzeł aktywny
+                sceneLink.classList.add('is-on');
+                // 3) wireframe rysuje się
+                sceneWire.classList.add('is-draw');
+                loopTimer = setTimeout(function () {
+                    // 4) materializacja prawdziwego ekranu
+                    showShot(s);
+                    // 5) pauza i następna scena
+                    loopTimer = setTimeout(function () {
+                        si = (si + 1) % scenes.length;
+                        play();
+                    }, 5200);
+                }, 1150);
+            })();
+        }
+        // pauza gdy karta nieaktywna — bez rozjeżdżania pętli
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) { clearTimeout(typeTimer); clearTimeout(loopTimer); }
+            else play();
         });
-    } else {
-        playDemo();
+        play();
     }
 
     /* ── Feed ostatnich generowań (lekkie webp przez render API) ── */
@@ -991,11 +1155,24 @@ img { max-width: 100%; display: block; }
         return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
             '?format=webp&width=' + (w || 480) + '&quality=70&resize=contain';
     }
+    var FALLBACK_SCENE = [{
+        idea: 'Prowadzę salon groomerski. Klienci notorycznie zapominają o wizytach…',
+        name: 'Pulpit narzędzia', img: DEMO_IMG, real: false, when: ''
+    }];
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
+
+        // scena hero: scenariusze, których projekt faktycznie jest w feedzie
+        var byName = {};
+        items.forEach(function (p) { byName[p.nazwa] = p; });
+        var scenes = SCENE_DEFS.filter(function (s) { return byName[s.name]; }).map(function (s) {
+            var p = byName[s.name];
+            return { idea: s.idea, name: p.nazwa, img: lightImg(p.img, 760), real: true, when: sceneTime(p.generated_at) };
+        });
+        startScene(scenes.length ? scenes : FALLBACK_SCENE);
+
         if (!items.length) return; // sekcja ukryta tylko przy CAŁKIEM pustym feedzie
         items = items.slice(0, 6);
-        demoFeedImg = lightImg(items[0].img, 480);
         var section = document.getElementById('projekty');
         section.hidden = false;
 
@@ -1105,7 +1282,7 @@ img { max-width: 100%; display: block; }
         section.querySelectorAll('[data-cta]').forEach(function (a) {
             if (q) a.href = '/aplikacja/sparing/' + q;
         });
-    }).catch(function () { });
+    }).catch(function () { startScene(FALLBACK_SCENE); });
 
     /* ── Cycler w final CTA ── */
     var WORDS = ['Tobą.', 'księgową.', 'trenerem.', 'architektem.', 'groomerką.', 'agentem.', 'Tobą.'];
