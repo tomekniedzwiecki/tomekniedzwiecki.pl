@@ -6030,9 +6030,18 @@
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
+        state.raport = null;
+        state.landingUrl = null;
         extras.summary = 'idle';
         extras.plan = 'idle';
+        extras.raport = 'idle';
+        extras.sklep = 'idle';
+        extras.telefon = 'idle';
+        extras.landing = 'idle';
+        extrasStart = {};
+        pjView = 'dash';
         pjNewPlan = false;
+        rkNew = false;
         if (activeTab !== 'chat') switchTab('chat');
         if (!state.pSlug) state.profession = null;
         messages = [];
@@ -7387,6 +7396,25 @@
         updateConvoMeta(); // odśwież listę projektów + tytuł karty przeglądarki
         syncProjectFromServer();
         scrollToBottom(true);
+        // start z chipa/pola na stronie głównej: jeśli aktywna rozmowa ma już
+        // treść albo werdykt, NAJPIERW otwieramy nową — user świadomie zaczyna
+        // nowy pomysł, a lądował w starej rozmowie z payboxem „Karta gotowa"
+        try {
+            var heroChoice = sessionStorage.getItem('spar_autosend_choice');
+            var heroIdea = sessionStorage.getItem('spar_prefill_idea');
+            var convoFresh = !state.verdict &&
+                messages.filter(function (m) { return m.role === 'user'; }).length === 0;
+            if ((heroChoice || heroIdea) && !convoFresh) {
+                if (convoIndex().length >= CONVOS_MAX) {
+                    // limit projektów — zostajemy w aktywnej rozmowie, sprzątamy klucze
+                    sessionStorage.removeItem('spar_autosend_choice');
+                    sessionStorage.removeItem('spar_prefill_idea');
+                } else {
+                    newConvo(); // startFresh → enterChat — klucze obsłuży świeża rozmowa
+                    return;
+                }
+            }
+        } catch (e) { /* sessionStorage niedostępny — pomijamy */ }
         // pomysł wpisany na stronie głównej (/aplikacja/) — wstaw do pola rozmowy
         try {
             var prefillIdea = sessionStorage.getItem('spar_prefill_idea');
