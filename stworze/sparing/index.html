@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="theme-color" content="#050507">
-    <title>Stworzę — zamień pomysł w produkt cyfrowy | Tomek Niedźwiecki</title>
-    <meta name="description" content="Masz pomysł na narzędzie albo znasz problem swojej branży? Kilka minut rozmowy z AI, podgląd Twojego narzędzia — a potem wspólna budowa biznesu z Tomkiem.">
+    <title>Aplikacja — zamień pomysł w produkt cyfrowy | Tomek Niedźwiecki</title>
+    <meta name="description" content="Masz pomysł na aplikację? Kilka minut rozmowy z AI, podgląd pierwszych ekranów — a potem wspólna budowa i rozkręcenie biznesu z Tomkiem.">
     <meta name="robots" content="noindex, follow">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
@@ -13,7 +13,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tomekniedzwiecki.pl/stworze/sparing/">
-    <meta property="og:title" content="Stworzę — zamień pomysł w produkt cyfrowy">
+    <meta property="og:title" content="Aplikacja — zamień pomysł w produkt cyfrowy">
     <meta property="og:description" content="Kilka minut rozmowy, podgląd Twojego narzędzia — a potem wspólna budowa biznesu z Tomkiem.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
@@ -3159,7 +3159,7 @@
     <aside class="side" id="side" aria-label="Menu projektu">
         <a class="side__brand" href="/stworze/">
             <img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">
-            <span>Stworzę</span>
+            <span>Aplikacja</span>
         </a>
         <button type="button" class="side__new" id="btn-restart">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
@@ -3204,7 +3204,7 @@
             </button>
             <div class="chat-top__brand">
                 <img src="/img/logo/tn-logo-icon-88.png" alt="" width="28" height="28" aria-hidden="true">
-                <span>Stworzę</span>
+                <span>Aplikacja</span>
             </div>
             <span class="chat-top__spacer" aria-hidden="true"></span>
         </header>
@@ -3251,7 +3251,7 @@
     var SPAR_FEED_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
     var SB_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
-    var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Pierwsza Makieta — Stworzę" (500 zł)
+    var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Rezerwacja współpracy — Aplikacja" (500 zł, zwrotne)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
 
     // Multi-rozmowy: stan każdej rozmowy żyje pod kluczem per-sesja,
@@ -3289,7 +3289,7 @@
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
     var OPENER_PROMISE = 'Krótka, konkretna rozmowa — a po kilku minutach zobaczysz **pierwsze ekrany swojego narzędzia**.\n\nOd czego zaczynamy?';
 
-    var OPENER_GENERIC = OPENER_HI + '\n\nZamienimy to, co znasz z pracy albo z pasji, w narzędzie, za które ludzie płacą co miesiąc.\n\n' + OPENER_PROMISE;
+    var OPENER_GENERIC = OPENER_HI + '\n\nZamienimy Twój pomysł — z pracy, z pasji albo z czystej obserwacji — w aplikację, za którą ludzie płacą co miesiąc.\n\n' + OPENER_PROMISE;
 
     // Chipy startowe = trzy drogi wejścia (pomysł / problem / szukamy)
     var START_CHIPS = [
@@ -3438,8 +3438,8 @@
         renderConvoList();
         // nazwa projektu w karcie przeglądarki — łatwiej znaleźć wśród kart
         document.title = (state.lastBrief && state.lastBrief.nazwa)
-            ? state.lastBrief.nazwa + ' — Stworzę'
-            : 'Stworzę — sparing pomysłu | Tomek Niedźwiecki';
+            ? state.lastBrief.nazwa + ' — Aplikacja'
+            : 'Aplikacja — sparing pomysłu | Tomek Niedźwiecki';
     }
     function renderConvoList() {
         var idx = convoIndex();
@@ -3738,13 +3738,13 @@
     // czysta wizytówka — ekrany + karta z serwera, zero czatu, na dole CTA
     // „stwórz własny”. Właściciel z tą sesją w LS dostaje link powrotny.
     function renderShareView(sid) {
-        document.title = 'Projekt narzędzia — Stworzę';
+        document.title = 'Projekt aplikacji | Tomek Niedźwiecki';
         var app = document.querySelector('main.app');
         app.className = 'app app--share';
         var isOwner = !!loadJSON(sessionKey(sid));
         function topBar() {
             return '<div class="share__top">' +
-                '<a class="share__brand" href="/stworze/"><img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">Stworzę</a>' +
+                '<a class="share__brand" href="/stworze/"><img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">Aplikacja</a>' +
                 (isOwner ? '<a class="share__owner" href="' + location.pathname + '?id=' + encodeURIComponent(sid) + '">To Twój projekt — wróć do rozmowy</a>' : '') +
                 '</div>';
         }
@@ -3778,7 +3778,7 @@
             }
             var pr = res.d.projekt;
             var nazwa = pr.nazwa || 'Projekt narzędzia';
-            document.title = nazwa + ' — Stworzę';
+            document.title = nazwa + ' — Aplikacja';
             // lightbox czyta state.previews — zasilamy z serwera
             state.previews = pr.preview_images || (pr.preview_image_url ? { panel: pr.preview_image_url } : {});
             var items = lightboxItems();
@@ -3808,8 +3808,8 @@
             if (pillUrl) html += pillHTML(pillUrl);
             html += '<div class="share-cta">' +
                 '<div class="share-cta__t">Ten projekt powstał w kilkanaście minut rozmowy z AI.</div>' +
-                '<p>Opowiadasz o swojej branży albo pasji — AI razem z Tobą projektuje narzędzie, pokazuje pierwsze ekrany i mówi wprost, czy pomysł się spina. Za darmo.</p>' +
-                '<a class="side-cta__btn" href="/stworze/sparing/">Stwórz projekt dla swojej branży</a>' +
+                '<p>Opowiadasz o swoim pomyśle — z pracy, z pasji albo z czystej obserwacji — a AI projektuje z Tobą aplikację, pokazuje pierwsze ekrany i mówi wprost, czy to się spina. Za darmo.</p>' +
+                '<a class="side-cta__btn" href="/stworze/sparing/">Stwórz aplikację ze swojego pomysłu</a>' +
                 '<a class="share-cta__more" href="/stworze/">Zobacz, jak działa współpraca z Tomkiem →</a>' +
                 '</div>';
             body.innerHTML = html;
@@ -4373,7 +4373,7 @@
         body.innerHTML =
             '<div class="tabpane__head"><div class="tabpane__eyebrow">Wspólny biznes</div>' +
             '<h2 class="tabpane__title">Budujemy to razem</h2>' +
-            '<p class="tabpane__sub">Ty znasz branżę. Tomek buduje, finansuje połowę i rozkręca sprzedaż.</p></div>' +
+            '<p class="tabpane__sub">Ty wnosisz pomysł i chęć działania. Tomek buduje, finansuje połowę i rozkręca sprzedaż.</p></div>' +
 
             '<div class="cw-stats">' +
             '<div class="cw-stat"><b>500 zł</b><span>rezerwacja rozmowy<br><em>w pełni zwrotna</em></span></div>' +
@@ -4391,7 +4391,7 @@
             '</div>' +
 
             '<div class="cw-roles">' +
-            '<div class="cw-role"><div class="cw-role__t">Ty wnosisz</div><ul><li>znajomość branży</li><li>kontakty i polecenia</li><li>oko praktyka przy testach</li></ul></div>' +
+            '<div class="cw-role"><div class="cw-role__t">Ty wnosisz</div><ul><li>pomysł i wizję</li><li>chęć prowadzenia i rozwijania biznesu</li><li>feedback przy testach pierwszej wersji</li></ul></div>' +
             '<div class="cw-role cw-role--tomek"><div class="cw-role__t">Tomek wnosi</div><ul><li>budowę narzędzia z zespołem</li><li>15 000 zł własnego wkładu</li><li>kampanie i pierwszych 50 klientów</li></ul></div>' +
             '</div>' +
 
