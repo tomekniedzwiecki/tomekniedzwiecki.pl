@@ -1412,6 +1412,48 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     text-align: center;
 }
 .cta__note b { color: var(--text-muted); font-weight: 600; }
+/* trzy drogi wejścia — klik od razu zaczyna rozmowę w sparingu */
+.cta__paths {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: clamp(18px, 2.5vh, 28px);
+}
+.cta__paths-label {
+    width: 100%;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 2px;
+}
+.cta__path {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: rgba(13, 13, 16, 0.85);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.cta__path::after { content: '→'; color: var(--accent); transition: transform 0.25s var(--ease); }
+.cta__path:hover {
+    border-color: rgba(77, 159, 255, 0.55);
+    background: var(--accent-dim);
+    transform: translateY(-2px);
+}
+.cta__path:hover::after { transform: translateX(3px); }
+@media (max-width: 700px) {
+    .cta__paths { flex-direction: column; }
+    .cta__path { width: 100%; max-width: 420px; justify-content: center; }
+}
 
 /* ============================================================
    FOOTER MINI
@@ -1761,6 +1803,12 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                         <button type="submit" class="cta__send" aria-label="Zacznij rozmowę z AI">→</button>
                     </div>
                     <p class="cta__note"><b>Za darmo i bez zobowiązań</b> — wciśnij Enter, a AI zacznie projektować z Tobą. Za kilkanaście minut zobaczysz pierwsze ekrany.</p>
+                    <div class="cta__paths">
+                        <span class="cta__paths-label">albo zacznij jednym kliknięciem</span>
+                        <button type="button" class="cta__path" data-path="Mam już pomysł na narzędzie">Mam już pomysł na narzędzie</button>
+                        <button type="button" class="cta__path" data-path="Znam problem, który warto rozwiązać">Znam problem, który warto rozwiązać</button>
+                        <button type="button" class="cta__path" data-path="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -2195,6 +2243,18 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                 if (window.fbq) fbq('trackCustom', 'AplikacjaCTA', { location: 'idea_composer' });
             } catch (err) {}
             location.href = '/aplikacja/sparing/' + (q || '');
+        });
+        // trzy drogi wejścia — klik wysyła wybór jako pierwszą wiadomość
+        // w sparingu (autosend), rozmowa startuje natychmiast
+        document.querySelectorAll('.cta__path').forEach(function (b) {
+            b.addEventListener('click', function () {
+                try { sessionStorage.setItem('spar_autosend_choice', b.dataset.path); } catch (err) {}
+                try {
+                    if (typeof gtag === 'function') gtag('event', 'cta_click', { cta_location: 'idea_path', destination: 'sparing', persona: 'stworze' });
+                    if (window.fbq) fbq('trackCustom', 'AplikacjaCTA', { location: 'idea_path' });
+                } catch (err) {}
+                location.href = '/aplikacja/sparing/' + (q || '');
+            });
         });
         // placeholder pisze przykładowe pomysły (pauza, gdy user pisze;
         // na wąskim ekranie krótsze — dłuższe zawijałyby pole)

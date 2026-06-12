@@ -7360,6 +7360,19 @@
                 sessionStorage.removeItem('spar_prefill_idea');
             }
         } catch (e) { /* sessionStorage niedostępny — pomijamy */ }
+        // droga wybrana na stronie głównej (chip) — wyślij OD RAZU jako
+        // pierwszą wiadomość; rozmowa startuje bez dodatkowego kliknięcia
+        try {
+            var autoChoice = sessionStorage.getItem('spar_autosend_choice');
+            if (autoChoice) {
+                sessionStorage.removeItem('spar_autosend_choice');
+                if (!state.verdict && !el('inline-gate') && !streaming &&
+                    messages.filter(function (m) { return m.role === 'user'; }).length === 0) {
+                    removeChips();
+                    sendOpening(autoChoice.slice(0, 200));
+                }
+            }
+        } catch (e) { /* sessionStorage niedostępny — pomijamy */ }
         // focus tylko na desktopie — na mobile klawiatura zasłoniłaby historię
         if (window.matchMedia('(hover: hover)').matches && !state.verdict && !el('inline-gate')) {
             el('chat-input').focus();
