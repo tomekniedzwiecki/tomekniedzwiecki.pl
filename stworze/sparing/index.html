@@ -3269,7 +3269,9 @@
         try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
     }
     function esc(s) {
-        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        // także " i ' — esc ląduje w atrybutach (value="...", url('...'))
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
     function getCookie(name) {
         var v = '; ' + document.cookie;
@@ -3369,6 +3371,7 @@
         state.phone = saved.phone || null;
         state.authUserId = saved.authUserId || null;
         state.authProvider = saved.authProvider || null;
+        pendingAuth = null; // dane OAuth nie przechodzą między rozmowami
         state.sessionId = saved.sessionId;
         state.verdict = saved.verdict || null;
         state.karta = saved.karta || null;
@@ -3657,7 +3660,6 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + SB_PUBLISHABLE,
                 'apikey': SB_PUBLISHABLE
             },
             body: JSON.stringify({ sessionId: sid, action: 'get' })
@@ -4468,7 +4470,12 @@
             ' — dorzuć jeszcze numer telefonu.</div>';
     }
 
-    var GATE_PHONE_RE = /(?:\d[\s\-()]?){9,}/;
+    // telefon: min 9 cyfr + CAŁY string w dozwolonym formacie (kotwice ^$ —
+    // bez nich przechodziło cokolwiek zawierającego 9 cyfr, np. PESEL w zdaniu)
+    function phoneValid(s) {
+        var digits = s.replace(/\D/g, '');
+        return digits.length >= 9 && digits.length <= 15 && /^[+]?[\d\s\-().]{9,20}$/.test(s);
+    }
 
     function renderInlineGate() {
         if (el('inline-gate') || state.email || state.emailKnown) return;
@@ -4521,13 +4528,14 @@
             var emailOk = GATE_EMAIL_RE.test(email);
             el('gate-email-error').classList.toggle('is-shown', !emailOk);
             if (!emailOk) ok = false;
-            var phoneOk = GATE_PHONE_RE.test(phone);
+            var phoneOk = phoneValid(phone);
             el('gate-phone-error').classList.toggle('is-shown', !phoneOk);
             if (!phoneOk) ok = false;
             if (!ok) return;
             state.name = name;
             state.email = email;
             state.phone = phone;
+            if (pa) { state.authUserId = pa.userId; state.authProvider = pa.provider; }
             persistSession();
             div.remove();
             sysMsg('Dzięki, ' + name.split(' ')[0] + '. Wracamy do rozmowy — pisz śmiało.');
@@ -4548,7 +4556,7 @@
 
     // Świeża rozmowa (nowy sessionId); keepContact=true zachowuje imię i mail
     function startFresh(keepContact) {
-        if (!keepContact) { state.email = null; state.name = null; state.phone = null; state.authUserId = null; state.authProvider = null; }
+        if (!keepContact) { state.email = null; state.name = null; state.phone = null; state.authUserId = null; state.authProvider = null; pendingAuth = null; }
         state.sessionId = uuid4();
         state.verdict = null; state.karta = null; state.leadId = null;
         state.kamien = 0;
@@ -5177,7 +5185,8 @@
             }
         }).then(function () {
             streaming = false;
-            if (el('composer').hidden === false) setComposerEnabled(true);
+            // bramka rejestracji blokuje composer — nie odblokowuj pod nią
+            if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
 
             if (failedBeforeText && !raw) {
                 bubble.remove();
