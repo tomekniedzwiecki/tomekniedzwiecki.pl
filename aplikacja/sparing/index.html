@@ -1034,6 +1034,177 @@
     .pj-wait--fail { border-style: solid; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
     .pj-wait--tile { margin-top: 0; min-height: 120px; }
 
+    /* ── Dashboard projektu: duże kafle elementów ── */
+    .pjd-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 14px;
+    }
+    .pjd-tile {
+        position: relative;
+        grid-column: span 2;
+        min-height: 185px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 7px;
+        text-align: left;
+        padding: 18px;
+        border: 1px solid var(--glass-border);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.02);
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+        overflow: hidden;
+        text-decoration: none;
+        transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
+    }
+    .pjd-tile:hover { border-color: rgba(77, 159, 255, 0.5); transform: translateY(-2px); background: rgba(255, 255, 255, 0.035); }
+    .pjd-tile--static { cursor: default; justify-content: flex-start; }
+    .pjd-tile--static:hover { border-color: var(--glass-border); transform: none; background: rgba(255, 255, 255, 0.02); }
+    .pjd-tile--dim { opacity: 0.55; cursor: default; }
+    .pjd-tile--dim:hover { border-color: var(--glass-border); transform: none; }
+    .pjd-tile--hero { grid-column: span 4; min-height: 250px; }
+    .pjd-tile--w3 { grid-column: span 3; }
+    .pjd-tile--img { background-size: cover; background-position: top center; }
+    .pjd-tile__ico {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        background: rgba(77, 159, 255, 0.14);
+        display: grid;
+        place-items: center;
+        margin-bottom: auto;
+        flex-shrink: 0;
+    }
+    .pjd-tile__ico svg { width: 18px; height: 18px; color: var(--accent); }
+    .pjd-tile__t {
+        font-family: inherit;
+        font-weight: 800;
+        font-size: 16.5px;
+        color: var(--text-strong);
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pjd-tile__sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+    .pjd-tile__go {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--glass-border);
+        display: grid;
+        place-items: center;
+        transition: background 0.16s ease, transform 0.16s ease;
+    }
+    .pjd-tile__go svg { width: 14px; height: 14px; color: var(--text-strong); }
+    .pjd-tile:hover .pjd-tile__go { background: var(--accent); transform: translateX(2px); }
+    .pjd-quote {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 14.5px;
+        line-height: 1.55;
+        color: var(--text-strong);
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .pjd-clamp {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .pjd-num { font-weight: 800; font-size: clamp(24px, 3vw, 32px); color: var(--text-strong); line-height: 1.1; }
+    .pjd-num small { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .pjd-live {
+        font-style: normal;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #5dd39e;
+        border: 1px solid rgba(93, 211, 158, 0.45);
+        border-radius: 99px;
+        padding: 2.5px 8px;
+    }
+    .pjd-badge {
+        align-self: flex-start;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--accent);
+        border: 1px solid rgba(77, 159, 255, 0.4);
+        border-radius: 99px;
+        padding: 3px 11px;
+    }
+    .pjd-badge--wysoki { color: #5dd39e; border-color: rgba(93, 211, 158, 0.45); }
+    .pjd-mini { display: flex; gap: 8px; }
+    .pjd-mini img {
+        width: calc(50% - 4px);
+        aspect-ratio: 3 / 2;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+    }
+    /* Pasek postępu generacji (ETA) */
+    .pjd-gen { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+    .pjd-gen__top { display: flex; align-items: center; gap: 9px; }
+    .pjd-gen__top .share__spin { width: 16px; height: 16px; flex-shrink: 0; }
+    .pjd-gen__top b { font-size: 13px; color: var(--text-strong); }
+    .pjd-gen__sub { font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+    .pjd-gen__bar {
+        height: 6px;
+        border-radius: 99px;
+        background: rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+    }
+    .pjd-gen__bar i {
+        display: block;
+        height: 100%;
+        border-radius: 99px;
+        background: linear-gradient(90deg, #2f6bdd, var(--accent));
+        transition: width 1s linear;
+    }
+    .pjd-gen__eta { font-size: 11px; color: var(--accent); font-weight: 600; }
+    .pjd-gen--fail b { font-size: 13px; color: var(--text-strong); }
+    .pjd-gen--fail .preview-retry { align-self: flex-start; margin-top: 2px; }
+    .pjd-gentile { border: 1px dashed var(--glass-border); border-radius: 16px; padding: 16px; }
+    /* Detal: nagłówek z powrotem */
+    .pjd-detailhead { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+    .pjd-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--glass-border);
+        border-radius: 11px;
+        padding: 9px 14px;
+        cursor: pointer;
+        transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .pjd-back svg { width: 15px; height: 15px; }
+    .pjd-back:hover { color: var(--text-strong); border-color: rgba(255, 255, 255, 0.25); }
+    .pjd-detailhead__txt h2 { font-size: clamp(20px, 3vw, 26px); color: var(--text-strong); letter-spacing: -0.01em; }
+    .pjd-detailhead__txt span { font-size: 12.5px; color: var(--text-muted); }
+    @media (max-width: 920px) {
+        .pjd-grid { grid-template-columns: 1fr; }
+        .pjd-tile, .pjd-tile--hero, .pjd-tile--w3 { grid-column: span 1; min-height: 150px; }
+        .pjd-tile--hero { min-height: 200px; }
+    }
+
     /* ── Sekcja „Twoja marka": sklep + telefon + działająca strona ── */
     .pj-brand {
         display: grid;
@@ -3624,6 +3795,12 @@
     var pjNewPlan = false;
     // Kropka na zakładce „Potencjał rynku", gdy raport policzył się w tle
     var rkNew = false;
+    // Dashboard projektu: aktywny widok ('dash' | 'ekrany' | 'marka' | 'karta' | 'plan')
+    var pjView = 'dash';
+    // Timestampy startu generacji (klucz extras → Date.now()) — paski ETA na kaflach
+    var extrasStart = {};
+    // Orientacyjny czas generacji w sekundach (z pomiarów produkcyjnych)
+    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, sklep: 85, telefon: 85 };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -3762,6 +3939,8 @@
         extras.sklep = 'idle';
         extras.telefon = 'idle';
         extras.landing = 'idle';
+        extrasStart = {};
+        pjView = 'dash';
         pjNewPlan = false;
         rkNew = false;
         state.previews = {};
@@ -3975,14 +4154,9 @@
     function applyHashTab() {
         var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|marka|karta|plan))?$/);
         if (!m) return;
+        if (m[1] === 'projekt' && m[2]) pjView = m[2]; // hash otwiera detal kafla
         switchTab(m[1]); // nadpisze hash samą zakładką…
-        if (m[1] === 'projekt' && m[2]) {
-            setTabHash(m[1] + '-' + m[2]); // …więc przywracamy pełny z sekcją
-            setTimeout(function () {
-                var sec = el('pjsec-' + m[2]);
-                if (sec) sec.scrollIntoView({ block: 'start' });
-            }, 80);
-        }
+        if (m[1] === 'projekt' && m[2]) setTabHash(m[1] + '-' + m[2]); // …przywracamy pełny
     }
 
     function updateSideBadges() {
@@ -4242,6 +4416,7 @@
         if (!force && state.previews[SUMMARY_META[0]]) return;
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.summary = 'gen';
+        extrasStart.summary = Date.now();
         var sid = state.sessionId;
         fetch(SPAR_IMAGE_ENDPOINT, {
             method: 'POST',
@@ -4277,6 +4452,7 @@
         if (!force && state.bizplan) return;
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.plan = 'gen';
+        extrasStart.plan = Date.now();
         var sid = state.sessionId;
         fetch(SPAR_PLAN_ENDPOINT, {
             method: 'POST',
@@ -4309,6 +4485,7 @@
         if (!force && state.raport) return;
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.raport = 'gen';
+        extrasStart.raport = Date.now();
         var sid = state.sessionId;
         if (activeTab === 'rynek') renderPaneRynek();
         fetch(SPAR_RAPORT_ENDPOINT, {
@@ -4343,6 +4520,7 @@
         if (extras[view] === 'gen' || state.previews[view]) return;
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras[view] = 'gen';
+        extrasStart[view] = Date.now();
         var sid = state.sessionId;
         fetch(SPAR_IMAGE_ENDPOINT, {
             method: 'POST',
@@ -4373,6 +4551,7 @@
         if (extras.landing === 'gen' || state.landingUrl) return;
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras.landing = 'gen';
+        extrasStart.landing = Date.now();
         var sid = state.sessionId;
         function pollReady(triesLeft) {
             if (state.sessionId !== sid) return;
@@ -4594,6 +4773,65 @@
         });
     }
 
+    /* ── Zakładka PROJEKT v2: DASHBOARD dużych kafli + widoki szczegółowe ──
+       Decyzja Tomka 2026-06-12: zamiast jednego długiego scrolla — dashboard,
+       gdzie każdy element projektu to duży kafel; klik otwiera szczegół
+       z przyciskiem powrotu. Generujące się elementy mają pasek postępu
+       z odliczanym, orientacyjnym czasem (GEN_ETA + ticker co sekundę). */
+
+    var PJ_ICONS = {
+        ekrany: '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
+        strona: '<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
+        marka: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path>',
+        karta: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
+        plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>',
+        raport: '<path d="M3 3v18h18"></path><path d="M7 13l3-3 4 4 5-6"></path>',
+        pigulka: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 9v11"></path>'
+    };
+
+    function fmtEta(sec) {
+        if (sec <= 5) return 'już kończę…';
+        if (sec < 90) return 'jeszcze ok. ' + (Math.ceil(sec / 10) * 10) + ' s';
+        return 'jeszcze ok. ' + Math.ceil(sec / 60) + ' min';
+    }
+    // Pasek postępu generacji: szacunek z GEN_ETA, ticker aktualizuje DOM
+    // bez pełnego re-renderu (data-gen-key). Po 96% pasek czeka na realny finisz.
+    function genProgressHTML(key, label, sub) {
+        if (!extrasStart[key]) extrasStart[key] = Date.now();
+        return '<div class="pjd-gen" data-gen-key="' + key + '" data-gen-start="' + extrasStart[key] + '">' +
+            '<div class="pjd-gen__top"><span class="share__spin" aria-hidden="true"></span><b>' + label + '</b></div>' +
+            (sub ? '<span class="pjd-gen__sub">' + sub + '</span>' : '') +
+            '<div class="pjd-gen__bar"><i data-gen-bar style="width:4%"></i></div>' +
+            '<span class="pjd-gen__eta" data-gen-eta>szacuję czas…</span></div>';
+    }
+    var pjTicker = null;
+    function tickGenProgress() {
+        var els = document.querySelectorAll('[data-gen-key]');
+        if (!els.length) {
+            if (pjTicker) { clearInterval(pjTicker); pjTicker = null; }
+            return;
+        }
+        els.forEach(function (box) {
+            var key = box.getAttribute('data-gen-key');
+            var start = parseInt(box.getAttribute('data-gen-start'), 10) || Date.now();
+            var eta = GEN_ETA[key] || 90;
+            var elapsed = (Date.now() - start) / 1000;
+            var pct = Math.max(4, Math.min(96, Math.round(elapsed / eta * 100)));
+            var bar = box.querySelector('[data-gen-bar]');
+            var lab = box.querySelector('[data-gen-eta]');
+            if (bar) bar.style.width = pct + '%';
+            if (lab) lab.textContent = fmtEta(Math.round(eta - elapsed));
+        });
+    }
+    function startPjTicker() {
+        tickGenProgress();
+        if (!pjTicker) pjTicker = setInterval(tickGenProgress, 1000);
+    }
+
+    function pjGoIcon() {
+        return '<span class="pjd-tile__go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg></span>';
+    }
+
     function renderPaneProjekt(verIdx) {
         var body = el('pane-projekt-body');
         var items = lightboxItems();
@@ -4604,6 +4842,10 @@
         var k = hasKarta ? versions[cur] : null;
         var brief = state.lastBrief || {};
         var nazwa = (k && k.nazwa) || brief.nazwa || 'Twoje narzędzie';
+
+        // dock ze starego układu mógł zostać w DOM — sprzątamy
+        var oldDock = el('pj-dock');
+        if (oldDock) oldDock.remove();
 
         // Pusty stan: nic jeszcze nie powstało
         if (!hasKarta && !items.length) {
@@ -4616,124 +4858,235 @@
             return;
         }
 
-        var html = '<div class="tabpane__head pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Twój projekt</div>' +
-            '<h2 class="tabpane__title">' + esc(nazwa) + '</h2>' +
-            (brief.opis ? '<p class="tabpane__sub">' + esc(brief.opis) + '</p>' : '') +
-            '</div>' +
-            '<button type="button" class="pj-share" id="pj-share" title="Skopiuj link do projektu">' +
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>' +
-            'Udostępnij</button>' +
-            '</div>';
-
-        // Archiwum wersji ekranów (pigułka też) — potrzebne do taba Ekrany
+        // Archiwum wersji ekranów (pigułka też) — używane w detalu Ekrany
         var oldShots = [];
         VIEW_META.concat([SUMMARY_META]).forEach(function (vm) {
             (state.previewHistory[vm[0]] || []).forEach(function (u, hi) {
                 oldShots.push({ view: vm[0], label: vm[1] + ' — v' + (hi + 1), url: u });
             });
         });
-
-        // Wszystkie sekcje w JEDNYM scrollu — nic nie chowa się za
-        // przełącznikiem (taby ukrywające treść = słaba odkrywalność).
-        // Pasek na górze to scroll-spy: pokazuje, gdzie jesteś, klik
-        // płynnie przewija do sekcji.
-        var hasShots = items.length > 0 || oldShots.length > 0;
-        var hasPlanSec = hasKarta && state.verdict === 'zielony';
-        var hasBrandSec = state.verdict === 'zielony';
-
-        // Generacje planu i pigułki startują od razu (niezależnie od scrolla)
-        if (hasPlanSec) ensureKartaExtras(false);
-
-        // Karty-zajawki: nawigacja, która wygląda jak treść — miniatura
-        // ekranów w tle, kwota planu na wierzchu. Klik = płynny scroll.
-        var NAV_ICONS = {
-            ekrany: '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
-            marka: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path>',
-            karta: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
-            plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>'
+        var ctx = {
+            items: items, oldShots: oldShots, versions: versions, cur: cur, k: k,
+            nazwa: nazwa, brief: brief, hasKarta: hasKarta,
+            hasShots: items.length > 0 || oldShots.length > 0,
+            hasPlanSec: hasKarta && state.verdict === 'zielony',
+            hasBrandSec: state.verdict === 'zielony'
         };
-        var GO_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M19 12l-7 7-7-7"></path></svg>';
-        var secCount = (hasShots ? 1 : 0) + (hasBrandSec ? 1 : 0) + 1 + (hasPlanSec ? 1 : 0);
-        if (secCount > 1) {
-            var cards = '';
-            if (hasShots) {
-                var thumb = items.length ? items[0].url : '';
-                cards += '<button type="button" class="pj-card" data-anchor="pjsec-ekrany"' +
-                    (thumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.55) 0%, rgba(5,5,7,0.93) 80%), url(\'' + esc(thumb) + '\')"' : '') + '>' +
-                    '<span class="pj-card__ico">' + pjIco(NAV_ICONS.ekrany) + '</span>' +
-                    '<span class="pj-card__go">' + GO_ICON + '</span>' +
-                    '<b>Ekrany narzędzia</b><span>' + (items.length ? items.length + ' ' + (items.length === 1 ? 'widok' : 'widoki') : 'wcześniejsze wersje') + '</span></button>';
+
+        // Generacje startują od razu (niezależnie od widoku)
+        if (ctx.hasPlanSec) ensureKartaExtras(false);
+
+        if (pjView === 'dash') renderProjektDash(body, ctx);
+        else renderProjektDetail(body, ctx);
+        startPjTicker();
+    }
+
+    function pjOpenDetail(view) {
+        pjView = view;
+        if (view === 'plan') pjNewPlan = false;
+        setTabHash('projekt-' + view);
+        renderPaneProjekt();
+        var pane = el('pane-projekt');
+        if (pane) pane.scrollTop = 0;
+    }
+
+    // ── DASHBOARD: duże kafle elementów projektu ──
+    function renderProjektDash(body, ctx) {
+        var html = '<div class="tabpane__head pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Twój projekt</div>' +
+            '<h2 class="tabpane__title">' + esc(ctx.nazwa) + '</h2>' +
+            (ctx.brief.opis ? '<p class="tabpane__sub">' + esc(ctx.brief.opis) + '</p>' : '') +
+            '</div>' +
+            '<button type="button" class="pj-share" id="pj-share" title="Skopiuj link do projektu">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>' +
+            'Udostępnij</button>' +
+            '</div>';
+
+        var tiles = '';
+
+        // EKRANY — kafel-bohater z głównym ekranem w tle
+        if (ctx.hasShots) {
+            var thumb = ctx.items.length ? ctx.items[0].url : (ctx.oldShots.length ? ctx.oldShots[0].url : '');
+            tiles += '<button type="button" class="pjd-tile pjd-tile--hero pjd-tile--img" data-pjd="ekrany"' +
+                (thumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.12) 0%, rgba(5,5,7,0.88) 78%), url(\'' + esc(thumb) + '\')"' : '') + '>' +
+                pjGoIcon() +
+                '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.ekrany) + '</span>' +
+                '<span class="pjd-tile__t">Ekrany narzędzia</span>' +
+                '<span class="pjd-tile__sub">' + (ctx.items.length ? ctx.items.length + ' ' + (ctx.items.length === 1 ? 'widok' : 'widoki') + ' — kliknij, żeby obejrzeć' : 'wcześniejsze wersje w archiwum') + '</span>' +
+                '</button>';
+        }
+
+        // KARTA — cytat problemu jako treść kafla
+        var kartaInner;
+        if (ctx.k) {
+            kartaInner = (ctx.k.problem ? '<span class="pjd-quote">' + esc(ctx.k.problem) + '</span>' : '') +
+                '<span class="pjd-tile__sub">' + (ctx.versions.length > 1 ? 'Wersja ' + ctx.versions.length + ' · aktualna' : 'problem, klienci i zakres pierwszej wersji') + '</span>';
+        } else {
+            kartaInner = '<span class="pjd-tile__sub">uzupełni się, gdy domkniemy ustalenia w rozmowie</span>';
+        }
+        tiles += '<button type="button" class="pjd-tile' + (ctx.k ? '' : ' pjd-tile--dim') + '" data-pjd="karta"' + (ctx.k ? '' : ' disabled') + '>' +
+            pjGoIcon() +
+            '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.karta) + '</span>' +
+            '<span class="pjd-tile__t">Karta projektu</span>' + kartaInner +
+            '</button>';
+
+        if (ctx.hasBrandSec) {
+            // STRONA — działająca strona narzędzia (klik → nowa karta)
+            var landThumb = state.previews.landing || '';
+            if (state.landingUrl) {
+                tiles += '<a class="pjd-tile pjd-tile--w3 pjd-tile--img" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener"' +
+                    (landThumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.15) 0%, rgba(5,5,7,0.9) 78%), url(\'' + esc(landThumb) + '\')"' : '') + '>' +
+                    '<span class="pjd-tile__go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"></path><path d="M8 7h9v9"></path></svg></span>' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.strona) + '</span>' +
+                    '<span class="pjd-tile__t">Strona narzędzia <em class="pjd-live">działa</em></span>' +
+                    '<span class="pjd-tile__sub">prawdziwa strona w przeglądarce, nie grafika — otwórz i poklikaj</span>' +
+                    '</a>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.strona) + '</span>' +
+                    '<span class="pjd-tile__t">Strona narzędzia</span>' +
+                    (extras.landing === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować strony.</b><button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('landing', 'Buduję działającą stronę…', 'prawdziwa strona w przeglądarce, nie grafika')) +
+                    '</div>';
             }
-            if (hasBrandSec) {
-                var brandThumb = state.previews.sklep || state.previews.telefon || '';
-                cards += '<button type="button" class="pj-card" data-anchor="pjsec-marka"' +
-                    (brandThumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.55) 0%, rgba(5,5,7,0.93) 80%), url(\'' + esc(brandThumb) + '\')"' : '') + '>' +
-                    '<span class="pj-card__ico">' + pjIco(NAV_ICONS.marka) + '</span>' +
-                    '<span class="pj-card__go">' + GO_ICON + '</span>' +
-                    '<b>Twoja marka</b><span>' + (state.landingUrl ? 'sklep, telefon i działająca strona' : 'sklep, telefon — strona w budowie') + '</span></button>';
-            }
-            var kartaSub = hasKarta
-                ? (versions.length > 1 ? 'Wersja ' + versions.length + ' · aktualna' : 'problem, klienci, zakres')
-                : 'w przygotowaniu';
-            cards += '<button type="button" class="pj-card" data-anchor="pjsec-karta">' +
-                '<span class="pj-card__ico">' + pjIco(NAV_ICONS.karta) + '</span>' +
-                '<span class="pj-card__go">' + GO_ICON + '</span>' +
-                '<b>Karta projektu</b><span>' + kartaSub + '</span></button>';
-            if (hasPlanSec) {
-                var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
-                    ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
-                cards += '<button type="button" class="pj-card pj-card--plan" data-anchor="pjsec-plan">' +
-                    '<span class="pj-card__ico">' + pjIco(NAV_ICONS.plan) + '</span>' +
-                    '<span class="pj-card__go">' + GO_ICON + '</span>' +
-                    (goalK && typeof goalK.mies === 'number'
-                        ? '<b>' + fmtZl(goalK.mies) + ' zł/mies.</b><span>' + (pjNewPlan ? '<i class="pj-card__dot" aria-hidden="true"></i>' : '') + 'przy ' + esc(String(goalK.klienci)) + ' klientach — zobacz plan</span>'
-                        : (extras.plan === 'fail'
-                            ? '<b>Plan przychodu</b><span>nie udało się policzyć — otwórz</span>'
-                            : '<b>Plan przychodu</b><span><i class="pj-card__spin" aria-hidden="true"></i>liczę szacunki…</span>')) +
+
+            // PLAN — kwota docelowa
+            var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
+                ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
+            if (goalK && typeof goalK.mies === 'number') {
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="plan">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
+                    '<span class="pjd-tile__t">Plan przychodu' + (pjNewPlan ? ' <i class="pj-card__dot" aria-hidden="true"></i>' : '') + '</span>' +
+                    '<span class="pjd-num">' + fmtZl(goalK.mies) + ' zł<small>/mies.</small></span>' +
+                    '<span class="pjd-tile__sub">przy ' + esc(String(goalK.klienci)) + ' płacących klientach — zobacz pełne wyliczenia</span>' +
                     '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
+                    '<span class="pjd-tile__t">Plan przychodu</span>' +
+                    (extras.plan === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć planu.</b><button type="button" class="preview-retry" data-retry="plan">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów')) +
+                    '</div>';
             }
-            html += '<div class="pj-cards" role="navigation" aria-label="Sekcje projektu">' + cards + '</div>';
+
+            // MARKA — sklep + telefon (mini-kolaż)
+            var sklepUrl = state.previews.sklep, telUrl = state.previews.telefon;
+            if (sklepUrl || telUrl) {
+                tiles += '<button type="button" class="pjd-tile" data-pjd="marka">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.marka) + '</span>' +
+                    '<span class="pjd-tile__t">Twoja marka</span>' +
+                    '<span class="pjd-mini">' +
+                    (sklepUrl ? '<img src="' + esc(sklepUrl) + '" alt="W sklepie" loading="lazy">' : '') +
+                    (telUrl ? '<img src="' + esc(telUrl) + '" alt="W rękach klienta" loading="lazy">' : '') +
+                    '</span>' +
+                    '<span class="pjd-tile__sub">aplikacja w sklepie i w rękach klienta</span>' +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.marka) + '</span>' +
+                    '<span class="pjd-tile__t">Twoja marka</span>' +
+                    ((extras.sklep === 'fail' && extras.telefon === 'fail')
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się wygenerować grafik.</b><button type="button" class="preview-retry" data-retry="sklep">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('sklep', 'Rysuję markę…', 'aplikacja w sklepie i w rękach klienta — 2 grafiki')) +
+                    '</div>';
+            }
+
+            // RAPORT — ocena potencjału (klik → zakładka Potencjał rynku)
+            if (state.raport) {
+                var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
+                tiles += '<button type="button" class="pjd-tile" data-pjd-rynek>' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
+                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
+                    (oc ? '<span class="pjd-badge pjd-badge--' + esc(oc) + '">' + esc(oc) + '</span>' : '') +
+                    (state.raport.teza ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.teza) + '</span>' : '') +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
+                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
+                    (extras.raport === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować raportu.</b><button type="button" class="preview-retry" data-retry="raport">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('raport', 'Sprawdzam Twój rynek w internecie…', 'konkurenci, ceny, wielkość niszy — realny research')) +
+                    '</div>';
+            }
+
+            // PIGUŁKA — miniatura (klik → lightbox)
+            var pillUrl = state.previews[SUMMARY_META[0]];
+            if (pillUrl) {
+                tiles += '<button type="button" class="pjd-tile pjd-tile--img" data-pjd-pill="' + esc(pillUrl) + '"' +
+                    ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.12) 0%, rgba(5,5,7,0.88) 78%), url(\'' + esc(pillUrl) + '\')">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.pigulka) + '</span>' +
+                    '<span class="pjd-tile__t">Projekt w pigułce</span>' +
+                    '<span class="pjd-tile__sub">jedna grafika — cały projekt</span>' +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.pigulka) + '</span>' +
+                    '<span class="pjd-tile__t">Projekt w pigułce</span>' +
+                    (extras.summary === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się narysować pigułki.</b><button type="button" class="preview-retry" data-retry="pill">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('summary', 'Rysuję projekt w pigułce…', 'graficzne podsumowanie karty')) +
+                    '</div>';
+            }
         }
 
-        function sechead(icon, title, sub) {
-            return '<div class="pj-sechead"><span class="pj-sechead__ico">' + pjIco(icon) + '</span>' +
-                '<div><h3>' + title + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>';
-        }
+        html += '<div class="pjd-grid">' + tiles + '</div>';
+        body.innerHTML = html;
+        bindProjektCommon(body, ctx);
+        body.querySelectorAll('[data-pjd]').forEach(function (t) {
+            t.addEventListener('click', function () { pjOpenDetail(t.getAttribute('data-pjd')); });
+        });
+        var rkTile = body.querySelector('[data-pjd-rynek]');
+        if (rkTile) rkTile.addEventListener('click', function () { switchTab('rynek'); });
+        var pillTile = body.querySelector('[data-pjd-pill]');
+        if (pillTile) pillTile.addEventListener('click', function () {
+            openLightbox({ url: pillTile.getAttribute('data-pjd-pill'), label: 'Projekt w pigułce' });
+        });
+    }
 
-        // ── SEKCJA: Ekrany narzędzia ──
-        if (hasShots) {
-            html += '<section class="pj-section" id="pjsec-ekrany" data-spy="ekrany">' +
-                sechead('<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
-                    'Ekrany narzędzia', 'kliknij ekran, żeby obejrzeć w powiększeniu');
-            // desktop: główny full-width + rząd mniejszych (grafiki zawsze
-            // poziome 3:2 — żadnych pionowych kadrów!); mobile: karuzela snap
-            if (items.length) {
-                html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
+    // ── DETAL: pojedynczy element na pełnej szerokości + powrót ──
+    function renderProjektDetail(body, ctx) {
+        var TITLES = {
+            ekrany: ['Ekrany narzędzia', 'kliknij ekran, żeby obejrzeć w powiększeniu'],
+            marka: ['Twoja marka', 'tak „' + esc(ctx.nazwa) + '" wygląda w świecie'],
+            karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
+            plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy']
+        };
+        var t = TITLES[pjView] || TITLES.karta;
+        var html = '<div class="pjd-detailhead">' +
+            '<button type="button" class="pjd-back" id="pjd-back">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>' +
+            'Twój projekt</button>' +
+            '<div class="pjd-detailhead__txt"><h2>' + t[0] + '</h2><span>' + t[1] + '</span></div></div>';
+
+        if (pjView === 'ekrany') {
+            if (ctx.items.length) {
+                html += '<div class="pj2-shots n' + ctx.items.length + '">' + ctx.items.map(function (it, i) {
                     return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                         '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
                         '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
-            if (oldShots.length) {
+            if (ctx.oldShots.length) {
                 html += '<div class="pj-later" style="margin:14px 0 8px">Wcześniejsze wersje ekranów:</div>' +
-                    '<div class="shots shots--old" style="margin-bottom:4px">' + oldShots.map(function (s, i) {
+                    '<div class="shots shots--old" style="margin-bottom:4px">' + ctx.oldShots.map(function (s, i) {
                         return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
                             '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
                             '<div class="pv-tile__body"><img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
                     }).join('') + '</div>';
             }
-            html += '</section>';
         }
 
-        // ── SEKCJA: Twoja marka (sklep + telefon + działająca strona) ──
-        if (hasBrandSec) {
-            html += '<section class="pj-section" id="pjsec-marka" data-spy="marka">' +
-                sechead(NAV_ICONS.marka, 'Twoja marka', 'tak „' + esc(nazwa) + '" wygląda w świecie — w sklepie, w rękach klienta i w przeglądarce');
-            // Działająca strona: żywy podgląd w ramce + otwarcie na pełnym ekranie
+        if (pjView === 'marka') {
             if (state.landingUrl) {
                 html += '<div class="pj-land">' +
                     '<div class="pj-land__bar"><span class="pj-land__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
-                    '<span class="pj-land__addr">' + pjIco('<rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>') + esc(nazwa.toLowerCase().replace(/[^a-ząćęłńóśźż0-9]+/gi, '')) + '.pl</span>' +
+                    '<span class="pj-land__addr">' + pjIco('<rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>') + esc(ctx.nazwa.toLowerCase().replace(/[^a-ząćęłńóśźż0-9]+/gi, '')) + '.pl</span>' +
                     '<a class="pj-land__open" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener">Otwórz stronę ↗</a></div>' +
                     '<a class="pj-land__frame" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener" aria-label="Otwórz stronę narzędzia">' +
                     '<iframe src="' + esc(state.landingUrl) + '" loading="lazy" tabindex="-1" title="Podgląd strony narzędzia"></iframe></a>' +
@@ -4741,14 +5094,11 @@
                     '</div>';
             } else if (extras.landing === 'fail') {
                 html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować strony narzędzia.</b>' +
-                    '<span>Spróbuj jeszcze raz — budowa trwa około 3 minut.</span></div>' +
+                    '<span>Spróbuj jeszcze raz — budowa trwa około 4 minut.</span></div>' +
                     '<button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>';
             } else {
-                html += '<div class="pj-wait"><span class="share__spin" aria-hidden="true"></span>' +
-                    '<div class="pj-wait__txt"><b>Buduję działającą stronę narzędzia…</b>' +
-                    '<span>prawdziwa strona w przeglądarce, nie grafika — około 3 minut</span></div></div>';
+                html += genProgressHTML('landing', 'Buduję działającą stronę narzędzia…', 'prawdziwa strona w przeglądarce, nie grafika');
             }
-            // Sklep + telefon
             html += '<div class="pj-brand">';
             BRAND_META.forEach(function (vm) {
                 var v = vm[0], burl = state.previews[v];
@@ -4761,111 +5111,67 @@
                         '<span>nie udało się wygenerować</span></div>' +
                         '<button type="button" class="preview-retry" data-retry="' + v + '">Ponów</button></div>';
                 } else {
-                    html += '<div class="pj-wait pj-wait--tile"><span class="share__spin" aria-hidden="true"></span>' +
-                        '<div class="pj-wait__txt"><b>' + esc(vm[1]) + '</b><span>generuję — około minuty</span></div></div>';
+                    html += '<div class="pjd-gentile">' + genProgressHTML(v, esc(vm[1]), 'generuję grafikę') + '</div>';
                 }
             });
-            html += '</div></section>';
-        }
-
-        // ── SEKCJA: Karta projektu (+ pigułka) ──
-        html += '<section class="pj-section" id="pjsec-karta" data-spy="karta">' +
-            sechead('<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
-                'Karta projektu', 'problem, klienci i zakres pierwszej wersji');
-        if (versions.length > 1) {
-            html += '<div class="pj-vers">';
-            versions.forEach(function (_, i) {
-                html += '<button type="button" class="pj-ver' + (i === cur ? ' is-on' : '') + '" data-ver="' + i + '">' +
-                    'Wersja ' + (i + 1) + (i === versions.length - 1 ? ' · aktualna' : '') + '</button>';
-            });
             html += '</div>';
-            if (cur !== versions.length - 1) {
-                html += '<div class="pj-oldnote">Przeglądasz starszą wersję karty — aktualna jest Wersja ' + versions.length + '.</div>';
-            }
         }
-        var editHtml = '';
-        if (hasKarta && state.verdict === 'zielony') {
-            var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
-            if (left > 0) {
-                editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
-                    '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
-                    '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
-            } else {
-                editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
-            }
-        }
-        if (k) {
-            html += kartaGridHTML(k, editHtml);
-        } else {
-            html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
-        }
-        if (hasPlanSec) {
-            var pillUrl = state.previews[SUMMARY_META[0]];
-            if (pillUrl) html += pillHTML(pillUrl);
-            else if (extras.summary === 'fail') html += extrasFailHTML('pill');
-            else html += extrasWaitHTML('pill');
-        }
-        html += '</section>';
 
-        // ── SEKCJA: Wstępny plan przychodu ──
-        if (hasPlanSec) {
-            html += '<section class="pj-section" id="pjsec-plan" data-spy="plan">' +
-                sechead('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>',
-                    'Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy');
+        if (pjView === 'karta') {
+            if (ctx.versions.length > 1) {
+                html += '<div class="pj-vers">';
+                ctx.versions.forEach(function (_, i) {
+                    html += '<button type="button" class="pj-ver' + (i === ctx.cur ? ' is-on' : '') + '" data-ver="' + i + '">' +
+                        'Wersja ' + (i + 1) + (i === ctx.versions.length - 1 ? ' · aktualna' : '') + '</button>';
+                });
+                html += '</div>';
+                if (ctx.cur !== ctx.versions.length - 1) {
+                    html += '<div class="pj-oldnote">Przeglądasz starszą wersję karty — aktualna jest Wersja ' + ctx.versions.length + '.</div>';
+                }
+            }
+            var editHtml = '';
+            if (ctx.hasKarta && state.verdict === 'zielony') {
+                var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
+                if (left > 0) {
+                    editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
+                        '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
+                        '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
+                } else {
+                    editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
+                }
+            }
+            if (ctx.k) {
+                html += kartaGridHTML(ctx.k, editHtml);
+            } else {
+                html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
+            }
+        }
+
+        if (pjView === 'plan') {
             if (state.bizplan) html += bizplanHTML(state.bizplan);
             else if (extras.plan === 'fail') html += extrasFailHTML('plan');
-            else html += extrasWaitHTML('plan');
-            html += '</section>';
+            else html += genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów — na podstawie rozmowy');
         }
 
         body.innerHTML = html;
-
-        // Pływający dock (fixed w obrębie zakładki — znika razem z nią);
-        // pojawia się po przescrollowaniu za karty-zajawki
-        var pane = el('pane-projekt');
-        var dock = el('pj-dock');
-        if (!dock && pane) {
-            dock = document.createElement('nav');
-            dock.id = 'pj-dock';
-            dock.className = 'pj-dock';
-            dock.setAttribute('aria-label', 'Sekcje projektu');
-            pane.appendChild(dock);
-        }
-        if (dock) {
-            dock.innerHTML = secCount > 1
-                ? (hasShots ? '<button type="button" class="pj-dock__btn" data-spy="ekrany" data-anchor="pjsec-ekrany">' + pjIco(NAV_ICONS.ekrany) + 'Ekrany</button>' : '') +
-                  (hasBrandSec ? '<button type="button" class="pj-dock__btn" data-spy="marka" data-anchor="pjsec-marka">' + pjIco(NAV_ICONS.marka) + 'Marka</button>' : '') +
-                  '<button type="button" class="pj-dock__btn" data-spy="karta" data-anchor="pjsec-karta">' + pjIco(NAV_ICONS.karta) + 'Karta</button>' +
-                  (hasPlanSec ? '<button type="button" class="pj-dock__btn" data-spy="plan" data-anchor="pjsec-plan">' + pjIco(NAV_ICONS.plan) + 'Przychody' + (pjNewPlan ? '<i class="pj-dock__dot" aria-hidden="true"></i>' : '') + '</button>' : '')
-                : '';
-        }
-
-        // klik w kartę-zajawkę albo przycisk docka → płynny scroll do sekcji
-        // + sekcja w hashu (odświeżenie wraca w to samo miejsce)
-        function bindAnchors(root) {
-            if (!root) return;
-            root.querySelectorAll('[data-anchor]').forEach(function (b) {
-                b.addEventListener('click', function () {
-                    var sec = el(b.getAttribute('data-anchor'));
-                    if (sec) {
-                        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        setTabHash('projekt-' + b.getAttribute('data-anchor').replace('pjsec-', ''));
-                    }
-                });
-            });
-        }
-        bindAnchors(body);
-        bindAnchors(dock);
-        bindPlanSim(body);
-        bindPjSpy();
-        updatePjSpy();
-        // Desktop: wszystkie sekcje otwarte (jest miejsce); mobile: pierwsza
-        // otwarta, reszta zwinięta — user otwiera, co go interesuje
+        bindProjektCommon(body, ctx);
+        var back = el('pjd-back');
+        if (back) back.addEventListener('click', function () {
+            pjView = 'dash';
+            setTabHash('projekt');
+            renderPaneProjekt();
+        });
+        // Desktop: sekcje karty otwarte; mobile: pierwsza otwarta
         var pjDesktop = window.matchMedia('(min-width: 1024px)').matches;
         body.querySelectorAll('details.pj-sec').forEach(function (d, di) {
             d.open = pjDesktop || di === 0;
         });
-        var oldList = oldShots;
+    }
+
+    // Wspólne bindowania obu widoków zakładki Projekt
+    function bindProjektCommon(body, ctx) {
+        bindPlanSim(body);
+        var oldList = ctx.oldShots;
         body.querySelectorAll('.pv-tile').forEach(function (t) {
             t.addEventListener('click', function () {
                 if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
@@ -4880,6 +5186,7 @@
                 if (kind === 'plan') { extras.plan = 'idle'; ensureBizplan(false); }
                 else if (kind === 'sklep' || kind === 'telefon') { extras[kind] = 'idle'; ensureBrandImage(kind); }
                 else if (kind === 'landing') { extras.landing = 'idle'; ensureLanding(); }
+                else if (kind === 'raport') { extras.raport = 'idle'; ensureRaport(false); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
                 renderPaneProjekt();
             });
@@ -4982,9 +5289,8 @@
             } else {
                 ensureRaport(false);
                 body.innerHTML = head +
-                    '<div class="pj-wait"><span class="share__spin" aria-hidden="true"></span>' +
-                    '<div class="pj-wait__txt"><b>Sprawdzam Twój rynek w internecie…</b>' +
-                    '<span>konkurenci i ich ceny, wielkość niszy, trendy — to realne wyszukiwanie, około 2 minut</span></div></div>';
+                    genProgressHTML('raport', 'Sprawdzam Twój rynek w internecie…', 'konkurenci i ich ceny, wielkość niszy, trendy — to realne wyszukiwanie');
+                startPjTicker();
             }
             return;
         }
