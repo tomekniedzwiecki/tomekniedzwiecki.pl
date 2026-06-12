@@ -145,11 +145,21 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .nav__brand {
     display: inline-flex;
     align-items: center;
+    gap: 10px;
     height: 32px;
     transition: opacity 0.25s var(--ease);
 }
 .nav__brand:hover { opacity: 0.78; }
 .nav__logo { height: 100%; width: auto; display: block; user-select: none; }
+.nav__suffix {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+    white-space: nowrap;
+}
+.nav__suffix::before { content: '/ '; color: var(--text-faint); font-weight: 500; }
+@media (max-width: 640px) { .nav__suffix { display: none; } }
 .nav__right { display: inline-flex; align-items: center; gap: 22px; }
 .nav__link {
     font-size: 13.5px;
@@ -696,7 +706,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .proof__sep { color: var(--text-faint); padding: 0 0.3em; }
 
 /* ============================================================
-   SCENE 3 — NA ŻYWO (pomysł → aplikacja, realny feed)
+   SCENE 3 — NA ŻYWO
+   Gigantyczny flip zawodu + okno, w którym crossfade'uje się
+   PRAWDZIWY mockup tego projektu (feed). Każdy pomysł = inny
+   design — to widać, nie trzeba tego mówić.
    ============================================================ */
 .scene--live .scene__aurora {
     background: radial-gradient(circle at center,
@@ -704,74 +717,62 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         rgba(77, 159, 255, 0.03) 42%,
         transparent 72%);
 }
-.scene--live { padding-top: 90px; padding-bottom: 60px; }
-.scene--live .scene__inner {
-    max-width: min(660px, calc((100dvh - 420px) * 1.5));
-    min-width: min(520px, 100%);
-    text-align: center;
-}
+.scene--live { padding-top: 96px; padding-bottom: 56px; }
+.scene--live .scene__inner { max-width: 1100px; text-align: center; }
 .live__eyebrow {
     font-family: var(--serif);
     font-style: italic;
-    font-size: clamp(20px, 2.4vw, 32px);
+    font-size: clamp(18px, 2.2vw, 30px);
     color: var(--text-muted);
-    margin-bottom: clamp(16px, 2.5vh, 30px);
+    margin-bottom: clamp(12px, 2vh, 22px);
     letter-spacing: -0.005em;
 }
-.live__stage { text-align: left; }
-.scene__idea {
+.live__title {
+    font-family: var(--sans);
+    font-size: clamp(30px, 4.6vw, 72px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    color: var(--text-strong);
+    margin-bottom: clamp(20px, 3.5vh, 40px);
+    white-space: nowrap;
+}
+.live__title .ser {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    font-size: 0.82em;
+    letter-spacing: -0.015em;
+}
+/* flip zawodu — stacked words, crossfade + lift (wzorzec cta-flip /zwolnie) */
+.live-flip {
     position: relative;
-    z-index: 2;
-    max-width: 520px;
-    border: 1px solid rgba(77, 159, 255, 0.32);
-    background: linear-gradient(180deg, rgba(77,159,255,0.13) 0%, rgba(77,159,255,0.05) 100%);
-    border-radius: 16px 16px 16px 5px;
-    padding: 11px 16px 12px;
-    box-shadow: 0 18px 50px -24px rgba(77, 159, 255, 0.35);
+    display: inline-block;
+    text-align: left;
+    color: var(--accent);
+    text-shadow: 0 0 80px rgba(77, 159, 255, 0.3);
+    min-width: 5.6em;
 }
-.scene__idea-label {
-    display: block;
-    font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 4px;
-}
-.scene__idea-text { font-size: 13.5px; line-height: 1.5; color: var(--text-strong); min-height: 40px; display: block; }
-.scene__caret {
-    display: inline-block; width: 7px; height: 13px;
-    background: var(--accent); margin-left: 3px; vertical-align: -2px; border-radius: 1px;
-    animation: caretBlink 0.9s steps(1) infinite;
-}
-@keyframes caretBlink { 50% { opacity: 0; } }
-.scene__link { position: relative; height: 38px; margin-left: 34px; z-index: 1; }
-.scene__link::before {
-    content: '';
-    position: absolute; left: 0; top: -8px; bottom: -8px; width: 2px;
-    background: linear-gradient(180deg, rgba(77,159,255,0), rgba(77,159,255,0.75) 28%, rgba(77,159,255,0.75) 72%, rgba(77,159,255,0));
-}
-.scene__spark {
-    position: absolute; left: -3px; top: 0;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent); box-shadow: 0 0 14px var(--accent);
+.live-flip__word {
+    position: absolute;
+    left: 0; top: 0;
     opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(6px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease), filter 0.5s var(--ease);
+    white-space: nowrap;
 }
-.scene__link.is-on .scene__spark { animation: sparkFlow 1.1s var(--ease) infinite; }
-@keyframes sparkFlow { 0% { opacity: 0; transform: translateY(-6px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(40px); } }
-.scene__node {
-    position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
-    display: inline-flex; align-items: center; gap: 8px;
-    font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--text-faint);
-    transition: color 0.4s;
+.live-flip__word.is-active {
+    position: relative;
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
 }
-.scene__node i {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text-faint); transition: background 0.4s, box-shadow 0.4s;
-}
-.scene__link.is-on .scene__node { color: var(--accent); }
-.scene__link.is-on .scene__node i { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 1.2s ease-in-out infinite; }
-@keyframes pulse { 50% { opacity: 0.35; } }
-.scene__win {
-    position: relative; z-index: 2;
-    width: 100%;
+.live__win {
+    position: relative;
+    width: min(640px, 100%);
+    margin: 0 auto;
     border-radius: 18px;
     border: 1px solid var(--border);
     background: #0a0a10;
@@ -781,14 +782,14 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         0 30px 90px -40px rgba(77, 159, 255, 0.18),
         0 0 0 1px rgba(77, 159, 255, 0.05);
 }
-.scene__bar {
+.live__bar {
     display: flex; align-items: center; gap: 7px;
     padding: 11px 14px;
     border-bottom: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.02);
 }
-.scene__dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); flex-shrink: 0; }
-.scene__url {
+.live__dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); flex-shrink: 0; }
+.live__url {
     margin: 0 auto;
     display: inline-flex; align-items: center; gap: 6px;
     max-width: 60%;
@@ -798,48 +799,35 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     font-size: 11.5px; font-weight: 600; color: var(--text-muted);
     white-space: nowrap; overflow: hidden;
 }
-.scene__url svg { width: 10px; height: 10px; flex-shrink: 0; opacity: 0.7; }
-.scene__live {
+.live__url svg { width: 10px; height: 10px; flex-shrink: 0; opacity: 0.7; }
+.live__badge {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--green); flex-shrink: 0;
 }
-.scene__live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.8s ease-in-out infinite; }
-.scene__screen { position: relative; aspect-ratio: 3 / 2; background: #0b0b11; }
-.scene__screen img {
+.live__badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.35; } }
+.live__screen { position: relative; aspect-ratio: 3 / 2; background: #0b0b11; }
+.live__screen img {
     position: absolute; inset: 0; width: 100%; height: 100%;
     object-fit: contain;
     opacity: 0;
-    transition: opacity 0.65s var(--ease), filter 0.65s var(--ease);
+    transition: opacity 0.6s var(--ease);
 }
-.scene__screen img.is-on { opacity: 1; }
-.scene__screen img.is-dim { opacity: 0.13; filter: saturate(0.2); }
-.scene__wire { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.4s; }
-.scene__wire.is-draw { opacity: 1; }
-.scene__wire rect, .scene__wire line {
-    fill: none; stroke: rgba(77, 159, 255, 0.5); stroke-width: 1.3;
-    stroke-dasharray: 900; stroke-dashoffset: 900;
-}
-.scene__wire.is-draw rect, .scene__wire.is-draw line { animation: wireDraw 0.9s var(--ease) forwards; }
-.scene__wire rect:nth-of-type(2), .scene__wire line:nth-of-type(1) { animation-delay: 0.12s !important; }
-.scene__wire rect:nth-of-type(3), .scene__wire line:nth-of-type(2) { animation-delay: 0.24s !important; }
-.scene__wire rect:nth-of-type(4), .scene__wire line:nth-of-type(3) { animation-delay: 0.36s !important; }
-.scene__wire rect:nth-of-type(5) { animation-delay: 0.46s !important; }
-.scene__wire rect:nth-of-type(6) { animation-delay: 0.56s !important; }
-@keyframes wireDraw { to { stroke-dashoffset: 0; } }
-.scene__cap {
+.live__screen img.is-on { opacity: 1; }
+.live__cap {
     display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-    padding: 11px 16px;
+    padding: 10px 16px;
     border-top: 1px solid var(--border);
 }
-.scene__cap b { font-size: 13.5px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.scene__cap span { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
-.scene__cap span em { font-style: normal; color: var(--text-muted); }
+.live__cap b { font-size: 13.5px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.live__cap span { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
+.live__cap span em { font-style: normal; color: var(--text-muted); }
 .live__more {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: clamp(18px, 3vh, 30px);
+    margin-top: clamp(16px, 2.5vh, 26px);
     font-size: 13.5px;
     font-weight: 600;
     color: var(--text-muted);
@@ -848,9 +836,103 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .live__more:hover { color: var(--text-strong); }
 .live__more .arr { transition: transform 0.25s var(--ease); }
 .live__more:hover .arr { transform: translateX(3px); }
-@media (prefers-reduced-motion: reduce) {
-    .scene__link.is-on .scene__spark { animation: none; opacity: 0; }
-    .scene__link.is-on .scene__node i { animation: none; }
+@media (max-width: 700px) {
+    .live__title { white-space: normal; }
+    .live-flip { display: block; min-width: 0; text-align: center; margin-top: 0.1em; min-height: 1.05em; }
+    .live-flip__word { left: 50%; transform: translateX(-50%) translateY(0.35em); }
+    .live-flip__word.is-active { position: relative; left: auto; transform: none; }
+}
+
+/* ============================================================
+   SCENE 4 — RYNEK (50 płacących klientów, zanim oddam prowadzenie)
+   ============================================================ */
+.scene--market .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.13) 0%,
+        rgba(77, 159, 255, 0.04) 40%,
+        transparent 72%);
+}
+.scene--market .scene__inner { text-align: center; max-width: 1100px; }
+.market__eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.4vw, 32px);
+    color: var(--text-muted);
+    margin-bottom: clamp(24px, 4vh, 48px);
+}
+.market__title {
+    font-family: var(--sans);
+    font-size: clamp(38px, 5.6vw, 92px);
+    font-weight: 900;
+    line-height: 0.96;
+    letter-spacing: -0.05em;
+    color: var(--text-strong);
+}
+.market__title em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    font-size: 0.8em;
+    letter-spacing: -0.015em;
+}
+.market__title-accent {
+    color: var(--accent);
+    text-shadow: 0 0 90px rgba(77, 159, 255, 0.32);
+}
+/* 50 kropek zapalających się + licznik — moment „aha: on naprawdę sprzedaje" */
+.market__viz {
+    margin: clamp(32px, 5vh, 56px) auto 0;
+    max-width: 760px;
+}
+.market__dots {
+    display: grid;
+    grid-template-columns: repeat(25, 1fr);
+    gap: clamp(5px, 0.8vw, 9px);
+}
+.market__dots i {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    transform: scale(0.55);
+    transition: background 0.3s ease, transform 0.45s var(--ease), box-shadow 0.3s ease;
+}
+.market__dots i.is-lit {
+    background: var(--accent);
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(77, 159, 255, 0.55);
+}
+.market__count {
+    margin-top: clamp(18px, 3vh, 28px);
+    font-family: var(--sans);
+    font-size: clamp(15px, 1.7vw, 20px);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+.market__count b {
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 1.35em;
+    letter-spacing: -0.02em;
+}
+.market__punch {
+    margin-top: clamp(26px, 4vh, 44px);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.6vw, 34px);
+    color: var(--text);
+    line-height: 1.3;
+}
+.market__punch strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 700;
+    color: var(--text-strong);
+    font-size: 0.92em;
+}
+@media (max-width: 560px) {
+    .market__dots { grid-template-columns: repeat(10, 1fr); }
 }
 
 /* ============================================================
@@ -971,6 +1053,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     margin: 0 auto;
 }
 .step {
+    position: relative;
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 14px;
@@ -979,6 +1062,16 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     transition: border-color 0.4s var(--ease), transform 0.4s var(--ease);
 }
 .step:hover { border-color: var(--border-strong); transform: translateY(-3px); }
+.step__pov {
+    position: absolute;
+    top: clamp(18px, 2.2vw, 28px);
+    right: clamp(18px, 2.2vw, 28px);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(15px, 1.5vw, 19px);
+    color: var(--text-faint);
+}
+.step--ja .step__pov { color: var(--accent); }
 .step__num {
     font-size: clamp(20px, 2vw, 26px);
     font-weight: 800;
@@ -1000,11 +1093,11 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     margin-bottom: 14px;
 }
 .step__line {
-    font-size: clamp(14.5px, 1.4vw, 17px);
-    font-weight: 600;
-    line-height: 1.5;
+    font-size: clamp(15px, 1.5vw, 18.5px);
+    font-weight: 700;
+    line-height: 1.4;
     color: var(--text-strong);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
 }
 .step__line em {
     font-family: var(--serif);
@@ -1012,6 +1105,12 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     font-weight: 400;
     color: var(--text);
     font-size: 1.04em;
+}
+.step__desc {
+    margin-top: 8px;
+    font-size: clamp(12.5px, 1.15vw, 14px);
+    line-height: 1.55;
+    color: var(--text-muted);
 }
 .step__accent { color: var(--accent); }
 .step--final {
@@ -1117,11 +1216,20 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     color: var(--text-muted);
     margin-bottom: clamp(20px, 3vh, 36px);
 }
+.cta__lead {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(24px, 3.4vw, 48px);
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-bottom: clamp(10px, 1.5vh, 18px);
+}
 .cta__h2 {
     font-family: var(--sans);
     font-size: clamp(40px, 7vw, 120px);
     font-weight: 900;
-    line-height: 0.92;
+    line-height: 0.96;
     letter-spacing: -0.05em;
     color: var(--text-strong);
 }
@@ -1135,6 +1243,32 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .cta__h2-accent {
     color: var(--accent);
     text-shadow: 0 0 90px rgba(77, 159, 255, 0.35);
+}
+/* gigant flip — czyj będzie następny pomysł (wzorzec cta-flip /zwolnie) */
+.cta-flip {
+    position: relative;
+    display: block;
+    margin-top: 0.05em;
+    color: var(--accent);
+    text-shadow: 0 0 90px rgba(77, 159, 255, 0.35);
+    min-height: 1.05em;
+}
+.cta-flip__word {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%) translateY(0.3em);
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), filter 0.55s var(--ease);
+    white-space: nowrap;
+}
+.cta-flip__word.is-active {
+    position: relative;
+    left: auto;
+    transform: none;
+    opacity: 1;
+    filter: blur(0);
 }
 .cta__actions {
     margin-top: clamp(32px, 5vh, 56px);
@@ -1196,6 +1330,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     <div class="nav__inner">
         <a class="nav__brand" href="https://tomekniedzwiecki.pl/" aria-label="tomekniedzwiecki.pl — strona główna">
             <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" height="32">
+            <span class="nav__suffix">aplikacja.</span>
         </a>
         <div class="nav__right">
             <a class="nav__link" href="/aplikacja/inspiracje/">Inspiracje</a>
@@ -1222,10 +1357,11 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     <a href="#act-1" class="progress__item is-active" data-act="0"><span>01</span><em>Wstęp</em></a>
     <a href="#act-2" class="progress__item" data-act="1"><span>02</span><em>Układ</em></a>
     <a href="#act-3" class="progress__item" data-act="2"><span>03</span><em>Na żywo</em></a>
-    <a href="#act-4" class="progress__item" data-act="3"><span>04</span><em>Obietnica</em></a>
-    <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Proces</em></a>
-    <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Ludzie</em></a>
-    <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Start</em></a>
+    <a href="#act-4" class="progress__item" data-act="3"><span>04</span><em>Rynek</em></a>
+    <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Obietnica</em></a>
+    <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Proces</em></a>
+    <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Ludzie</em></a>
+    <a href="#act-8" class="progress__item" data-act="7"><span>08</span><em>Start</em></a>
 </aside>
 
 <!-- ============================================================
@@ -1287,56 +1423,63 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         </div>
     </section>
 
-    <!-- SCENE 3 — NA ŻYWO (pomysł → aplikacja) -->
+    <!-- SCENE 3 — NA ŻYWO (każdy pomysł = inny projekt) -->
     <section class="scene scene--live" id="act-3" data-act="2">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
             <p class="live__eyebrow" data-reveal>tak to się zaczyna.</p>
 
-            <div class="live__stage" data-reveal data-delay="200">
-                <div class="scene__idea">
-                    <span class="scene__idea-label">Pomysł</span>
-                    <span class="scene__idea-text"><span id="idea-text"></span><span class="scene__caret" id="idea-caret"></span></span>
+            <h2 class="live__title" data-reveal data-delay="150">
+                Aplikacja <span class="ser">dla</span>
+                <span class="live-flip" id="live-flip" aria-live="off"></span>
+            </h2>
+
+            <div class="live__win" data-reveal data-delay="350">
+                <div class="live__bar">
+                    <span class="live__dot"></span><span class="live__dot"></span><span class="live__dot"></span>
+                    <span class="live__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja</span>
+                    <span class="live__badge"><i></i>feed na żywo</span>
                 </div>
-                <div class="scene__link" id="scene-link">
-                    <span class="scene__spark"></span>
-                    <span class="scene__node"><i></i>AI projektuje ekrany</span>
+                <div class="live__screen" id="live-screen">
+                    <img id="live-img-a" alt="Ekran aplikacji wygenerowany w rozmowie z AI" decoding="async">
+                    <img id="live-img-b" alt="" aria-hidden="true" decoding="async">
                 </div>
-                <div class="scene__win">
-                    <div class="scene__bar">
-                        <span class="scene__dot"></span><span class="scene__dot"></span><span class="scene__dot"></span>
-                        <span class="scene__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja</span>
-                        <span class="scene__live"><i></i>feed na żywo</span>
-                    </div>
-                    <div class="scene__screen">
-                        <svg class="scene__wire" id="scene-wire" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true">
-                            <rect x="18" y="16" width="564" height="34" rx="6"/>
-                            <rect x="18" y="66" width="172" height="78" rx="6"/>
-                            <rect x="214" y="66" width="172" height="78" rx="6"/>
-                            <rect x="410" y="66" width="172" height="78" rx="6"/>
-                            <rect x="18" y="160" width="564" height="180" rx="6"/>
-                            <rect x="18" y="356" width="180" height="28" rx="6"/>
-                            <line x1="40" y1="206" x2="560" y2="206"/>
-                            <line x1="40" y1="250" x2="560" y2="250"/>
-                            <line x1="40" y1="294" x2="560" y2="294"/>
-                        </svg>
-                        <img id="scene-img" alt="Ekran aplikacji wygenerowany w rozmowie z AI" decoding="async">
-                    </div>
-                    <div class="scene__cap">
-                        <b id="scene-name">&nbsp;</b>
-                        <span id="scene-meta"></span>
-                    </div>
+                <div class="live__cap">
+                    <b id="live-name">&nbsp;</b>
+                    <span id="live-meta"></span>
                 </div>
             </div>
 
-            <a class="live__more" href="/aplikacja/inspiracje/" data-reveal data-delay="500">
-                Zobacz wszystkie — aktualizowane na żywo <span class="arr">→</span>
+            <a class="live__more" href="/aplikacja/inspiracje/" data-reveal data-delay="550">
+                Każdy projekt wygląda inaczej — zobacz wszystkie <span class="arr">→</span>
             </a>
         </div>
     </section>
 
-    <!-- SCENE 4 — OBIETNICA -->
-    <section class="scene scene--motto" id="act-4" data-act="3">
+    <!-- SCENE 4 — RYNEK (zanim oddam prowadzenie) -->
+    <section class="scene scene--market" id="act-4" data-act="3">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="market__eyebrow" data-reveal>zbudować to połowa roboty.</p>
+
+            <h2 class="market__title" data-reveal data-delay="150">
+                Wprowadzam <em>ją</em> na rynek.<br>
+                <span class="market__title-accent">I sprzedaję.</span>
+            </h2>
+
+            <div class="market__viz" data-reveal data-delay="500">
+                <div class="market__dots" id="market-dots" aria-hidden="true"></div>
+                <p class="market__count"><b id="market-count">0</b> / 50 płacących klientów — <span id="market-label">tyle zdobywam, zanim oddam Ci prowadzenie</span></p>
+            </div>
+
+            <p class="market__punch" data-reveal data-delay="900">
+                Dopiero wtedy przejmujesz biznes — <strong>a ja zostaję obok jako doradca.</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- SCENE 5 — OBIETNICA -->
+    <section class="scene scene--motto" id="act-5" data-act="4">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
             <p class="motto__intro" data-reveal>Wyobraź sobie.</p>
@@ -1368,14 +1511,22 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                     <span class="motto__word motto__word--accent" style="--wi:5">biznes</span>
                     <span class="motto__word motto__word--accent" style="--wi:6">działa.</span>
                 </span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="2200">
+                    <span class="motto__word" style="--wi:0">A</span>
+                    <span class="motto__word" style="--wi:1">potem</span>
+                    <span class="motto__word" style="--wi:2">zostaje</span>
+                    <em class="motto__word" style="--wi:3">po</em>
+                    <em class="motto__word" style="--wi:4">Twojej</em>
+                    <em class="motto__word" style="--wi:5">stronie.</em>
+                </span>
             </blockquote>
 
-            <p class="motto__attribution" data-reveal data-delay="2300">Tomek Niedźwiecki</p>
+            <p class="motto__attribution" data-reveal data-delay="2900">Tomek Niedźwiecki</p>
         </div>
     </section>
 
-    <!-- SCENE 5 — PROCES -->
-    <section class="scene scene--how" id="act-5" data-act="4">
+    <!-- SCENE 6 — PROCES -->
+    <section class="scene scene--how" id="act-6" data-act="5">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
             <header class="how__header">
@@ -1388,34 +1539,42 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 
             <div class="how__steps">
                 <article class="step" data-reveal data-delay="200">
+                    <span class="step__pov">ty</span>
                     <div class="step__num">01</div>
-                    <span class="step__chip">Pomysł</span>
-                    <p class="step__line">Przynosisz pomysł — AI sprawdza go w rozmowie i <span class="step__accent">od razu pokazuje ekrany</span>. <em>Za darmo.</em></p>
+                    <span class="step__chip">Pomysł · za darmo</span>
+                    <p class="step__line">Przynosisz <em>pomysł</em> — to wystarczy.</p>
+                    <p class="step__desc">AI sprawdza go z Tobą w rozmowie i od razu pokazuje pierwsze ekrany Twojego narzędzia.</p>
                 </article>
 
-                <article class="step" data-reveal data-delay="400">
+                <article class="step step--ja" data-reveal data-delay="400">
+                    <span class="step__pov">ja</span>
                     <div class="step__num">02</div>
-                    <span class="step__chip">Budowa</span>
-                    <p class="step__line">Mój zespół buduje kompletną aplikację. Budżet 30 000 zł dzielimy <em>pół na pół</em>.</p>
+                    <span class="step__chip">Budowa · 50/50</span>
+                    <p class="step__line">Buduję <span class="step__accent">kompletną aplikację</span>.</p>
+                    <p class="step__desc">Mój zespół, konta, płatności, panel. Budżet 30 000 zł dzielimy pół na pół — gram swoimi pieniędzmi.</p>
                 </article>
 
-                <article class="step" data-reveal data-delay="600">
+                <article class="step step--ja" data-reveal data-delay="600">
+                    <span class="step__pov">ja</span>
                     <div class="step__num">03</div>
-                    <span class="step__chip">Klienci</span>
-                    <p class="step__line">Osobiście pozyskuję <span class="step__accent">pierwszych 50 płacących klientów</span>. Ty uczysz się biznesu od środka.</p>
+                    <span class="step__chip">Rynek · ok. pół roku</span>
+                    <p class="step__line">Sprzedaję do <span class="step__accent">50 płacących klientów</span>.</p>
+                    <p class="step__desc">Osobiście prowadzę kampanie i sprzedaż. Ty w tym czasie uczysz się biznesu od środka.</p>
                 </article>
 
                 <article class="step step--final" data-reveal data-delay="800">
+                    <span class="step__pov">ty</span>
                     <div class="step__num">04</div>
-                    <span class="step__chip">Prowadzenie</span>
-                    <p class="step__line">Przejmujesz prowadzenie — ja zostaję <span class="step__accent">doradcą z 20% udziałów</span>. Zarabiam, gdy Ty zarabiasz.</p>
+                    <span class="step__chip">Prowadzenie · 20% udziałów</span>
+                    <p class="step__line">Przejmujesz <em>rozkręcony</em> biznes.</p>
+                    <p class="step__desc">Ja zostaję doradcą strategicznym i pomagam w dalszym rozwoju. Zarabiam dopiero wtedy, gdy Ty zarabiasz.</p>
                 </article>
             </div>
         </div>
     </section>
 
-    <!-- SCENE 6 — SPOŁECZNOŚĆ -->
-    <section class="scene scene--crew" id="act-6" data-act="5">
+    <!-- SCENE 7 — SPOŁECZNOŚĆ -->
+    <section class="scene scene--crew" id="act-7" data-act="6">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
             <p class="crew__eyebrow" data-reveal>I jeszcze jedno.</p>
@@ -1434,15 +1593,25 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         </div>
     </section>
 
-    <!-- SCENE 7 — CTA -->
-    <section class="scene scene--cta" id="act-7" data-act="6">
+    <!-- SCENE 8 — CTA -->
+    <section class="scene scene--cta" id="act-8" data-act="7">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
             <p class="cta__eyebrow" data-reveal>Twoja kolej.</p>
 
-            <h2 class="cta__h2" data-reveal data-delay="100">
-                Masz <em class="cta__h2-italic">pomysł?</em><br>
-                <span class="cta__h2-accent">Sprawdź go za darmo.</span>
+            <p class="cta__lead" data-reveal data-delay="100">
+                <em>Następna aplikacja powstanie z pomysłu...</em>
+            </p>
+
+            <h2 class="cta__h2" data-reveal data-delay="250">
+                <span class="cta-flip" id="cta-flip">
+                    <span class="cta-flip__word is-active">Twojego.</span>
+                    <span class="cta-flip__word">księgowej.</span>
+                    <span class="cta-flip__word">trenera.</span>
+                    <span class="cta-flip__word">florystki.</span>
+                    <span class="cta-flip__word">elektryka.</span>
+                    <span class="cta-flip__word">Twojego.</span>
+                </span>
             </h2>
 
             <div class="cta__actions" data-reveal data-delay="350">
@@ -1452,7 +1621,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                         <span class="cta__primary-arrow" aria-hidden="true">→</span>
                     </a>
                 </span>
-                <p class="cta__note"><b>Bez zobowiązań</b> — kilkanaście minut rozmowy i zobaczysz pierwsze ekrany swojego narzędzia.</p>
+                <p class="cta__note"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy i zobaczysz pierwsze ekrany swojego narzędzia.</p>
             </div>
         </div>
     </section>
@@ -1630,10 +1799,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     });
 
     // ============================================================
-    //  SCENA 3 — „pomysł → aplikacja" na realnym feedzie
-    //  Pomysły to przykładowe punkty startu; ekran i nazwa są
-    //  PRAWDZIWE (publiczny feed generowań, z godziną). Scenariusz
-    //  gra tylko, jeśli jego projekt faktycznie jest w feedzie.
+    //  SCENA 3 — „Aplikacja dla [zawodu]" na realnym feedzie
+    //  Flip zawodu zsynchronizowany z crossfade'em PRAWDZIWEGO
+    //  mockupu z feedu (nazwa + godzina generacji). Scenariusz gra
+    //  tylko, jeśli jego projekt faktycznie jest w feedzie.
     // ============================================================
     var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
     var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png';
@@ -1643,18 +1812,18 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             '?format=webp&width=' + (w || 760) + '&quality=70&resize=contain';
     }
     var SCENE_DEFS = [
-        { idea: 'Prowadzę hodowlę kotów rasowych. Terminy kryć i porodów trzymam w zeszycie — i co miesiąc coś mi umyka…', name: 'LitterPlan' },
-        { idea: 'Jestem elektrykiem. Pomiary robię w godzinę, a protokoły dla klientów klepię po nocach…', name: 'RaportElektryk' },
-        { idea: 'Jeżdżę zawodowo TIR-em. Osiem godzin za kółkiem dziennie i plecy powoli wysiadają…', name: 'Pauza dla Pleców' },
-        { idea: 'Hurtowe zamówienia w moim sklepie giną między mailem a Excelem. Nie widzę, które są po terminie…', name: 'OrderVault 18+' }
+        { prof: 'tatuażysty.', name: 'InkBrief' },
+        { prof: 'korepetytorki.', name: 'MatmaPulse' },
+        { prof: 'pszczelarza.', name: 'Pasieczny Porządek' },
+        { prof: 'florystki.', name: 'BukietPlan' },
+        { prof: 'hodowczyni kotów.', name: 'LitterPlan' },
+        { prof: 'elektryka.', name: 'RaportElektryk' }
     ];
-    var ideaText = document.getElementById('idea-text');
-    var ideaCaret = document.getElementById('idea-caret');
-    var sceneLink = document.getElementById('scene-link');
-    var sceneWire = document.getElementById('scene-wire');
-    var sceneImg = document.getElementById('scene-img');
-    var sceneName = document.getElementById('scene-name');
-    var sceneMeta = document.getElementById('scene-meta');
+    var liveFlip = document.getElementById('live-flip');
+    var liveImgA = document.getElementById('live-img-a');
+    var liveImgB = document.getElementById('live-img-b');
+    var liveName = document.getElementById('live-name');
+    var liveMeta = document.getElementById('live-meta');
 
     function sceneTime(iso) {
         var d = new Date(iso);
@@ -1669,82 +1838,109 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 
     var sceneStarted = false;
     function startScene(scs) {
-        if (sceneStarted || !ideaText) return;
+        if (sceneStarted || !liveFlip) return;
         sceneStarted = true;
-        var si = 0, typeTimer = null, loopTimer = null;
-        function showShot(s) {
-            var paint = function () {
-                sceneWire.classList.remove('is-draw');
-                sceneImg.classList.remove('is-dim');
-                sceneImg.classList.add('is-on');
-                sceneName.textContent = s.name;
-                sceneMeta.innerHTML = s.real
+        // flip words
+        liveFlip.innerHTML = scs.map(function (s, i) {
+            return '<span class="live-flip__word' + (i === 0 ? ' is-active' : '') + '">' + s.prof.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>';
+        }).join('');
+        var words = liveFlip.querySelectorAll('.live-flip__word');
+        var frontA = false;
+        function paint(s) {
+            frontA = !frontA;
+            var front = frontA ? liveImgA : liveImgB;
+            var back = frontA ? liveImgB : liveImgA;
+            front.onload = function () {
+                front.classList.add('is-on');
+                back.classList.remove('is-on');
+                liveName.textContent = s.name;
+                liveMeta.innerHTML = s.real
                     ? 'prawdziwy projekt · <em>' + s.when + '</em>'
                     : 'ekrany prosto z rozmowy';
             };
-            if (sceneImg.getAttribute('src') === s.img) { paint(); return; }
-            sceneImg.onload = paint;
-            sceneImg.src = s.img;
-            if (sceneImg.complete && sceneImg.naturalWidth) paint();
+            front.src = s.img;
+            if (front.complete && front.naturalWidth) front.onload();
         }
-        if (reduceMotion) {
-            var s0 = scs[0];
-            ideaText.textContent = s0.idea;
-            ideaCaret.style.display = 'none';
-            sceneLink.classList.add('is-on');
-            showShot(s0);
-            return;
+        var si = 0;
+        paint(scs[0]);
+        if (reduceMotion || scs.length < 2) return;
+        var loopTimer = null;
+        function next() {
+            si = (si + 1) % scs.length;
+            words.forEach(function (w, i) { w.classList.toggle('is-active', i === si); });
+            paint(scs[si]);
+            // preload kolejnego
+            var pre = new Image(); pre.src = scs[(si + 1) % scs.length].img;
+            loopTimer = setTimeout(next, 4200);
         }
-        function play() {
-            var s = scs[si];
-            sceneLink.classList.remove('is-on');
-            if (sceneImg.classList.contains('is-on')) {
-                sceneImg.classList.remove('is-on');
-                sceneImg.classList.add('is-dim');
-            }
-            ideaText.textContent = '';
-            ideaCaret.style.display = '';
-            var pre = new Image(); pre.src = s.img;
-            var nx = new Image(); nx.src = scs[(si + 1) % scs.length].img;
-            var ch = 0;
-            (function type() {
-                if (ch <= s.idea.length) {
-                    ideaText.textContent = s.idea.slice(0, ch++);
-                    typeTimer = setTimeout(type, 24);
-                    return;
-                }
-                sceneLink.classList.add('is-on');
-                sceneWire.classList.add('is-draw');
-                loopTimer = setTimeout(function () {
-                    showShot(s);
-                    loopTimer = setTimeout(function () {
-                        si = (si + 1) % scs.length;
-                        play();
-                    }, 5200);
-                }, 1150);
-            })();
-        }
+        loopTimer = setTimeout(next, 4200);
         document.addEventListener('visibilitychange', function () {
-            if (document.hidden) { clearTimeout(typeTimer); clearTimeout(loopTimer); }
-            else play();
+            if (document.hidden) clearTimeout(loopTimer);
+            else loopTimer = setTimeout(next, 2000);
         });
-        play();
     }
 
-    var FALLBACK_SCENE = [{
-        idea: 'Prowadzę salon groomerski. Klienci notorycznie zapominają o wizytach…',
-        name: 'Pulpit narzędzia', img: DEMO_IMG, real: false, when: ''
-    }];
+    var FALLBACK_SCENE = [{ prof: 'groomerki.', name: 'Pulpit narzędzia', img: DEMO_IMG, real: false, when: '' }];
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
         var byName = {};
         items.forEach(function (p) { byName[p.nazwa] = p; });
         var scs = SCENE_DEFS.filter(function (s) { return byName[s.name]; }).map(function (s) {
             var p = byName[s.name];
-            return { idea: s.idea, name: p.nazwa, img: lightImg(p.img, 760), real: true, when: sceneTime(p.generated_at) };
+            return { prof: s.prof, name: p.nazwa, img: lightImg(p.img, 760), real: true, when: sceneTime(p.generated_at) };
         });
         startScene(scs.length ? scs : FALLBACK_SCENE);
     }).catch(function () { startScene(FALLBACK_SCENE); });
+
+    // ============================================================
+    //  SCENA 4 — RYNEK: 50 kropek zapala się z licznikiem
+    // ============================================================
+    var dotsBox = document.getElementById('market-dots');
+    var countEl = document.getElementById('market-count');
+    if (dotsBox) {
+        for (var di = 0; di < 50; di++) dotsBox.appendChild(document.createElement('i'));
+        var dots = dotsBox.querySelectorAll('i');
+        var marketFired = false;
+        function lightDots() {
+            if (marketFired) return;
+            marketFired = true;
+            if (reduceMotion) {
+                dots.forEach(function (d) { d.classList.add('is-lit'); });
+                countEl.textContent = '50';
+                return;
+            }
+            var n = 0;
+            (function lightNext() {
+                if (n >= 50) return;
+                dots[n].classList.add('is-lit');
+                n++;
+                countEl.textContent = String(n);
+                // ease-out: pierwsze szybkie, końcówka celebruje
+                setTimeout(lightNext, n < 35 ? 38 : (n < 47 ? 80 : 170));
+            })();
+        }
+        var marketObs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (en.isIntersecting) { setTimeout(lightDots, 700); marketObs.unobserve(en.target); }
+            });
+        }, { threshold: 0.5 });
+        var marketScene = document.getElementById('act-4');
+        if (marketScene) marketObs.observe(marketScene);
+    }
+
+    // ============================================================
+    //  SCENA 8 — CTA flip (czyj pomysł będzie następny)
+    // ============================================================
+    var ctaFlip = document.getElementById('cta-flip');
+    if (ctaFlip && !reduceMotion) {
+        var ctaWords = ctaFlip.querySelectorAll('.cta-flip__word');
+        var ci = 0;
+        setInterval(function () {
+            if (document.hidden) return;
+            ci = (ci + 1) % ctaWords.length;
+            ctaWords.forEach(function (w, i) { w.classList.toggle('is-active', i === ci); });
+        }, 2200);
+    }
 })();
 </script>
 
