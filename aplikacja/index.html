@@ -54,6 +54,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://yxmavwkwnfuphjqbelws.supabase.co">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
 
     <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
@@ -1384,7 +1385,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     gap: 14px;
     padding: 26px 24px calc(26px + env(safe-area-inset-bottom));
     font-size: 12.5px;
-    color: var(--text-faint);
+    color: var(--text-muted); /* min. 4.5:1 na czerni (WCAG AA) */
     border-top: 1px solid var(--border);
 }
 .footer-mini a { transition: color 0.25s var(--ease); }
@@ -1427,7 +1428,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 <nav class="nav">
     <div class="nav__inner">
         <a class="nav__brand" href="https://tomekniedzwiecki.pl/" aria-label="tomekniedzwiecki.pl — strona główna">
-            <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" height="32">
+            <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" width="244" height="32">
             <span class="nav__suffix">aplikacja.</span>
         </a>
         <div class="nav__right">
@@ -1440,7 +1441,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 <!-- ============================================================
      INTRO OVERLAY
 ============================================================ -->
-<div class="intro" id="intro">
+<div class="intro" id="intro" role="button" tabindex="0" aria-label="Pomiń intro">
     <div class="intro__content">
         <h2 class="intro__greeting">Masz pomysł<span class="intro__dot">.</span></h2>
         <p class="intro__followup">To wystarczy.</p>
@@ -1821,6 +1822,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         setTimeout(dismissIntro, INTRO_DURATION);
         if (intro) {
             intro.addEventListener('click', dismissIntro);
+            intro.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dismissIntro(); }
+            });
+            intro.focus({ preventScroll: true });
         }
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && intro && !intro.classList.contains('is-hiding')) dismissIntro();
