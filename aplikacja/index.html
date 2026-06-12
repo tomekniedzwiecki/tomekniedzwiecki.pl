@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#050507">
-    <title>Aplikacja — zbuduję ją na Twoim pomyśle i oddam Ci stery | Tomek Niedźwiecki</title>
-    <meta name="description" content="Masz pomysł na aplikację? Buduję ją z moim zespołem, finansuję połowę budżetu, pozyskuję pierwszych 50 płacących klientów — i przekazuję Ci stery gotowego biznesu. Sprawdź pomysł w rozmowie z AI — za darmo.">
+    <meta name="theme-color" content="#000000">
+    <title>Tomek Niedźwiecki — Zbuduję Ci aplikację na Twoim pomyśle</title>
+    <meta name="description" content="Masz pomysł na aplikację? Buduję ją z moim zespołem, finansuję połowę budżetu, pozyskuję pierwszych 50 płacących klientów — i oddaję Ci prowadzenie. Sprawdź pomysł w rozmowie z AI — za darmo.">
+    <meta name="robots" content="index, follow">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
     <link rel="canonical" href="https://tomekniedzwiecki.pl/aplikacja/">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tomekniedzwiecki.pl/aplikacja/">
-    <meta property="og:title" content="Aplikacja — zbuduję ją na Twoim pomyśle i oddam Ci stery">
-    <meta property="og:description" content="Aplikacja na Twój pomysł. Buduję, finansuję połowę, pozyskuję 50 pierwszych klientów — potem przejmujesz rozkręcony biznes. Sprawdź pomysł w rozmowie z AI.">
+    <meta property="og:title" content="Aplikacja — zbuduję Ci ją na Twoim pomyśle i oddam Ci prowadzenie">
+    <meta property="og:description" content="Aplikacja na Twój pomysł. Buduję, finansuję połowę, pozyskuję 50 pierwszych klientów — potem przejmujesz prowadzenie. Sprawdź pomysł w rozmowie z AI.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
     <meta name="twitter:card" content="summary_large_image">
@@ -55,41 +56,48 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
 
+    <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="/img/logo/tn-logo-white-88.png" fetchpriority="high">
+
 <style>
 /* ============================================================
-   STWORZĘ — strona główna v2 (2026-06-13)
-   Narracja: pomysł → buduję → pozyskuję klientów → oddaję stery.
-   DNA marki: Inter 800-900 + Instrument Serif italic, dark
-   #050507, persona NIEBIESKA #4d9fff. Normalny scroll + reveal
-   (bez snap — sekcje są bogatsze niż 100dvh: feed, społeczność).
-   Smaczki AI-grade: grid-pattern, aurora, conic border beam,
-   marquee generowań, animowany czat w hero, liczniki rAF.
+   APLIKACJA — editorial storytelling one-pager (2026-06-12)
+   DNA rodziny: /zbuduje + /zwolnie + /home — Inter 700-900 +
+   Instrument Serif italic, czarne tło, snap-scroll, intro
+   overlay, progress dock. Persona NIEBIESKA #4d9fff.
+   Scena 3 = żywa linia „pomysł → aplikacja" na realnym feedzie.
    ============================================================ */
 :root {
-    --bg: #050507;
-    --bg-elev: #0a0a0e;
-    --bg-card: #0c0c12;
-    --glass: rgba(255, 255, 255, 0.035);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-border-soft: rgba(255, 255, 255, 0.055);
-    --border-strong: #2d2d34;
-    --text: #e9e9ee;
+    --bg: #000;
+    --bg-elev: #0a0a0a;
+    --bg-card: #0d0d0d;
+
+    --border: #1f1f1f;
+    --border-strong: #2d2d2d;
+
+    --text: #ededed;
     --text-strong: #ffffff;
-    --text-muted: #8b8b96;
-    --text-faint: #5a5a64;
+    --text-muted: #8a8a8a;
+    --text-faint: #5a5a5a;
+
     --accent: #4d9fff;
-    --accent-2: #2f7fe6;
-    --accent-soft: rgba(77, 159, 255, 0.14);
-    --accent-dim: rgba(77, 159, 255, 0.06);
+    --accent-soft: rgba(77, 159, 255, 0.12);
+    --accent-dim: rgba(77, 159, 255, 0.05);
     --accent-ink: #061320;
     --green: #00d97e;
-    --serif: 'Instrument Serif', Georgia, serif;
-    --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+
+    --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
-    --pad-x: clamp(20px, 5vw, 48px);
 }
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-snap-type: y mandatory;
+}
 body {
     font-family: var(--sans);
     background: var(--bg);
@@ -97,158 +105,643 @@ body {
     line-height: 1.6;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
 }
+img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; text-decoration: none; }
-button { font-family: inherit; border: 0; background: none; cursor: pointer; color: inherit; }
-img { max-width: 100%; display: block; }
-::selection { background: rgba(77, 159, 255, 0.3); color: #fff; }
+button { font-family: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+::selection { background: var(--text-strong); color: var(--bg); }
 
-/* ── NAV ── */
+.scene, .footer-mini { scroll-snap-stop: always; }
+.scene { scroll-snap-align: start; }
+.footer-mini { scroll-snap-align: end; }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-snap-type: none; scroll-behavior: auto; }
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
 .nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px var(--pad-x);
-    background: rgba(5, 5, 7, 0.72);
-    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.3s;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
 }
-.nav.is-scrolled { border-bottom-color: var(--glass-border-soft); }
-.nav__brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; color: var(--text-strong); letter-spacing: -0.01em; }
-.nav__brand img { width: 26px; height: 26px; border-radius: 7px; }
-.nav__brand span em { font-style: normal; color: var(--accent); }
-.nav__links { display: flex; align-items: center; gap: 26px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); }
-.nav__links a:hover { color: var(--text-strong); }
-.nav__cta {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 9px 18px; border-radius: 999px;
-    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
-    color: var(--accent-ink); font-weight: 800; font-size: 13px;
-    box-shadow: 0 8px 28px -10px rgba(77, 159, 255, 0.55);
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
-}
-.nav__cta:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -10px rgba(77, 159, 255, 0.7); }
-@media (max-width: 760px) { .nav__links a:not(.nav__cta) { display: none; } }
-
-/* ── HERO ── */
-.hero {
-    position: relative;
-    min-height: 100svh;
-    display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-    align-items: center;
-    gap: clamp(32px, 5vw, 72px);
-    padding: calc(72px + 6vh) var(--pad-x) 9vh;
-    max-width: 1280px;
+.nav__inner {
+    max-width: 1400px;
     margin: 0 auto;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+.nav__brand {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    transition: opacity 0.25s var(--ease);
+}
+.nav__brand:hover { opacity: 0.78; }
+.nav__logo { height: 100%; width: auto; display: block; user-select: none; }
+.nav__right { display: inline-flex; align-items: center; gap: 22px; }
+.nav__link {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: color 0.25s var(--ease);
+}
+.nav__link:hover { color: var(--text-strong); }
+.nav__cta {
+    padding: 9px 18px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(77, 159, 255, 0.38);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), color 0.25s var(--ease);
+}
+.nav__cta:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+}
+@media (max-width: 640px) { .nav__link { display: none; } }
+
+/* ============================================================
+   INTRO OVERLAY — „Masz pomysł." / „To wystarczy."
+   ============================================================ */
+.intro {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
 }
-/* siatka inżynierska + aurora — podpis wizualny AI-stron */
-.hero::before {
+.intro::before {
     content: '';
-    position: absolute; inset: 0; z-index: -2;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 56px 56px;
-    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
-    mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
-}
-.hero::after {
-    content: '';
-    position: absolute; z-index: -1;
-    top: -20%; left: 50%; transform: translateX(-50%);
-    width: min(1100px, 130vw); height: 70vh;
-    background: radial-gradient(ellipse at center, rgba(77, 159, 255, 0.16) 0%, rgba(77, 159, 255, 0.05) 40%, transparent 70%);
-    filter: blur(40px);
+    position: absolute;
+    top: 50%; left: 50%;
+    width: clamp(400px, 60vw, 800px);
+    aspect-ratio: 1;
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.15) 0%,
+        rgba(77, 159, 255, 0.03) 40%,
+        transparent 70%);
+    filter: blur(80px);
+    transform: translate(-50%, -50%);
     pointer-events: none;
+    opacity: 0;
+    animation: introAurora 1.2s ease 200ms forwards;
 }
-.eyebrow {
-    display: inline-flex; align-items: baseline; gap: 8px;
-    font-size: 11.5px; font-weight: 800; letter-spacing: 0.18em;
-    text-transform: uppercase; color: var(--accent);
-    margin-bottom: 22px;
+@keyframes introAurora { to { opacity: 1; } }
+.intro.is-hiding { animation: introHide 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes introHide { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+.intro__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(16px, 2.5vh, 32px);
+    text-align: center;
 }
-.eyebrow .ser {
-    font-family: var(--serif); font-style: italic; font-weight: 400;
-    font-size: 15px; letter-spacing: 0; text-transform: none;
-    color: var(--text-muted);
-}
-.hero h1 {
-    font-size: clamp(38px, 5.4vw, 68px);
-    line-height: 1.02;
+.intro__greeting {
+    font-family: var(--sans);
+    font-weight: 900;
+    font-size: clamp(44px, 10vw, 150px);
+    line-height: 0.92;
     letter-spacing: -0.045em;
+    color: var(--text-strong);
+    padding: 0 24px;
+    clip-path: inset(0 100% 0 0);
+    animation: introSweep 1.4s cubic-bezier(0.65, 0, 0.35, 1) 300ms forwards;
+}
+@keyframes introSweep { to { clip-path: inset(0 0 0 0); } }
+.intro__dot {
+    color: var(--accent);
+    display: inline-block;
+    animation: introDotPulse 2.2s ease-in-out 2200ms infinite;
+}
+@keyframes introDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.55; transform: scale(1.18); }
+}
+.intro__followup {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(26px, 4.5vw, 60px);
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    padding: 0 24px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: introFollowupIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1500ms forwards;
+}
+@keyframes introFollowupIn { to { opacity: 1; transform: translateY(0); } }
+.intro__skip {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0;
+    animation: introSkipIn 0.6s ease 2400ms forwards,
+               introSkipBob 2.4s ease 3200ms infinite;
+    z-index: 2;
+}
+@keyframes introSkipIn { to { opacity: 1; } }
+@keyframes introSkipBob {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.7; }
+    50%      { transform: translateX(-50%) translateY(4px); opacity: 1; }
+}
+.intro:hover .intro__skip { color: var(--text); }
+@media (max-width: 480px) {
+    .intro__greeting { font-size: clamp(36px, 12vw, 60px); padding: 0 18px; }
+    .intro__followup { font-size: clamp(20px, 6vw, 30px); padding: 0 18px; }
+    .intro__skip { bottom: 24px; letter-spacing: 0.14em; padding: 8px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .intro__greeting { animation: none; clip-path: none; }
+    .intro__followup { animation: none; opacity: 1; transform: none; }
+    .intro::before { animation: none; opacity: 1; }
+    .intro__skip { animation: introSkipIn 0.3s ease forwards; }
+    .intro__dot { animation: none; }
+}
+
+/* ============================================================
+   PROGRESS SIDEBAR (desktop) + DOCK (mobile)
+   ============================================================ */
+.progress {
+    position: fixed;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+}
+.progress.is-shown { opacity: 1; }
+.progress__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+    transition: color 0.35s var(--ease);
+    cursor: pointer;
+}
+.progress__item::before {
+    content: '';
+    width: 18px;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.35s var(--ease);
+    flex-shrink: 0;
+}
+.progress__item span { font-variant-numeric: tabular-nums; font-weight: 600; }
+.progress__item em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+}
+.progress__item:hover { color: var(--text); }
+.progress__item.is-active { color: var(--text-strong); }
+.progress__item.is-active::before { width: 40px; }
+.progress__item.is-active em { opacity: 1; transform: translateX(0); }
+
+@media (max-width: 920px) {
+    .progress {
+        left: 50%;
+        top: auto;
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        transform: translateX(-50%);
+        flex-direction: row;
+        gap: 0;
+        padding: 2px 6px;
+        background: rgba(0, 0, 0, 0.55);
+        -webkit-backdrop-filter: blur(14px);
+                backdrop-filter: blur(14px);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        align-items: center;
+    }
+    .progress__item {
+        gap: 0;
+        padding: 14px 11px;
+        min-width: 44px;
+        min-height: 44px;
+        justify-content: center;
+        position: relative;
+    }
+    .progress__item::before {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--text-faint);
+        opacity: 0.6;
+        transition: width 0.3s var(--ease), background 0.3s var(--ease), opacity 0.3s var(--ease);
+    }
+    .progress__item.is-active::before {
+        width: 18px;
+        border-radius: 999px;
+        background: var(--accent);
+        opacity: 1;
+    }
+    .progress__item span { display: none; }
+    .progress__item em {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%) translateY(4px);
+        font-size: 12px;
+        font-style: normal;
+        font-family: var(--sans);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-strong);
+        background: rgba(0, 0, 0, 0.7);
+        -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+        pointer-events: none;
+        border: 1px solid var(--border);
+    }
+    .progress__item.is-active em { transform: translateX(-50%) translateY(0); }
+}
+
+/* ============================================================
+   SCENE — 100dvh snap target
+   ============================================================ */
+.story { position: relative; }
+.scene {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 32px;
+    overflow: hidden;
+    scroll-margin-top: 56px;
+}
+.scene__inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1280px;
+}
+.scene__aurora {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(500px, 75vw, 1000px);
+    aspect-ratio: 1;
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.08) 0%,
+        rgba(77, 159, 255, 0.02) 40%,
+        transparent 72%);
+    filter: blur(110px);
+    pointer-events: none;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    animation: auroraDrift 24s ease-in-out infinite;
+    will-change: transform;
+}
+@keyframes auroraDrift {
+    0%, 100% { transform: translate(-52%, -50%) scale(1); }
+    50%      { transform: translate(-48%, -53%) scale(1.05); }
+}
+
+/* ============================================================
+   REVEALS
+   ============================================================ */
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    will-change: opacity, transform;
+}
+[data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+[data-reveal].reveal-mask {
+    opacity: 1;
+    transform: none;
+    overflow: hidden;
+    display: block;
+    transition: none;
+}
+.reveal-mask__inner {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform 1.1s var(--ease);
+    will-change: transform;
+    padding-bottom: 0.12em;
+}
+[data-reveal].reveal-mask.is-visible .reveal-mask__inner { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .reveal-mask__inner { transform: none; transition: none; }
+    .scene__aurora { animation: none; }
+}
+
+/* ============================================================
+   MOBILE PERFORMANCE (wzorzec /zbuduje)
+   ============================================================ */
+@media (max-width: 820px) {
+    .scene__aurora {
+        animation: none !important;
+        filter: blur(60px);
+        opacity: 0.8;
+        will-change: auto;
+    }
+    .intro::before { animation: introAurora 0.5s ease forwards !important; filter: blur(50px); }
+    .nav { background: rgba(0, 0, 0, 0.88); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .progress { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0, 0, 0, 0.85); }
+    .progress__item em { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0, 0, 0, 0.92); }
+    .scene { scroll-snap-stop: normal; }
+    .footer-mini { scroll-snap-stop: normal; }
+    html { scroll-snap-type: y mandatory; }
+    [data-reveal] { transform: translateY(16px); transition-duration: 0.6s; }
+    .reveal-mask__inner { transition-duration: 0.8s; }
+    .hero__meta-arrow { animation: none; opacity: 0.85; }
+    .intro__dot { animation: none; }
+    [data-reveal] { will-change: auto; }
+    [data-reveal]:not(.is-visible) { will-change: opacity, transform; }
+    .scene--hero .hero__meta { display: none; }
+    .reveal-mask__inner { will-change: auto; }
+    [data-reveal]:not(.is-visible) .reveal-mask__inner { will-change: transform; }
+    .motto__line--words.is-visible .motto__word {
+        transition-delay: calc(var(--wi, 0) * 40ms);
+        transition-duration: 0.5s;
+    }
+    .step--final {
+        animation: none !important;
+        background: linear-gradient(135deg, var(--bg-card) 0%, rgba(77, 159, 255, 0.07) 100%) !important;
+        border-color: var(--accent) !important;
+    }
+}
+
+/* ============================================================
+   SCENE 1 — HERO
+   ============================================================ */
+.scene--hero { padding-top: 110px; }
+.scene--hero .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.12) 0%,
+        rgba(77, 159, 255, 0.03) 40%,
+        transparent 72%);
+}
+.scene--hero .scene__inner { max-width: 1400px; text-align: left; }
+
+.me {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 18px 6px 6px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    margin-bottom: clamp(28px, 5vh, 56px);
+    max-width: max-content;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.7s var(--ease) 1300ms, transform 0.7s var(--ease) 1300ms;
+}
+.me.is-visible { opacity: 1; transform: translateY(0); }
+.me img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    flex-shrink: 0;
+}
+.me__name { color: var(--text-strong); font-weight: 600; font-size: 14px; line-height: 1.25; letter-spacing: -0.005em; }
+.me__role { color: var(--text-muted); font-size: 12.5px; line-height: 1.25; margin-top: 2px; }
+
+.hero__h1 {
+    font-family: var(--sans);
+    font-size: clamp(50px, 10.5vw, 158px);
+    line-height: 0.86;
+    letter-spacing: -0.05em;
     font-weight: 900;
     color: var(--text-strong);
-    margin-bottom: 24px;
+    margin: 0;
+    max-width: 1300px;
 }
-.hero h1 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.02em; color: var(--accent); }
-.hero__lead {
-    font-size: clamp(15.5px, 1.7vw, 18px);
+.hero__h1-line { display: block; overflow: hidden; line-height: 0.92; margin-bottom: -0.05em; }
+.hero__h1-italic {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
     color: var(--text-muted);
-    max-width: 54ch;
-    margin-bottom: 34px;
+    font-size: 0.65em;
+    line-height: 1;
+    letter-spacing: -0.015em;
+    padding: 0 0.15em;
+    vertical-align: 0.04em;
 }
-.hero__lead strong { color: var(--text); font-weight: 600; }
-.hero__ctas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.btn {
-    position: relative;
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 16px 30px; border-radius: 999px;
-    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
-    color: var(--accent-ink); font-weight: 800; font-size: 15px;
-    box-shadow: 0 10px 36px -10px rgba(77, 159, 255, 0.6);
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+.hero__h1-accent {
+    color: var(--accent);
+    text-shadow: 0 0 80px rgba(77, 159, 255, 0.32);
 }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 18px 48px -12px rgba(77, 159, 255, 0.75); }
-.btn .arr { transition: transform 0.25s var(--ease); }
-.btn:hover .arr { transform: translateX(3px); }
-.btn--ghost {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--glass-border);
-    box-shadow: none;
-    font-weight: 700;
+.hero__h1-personal {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.4em;
+    letter-spacing: -0.015em;
+    color: var(--text-strong);
+    line-height: 1;
+    vertical-align: 0.12em;
 }
-.btn--ghost:hover { border-color: var(--border-strong); background: var(--glass); box-shadow: none; }
-.hero__note { margin-top: 16px; font-size: 12.5px; color: var(--text-faint); }
-.hero__note b { color: var(--text-muted); font-weight: 600; }
 
-/* ── Hero: scena „pomysł → aplikacja" ──
-   Nie mockup obok tekstu, tylko linia produkcyjna produktu:
-   dymek z pomysłem (typewriter) → nić z iskrą → okno, w którym
-   rysuje się wireframe i materializuje PRAWDZIWY ekran z feedu. */
-.hero__noise {
-    position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-    background-size: 180px 180px;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
+.hero__sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(22px, 3.8vw, 48px);
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-top: clamp(16px, 3vh, 32px);
+    max-width: 980px;
 }
-.hero__scene { position: relative; perspective: 1500px; min-width: 0; }
+.hero__sub-accent { color: var(--accent); font-weight: 500; }
+
+.hero__meta {
+    margin-top: clamp(28px, 5vh, 52px);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+.hero__meta-arrow { animation: arrowBob 2.4s ease-in-out infinite; display: inline-block; }
+@keyframes arrowBob {
+    0%, 100% { transform: translateY(0); opacity: 0.7; }
+    50%      { transform: translateY(4px); opacity: 1; }
+}
+
+/* ============================================================
+   SCENE 2 — POLICZMY (50/50)
+   ============================================================ */
+.scene--proof .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.15) 0%,
+        rgba(77, 159, 255, 0.04) 40%,
+        transparent 72%);
+}
+.scene--proof .scene__inner { text-align: center; }
+.proof__eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.6vw, 36px);
+    color: var(--text-muted);
+    margin-bottom: clamp(40px, 8vh, 96px);
+    letter-spacing: -0.005em;
+}
+.proof__hero {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.06em;
+    position: relative;
+}
+.proof__digits {
+    font-family: var(--sans);
+    font-weight: 900;
+    font-size: clamp(110px, 24vw, 330px);
+    line-height: 0.88;
+    letter-spacing: -0.05em;
+    color: var(--accent);
+    text-shadow: 0 0 140px rgba(77, 159, 255, 0.35);
+    font-variant-numeric: tabular-nums;
+}
+.proof__slash {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(70px, 15vw, 210px);
+    color: var(--text-faint);
+    line-height: 1;
+    padding: 0 0.04em;
+}
+.proof__subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(26px, 4vw, 56px);
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-top: clamp(24px, 4vh, 48px);
+}
+.proof__subtitle strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text-strong);
+    font-size: 0.92em;
+}
+.proof__supporting {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(16px, 1.8vw, 22px);
+    color: var(--text-muted);
+    letter-spacing: -0.005em;
+    margin-top: clamp(40px, 6vh, 80px);
+    line-height: 1.45;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.proof__supporting strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.proof__sep { color: var(--text-faint); padding: 0 0.3em; }
+
+/* ============================================================
+   SCENE 3 — NA ŻYWO (pomysł → aplikacja, realny feed)
+   ============================================================ */
+.scene--live .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.12) 0%,
+        rgba(77, 159, 255, 0.03) 42%,
+        transparent 72%);
+}
+.scene--live { padding-top: 90px; padding-bottom: 60px; }
+.scene--live .scene__inner {
+    max-width: min(660px, calc((100dvh - 420px) * 1.5));
+    min-width: min(520px, 100%);
+    text-align: center;
+}
+.live__eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.4vw, 32px);
+    color: var(--text-muted);
+    margin-bottom: clamp(16px, 2.5vh, 30px);
+    letter-spacing: -0.005em;
+}
+.live__stage { text-align: left; }
 .scene__idea {
-    position: relative; z-index: 2;
-    max-width: 480px;
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
     border: 1px solid rgba(77, 159, 255, 0.32);
     background: linear-gradient(180deg, rgba(77,159,255,0.13) 0%, rgba(77,159,255,0.05) 100%);
     border-radius: 16px 16px 16px 5px;
-    padding: 12px 16px 13px;
+    padding: 11px 16px 12px;
     box-shadow: 0 18px 50px -24px rgba(77, 159, 255, 0.35);
 }
 .scene__idea-label {
     display: block;
     font-size: 10px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 5px;
+    color: var(--accent); margin-bottom: 4px;
 }
-.scene__idea-text { font-size: 14px; line-height: 1.5; color: var(--text-strong); min-height: 42px; display: block; }
+.scene__idea-text { font-size: 13.5px; line-height: 1.5; color: var(--text-strong); min-height: 40px; display: block; }
 .scene__caret {
-    display: inline-block; width: 7px; height: 14px;
+    display: inline-block; width: 7px; height: 13px;
     background: var(--accent); margin-left: 3px; vertical-align: -2px; border-radius: 1px;
     animation: caretBlink 0.9s steps(1) infinite;
 }
 @keyframes caretBlink { 50% { opacity: 0; } }
-.scene__link { position: relative; height: 52px; margin-left: 34px; z-index: 1; }
+.scene__link { position: relative; height: 38px; margin-left: 34px; z-index: 1; }
 .scene__link::before {
     content: '';
     position: absolute; left: 0; top: -8px; bottom: -8px; width: 2px;
@@ -261,7 +754,7 @@ img { max-width: 100%; display: block; }
     opacity: 0;
 }
 .scene__link.is-on .scene__spark { animation: sparkFlow 1.1s var(--ease) infinite; }
-@keyframes sparkFlow { 0% { opacity: 0; transform: translateY(-6px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(48px); } }
+@keyframes sparkFlow { 0% { opacity: 0; transform: translateY(-6px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(40px); } }
 .scene__node {
     position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
     display: inline-flex; align-items: center; gap: 8px;
@@ -278,24 +771,20 @@ img { max-width: 100%; display: block; }
 @keyframes pulse { 50% { opacity: 0.35; } }
 .scene__win {
     position: relative; z-index: 2;
-    width: min(660px, 100%);
+    width: 100%;
     border-radius: 18px;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--border);
     background: #0a0a10;
     overflow: hidden;
     box-shadow:
         0 70px 140px -60px rgba(0, 0, 0, 0.95),
         0 30px 90px -40px rgba(77, 159, 255, 0.18),
         0 0 0 1px rgba(77, 159, 255, 0.05);
-    transform: rotateY(-6.5deg) rotateX(2deg);
-    transform-origin: 85% 40%;
-    transition: transform 0.9s var(--ease);
 }
-.hero__scene:hover .scene__win { transform: none; }
 .scene__bar {
     display: flex; align-items: center; gap: 7px;
     padding: 11px 14px;
-    border-bottom: 1px solid var(--glass-border-soft);
+    border-bottom: 1px solid var(--border);
     background: rgba(255, 255, 255, 0.02);
 }
 .scene__dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); flex-shrink: 0; }
@@ -324,9 +813,7 @@ img { max-width: 100%; display: block; }
     transition: opacity 0.65s var(--ease), filter 0.65s var(--ease);
 }
 .scene__screen img.is-on { opacity: 1; }
-/* podczas „projektowania" poprzedni ekran zostaje przygaszony pod wireframe'em */
 .scene__screen img.is-dim { opacity: 0.13; filter: saturate(0.2); }
-/* wireframe „szkic ekranu" rysujący się przed materializacją */
 .scene__wire { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.4s; }
 .scene__wire.is-draw { opacity: 1; }
 .scene__wire rect, .scene__wire line {
@@ -343,713 +830,818 @@ img { max-width: 100%; display: block; }
 .scene__cap {
     display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
     padding: 11px 16px;
-    border-top: 1px solid var(--glass-border-soft);
+    border-top: 1px solid var(--border);
 }
 .scene__cap b { font-size: 13.5px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .scene__cap span { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; }
 .scene__cap span em { font-style: normal; color: var(--text-muted); }
-@media (max-width: 960px) {
-    .hero { grid-template-columns: 1fr; padding-top: calc(64px + 4vh); min-height: auto; }
-    .hero__scene { max-width: 540px; }
-    .scene__win { transform: none; width: 100%; }
-    .scene__idea { max-width: 100%; }
-}
-
-/* ── PASEK LICZB ── */
-.proof {
-    border-top: 1px solid var(--glass-border-soft);
-    border-bottom: 1px solid var(--glass-border-soft);
-    background: rgba(255, 255, 255, 0.012);
-}
-.proof__inner {
-    max-width: 1280px; margin: 0 auto;
-    padding: 26px var(--pad-x);
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
-}
-.proof__item { text-align: center; }
-.proof__num { font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; letter-spacing: -0.03em; color: var(--text-strong); }
-.proof__num em { font-style: normal; color: var(--accent); }
-.proof__label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); margin-top: 3px; }
-@media (max-width: 720px) { .proof__inner { grid-template-columns: repeat(2, 1fr); } }
-
-/* ── SEKCJE WSPÓLNE ── */
-.section { position: relative; padding: clamp(80px, 12vh, 130px) var(--pad-x); max-width: 1280px; margin: 0 auto; }
-.section__head { max-width: 720px; margin-bottom: clamp(40px, 6vh, 64px); }
-.section__h2 {
-    font-size: clamp(30px, 4vw, 50px);
-    line-height: 1.04;
-    letter-spacing: -0.04em;
-    font-weight: 900;
-    color: var(--text-strong);
-}
-.section__h2 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
-.section__sub { margin-top: 16px; font-size: 16px; color: var(--text-muted); max-width: 58ch; }
-[data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
-[data-reveal].is-in { opacity: 1; transform: none; }
-
-/* ── PROCES (4 kroki do sterów) ── */
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-.step {
-    position: relative;
-    border: 1px solid var(--glass-border-soft);
-    border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%);
-    padding: clamp(22px, 2.6vw, 30px) clamp(18px, 2vw, 24px);
-    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease), background 0.35s var(--ease);
-}
-.step:hover { transform: translateY(-4px); border-color: rgba(77, 159, 255, 0.35); background: var(--bg-card); }
-.step__pov {
-    display: inline-block;
-    font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--text-muted);
-    border: 1px solid var(--glass-border); border-radius: 999px;
-    padding: 4px 11px; margin-bottom: 18px;
-}
-.step--ja .step__pov { color: var(--accent); border-color: rgba(77,159,255,0.4); }
-.step__num { font-size: 13px; font-weight: 900; color: var(--accent); letter-spacing: 0.06em; margin-bottom: 8px; }
-.step__t { font-size: clamp(17px, 1.6vw, 20px); font-weight: 800; letter-spacing: -0.02em; color: var(--text-strong); line-height: 1.25; margin-bottom: 9px; }
-.step__d { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
-.step__d strong { color: var(--text); font-weight: 600; }
-.step--final { border-color: transparent; }
-.step--final::before {
-    content: '';
-    position: absolute; inset: -1px; z-index: -1; border-radius: 19px;
-    background: conic-gradient(from var(--beam, 0deg), rgba(77,159,255,0.08) 0 60%, rgba(77,159,255,0.75) 80%, rgba(77,159,255,0.08) 100%);
-    animation: beamSpin 5s linear infinite;
-}
-.step--final { background: var(--bg-elev); }
-.steps__bridge {
-    margin-top: 22px;
-    text-align: center;
-    font-family: var(--serif); font-style: italic;
-    font-size: clamp(17px, 2vw, 21px);
-    color: var(--text-muted);
-}
-.steps__bridge b { color: var(--text-strong); font-weight: 400; }
-@media (max-width: 960px) { .steps { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
-
-/* ── FEED GENEROWAŃ (marquee) ── */
-.feed { padding-left: 0; padding-right: 0; max-width: none; }
-.feed .section__head { padding: 0 var(--pad-x); max-width: 1280px; margin-left: auto; margin-right: auto; }
-.feed .section__head-wrap { max-width: 1280px; margin: 0 auto; }
-/* Showcase generowań: lista projektów (tekst, nie miniatury) + OKNO APLIKACJI
-   z pełnym ekranem 3:2. Grafika w całości, nazwa w pasku okna — nic jej nie
-   zasłania. Auto-rotacja z paskiem postępu na aktywnym wierszu. */
-.show {
-    display: grid;
-    grid-template-columns: minmax(260px, 350px) minmax(0, 1fr);
-    gap: clamp(28px, 4.5vw, 64px);
-    align-items: center;
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 0 var(--pad-x);
-}
-.show__list { display: flex; flex-direction: column; gap: 6px; }
-.show__item {
-    position: relative;
-    width: 100%;
-    text-align: left;
-    padding: 14px 16px 15px;
-    border-radius: 14px;
-    border: 1px solid transparent;
-    transition: background 0.25s var(--ease), border-color 0.25s var(--ease);
-}
-.show__item:hover { background: rgba(255, 255, 255, 0.03); }
-.show__item.is-on {
-    background: var(--accent-dim);
-    border-color: rgba(77, 159, 255, 0.28);
-}
-.show__num {
-    display: block;
-    font-size: 10.5px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    color: var(--text-faint);
-    margin-bottom: 3px;
-    font-variant-numeric: tabular-nums;
-    transition: color 0.25s var(--ease);
-}
-.show__item.is-on .show__num { color: var(--accent); }
-.show__name {
-    display: block;
-    font-size: clamp(15.5px, 1.6vw, 17.5px);
-    font-weight: 800;
-    letter-spacing: -0.015em;
-    color: var(--text-muted);
-    transition: color 0.25s var(--ease);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.show__item.is-on .show__name { color: var(--text-strong); }
-.show__prog {
-    height: 2px;
-    margin-top: 11px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.06);
-    overflow: hidden;
-}
-.show__prog i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
-.show__item.is-on .show__prog i { animation: showProg var(--t, 5s) linear forwards; }
-.show.is-paused .show__prog i { animation-play-state: paused; }
-@keyframes showProg { to { width: 100%; } }
-.show__hint { margin-top: 16px; padding: 0 16px; font-size: 12px; color: var(--text-faint); line-height: 1.6; }
-
-/* Okno aplikacji — rama przeglądarki nadaje kontekst „to działa" */
-.show__win {
-    border-radius: 18px;
-    border: 1px solid var(--glass-border);
-    background: var(--bg-card);
-    overflow: hidden;
-    box-shadow:
-        0 70px 150px -60px rgba(0, 0, 0, 0.95),
-        0 30px 70px -40px rgba(77, 159, 255, 0.3),
-        0 0 0 1px rgba(77, 159, 255, 0.05);
-}
-.show__topbar {
-    display: flex;
-    align-items: center;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--glass-border-soft);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
-}
-.show__lights { display: inline-flex; gap: 7px; flex-shrink: 0; }
-.show__lights i { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
-.show__url {
+.live__more {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin: 0 auto;
-    max-width: min(420px, 70%);
-    padding: 6px 18px;
-    border-radius: 8px;
-    border: 1px solid var(--glass-border-soft);
-    background: rgba(0, 0, 0, 0.35);
-    font-size: 11.5px;
+    margin-top: clamp(18px, 3vh, 30px);
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
+    transition: color 0.25s var(--ease);
 }
-.show__url svg { width: 10px; height: 10px; color: var(--green); flex-shrink: 0; }
-.show__url b { color: var(--text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
-.show__screen {
-    position: relative;
-    display: block;
-    aspect-ratio: 3 / 2;
-    background: var(--bg-elev);
+.live__more:hover { color: var(--text-strong); }
+.live__more .arr { transition: transform 0.25s var(--ease); }
+.live__more:hover .arr { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) {
+    .scene__link.is-on .scene__spark { animation: none; opacity: 0; }
+    .scene__link.is-on .scene__node i { animation: none; }
 }
-.show__screen img {
+
+/* ============================================================
+   SCENE 4 — MOTTO
+   ============================================================ */
+.scene--motto .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.13) 0%,
+        rgba(77, 159, 255, 0.04) 40%,
+        transparent 72%);
+    animation-duration: 30s;
+}
+.scene--motto::before {
+    content: '';
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    /* contain, nie cover: grafika ZAWSZE w całości — nawet gdyby źródło
-       miało inną proporcję niż okno, nic nie zostanie ucięte */
-    object-fit: contain;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 1;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at center, #000 30%, transparent 80%);
+            mask-image: radial-gradient(ellipse 70% 60% at center, #000 30%, transparent 80%);
+}
+.scene--motto .scene__inner { max-width: 1400px; text-align: center; }
+.motto__intro {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.2vw, 28px);
+    color: var(--text-muted);
+    margin-bottom: clamp(28px, 5vh, 56px);
+    letter-spacing: -0.005em;
+}
+.motto__quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(28px, 4.4vw, 72px);
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+    color: var(--text);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.motto__line { display: block; margin-bottom: 0.15em; }
+.motto__line:last-child { margin-bottom: 0; }
+.motto__line--words { opacity: 1; transform: none; transition: none; }
+.motto__word {
+    display: inline-block;
     opacity: 0;
-    transition: opacity 0.55s var(--ease);
+    filter: blur(10px);
+    transform: translateY(8px);
+    transition: opacity 0.65s var(--ease), filter 0.65s var(--ease), transform 0.65s var(--ease);
+    transition-delay: calc(var(--wi, 0) * 75ms);
+    will-change: opacity, filter, transform;
 }
-.show__screen img.is-on { opacity: 1; }
-/* przełącznik widoków aktywnego projektu (pulpit/funkcja/landing…) */
-.show__views { display: inline-flex; gap: 7px; flex-shrink: 0; margin-left: 12px; }
-.show__view {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.16);
-    padding: 0;
-    transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+.motto__line--words.is-visible .motto__word {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
 }
-.show__view:hover { background: rgba(255, 255, 255, 0.35); }
-.show__view.is-on { background: var(--accent); transform: scale(1.25); box-shadow: 0 0 8px rgba(77, 159, 255, 0.7); }
-.show__more {
+.motto__word--accent {
+    color: var(--accent);
+    font-weight: 500;
+    text-shadow: 0 0 80px rgba(77, 159, 255, 0.28);
+}
+.motto__attribution {
+    margin-top: clamp(32px, 5vh, 56px);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+}
+.motto__attribution::before { content: '— '; }
+
+/* ============================================================
+   SCENE 5 — PROCES (4 kroki)
+   ============================================================ */
+.scene--how .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.10) 0%,
+        rgba(77, 159, 255, 0.03) 40%,
+        transparent 72%);
+}
+.how__header { margin-bottom: clamp(36px, 5vh, 64px); text-align: center; }
+.how__eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 26px);
+    color: var(--text-muted);
+    margin-bottom: clamp(16px, 2vh, 24px);
+}
+.how__title {
+    font-family: var(--sans);
+    font-size: clamp(34px, 5vw, 80px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    color: var(--text-strong);
+}
+.how__title em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    font-size: 0.78em;
+    padding: 0 0.05em;
+    letter-spacing: -0.015em;
+}
+.how__title-accent {
+    color: var(--accent);
+    text-shadow: 0 0 80px rgba(77, 159, 255, 0.3);
+}
+.how__steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+.step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: clamp(20px, 2.6vw, 32px);
+    text-align: left;
+    transition: border-color 0.4s var(--ease), transform 0.4s var(--ease);
+}
+.step:hover { border-color: var(--border-strong); transform: translateY(-3px); }
+.step__num {
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-variant-numeric: tabular-nums;
+}
+.step__chip {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 999px;
+    padding: 4px 11px;
+    margin-bottom: 14px;
+}
+.step__line {
+    font-size: clamp(14.5px, 1.4vw, 17px);
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+}
+.step__line em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    font-size: 1.04em;
+}
+.step__accent { color: var(--accent); }
+.step--final {
+    border-color: rgba(77, 159, 255, 0.4);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(77, 159, 255, 0.07) 100%);
+}
+@media (max-width: 920px) {
+    .how__steps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+    .how__steps { grid-template-columns: 1fr; gap: 10px; }
+    .step { padding: 16px 18px; }
+    .step__chip { margin-bottom: 8px; }
+}
+
+/* ============================================================
+   SCENE 6 — SPOŁECZNOŚĆ
+   ============================================================ */
+.scene--crew .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.11) 0%,
+        rgba(77, 159, 255, 0.03) 40%,
+        transparent 72%);
+}
+.scene--crew .scene__inner { text-align: center; max-width: 1000px; }
+.crew__eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 26px);
+    color: var(--text-muted);
+    margin-bottom: clamp(16px, 2vh, 24px);
+}
+.crew__title {
+    font-family: var(--sans);
+    font-size: clamp(34px, 5vw, 80px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    color: var(--text-strong);
+}
+.crew__title em {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+    font-size: 0.85em;
+    letter-spacing: -0.015em;
+}
+.crew__sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(18px, 2.2vw, 28px);
+    color: var(--text-muted);
+    line-height: 1.4;
+    max-width: 720px;
+    margin: clamp(20px, 3vh, 36px) auto 0;
+}
+.crew__sub strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.92em;
+}
+.crew__chips {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: clamp(28px, 4vh, 48px);
+}
+.crew__chip {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin-top: 14px;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--text-muted);
-    transition: color 0.2s var(--ease);
-}
-.show__more:hover { color: var(--text-strong); }
-.show__more .arr { transition: transform 0.25s var(--ease); }
-.show__more:hover .arr { transform: translateX(3px); }
-.feed__note { text-align: center; margin-top: 26px; font-size: 12.5px; color: var(--text-faint); padding: 0 var(--pad-x); }
-@media (max-width: 940px) {
-    .show { grid-template-columns: 1fr; gap: 22px; }
-    .show__win { order: -1; }
-    .show__item { padding: 11px 14px 12px; }
-    .show__prog { margin-top: 8px; }
-    .show__hint { padding: 0 14px; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .show__screen img { transition: opacity 0.3s ease; }
-    .show__item.is-on .show__prog i { animation: none; width: 100%; }
-    .step--final::before { animation: none; }
-    .scene__link.is-on .scene__spark { animation: none; opacity: 0; }
-    .scene__link.is-on .scene__node i { animation: none; }
-    .scene__win { transform: none; }
-}
-
-/* ── MODEL (gramy do jednej bramki) ── */
-.model { }
-.model__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.mcard {
-    border: 1px solid var(--glass-border-soft);
-    border-radius: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%);
-    padding: clamp(24px, 3vw, 34px) clamp(20px, 2.4vw, 28px);
-    transition: transform 0.35s var(--ease), border-color 0.35s var(--ease);
-}
-.mcard:hover { transform: translateY(-4px); border-color: rgba(77,159,255,0.35); }
-.mcard__num { font-size: clamp(30px, 3.6vw, 44px); font-weight: 900; letter-spacing: -0.04em; color: var(--text-strong); line-height: 1; }
-.mcard__num em { font-style: normal; color: var(--accent); }
-.mcard__t { margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--text); }
-.mcard__d { margin-top: 7px; font-size: 13.5px; color: var(--text-muted); line-height: 1.65; }
-.model__line {
-    margin-top: 36px;
-    text-align: center;
-    font-family: var(--serif); font-style: italic;
-    font-size: clamp(19px, 2.6vw, 26px);
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-elev);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--text);
 }
-.model__line b { font-weight: 400; color: var(--accent); }
-@media (max-width: 880px) { .model__grid { grid-template-columns: 1fr; } }
+.crew__chip i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+}
 
-/* ── SPOŁECZNOŚĆ ── */
-.community { }
-.community__wrap {
-    position: relative;
-    border: 1px solid var(--glass-border-soft);
-    border-radius: 26px;
-    background:
-        radial-gradient(ellipse 60% 90% at 85% 10%, rgba(77,159,255,0.1) 0%, transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.008) 100%);
-    padding: clamp(32px, 5vw, 64px);
-    overflow: hidden;
+/* ============================================================
+   SCENE 7 — CTA FINAL
+   ============================================================ */
+.scene--cta .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.16) 0%,
+        rgba(77, 159, 255, 0.05) 40%,
+        transparent 72%);
 }
-.community__wrap::before {
-    content: '';
-    position: absolute; inset: 0; z-index: 0;
-    background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 44px 44px;
-    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 80% 20%, #000 20%, transparent 70%);
-    mask-image: radial-gradient(ellipse 70% 80% at 80% 20%, #000 20%, transparent 70%);
-    pointer-events: none;
+.scene--cta .scene__inner { text-align: center; }
+.cta__eyebrow {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(20px, 2.4vw, 32px);
+    color: var(--text-muted);
+    margin-bottom: clamp(20px, 3vh, 36px);
 }
-.community__inner { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
-.community__cards { display: grid; gap: 12px; }
-.ccard {
-    display: flex; gap: 14px; align-items: flex-start;
-    border: 1px solid var(--glass-border-soft);
-    border-radius: 15px;
-    background: rgba(5, 5, 7, 0.55);
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    padding: 16px 18px;
-    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
-}
-.ccard:hover { border-color: rgba(77,159,255,0.35); transform: translateX(4px); }
-.ccard__ico {
-    width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
-    display: grid; place-items: center;
-    background: var(--accent-dim); border: 1px solid rgba(77,159,255,0.25); color: var(--accent);
-}
-.ccard__ico svg { width: 18px; height: 18px; }
-.ccard b { display: block; font-size: 14.5px; font-weight: 800; color: var(--text-strong); margin-bottom: 2px; }
-.ccard span { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-.community__quote {
-    margin-top: 22px;
-    display: flex; gap: 14px; align-items: center;
-}
-.community__quote img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(77,159,255,0.4); }
-.community__quote p { font-size: 13.5px; color: var(--text-muted); line-height: 1.6; }
-.community__quote p b { color: var(--text); font-weight: 700; }
-@media (max-width: 920px) { .community__inner { grid-template-columns: 1fr; } }
-
-/* ── FAQ ── */
-.faq__list { max-width: 760px; }
-.faq__item { border-bottom: 1px solid var(--glass-border-soft); }
-.faq__item summary {
-    display: flex; align-items: center; justify-content: space-between; gap: 16px;
-    padding: 20px 4px;
-    cursor: pointer; list-style: none;
-    font-size: clamp(15px, 1.6vw, 17px); font-weight: 700; color: var(--text-strong);
-    transition: color 0.2s;
-}
-.faq__item summary::-webkit-details-marker { display: none; }
-.faq__item summary::after {
-    content: '+';
-    font-size: 22px; font-weight: 400; color: var(--accent);
-    transition: transform 0.3s var(--ease);
-    flex-shrink: 0;
-}
-.faq__item[open] summary::after { transform: rotate(45deg); }
-.faq__item p { padding: 0 4px 22px; font-size: 14.5px; color: var(--text-muted); line-height: 1.75; max-width: 64ch; }
-.faq__item p b { color: var(--text); font-weight: 600; }
-
-/* ── FINAL CTA ── */
-.final {
-    position: relative;
-    text-align: center;
-    padding: clamp(90px, 14vh, 150px) var(--pad-x);
-    overflow: hidden;
-}
-.final::before {
-    content: '';
-    position: absolute; left: 50%; bottom: -40%; transform: translateX(-50%);
-    width: min(900px, 120vw); height: 80%;
-    background: radial-gradient(ellipse at center, rgba(77,159,255,0.18) 0%, transparent 65%);
-    filter: blur(30px);
-    pointer-events: none;
-}
-.final h2 {
-    position: relative;
-    font-size: clamp(34px, 5.4vw, 64px);
-    line-height: 1.05; letter-spacing: -0.045em; font-weight: 900;
+.cta__h2 {
+    font-family: var(--sans);
+    font-size: clamp(40px, 7vw, 120px);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.05em;
     color: var(--text-strong);
-    max-width: 880px; margin: 0 auto 18px;
 }
-.final h2 .cycler {
-    display: inline-block;
-    font-family: var(--serif); font-style: italic; font-weight: 400;
+.cta__h2-italic {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.015em;
+}
+.cta__h2-accent {
     color: var(--accent);
-    min-width: 5ch;
-    transition: opacity 0.3s, transform 0.3s;
+    text-shadow: 0 0 90px rgba(77, 159, 255, 0.35);
 }
-.final h2 .cycler.is-out { opacity: 0; transform: translateY(10px); }
-.final p { position: relative; color: var(--text-muted); font-size: 15.5px; max-width: 52ch; margin: 0 auto 36px; }
-.final .btn { position: relative; }
-.final__micro { position: relative; margin-top: 16px; font-size: 12px; color: var(--text-faint); }
+.cta__actions {
+    margin-top: clamp(32px, 5vh, 56px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+.cta__magnetic { display: inline-block; transition: transform 0.3s var(--ease); will-change: transform; }
+.cta__primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 44px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, #2f7fe6 100%);
+    color: var(--accent-ink);
+    font-size: clamp(16px, 1.8vw, 20px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    box-shadow: 0 18px 60px -16px rgba(77, 159, 255, 0.6);
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.cta__primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 26px 80px -18px rgba(77, 159, 255, 0.75);
+}
+.cta__primary-arrow { transition: transform 0.25s var(--ease); }
+.cta__primary:hover .cta__primary-arrow { transform: translateX(4px); }
+.cta__note {
+    font-size: 13px;
+    color: var(--text-faint);
+}
+.cta__note b { color: var(--text-muted); font-weight: 600; }
 
-/* ── FOOTER ── */
-.footer {
-    border-top: 1px solid var(--glass-border-soft);
-    padding: 30px var(--pad-x);
-    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-    max-width: 1280px; margin: 0 auto;
-    font-size: 12.5px; color: var(--text-faint);
+/* ============================================================
+   FOOTER MINI
+   ============================================================ */
+.footer-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 26px 24px calc(26px + env(safe-area-inset-bottom));
+    font-size: 12.5px;
+    color: var(--text-faint);
+    border-top: 1px solid var(--border);
 }
-.footer a:hover { color: var(--text); }
-.footer__links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-mini a { transition: color 0.25s var(--ease); }
+.footer-mini a:hover { color: var(--text); }
 </style>
 </head>
 <body>
 
-<nav class="nav" id="nav">
-    <a class="nav__brand" href="https://tomekniedzwiecki.pl/">
-        <img src="/img/logo/tn-logo-icon-88.png" alt="">
-        <span>Tomek Niedźwiecki <em>/ Aplikacja</em></span>
-    </a>
-    <div class="nav__links">
-        <a href="#proces">Jak to działa</a>
-        <a href="/aplikacja/inspiracje/">Inspiracje</a>
-        <a href="#spolecznosc">Społeczność</a>
-        <a href="#faq">FAQ</a>
-        <a class="nav__cta" href="/aplikacja/sparing/" data-cta>Zacznij rozmowę</a>
+<!-- ============================================================
+     NAV
+============================================================ -->
+<nav class="nav">
+    <div class="nav__inner">
+        <a class="nav__brand" href="https://tomekniedzwiecki.pl/" aria-label="tomekniedzwiecki.pl — strona główna">
+            <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" height="32">
+        </a>
+        <div class="nav__right">
+            <a class="nav__link" href="/aplikacja/inspiracje/">Inspiracje</a>
+            <a class="nav__cta" href="/aplikacja/sparing/" data-cta data-cta-loc="nav">Sprawdź pomysł →</a>
+        </div>
     </div>
 </nav>
 
-<!-- ════════ HERO ════════ -->
-<header class="hero">
-    <div class="hero__noise" aria-hidden="true"></div>
-    <div>
-        <div class="eyebrow">Wspólny biznes <span class="ser">— nie usługa</span></div>
-        <h1>Zbuduję aplikację na <span class="ser">Twoim pomyśle</span>.<br>Rozkręcę. Oddam Ci stery.</h1>
-        <p class="hero__lead">Ty wnosisz pomysł i chęć poprowadzenia tego dalej. Ja wnoszę zespół,
-        połowę budżetu i <strong>15 lat budowania biznesów online</strong>. Buduję aplikację, osobiście
-        pozyskuję pierwszych 50 płacących klientów — i przekazuję Ci rozkręcony biznes.</p>
-        <div class="hero__ctas">
-            <a class="btn" href="/aplikacja/sparing/" data-cta>Sprawdź swój pomysł z AI <span class="arr">→</span></a>
-            <a class="btn btn--ghost" href="#proces">Jak to działa</a>
-        </div>
-        <p class="hero__note"><b>Za darmo i bez zobowiązań</b> — kilkanaście minut rozmowy, a zobaczysz pierwsze ekrany swojego narzędzia.</p>
+<!-- ============================================================
+     INTRO OVERLAY
+============================================================ -->
+<div class="intro" id="intro">
+    <div class="intro__content">
+        <h2 class="intro__greeting">Masz pomysł<span class="intro__dot">.</span></h2>
+        <p class="intro__followup">To wystarczy.</p>
     </div>
-
-    <div class="hero__scene">
-        <div class="scene__idea">
-            <span class="scene__idea-label">Pomysł — tak to się zaczyna</span>
-            <span class="scene__idea-text"><span id="idea-text"></span><span class="scene__caret" id="idea-caret"></span></span>
-        </div>
-        <div class="scene__link" id="scene-link">
-            <span class="scene__spark"></span>
-            <span class="scene__node"><i></i>AI projektuje ekrany</span>
-        </div>
-        <div class="scene__win">
-            <div class="scene__bar">
-                <span class="scene__dot"></span><span class="scene__dot"></span><span class="scene__dot"></span>
-                <span class="scene__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja</span>
-                <span class="scene__live"><i></i>feed na żywo</span>
-            </div>
-            <div class="scene__screen">
-                <svg class="scene__wire" id="scene-wire" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true">
-                    <rect x="18" y="16" width="564" height="34" rx="6"/>
-                    <rect x="18" y="66" width="172" height="78" rx="6"/>
-                    <rect x="214" y="66" width="172" height="78" rx="6"/>
-                    <rect x="410" y="66" width="172" height="78" rx="6"/>
-                    <rect x="18" y="160" width="564" height="180" rx="6"/>
-                    <rect x="18" y="356" width="180" height="28" rx="6"/>
-                    <line x1="40" y1="206" x2="560" y2="206"/>
-                    <line x1="40" y1="250" x2="560" y2="250"/>
-                    <line x1="40" y1="294" x2="560" y2="294"/>
-                </svg>
-                <img id="scene-img" alt="Ekran aplikacji wygenerowany w rozmowie z AI" decoding="async">
-            </div>
-            <div class="scene__cap">
-                <b id="scene-name">&nbsp;</b>
-                <span id="scene-meta"></span>
-            </div>
-        </div>
-    </div>
-</header>
-
-<!-- ════════ PASEK LICZB ════════ -->
-<div class="proof" data-reveal>
-    <div class="proof__inner">
-        <div class="proof__item"><div class="proof__num" data-count="15">0</div><div class="proof__label">lat w e-commerce</div></div>
-        <div class="proof__item"><div class="proof__num"><span data-count="70">0</span><em> mln zł</em></div><div class="proof__label">obrotu zbudowanych biznesów</div></div>
-        <div class="proof__item"><div class="proof__num"><em>50</em>/<em>50</em></div><div class="proof__label">tak dzielimy budżet budowy</div></div>
-        <div class="proof__item"><div class="proof__num" data-count="50">0</div><div class="proof__label">klientów — wtedy oddaję stery</div></div>
-    </div>
+    <span class="intro__skip">pokaż &nbsp;↓</span>
 </div>
 
-<!-- ════════ PROCES ════════ -->
-<section class="section" id="proces">
-    <div class="section__head" data-reveal>
-        <div class="eyebrow">Jak to działa</div>
-        <h2 class="section__h2">Od pomysłu do <span class="ser">Twojego biznesu</span> — w 4 krokach</h2>
-        <p class="section__sub">Nie sprzedaję Ci „aplikacji i powodzenia". Wchodzę w to z Tobą — moimi ludźmi, moimi pieniędzmi i moją sprzedażą — aż biznes stanie na nogi.</p>
-    </div>
-    <div class="steps">
-        <article class="step" data-reveal>
-            <span class="step__pov">Ty</span>
-            <div class="step__num">01</div>
-            <h3 class="step__t">Przynosisz pomysł</h3>
-            <p class="step__d">Z pracy, z pasji albo z czystej obserwacji — nie musisz być ekspertem. AI sprawdza pomysł z Tobą w rozmowie i <strong>od razu pokazuje ekrany aplikacji</strong> + wstępny plan przychodu. Za darmo.</p>
-        </article>
-        <article class="step step--ja" data-reveal>
-            <span class="step__pov">Ja</span>
-            <div class="step__num">02</div>
-            <h3 class="step__t">Buduję narzędzie</h3>
-            <p class="step__d">Mój zespół buduje kompletną aplikację — konta, płatności, abonamenty, panel. Budżet 30 000 zł dzielimy <strong>pół na pół</strong>: gram własnymi pieniędzmi.</p>
-        </article>
-        <article class="step step--ja" data-reveal>
-            <span class="step__pov">Ja</span>
-            <div class="step__num">03</div>
-            <h3 class="step__t">Pozyskuję klientów</h3>
-            <p class="step__d">Przez około pół roku osobiście prowadzę sprzedaż i kampanie — aż do <strong>pierwszych 50 płacących klientów</strong>. Ty w tym czasie uczysz się biznesu od środka.</p>
-        </article>
-        <article class="step step--final" data-reveal>
-            <span class="step__pov">Ty</span>
-            <div class="step__num">04</div>
-            <h3 class="step__t">Przejmujesz stery</h3>
-            <p class="step__d">Dostajesz rozkręcony, przychodowy biznes. Ja zostaję doradcą strategicznym z 20% udziałów — <strong>zarabiam dopiero wtedy, gdy Ty zarabiasz</strong>.</p>
-        </article>
-    </div>
-    <p class="steps__bridge" data-reveal>Pierwszy krok nic nie kosztuje — <b>rozmowa z AI sprawdzi pomysł szybciej, niż zdążysz o nim opowiedzieć wspólnikowi.</b></p>
-</section>
+<!-- ============================================================
+     PROGRESS SIDEBAR / DOCK
+============================================================ -->
+<aside class="progress" id="progress" aria-hidden="true">
+    <a href="#act-1" class="progress__item is-active" data-act="0"><span>01</span><em>Wstęp</em></a>
+    <a href="#act-2" class="progress__item" data-act="1"><span>02</span><em>Układ</em></a>
+    <a href="#act-3" class="progress__item" data-act="2"><span>03</span><em>Na żywo</em></a>
+    <a href="#act-4" class="progress__item" data-act="3"><span>04</span><em>Obietnica</em></a>
+    <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Proces</em></a>
+    <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Ludzie</em></a>
+    <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Start</em></a>
+</aside>
 
-<!-- ════════ FEED GENEROWAŃ ════════ -->
-<section class="section feed" id="projekty" hidden>
-    <div class="section__head" data-reveal>
-        <div class="eyebrow">Powstają tu naprawdę</div>
-        <h2 class="section__h2">Ostatnio <span class="ser">zaprojektowane</span> narzędzia</h2>
-        <p class="section__sub">Każdy z tych ekranów powstał w rozmowie z AI — z czyjegoś pomysłu: czasem z pracy, czasem z pasji, czasem z samej obserwacji. Następny może być Twój.</p>
-    </div>
-    <div class="show" id="show">
-        <div class="show__list" id="show-list" role="tablist" aria-label="Przykładowe projekty"></div>
-        <div class="show__win">
-            <div class="show__topbar">
-                <span class="show__lights" aria-hidden="true"><i></i><i></i><i></i></span>
-                <span class="show__url">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    <b id="show-url-name"></b>
-                </span>
-                <span class="show__views" id="show-views" aria-label="Ekrany tego projektu"></span>
+<!-- ============================================================
+     STORY — 7 aktów
+============================================================ -->
+<main class="story">
+
+    <!-- SCENE 1 — HERO -->
+    <section class="scene scene--hero" id="act-1" data-act="0">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+
+            <div class="me" data-reveal data-delay="1300">
+                <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="44" height="44">
+                <div>
+                    <div class="me__name">Tomek Niedźwiecki</div>
+                    <div class="me__role">Buduję e-biznesy od 15 lat</div>
+                </div>
             </div>
-            <a class="show__screen" id="show-screen" href="/aplikacja/sparing/" data-cta aria-label="Zobacz przykładową aplikację i zacznij własną rozmowę">
-                <img id="show-buf-a" alt="" decoding="async">
-                <img id="show-buf-b" alt="" decoding="async">
+
+            <h1 class="hero__h1">
+                <span class="hero__h1-line reveal-mask" data-reveal data-delay="0">
+                    <span class="reveal-mask__inner">Zbuduję <span class="hero__h1-italic">Ci</span></span>
+                </span>
+                <span class="hero__h1-line reveal-mask" data-reveal data-delay="400">
+                    <span class="reveal-mask__inner"><span class="hero__h1-accent">aplikację</span>&nbsp;<span class="hero__h1-personal">na Twoim pomyśle.</span></span>
+                </span>
+            </h1>
+
+            <p class="hero__sub" data-reveal data-delay="1400">
+                <em>Rozkręcę.</em>
+                <span class="hero__sub-accent">Oddam Ci prowadzenie.</span>
+            </p>
+
+            <p class="hero__meta" data-reveal data-delay="2300">
+                <span>SCROLL</span>
+                <span class="hero__meta-arrow" aria-hidden="true">↓</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- SCENE 2 — UKŁAD (50/50) -->
+    <section class="scene scene--proof" id="act-2" data-act="1">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="proof__eyebrow" data-reveal>umówmy się uczciwie.</p>
+
+            <div class="proof__hero" data-reveal data-delay="200">
+                <span class="proof__digits" data-counter-to="50" data-counter-duration="1500">0</span><span class="proof__slash">/</span><span class="proof__digits" data-counter-to="50" data-counter-duration="1500">0</span>
+            </div>
+
+            <p class="proof__subtitle" data-reveal data-delay="800">
+                tak dzielimy budżet budowy. <strong>Gram własnymi pieniędzmi.</strong>
+            </p>
+
+            <p class="proof__supporting" data-reveal data-delay="1200">
+                <strong>15 lat</strong> w e-biznesie <span class="proof__sep">·</span> <strong>70 mln zł</strong> obrotu zbudowanych firm <span class="proof__sep">·</span> tysiące wdrożonych osób
+            </p>
+        </div>
+    </section>
+
+    <!-- SCENE 3 — NA ŻYWO (pomysł → aplikacja) -->
+    <section class="scene scene--live" id="act-3" data-act="2">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="live__eyebrow" data-reveal>tak to się zaczyna.</p>
+
+            <div class="live__stage" data-reveal data-delay="200">
+                <div class="scene__idea">
+                    <span class="scene__idea-label">Pomysł</span>
+                    <span class="scene__idea-text"><span id="idea-text"></span><span class="scene__caret" id="idea-caret"></span></span>
+                </div>
+                <div class="scene__link" id="scene-link">
+                    <span class="scene__spark"></span>
+                    <span class="scene__node"><i></i>AI projektuje ekrany</span>
+                </div>
+                <div class="scene__win">
+                    <div class="scene__bar">
+                        <span class="scene__dot"></span><span class="scene__dot"></span><span class="scene__dot"></span>
+                        <span class="scene__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja</span>
+                        <span class="scene__live"><i></i>feed na żywo</span>
+                    </div>
+                    <div class="scene__screen">
+                        <svg class="scene__wire" id="scene-wire" viewBox="0 0 600 400" preserveAspectRatio="none" aria-hidden="true">
+                            <rect x="18" y="16" width="564" height="34" rx="6"/>
+                            <rect x="18" y="66" width="172" height="78" rx="6"/>
+                            <rect x="214" y="66" width="172" height="78" rx="6"/>
+                            <rect x="410" y="66" width="172" height="78" rx="6"/>
+                            <rect x="18" y="160" width="564" height="180" rx="6"/>
+                            <rect x="18" y="356" width="180" height="28" rx="6"/>
+                            <line x1="40" y1="206" x2="560" y2="206"/>
+                            <line x1="40" y1="250" x2="560" y2="250"/>
+                            <line x1="40" y1="294" x2="560" y2="294"/>
+                        </svg>
+                        <img id="scene-img" alt="Ekran aplikacji wygenerowany w rozmowie z AI" decoding="async">
+                    </div>
+                    <div class="scene__cap">
+                        <b id="scene-name">&nbsp;</b>
+                        <span id="scene-meta"></span>
+                    </div>
+                </div>
+            </div>
+
+            <a class="live__more" href="/aplikacja/inspiracje/" data-reveal data-delay="500">
+                Zobacz wszystkie — aktualizowane na żywo <span class="arr">→</span>
             </a>
         </div>
-    </div>
-    <p class="feed__note">Pełne ekrany wygenerowane w prawdziwych rozmowach — bez danych ich autorów.<br>
-        <a class="show__more" href="/aplikacja/inspiracje/">Zobacz wszystkie inspiracje — aktualizowane na żywo <span class="arr">→</span></a></p>
-</section>
+    </section>
 
-<!-- ════════ MODEL ════════ -->
-<section class="section model" id="model">
-    <div class="section__head" data-reveal>
-        <div class="eyebrow">Gramy do jednej bramki</div>
-        <h2 class="section__h2">Model, w którym <span class="ser">nie zostajesz sam</span></h2>
-    </div>
-    <div class="model__grid">
-        <div class="mcard" data-reveal>
-            <div class="mcard__num">500 <em>zł</em></div>
-            <div class="mcard__t">Rezerwacja — w pełni zwrotna</div>
-            <div class="mcard__d">Rezerwujesz wspólną rozmowę. Przygotowuję osobiście plan przedsięwzięcia. Nie wchodzimy we współpracę — z dowolnego powodu — oddaję całość.</div>
-        </div>
-        <div class="mcard" data-reveal>
-            <div class="mcard__num">50<em>%</em></div>
-            <div class="mcard__t">Budowy finansuję ja</div>
-            <div class="mcard__d">Z 30 000 zł budżetu Ty wnosisz 15 000 zł (rezerwacja się wlicza). Drugą połowę dokładam ja — bo wierzę w projekt, w który wchodzę.</div>
-        </div>
-        <div class="mcard" data-reveal>
-            <div class="mcard__num">20<em>%</em></div>
-            <div class="mcard__t">Udziałów — za rozkręcenie</div>
-            <div class="mcard__d">Stery i większość zysków są Twoje. Moje 20% to motywacja, żeby biznes działał długo po przekazaniu — zostaję Twoim doradcą strategicznym.</div>
-        </div>
-    </div>
-    <p class="model__line" data-reveal>Zarabiam dopiero wtedy, <b>gdy Ty zarabiasz.</b></p>
-</section>
+    <!-- SCENE 4 — OBIETNICA -->
+    <section class="scene scene--motto" id="act-4" data-act="3">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="motto__intro" data-reveal>Wyobraź sobie.</p>
 
-<!-- ════════ SPOŁECZNOŚĆ ════════ -->
-<section class="section community" id="spolecznosc">
-    <div class="community__wrap" data-reveal>
-        <div class="community__inner">
-            <div>
-                <div class="eyebrow">Społeczność</div>
-                <h2 class="section__h2" style="font-size: clamp(26px, 3.4vw, 42px);">Budujesz swoje — <span class="ser">ale nie sam</span></h2>
-                <p class="section__sub">Każdy projekt dołącza do społeczności ludzi, którzy budują własne aplikacje. Wymieniamy się tym, co działa: pomysłami, liczbami, kontaktami.</p>
-                <div class="community__quote">
-                    <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat.png" alt="Tomek Niedźwiecki" loading="lazy">
-                    <p><b>Jestem tam aktywnie.</b> Nie jako „mentor z nagrań" — siedzę w tych samych okopach, bo w każdym projekcie mam własne pieniądze i udziały.</p>
-                </div>
+            <blockquote class="motto__quote">
+                <span class="motto__line motto__line--words" data-reveal data-delay="200">
+                    <span class="motto__word" style="--wi:0">Że</span>
+                    <span class="motto__word" style="--wi:1">ktoś</span>
+                    <em class="motto__word" style="--wi:2">bierze</em>
+                    <em class="motto__word" style="--wi:3">Twój</em>
+                    <em class="motto__word" style="--wi:4">pomysł</em>
+                    <span class="motto__word" style="--wi:5">na</span>
+                    <span class="motto__word" style="--wi:6">poważnie.</span>
+                </span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="800">
+                    <span class="motto__word" style="--wi:0">Buduje</span>
+                    <span class="motto__word" style="--wi:1">z</span>
+                    <span class="motto__word" style="--wi:2">niego</span>
+                    <span class="motto__word" style="--wi:3">aplikację.</span>
+                    <span class="motto__word" style="--wi:4">Zdobywa</span>
+                    <span class="motto__word" style="--wi:5">klientów.</span>
+                </span>
+                <span class="motto__line motto__line--words" data-reveal data-delay="1500">
+                    <span class="motto__word" style="--wi:0">I</span>
+                    <span class="motto__word motto__word--accent" style="--wi:1">oddaje</span>
+                    <span class="motto__word motto__word--accent" style="--wi:2">Ci</span>
+                    <span class="motto__word motto__word--accent" style="--wi:3">prowadzenie,</span>
+                    <span class="motto__word motto__word--accent" style="--wi:4">gdy</span>
+                    <span class="motto__word motto__word--accent" style="--wi:5">biznes</span>
+                    <span class="motto__word motto__word--accent" style="--wi:6">działa.</span>
+                </span>
+            </blockquote>
+
+            <p class="motto__attribution" data-reveal data-delay="2300">Tomek Niedźwiecki</p>
+        </div>
+    </section>
+
+    <!-- SCENE 5 — PROCES -->
+    <section class="scene scene--how" id="act-5" data-act="4">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <header class="how__header">
+                <p class="how__eyebrow" data-reveal>Cztery kroki, jedno partnerstwo</p>
+                <h2 class="how__title" data-reveal data-delay="150">
+                    Buduję <em>Ci</em> aplikację.<br>
+                    <span class="how__title-accent">Ty nią zarabiasz.</span>
+                </h2>
+            </header>
+
+            <div class="how__steps">
+                <article class="step" data-reveal data-delay="200">
+                    <div class="step__num">01</div>
+                    <span class="step__chip">Pomysł</span>
+                    <p class="step__line">Przynosisz pomysł — AI sprawdza go w rozmowie i <span class="step__accent">od razu pokazuje ekrany</span>. <em>Za darmo.</em></p>
+                </article>
+
+                <article class="step" data-reveal data-delay="400">
+                    <div class="step__num">02</div>
+                    <span class="step__chip">Budowa</span>
+                    <p class="step__line">Mój zespół buduje kompletną aplikację. Budżet 30 000 zł dzielimy <em>pół na pół</em>.</p>
+                </article>
+
+                <article class="step" data-reveal data-delay="600">
+                    <div class="step__num">03</div>
+                    <span class="step__chip">Klienci</span>
+                    <p class="step__line">Osobiście pozyskuję <span class="step__accent">pierwszych 50 płacących klientów</span>. Ty uczysz się biznesu od środka.</p>
+                </article>
+
+                <article class="step step--final" data-reveal data-delay="800">
+                    <div class="step__num">04</div>
+                    <span class="step__chip">Prowadzenie</span>
+                    <p class="step__line">Przejmujesz prowadzenie — ja zostaję <span class="step__accent">doradcą z 20% udziałów</span>. Zarabiam, gdy Ty zarabiasz.</p>
+                </article>
             </div>
-            <div class="community__cards">
-                <div class="ccard" data-reveal>
-                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg></span>
-                    <div><b>Spotkania online</b><span>Regularne sesje robocze: przegląd liczb, blokerów i następnych kroków każdego projektu.</span></div>
-                </div>
-                <div class="ccard" data-reveal>
-                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
-                    <div><b>Zloty na żywo</b><span>Spotkania stacjonarne — bo najlepsze pomysły i partnerstwa rodzą się przy jednym stole.</span></div>
-                </div>
-                <div class="ccard" data-reveal>
-                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
-                    <div><b>Wymiana doświadczeń</b><span>Ktoś już rozwiązał Twój problem z cennikiem, reklamą albo churnem — i podzieli się tym wprost.</span></div>
-                </div>
-                <div class="ccard" data-reveal>
-                    <span class="ccard__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg></span>
-                    <div><b>Wsparcie w rozwoju</b><span>Dołączasz w dniu startu współpracy — i zostajesz także po przejęciu sterów.</span></div>
-                </div>
+        </div>
+    </section>
+
+    <!-- SCENE 6 — SPOŁECZNOŚĆ -->
+    <section class="scene scene--crew" id="act-6" data-act="5">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="crew__eyebrow" data-reveal>I jeszcze jedno.</p>
+            <h2 class="crew__title" data-reveal data-delay="150">
+                Nie zostajesz <em>z tym sam.</em>
+            </h2>
+            <p class="crew__sub" data-reveal data-delay="400">
+                Każdy, kto buduje ze mną aplikację, wchodzi do społeczności ludzi,
+                którzy robią dokładnie to samo. <strong>Jestem tam aktywny codziennie.</strong>
+            </p>
+            <div class="crew__chips" data-reveal data-delay="700">
+                <span class="crew__chip"><i></i>Spotkania online</span>
+                <span class="crew__chip"><i></i>Spotkania na żywo</span>
+                <span class="crew__chip"><i></i>Wspólne premiery projektów</span>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ════════ FAQ ════════ -->
-<section class="section" id="faq">
-    <div class="section__head" data-reveal>
-        <div class="eyebrow">Pytania</div>
-        <h2 class="section__h2">Zanim <span class="ser">zapytasz</span></h2>
-    </div>
-    <div class="faq__list" data-reveal>
-        <details class="faq__item">
-            <summary>Ile to kosztuje i co dokładnie płacę?</summary>
-            <p>Rozmowa z AI, ekrany narzędzia i plan przychodu — <b>za darmo</b>. Rezerwacja wspólnej rozmowy to <b>500 zł, w pełni zwrotne</b>. Jeśli wchodzimy we współpracę: budżet budowy 30 000 zł dzielimy pół na pół (Twoje 500 zł się wlicza). Żadnych ukrytych kosztów po drodze.</p>
-        </details>
-        <details class="faq__item">
-            <summary>Czyj jest pomysł i czyja jest firma?</summary>
-            <p><b>Twoje.</b> Firma i większość udziałów należą do Ciebie. Ja obejmuję 20% za budowę, finansowanie połowy i rozkręcenie sprzedaży — i zostaję doradcą strategicznym, nie szefem.</p>
-        </details>
-        <details class="faq__item">
-            <summary>Co jeśli AI uzna, że pomysł się nie spina?</summary>
-            <p>Usłyszysz to wprost — z konkretnym uzasadnieniem. AI jest strażnikiem, nie sprzedawcą: lepiej skorygować pomysł w kilkanaście minut, niż utopić rok i oszczędności. Możesz sprawdzić do trzech pomysłów.</p>
-        </details>
-        <details class="faq__item">
-            <summary>Nie znam się na technologii ani nie mam wiedzy branżowej. To problem?</summary>
-            <p>Nie — to wręcz założenie tego modelu. Technologię, płatności, serwery i kampanie biorę na siebie. Od Ciebie potrzebuję dwóch rzeczy: <b>pomysłu</b> i <b>chęci poprowadzenia tego biznesu dalej</b>. Znajomość branży pomaga, ale resztę — kto płaci, ile i gdzie szukać klientów — sprawdzimy razem już w rozmowie z AI.</p>
-        </details>
-        <details class="faq__item">
-            <summary>Skąd pewność, że pozyskasz tych 50 klientów?</summary>
-            <p>Pewności nie sprzedaję — sprzedaję skórę w grze. W każdy projekt wkładam własne 15 000 zł i pół roku własnej pracy, a moje wynagrodzenie to udziały w zyskach. Jeśli biznes nie zarabia — ja też nie.</p>
-        </details>
-    </div>
-</section>
+    <!-- SCENE 7 — CTA -->
+    <section class="scene scene--cta" id="act-7" data-act="6">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="cta__eyebrow" data-reveal>Twoja kolej.</p>
 
-<!-- ════════ FINAL CTA ════════ -->
-<section class="final">
-    <h2>Zbuduję ją z<br><span class="cycler" id="cycler">Tobą.</span></h2>
-    <p>Księgowa, groomerka, trener, architekt — albo po prostu ktoś z pomysłem. Każdy może mieć aplikację, za którą inni płacą co miesiąc. Sprawdź swoją w kilkanaście minut.</p>
-    <a class="btn" href="/aplikacja/sparing/" data-cta>Zaczynam rozmowę z AI <span class="arr">→</span></a>
-    <div class="final__micro">Bez karty. Bez zobowiązań. Pierwsze ekrany zobaczysz dziś.</div>
-</section>
+            <h2 class="cta__h2" data-reveal data-delay="100">
+                Masz <em class="cta__h2-italic">pomysł?</em><br>
+                <span class="cta__h2-accent">Sprawdź go za darmo.</span>
+            </h2>
 
-<footer class="footer">
-    <span>© 2026 Tomek Niedźwiecki</span>
-    <div class="footer__links">
-        <a href="https://tomekniedzwiecki.pl/zbuduje/">Zbuduję</a>
-        <a href="https://tomekniedzwiecki.pl/zwolnie/">Zwolnię</a>
-        <a href="/aplikacja/regulamin/">Regulamin rezerwacji</a>
-    </div>
+            <div class="cta__actions" data-reveal data-delay="350">
+                <span class="cta__magnetic">
+                    <a href="/aplikacja/sparing/" class="cta__primary" data-cta data-cta-loc="final">
+                        Sprawdź swój pomysł z AI
+                        <span class="cta__primary-arrow" aria-hidden="true">→</span>
+                    </a>
+                </span>
+                <p class="cta__note"><b>Bez zobowiązań</b> — kilkanaście minut rozmowy i zobaczysz pierwsze ekrany swojego narzędzia.</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ============================================================
+     FOOTER MINI
+============================================================ -->
+<footer class="footer-mini">
+    <a href="/aplikacja/inspiracje/">Inspiracje</a>
+    <span>·</span>
+    <a href="/aplikacja/regulamin/">Regulamin</a>
+    <span>·</span>
+    <a href="https://tomekniedzwiecki.pl/dokumenty/polityka-prywatnosci.html">Polityka prywatności</a>
 </footer>
 
 <script>
+// ============================================================
+//  APLIKACJA — choreography (wzorzec /zbuduje)
+// ============================================================
 (function () {
     'use strict';
 
-    /* ── Nav scroll state ── */
-    var nav = document.getElementById('nav');
-    addEventListener('scroll', function () {
-        nav.classList.toggle('is-scrolled', scrollY > 30);
-    }, { passive: true });
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isMobile = window.matchMedia('(max-width: 820px)').matches;
+    var intro = document.getElementById('intro');
+    var progress = document.getElementById('progress');
+    var progressItems = progress ? progress.querySelectorAll('.progress__item') : [];
+    var scenes = document.querySelectorAll('.scene');
 
-    /* ── Query passthrough: ?p= itd. wędrują do sparingu ── */
-    var q = location.search;
-    if (q) {
-        document.querySelectorAll('a[href="/aplikacja/sparing/"]').forEach(function (a) {
-            a.href = '/aplikacja/sparing/' + q;
-        });
-    }
+    var INTRO_DURATION = reduceMotion ? 0 : (isMobile ? 2500 : 3500);
 
-    /* ── CTA events ── */
-    document.querySelectorAll('[data-cta]').forEach(function (a) {
-        a.addEventListener('click', function () {
-            try {
-                if (window.gtag) gtag('event', 'stworze_cta_click');
-                if (window.fbq) fbq('trackCustom', 'StworzeCTA');
-            } catch (e) { }
-        });
-    });
-
-    /* ── Reveal on scroll ── */
-    var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-            if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
-        });
-    }, { threshold: 0.2, rootMargin: '0px 0px -8% 0px' });
-    document.querySelectorAll('[data-reveal]').forEach(function (el) { io.observe(el); });
-
-    /* ── Liczniki ── */
-    function countUp(el) {
-        var target = parseInt(el.getAttribute('data-count'), 10);
-        var t0 = null;
-        function tick(t) {
-            if (!t0) t0 = t;
-            var p = Math.min(1, (t - t0) / 1300);
-            var eased = 1 - Math.pow(1 - p, 3);
-            el.textContent = Math.round(target * eased);
-            if (p < 1) requestAnimationFrame(tick);
+    function startCounter(el) {
+        var target = parseInt(el.dataset.counterTo, 10);
+        if (isNaN(target)) return;
+        var duration = parseInt(el.dataset.counterDuration || '1600', 10);
+        var startTs = performance.now();
+        function tick(now) {
+            var t = Math.min((now - startTs) / duration, 1);
+            var eased = 1 - Math.pow(1 - t, 3);
+            el.textContent = Math.round(eased * target);
+            if (t < 1) requestAnimationFrame(tick);
         }
         requestAnimationFrame(tick);
     }
-    var cio = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-            if (en.isIntersecting) { countUp(en.target); cio.unobserve(en.target); }
-        });
-    }, { threshold: 0.6 });
-    document.querySelectorAll('[data-count]').forEach(function (el) { cio.observe(el); });
 
-    /* ── Hero: scena „pomysł → aplikacja" ──
-       Pomysły to przykładowe punkty startu; ekran i nazwa są PRAWDZIWE
-       (z publicznego feedu generowań, z godziną). Scenariusz gra tylko,
-       jeśli jego projekt faktycznie jest w feedzie. */
-    var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png'; // fallback, gdy feed pusty
+    function startReveals() {
+        if (reduceMotion) {
+            document.querySelectorAll('[data-reveal]').forEach(function (el) {
+                el.classList.add('is-visible');
+                el.querySelectorAll('[data-counter-to]').forEach(function (c) { c.textContent = c.dataset.counterTo; });
+                if (el.matches('[data-counter-to]')) el.textContent = el.dataset.counterTo;
+            });
+            return;
+        }
+        var delayMul = isMobile ? 0.5 : 1;
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    var rawDelay = parseInt(entry.target.dataset.delay || '0', 10);
+                    var delay = Math.round(rawDelay * delayMul);
+                    setTimeout(function () {
+                        entry.target.classList.add('is-visible');
+                        entry.target.querySelectorAll('[data-counter-to]').forEach(function (c) { startCounter(c); });
+                        if (entry.target.matches('[data-counter-to]')) startCounter(entry.target);
+                        if (isMobile) {
+                            setTimeout(function () {
+                                entry.target.style.willChange = 'auto';
+                                entry.target.querySelectorAll('.reveal-mask__inner').forEach(function (el) { el.style.willChange = 'auto'; });
+                            }, 900);
+                        }
+                    }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+
+        document.querySelectorAll('[data-reveal]').forEach(function (el) { observer.observe(el); });
+    }
+
+    function dismissIntro() {
+        if (!intro || intro.classList.contains('is-hiding')) return;
+        intro.classList.add('is-hiding');
+        startReveals();
+        setTimeout(function () {
+            if (progress) { progress.classList.add('is-shown'); progress.setAttribute('aria-hidden', 'false'); }
+        }, 600);
+        setTimeout(function () { intro.style.display = 'none'; }, 700);
+    }
+
+    if (reduceMotion) {
+        if (intro) intro.style.display = 'none';
+        startReveals();
+        if (progress) { progress.classList.add('is-shown'); progress.setAttribute('aria-hidden', 'false'); }
+    } else {
+        setTimeout(dismissIntro, INTRO_DURATION);
+        if (intro) {
+            intro.addEventListener('click', dismissIntro);
+        }
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && intro && !intro.classList.contains('is-hiding')) dismissIntro();
+        }, { once: true });
+    }
+
+    // ===== PROGRESS — active per scene + GA4 scene_view =====
+    if (scenes.length && progressItems.length) {
+        var firedScenes = {};
+        var actObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    var act = entry.target.dataset.act;
+                    progressItems.forEach(function (item) {
+                        item.classList.toggle('is-active', item.dataset.act === act);
+                    });
+                    if (act != null && !firedScenes[act]) {
+                        firedScenes[act] = true;
+                        try { if (typeof gtag === 'function') gtag('event', 'scene_view', { scene_index: Number(act) + 1, persona: 'stworze' }); } catch (e) {}
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+        scenes.forEach(function (scene) { actObserver.observe(scene); });
+    }
+
+    progressItems.forEach(function (item) {
+        item.addEventListener('click', function (e) {
+            var href = item.getAttribute('href');
+            if (href && href.indexOf('#') === 0) {
+                e.preventDefault();
+                var target = document.querySelector(href);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // ===== Magnetic CTA (desktop) =====
+    var supportsHover = window.matchMedia('(hover: hover)').matches;
+    if (supportsHover && !reduceMotion) {
+        document.querySelectorAll('.cta__magnetic').forEach(function (wrap) {
+            var strength = 0.32;
+            var radius = 120;
+            var isNear = false;
+            document.addEventListener('mousemove', function (e) {
+                var rect = wrap.getBoundingClientRect();
+                var cx = rect.left + rect.width / 2;
+                var cy = rect.top + rect.height / 2;
+                var dx = e.clientX - cx;
+                var dy = e.clientY - cy;
+                var dist = Math.hypot(dx, dy);
+                if (dist < radius + Math.max(rect.width, rect.height) / 2) {
+                    if (!isNear) isNear = true;
+                    wrap.style.transform = 'translate(' + (dx * strength) + 'px, ' + (dy * strength) + 'px)';
+                } else if (isNear) {
+                    isNear = false;
+                    wrap.style.transform = 'translate(0, 0)';
+                }
+            }, { passive: true });
+        });
+    }
+
+    // ===== Query string (?id= itd.) — przenieś na linki do sparingu + GA4 cta_click =====
+    var q = location.search;
+    document.querySelectorAll('a[href^="/aplikacja/sparing/"], a[href^="/aplikacja/inspiracje/"]').forEach(function (a) {
+        if (q) a.href = a.getAttribute('href') + q;
+    });
+    document.querySelectorAll('[data-cta]').forEach(function (a) {
+        a.addEventListener('click', function () {
+            var loc = a.dataset.ctaLoc || 'body';
+            try {
+                if (typeof gtag === 'function') gtag('event', 'cta_click', { cta_location: loc, destination: 'sparing', persona: 'stworze' });
+                if (window.fbq) fbq('trackCustom', 'AplikacjaCTA', { location: loc });
+            } catch (e) {}
+        });
+    });
+
+    // ============================================================
+    //  SCENA 3 — „pomysł → aplikacja" na realnym feedzie
+    //  Pomysły to przykładowe punkty startu; ekran i nazwa są
+    //  PRAWDZIWE (publiczny feed generowań, z godziną). Scenariusz
+    //  gra tylko, jeśli jego projekt faktycznie jest w feedzie.
+    // ============================================================
+    var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
+    var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png';
+    function lightImg(url, w) {
+        // resize=contain obowiązkowo — bez niego render API tnie boki
+        return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
+            '?format=webp&width=' + (w || 760) + '&quality=70&resize=contain';
+    }
     var SCENE_DEFS = [
         { idea: 'Prowadzę hodowlę kotów rasowych. Terminy kryć i porodów trzymam w zeszycie — i co miesiąc coś mi umyka…', name: 'LitterPlan' },
         { idea: 'Jestem elektrykiem. Pomiary robię w godzinę, a protokoły dla klientów klepię po nocach…', name: 'RaportElektryk' },
@@ -1063,21 +1655,22 @@ img { max-width: 100%; display: block; }
     var sceneImg = document.getElementById('scene-img');
     var sceneName = document.getElementById('scene-name');
     var sceneMeta = document.getElementById('scene-meta');
-    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function sceneTime(iso) {
         var d = new Date(iso);
         if (isNaN(d)) return '';
         var now = new Date();
-        var sameDay = d.toDateString() === now.toDateString();
         var hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-        if (sameDay) return 'dziś ' + hm;
+        if (d.toDateString() === now.toDateString()) return 'dziś ' + hm;
         var y = new Date(now - 864e5);
         if (d.toDateString() === y.toDateString()) return 'wczoraj ' + hm;
         return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ', ' + hm;
     }
 
-    function startScene(scenes) {
+    var sceneStarted = false;
+    function startScene(scs) {
+        if (sceneStarted || !ideaText) return;
+        sceneStarted = true;
         var si = 0, typeTimer = null, loopTimer = null;
         function showShot(s) {
             var paint = function () {
@@ -1089,14 +1682,13 @@ img { max-width: 100%; display: block; }
                     ? 'prawdziwy projekt · <em>' + s.when + '</em>'
                     : 'ekrany prosto z rozmowy';
             };
-            if (sceneImg.src === s.img || sceneImg.getAttribute('src') === s.img) { paint(); return; }
+            if (sceneImg.getAttribute('src') === s.img) { paint(); return; }
             sceneImg.onload = paint;
             sceneImg.src = s.img;
             if (sceneImg.complete && sceneImg.naturalWidth) paint();
         }
-        if (reduced) {
-            // wersja statyczna: pełny pomysł + ekran od razu, bez pętli
-            var s0 = scenes[0];
+        if (reduceMotion) {
+            var s0 = scs[0];
             ideaText.textContent = s0.idea;
             ideaCaret.style.display = 'none';
             sceneLink.classList.add('is-on');
@@ -1104,8 +1696,7 @@ img { max-width: 100%; display: block; }
             return;
         }
         function play() {
-            var s = scenes[si];
-            // reset — poprzedni ekran zostaje przygaszony, nie znika do zera
+            var s = scs[si];
             sceneLink.classList.remove('is-on');
             if (sceneImg.classList.contains('is-on')) {
                 sceneImg.classList.remove('is-on');
@@ -1113,10 +1704,8 @@ img { max-width: 100%; display: block; }
             }
             ideaText.textContent = '';
             ideaCaret.style.display = '';
-            // preload obrazu tej i następnej sceny
             var pre = new Image(); pre.src = s.img;
-            var nx = new Image(); nx.src = scenes[(si + 1) % scenes.length].img;
-            // 1) typewriter
+            var nx = new Image(); nx.src = scs[(si + 1) % scs.length].img;
             var ch = 0;
             (function type() {
                 if (ch <= s.idea.length) {
@@ -1124,22 +1713,17 @@ img { max-width: 100%; display: block; }
                     typeTimer = setTimeout(type, 24);
                     return;
                 }
-                // 2) iskra płynie, węzeł aktywny
                 sceneLink.classList.add('is-on');
-                // 3) wireframe rysuje się
                 sceneWire.classList.add('is-draw');
                 loopTimer = setTimeout(function () {
-                    // 4) materializacja prawdziwego ekranu
                     showShot(s);
-                    // 5) pauza i następna scena
                     loopTimer = setTimeout(function () {
-                        si = (si + 1) % scenes.length;
+                        si = (si + 1) % scs.length;
                         play();
                     }, 5200);
                 }, 1150);
             })();
         }
-        // pauza gdy karta nieaktywna — bez rozjeżdżania pętli
         document.addEventListener('visibilitychange', function () {
             if (document.hidden) { clearTimeout(typeTimer); clearTimeout(loopTimer); }
             else play();
@@ -1147,156 +1731,22 @@ img { max-width: 100%; display: block; }
         play();
     }
 
-    /* ── Feed ostatnich generowań (lekkie webp przez render API) ── */
-    var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
-    function lightImg(url, w) {
-        // storage object URL -> render API z transformacją (webp, szerokość)
-        // resize=contain obowiązkowo — bez niego render API tnie boki (zwraca width×oryginalna_wysokość)
-        return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
-            '?format=webp&width=' + (w || 480) + '&quality=70&resize=contain';
-    }
     var FALLBACK_SCENE = [{
         idea: 'Prowadzę salon groomerski. Klienci notorycznie zapominają o wizytach…',
         name: 'Pulpit narzędzia', img: DEMO_IMG, real: false, when: ''
     }];
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
-
-        // scena hero: scenariusze, których projekt faktycznie jest w feedzie
         var byName = {};
         items.forEach(function (p) { byName[p.nazwa] = p; });
-        var scenes = SCENE_DEFS.filter(function (s) { return byName[s.name]; }).map(function (s) {
+        var scs = SCENE_DEFS.filter(function (s) { return byName[s.name]; }).map(function (s) {
             var p = byName[s.name];
             return { idea: s.idea, name: p.nazwa, img: lightImg(p.img, 760), real: true, when: sceneTime(p.generated_at) };
         });
-        startScene(scenes.length ? scenes : FALLBACK_SCENE);
-
-        if (!items.length) return; // sekcja ukryta tylko przy CAŁKIEM pustym feedzie
-        items = items.slice(0, 6);
-        var section = document.getElementById('projekty');
-        section.hidden = false;
-
-        // Lista projektów (tekst) + okno aplikacji. Każdy projekt ma KILKA
-        // ekranów (pulpit/funkcja/landing…) — kropki w pasku okna je przełączają.
-        // Obraz przez double-buffer (2 <img>, crossfade) zamiast dziesiątek node'ów.
-        var ROT_MS = 5000;
-        var wrap = document.getElementById('show');
-        var list = document.getElementById('show-list');
-        var urlName = document.getElementById('show-url-name');
-        var viewsBox = document.getElementById('show-views');
-        var bufA = document.getElementById('show-buf-a');
-        var bufB = document.getElementById('show-buf-b');
-        var escA = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
-        var imgsOf = function (p) { return (p.imgs && p.imgs.length) ? p.imgs : [{ view: 'panel', label: 'Pulpit', url: p.img }]; };
-
-        list.innerHTML = items.map(function (p, i) {
-            return '<button type="button" class="show__item" role="tab" data-i="' + i + '" style="--t:' + ROT_MS + 'ms">' +
-                '<span class="show__num">' + String(i + 1).padStart(2, '0') + '</span>' +
-                '<span class="show__name">' + escA(p.nazwa) + '</span>' +
-                (items.length > 1 ? '<span class="show__prog"><i></i></span>' : '') +
-                '</button>';
-        }).join('') + '<p class="show__hint">Każdy z tych ekranów powstał w kilkanaście minut rozmowy. Kliknij okno, żeby zacząć własną.</p>';
-
-        var rows = list.querySelectorAll('.show__item');
-        var pIdx = -1, vIdx = 0, frontA = false;
-        var timer = null;
-        var noAuto = items.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        function paintImg(url, alt) {
-            frontA = !frontA;
-            var front = frontA ? bufA : bufB;
-            var back = frontA ? bufB : bufA;
-            front.alt = alt;
-            front.onload = function () {
-                front.classList.add('is-on');
-                back.classList.remove('is-on');
-            };
-            front.src = lightImg(url, 1400);
-            if (front.complete && front.naturalWidth) {
-                front.classList.add('is-on');
-                back.classList.remove('is-on');
-            }
-        }
-        function paintViews() {
-            var vs = imgsOf(items[pIdx]);
-            viewsBox.innerHTML = vs.length > 1 ? vs.map(function (v, i) {
-                return '<button type="button" class="show__view' + (i === vIdx ? ' is-on' : '') + '" data-v="' + i + '" aria-label="' + escA(v.label) + '" title="' + escA(v.label) + '"></button>';
-            }).join('') : '';
-            viewsBox.querySelectorAll('.show__view').forEach(function (d) {
-                d.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    goView(parseInt(d.dataset.v, 10), true);
-                });
-            });
-        }
-        function goView(v, manual) {
-            var vs = imgsOf(items[pIdx]);
-            vIdx = (v + vs.length) % vs.length;
-            paintImg(vs[vIdx].url, items[pIdx].nazwa + ' — ' + vs[vIdx].label);
-            viewsBox.querySelectorAll('.show__view').forEach(function (d, i) {
-                d.classList.toggle('is-on', i === vIdx);
-            });
-            if (manual) holdAuto(); // ręczne oglądanie ekranów wstrzymuje rotację
-        }
-        function go(i) {
-            pIdx = (i + items.length) % items.length;
-            vIdx = 0;
-            rows.forEach(function (b) { b.classList.remove('is-on'); b.setAttribute('aria-selected', 'false'); });
-            void rows[pIdx].offsetWidth; // restart animacji paska postępu
-            rows[pIdx].classList.add('is-on');
-            rows[pIdx].setAttribute('aria-selected', 'true');
-            urlName.textContent = items[pIdx].nazwa;
-            paintViews();
-            paintImg(imgsOf(items[pIdx])[0].url, items[pIdx].nazwa);
-            // preload pierwszego ekranu następnego projektu
-            var nx = new Image();
-            nx.src = lightImg(imgsOf(items[(pIdx + 1) % items.length])[0].url, 1400);
-            schedule();
-        }
-        function schedule() {
-            if (timer) clearTimeout(timer);
-            if (!noAuto && !wrap.classList.contains('is-paused') && !document.hidden) {
-                timer = setTimeout(function () { go(pIdx + 1); }, ROT_MS);
-            }
-        }
-        function holdAuto() {
-            wrap.classList.add('is-paused');
-            if (timer) { clearTimeout(timer); timer = null; }
-        }
-        go(0);
-
-        // hover = pauza (pasek postępu zamiera); zejście = pełny cykl od nowa
-        wrap.addEventListener('mouseenter', holdAuto);
-        wrap.addEventListener('mouseleave', function () {
-            wrap.classList.remove('is-paused');
-            go(pIdx);
-        });
-        document.addEventListener('visibilitychange', function () {
-            if (document.hidden) { if (timer) { clearTimeout(timer); timer = null; } }
-            else { wrap.classList.remove('is-paused'); go(pIdx); }
-        });
-        rows.forEach(function (b) {
-            b.addEventListener('click', function () { go(parseInt(b.dataset.i, 10)); });
-        });
-
-        section.querySelectorAll('[data-cta]').forEach(function (a) {
-            if (q) a.href = '/aplikacja/sparing/' + q;
-        });
+        startScene(scs.length ? scs : FALLBACK_SCENE);
     }).catch(function () { startScene(FALLBACK_SCENE); });
-
-    /* ── Cycler w final CTA ── */
-    var WORDS = ['Tobą.', 'księgową.', 'trenerem.', 'architektem.', 'groomerką.', 'agentem.', 'Tobą.'];
-    var cyc = document.getElementById('cycler');
-    var wi = 0;
-    setInterval(function () {
-        cyc.classList.add('is-out');
-        setTimeout(function () {
-            wi = (wi + 1) % WORDS.length;
-            cyc.textContent = WORDS[wi];
-            cyc.classList.remove('is-out');
-        }, 300);
-    }, 2600);
 })();
 </script>
+
 </body>
 </html>
