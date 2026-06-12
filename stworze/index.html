@@ -342,6 +342,17 @@ img { max-width: 100%; display: block; }
 .feed .section__head { padding: 0 var(--pad-x); max-width: 1280px; margin-left: auto; margin-right: auto; }
 .feed .section__head-wrap { max-width: 1280px; margin: 0 auto; }
 .feed__rows { display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+/* mało projektów (<4): statyczny grid zamiast marquee — bez pustej karuzeli */
+.feed__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 var(--pad-x);
+}
+.feed__grid .feedcard { width: auto; }
+@media (max-width: 760px) { .feed__grid { grid-template-columns: 1fr; max-width: 480px; } }
 .feed__track {
     display: flex; gap: 16px; width: max-content;
     animation: feedScroll var(--dur, 60s) linear infinite;
@@ -850,7 +861,7 @@ img { max-width: 100%; display: block; }
     }
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
-        if (items.length < 3) return; // sekcja zostaje ukryta przy pustym feedzie
+        if (!items.length) return; // sekcja ukryta tylko przy CAŁKIEM pustym feedzie
         demoFeedImg = lightImg(items[0].img, 480);
         var section = document.getElementById('projekty');
         section.hidden = false;
@@ -859,15 +870,21 @@ img { max-width: 100%; display: block; }
                 '<img src="' + lightImg(p.img) + '" alt="' + p.nazwa.replace(/"/g, '&quot;') + ' — podgląd narzędzia" loading="lazy" decoding="async">' +
                 '<div class="feedcard__bar"><i></i><span>' + p.nazwa.replace(/</g, '&lt;') + '</span></div></a>';
         }
-        // dwa przeciwbieżne rzędy marquee; zawartość duplikowana dla pętli
-        var half = Math.ceil(items.length / 2);
-        var rows = [items.slice(0, half), items.length > 3 ? items.slice(half) : items.slice(0, half)];
-        document.getElementById('feed-rows').innerHTML = rows.map(function (row, ri) {
-            var doubled = row.concat(row).concat(row.length < 4 ? row : []); // min szerokość pętli
-            var dur = Math.max(36, doubled.length * 9);
-            return '<div class="feed__track' + (ri === 1 ? ' feed__track--rev' : '') + '" style="--dur:' + dur + 's">' +
-                doubled.map(card).join('') + '</div>';
-        }).join('');
+        if (items.length < 4) {
+            // mało projektów: spokojny, statyczny grid
+            document.getElementById('feed-rows').innerHTML =
+                '<div class="feed__grid">' + items.map(card).join('') + '</div>';
+        } else {
+            // dwa przeciwbieżne rzędy marquee; zawartość duplikowana dla pętli
+            var half = Math.ceil(items.length / 2);
+            var rows = [items.slice(0, half), items.slice(half)];
+            document.getElementById('feed-rows').innerHTML = rows.map(function (row, ri) {
+                var doubled = row.concat(row).concat(row.length < 4 ? row : []); // min szerokość pętli
+                var dur = Math.max(36, doubled.length * 9);
+                return '<div class="feed__track' + (ri === 1 ? ' feed__track--rev' : '') + '" style="--dur:' + dur + 's">' +
+                    doubled.map(card).join('') + '</div>';
+            }).join('');
+        }
         section.querySelectorAll('[data-cta]').forEach(function (a) {
             if (q) a.href = '/stworze/sparing/' + q;
         });
