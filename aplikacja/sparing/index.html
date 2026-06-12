@@ -1073,8 +1073,9 @@
     .pjd-tile--hero { grid-column: span 4; min-height: 300px; }
     .pjd-tile--w3 { grid-column: span 3; min-height: 235px; }
     .pjd-tile--img { background-size: cover; background-position: top center; }
-    /* Kafel ze strefą MEDIA: obraz w kontrolowanym kontenerze (object-fit),
-       tekst pod nim na tle karty — grafika nigdy nie „wyjeżdża" poza box */
+    /* Kafel ze strefą MEDIA: grafika ZAWSZE w całości (object-fit: contain),
+       a wolne pola wypełnia rozmyta kopia tej samej grafiki — zero przycinania
+       niezależnie od proporcji kontenera */
     .pjd-tile--media { padding: 0; justify-content: flex-start; gap: 0; }
     .pjd-tile__media {
         position: relative;
@@ -1090,11 +1091,16 @@
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        object-position: top center;
+        object-fit: contain;
         transition: transform 0.45s var(--ease, ease);
     }
-    .pjd-tile:hover .pjd-tile__media img { transform: scale(1.045); }
+    .pjd-tile__media .pjd-tile__blur {
+        object-fit: cover;
+        transform: scale(1.14);
+        filter: blur(26px) saturate(1.2) brightness(0.55);
+        transition: none;
+    }
+    .pjd-tile:hover .pjd-tile__media img:not(.pjd-tile__blur) { transform: scale(1.035); }
     .pjd-tile__media::after {
         content: '';
         position: absolute;
@@ -1240,14 +1246,8 @@
         .pjd-tile--hero .pjd-tile__media { min-height: 150px; }
     }
 
-    /* Podpozycje sekcji pulpitu w menu po lewej */
-    .side__item--sub {
-        padding-left: 36px;
-        font-size: 12.5px;
-        opacity: 0.82;
-    }
-    .side__item--sub svg { width: 14px; height: 14px; }
-    .side__item--sub.is-active { opacity: 1; }
+    /* Ekrany / Karta / Strona / Plan = pozycje równorzędne z Pulpitem
+       (decyzja 2026-06-12: bez wcięcia i pomniejszenia — to pełnoprawne ekrany) */
 
     /* ── Sekcja „Twoja strona": działająca strona narzędzia ── */
     .pj-land {
@@ -1334,50 +1334,185 @@
     .share-land small { font-size: 12px; color: var(--text-muted); }
     .share-land em { font-style: normal; font-size: 18px; color: var(--accent); }
 
-    /* ── Zakładka „Potencjał rynku" (raport z web-searchu) ── */
-    .rk-verdict {
+    /* ── Zakładka „Potencjał rynku" — raport analityczny v2 ──
+       Czyta się jak rozdziały: sticky pasek nawigacji ze scroll-spy,
+       werdykt z zegarem potencjału, nisza przeliczona na cel 50 klientów,
+       konkurencja w kartach, okno rynkowe jako spotlight z radarem. */
+    .rk-rail {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        overflow-x: auto;
+        scrollbar-width: none;
+        margin: -28px calc(-1 * clamp(14px, 4vw, 26px)) 4px;
+        padding: 12px clamp(14px, 4vw, 26px) 10px;
+        background: linear-gradient(180deg, rgba(5, 5, 7, 0.94) 72%, rgba(5, 5, 7, 0));
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+    }
+    .rk-rail::-webkit-scrollbar { display: none; }
+    .rk-rail__chip {
+        flex-shrink: 0;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--text-muted);
         border: 1px solid var(--glass-border);
-        border-radius: 18px;
-        padding: 20px 22px;
-        margin-bottom: 22px;
-        background: linear-gradient(135deg, rgba(77, 159, 255, 0.08), rgba(255, 255, 255, 0.02));
-    }
-    .rk-verdict__badge {
-        display: inline-block;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--accent);
-        border: 1px solid rgba(77, 159, 255, 0.4);
+        background: rgba(255, 255, 255, 0.03);
         border-radius: 99px;
-        padding: 4px 12px;
-        margin-bottom: 12px;
+        padding: 6px 13px;
+        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
     }
-    .rk-verdict--wysoki .rk-verdict__badge { color: #5dd39e; border-color: rgba(93, 211, 158, 0.45); }
-    .rk-verdict__teza { font-size: 16px; line-height: 1.55; color: var(--text-strong); font-weight: 600; }
-    .rk-verdict__why { margin-top: 8px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-    .rk-market {
+    .rk-rail__chip:hover { color: var(--text-strong); border-color: var(--border-strong); }
+    .rk-rail__chip.is-on {
+        color: var(--accent);
+        border-color: rgba(77, 159, 255, 0.5);
+        background: var(--accent-dim);
+    }
+    /* Rozdział: numer serif + tytuł; scroll-margin pod sticky pasek */
+    .rk-sec { margin-bottom: 36px; scroll-margin-top: 58px; }
+    .rk-sec__head { display: flex; align-items: baseline; gap: 13px; margin-bottom: 16px; }
+    .rk-sec__no {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 29px;
+        line-height: 1;
+        color: rgba(77, 159, 255, 0.5);
+        flex-shrink: 0;
+    }
+    .rk-sec__head h3 { font-size: 17.5px; font-weight: 800; color: var(--text-strong); margin: 0; }
+    .rk-sec__head h3 span { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
+    /* Werdykt: teza serifem + zegar potencjału */
+    .rk-hero {
+        position: relative;
         display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 20px;
+        grid-template-columns: minmax(0, 1fr) 208px;
+        gap: 28px;
         align-items: center;
         border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 18px 20px;
+        border-radius: 22px;
+        padding: 26px 28px;
+        margin: 16px 0 32px;
+        overflow: hidden;
+        background:
+            radial-gradient(120% 150% at 100% 0%, rgba(77, 159, 255, 0.11), transparent 55%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
     }
-    @media (max-width: 700px) { .rk-market { grid-template-columns: 1fr; gap: 10px; } }
-    .rk-market__num { font-size: clamp(26px, 4vw, 38px); font-weight: 800; color: var(--text-strong); line-height: 1.1; white-space: nowrap; }
-    .rk-market__num span { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 4px; white-space: normal; max-width: 220px; }
-    .rk-market__desc { font-size: 13px; color: var(--text-soft, var(--text-muted)); line-height: 1.65; }
-    .rk-comps { display: flex; flex-direction: column; gap: 10px; }
-    .rk-comp {
+    @media (max-width: 760px) {
+        .rk-hero { grid-template-columns: 1fr; gap: 14px; padding: 22px 20px; }
+        .rk-gauge { margin: 0 auto; }
+    }
+    .rk-hero__teza {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(19px, 2.7vw, 25px);
+        line-height: 1.45;
+        color: var(--text-strong);
+        overflow-wrap: break-word;
+    }
+    .rk-hero__teza::before { content: '„'; color: var(--accent); }
+    .rk-hero__teza::after { content: '"'; color: var(--accent); }
+    .rk-hero__why { margin-top: 12px; font-size: 13px; color: var(--text-muted); line-height: 1.65; max-width: 56ch; }
+    /* Zegar potencjału: łuk SVG (długość 264) wypełniany po wejściu w kadr */
+    .rk-gauge { position: relative; width: 200px; max-width: 100%; text-align: center; flex-shrink: 0; }
+    .rk-gauge svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .rk-gauge path { fill: none; stroke-width: 12; stroke-linecap: round; }
+    .rk-gauge__track { stroke: rgba(255, 255, 255, 0.07); }
+    .rk-gauge__fill {
+        stroke: var(--accent);
+        stroke-dasharray: 264;
+        stroke-dashoffset: 264;
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.25s;
+        filter: drop-shadow(0 0 8px rgba(77, 159, 255, 0.35));
+    }
+    .rk-gauge--wysoki .rk-gauge__fill { stroke: #5dd39e; filter: drop-shadow(0 0 8px rgba(93, 211, 158, 0.4)); }
+    .rk-gauge--umiarkowany .rk-gauge__fill { stroke: var(--yellow); filter: drop-shadow(0 0 8px rgba(255, 197, 61, 0.35)); }
+    .rk-gauge.is-in .rk-gauge__fill { stroke-dashoffset: 132; }
+    .rk-gauge.is-in.rk-gauge--niszowy .rk-gauge__fill { stroke-dashoffset: 184; }
+    .rk-gauge.is-in.rk-gauge--umiarkowany .rk-gauge__fill { stroke-dashoffset: 106; }
+    .rk-gauge.is-in.rk-gauge--wysoki .rk-gauge__fill { stroke-dashoffset: 32; }
+    .rk-gauge__val {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 26px;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: var(--text-strong);
+    }
+    .rk-gauge--wysoki .rk-gauge__val { color: #5dd39e; }
+    .rk-gauge--umiarkowany .rk-gauge__val { color: var(--yellow); }
+    .rk-gauge__cap {
+        margin-top: 4px;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+    /* Nisza: liczba + siatka 100 kropek (1 kropka = 1% rynku) */
+    .rk-niche {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 26px;
+        align-items: center;
         border: 1px solid var(--glass-border);
-        border-radius: 14px;
-        padding: 14px 16px;
+        border-radius: 20px;
+        padding: 22px 24px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
     }
-    .rk-comp__top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .rk-comp__top b { font-size: 14.5px; color: var(--text-strong); }
+    @media (max-width: 760px) { .rk-niche { grid-template-columns: 1fr; gap: 18px; } }
+    .rk-niche__num {
+        font-size: clamp(34px, 5vw, 46px);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        color: var(--text-strong);
+        line-height: 1.05;
+        overflow-wrap: break-word;
+    }
+    .rk-niche__kogo { font-size: 13px; color: var(--text-muted); margin-top: 5px; max-width: 36ch; line-height: 1.5; }
+    .rk-niche__desc { margin-top: 14px; font-size: 13px; color: var(--text-muted); line-height: 1.7; overflow-wrap: break-word; }
+    .rk-dots { width: 236px; max-width: 100%; }
+    .rk-dots__grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+    .rk-dots__grid i {
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: rgba(77, 159, 255, 0.26);
+        transform: scale(0);
+        transition: transform 0.45s var(--ease);
+    }
+    .rk-dots.is-in .rk-dots__grid i { transform: scale(1); }
+    .rk-dots__grid i.is-you {
+        background: #5dd39e;
+        animation: rkPulse 2.6s ease-in-out 1.6s infinite;
+    }
+    @keyframes rkPulse {
+        0%, 100% { box-shadow: 0 0 4px rgba(93, 211, 158, 0.35); }
+        50%      { box-shadow: 0 0 15px rgba(93, 211, 158, 0.95); }
+    }
+    .rk-dots__cap { margin-top: 11px; font-size: 11.5px; color: var(--text-muted); line-height: 1.6; }
+    .rk-dots__cap b { color: #5dd39e; font-weight: 700; }
+    /* Konkurencja: karty w siatce; cena to chip z łamaniem (nic nie wyjeżdża) */
+    .rk-comps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 760px) { .rk-comps { grid-template-columns: 1fr; } }
+    .rk-comp {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        min-width: 0;
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 16px 18px;
+        background: rgba(255, 255, 255, 0.018);
+        transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .rk-comp:hover { border-color: rgba(77, 159, 255, 0.4); transform: translateY(-2px); }
+    .rk-comp__top { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; min-width: 0; }
+    .rk-comp__top b { font-size: 15px; color: var(--text-strong); overflow-wrap: anywhere; }
     .rk-comp__kraj {
         font-size: 10.5px;
         font-weight: 700;
@@ -1386,55 +1521,162 @@
         border: 1px solid var(--glass-border);
         border-radius: 99px;
         padding: 2px 9px;
+        white-space: nowrap;
     }
-    .rk-comp__price { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--text-strong); white-space: nowrap; }
-    .rk-comp__what { margin-top: 7px; font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
-    .rk-comp__gap { margin-top: 7px; font-size: 12.5px; color: #5dd39e; line-height: 1.55; }
-    .rk-comp__gap::before { content: '→ '; font-weight: 700; }
-    .rk-gap {
-        border: 1px solid rgba(77, 159, 255, 0.4);
-        border-radius: 18px;
-        padding: 20px 22px;
-        margin: 26px 0;
-        background: rgba(77, 159, 255, 0.06);
+    .rk-comp__price {
+        align-self: flex-start;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.5;
+        color: var(--accent);
+        background: var(--accent-dim);
+        border: 1px solid rgba(77, 159, 255, 0.25);
+        border-radius: 8px;
+        padding: 4px 10px;
+        overflow-wrap: anywhere;
+        max-width: 100%;
     }
-    .rk-gap__t {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        font-size: 13px;
+    .rk-comp__what { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; overflow-wrap: break-word; }
+    .rk-comp__gap {
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px dashed rgba(93, 211, 158, 0.3);
+        font-size: 12.5px;
+        color: #5dd39e;
+        line-height: 1.6;
+        overflow-wrap: break-word;
+    }
+    .rk-comp__gap span {
+        display: block;
+        font-size: 10px;
         font-weight: 800;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(93, 211, 158, 0.75);
+        margin-bottom: 3px;
+    }
+    /* Okno rynkowe: spotlight z pulsującym radarem */
+    .rk-window {
+        position: relative;
+        border: 1px solid rgba(77, 159, 255, 0.45);
+        border-radius: 22px;
+        padding: 30px clamp(20px, 4vw, 38px) 32px;
+        text-align: center;
+        overflow: hidden;
+        background:
+            radial-gradient(90% 130% at 50% -20%, rgba(77, 159, 255, 0.16), transparent 60%),
+            rgba(77, 159, 255, 0.04);
+    }
+    .rk-window .rk-ring {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 380px;
+        height: 380px;
+        border: 1px solid rgba(77, 159, 255, 0.3);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: rkRing 5.5s linear infinite;
+    }
+    .rk-window .rk-ring:nth-child(2) { animation-delay: 2.75s; }
+    @keyframes rkRing {
+        from { transform: translate(-50%, -50%) scale(0.12); opacity: 0.85; }
+        to   { transform: translate(-50%, -50%) scale(1.3); opacity: 0; }
+    }
+    .rk-window__label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
         color: var(--accent);
-        margin-bottom: 10px;
-    }
-    .rk-gap__t svg { width: 17px; height: 17px; }
-    .rk-gap p { font-size: 14px; line-height: 1.7; color: var(--text-strong); }
-    .rk-trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    @media (max-width: 700px) { .rk-trends { grid-template-columns: 1fr; } }
-    .rk-trend { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; }
-    .rk-trend b { font-size: 13.5px; color: var(--text-strong); }
-    .rk-trend p { margin-top: 6px; font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
-    .rk-means { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-    .rk-means li {
+        border: 1px solid rgba(77, 159, 255, 0.4);
+        border-radius: 99px;
+        padding: 5px 14px;
+        background: rgba(5, 5, 7, 0.4);
         position: relative;
-        padding-left: 26px;
-        font-size: 13.5px;
-        color: var(--text-soft, var(--text-muted));
+    }
+    .rk-window__label svg { width: 14px; height: 14px; }
+    .rk-window p {
+        position: relative;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(17px, 2.4vw, 22px);
         line-height: 1.6;
+        color: var(--text-strong);
+        max-width: 58ch;
+        margin: 14px auto 0;
+        overflow-wrap: break-word;
     }
-    .rk-means li::before { content: '✓'; position: absolute; left: 2px; top: 0; color: #5dd39e; font-weight: 800; }
+    /* Trendy: karty z numerem-duchem */
+    .rk-trends { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 760px) { .rk-trends { grid-template-columns: 1fr; } }
+    .rk-trend {
+        position: relative;
+        min-width: 0;
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 16px 18px;
+        background: rgba(255, 255, 255, 0.018);
+        overflow: hidden;
+    }
+    .rk-trend__no {
+        position: absolute;
+        right: 10px;
+        top: 2px;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 46px;
+        line-height: 1.1;
+        color: rgba(255, 255, 255, 0.055);
+        pointer-events: none;
+    }
+    .rk-trend b { display: block; font-size: 13.5px; color: var(--text-strong); padding-right: 34px; overflow-wrap: break-word; }
+    .rk-trend p { margin-top: 7px; font-size: 12.5px; color: var(--text-muted); line-height: 1.65; overflow-wrap: break-word; }
+    /* Wnioski: ponumerowana lista w jednym boxie */
+    .rk-means {
+        list-style: none;
+        counter-reset: rkm;
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .rk-means li {
+        counter-increment: rkm;
+        display: flex;
+        gap: 14px;
+        min-width: 0;
+        padding: 13px 18px;
+        font-size: 13.5px;
+        color: var(--text);
+        line-height: 1.65;
+        border-top: 1px solid var(--glass-border-soft);
+        overflow-wrap: break-word;
+    }
+    .rk-means li:first-child { border-top: 0; }
+    .rk-means li::before {
+        content: counter(rkm, decimal-leading-zero);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 17px;
+        color: var(--accent);
+        line-height: 1.45;
+        flex-shrink: 0;
+    }
+    /* Uczciwe ryzyka */
     .rk-warn {
-        border: 1px dashed var(--glass-border);
-        border-radius: 14px;
-        padding: 14px 18px;
-        margin-top: 22px;
+        border: 1px dashed rgba(255, 197, 61, 0.35);
+        border-radius: 16px;
+        padding: 16px 18px;
+        background: rgba(255, 197, 61, 0.03);
     }
-    .rk-warn__t { font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-    .rk-warn ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-    .rk-warn li { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; padding-left: 14px; position: relative; }
-    .rk-warn li::before { content: '–'; position: absolute; left: 0; }
+    .rk-warn__t { font-size: 11.5px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--yellow); margin-bottom: 9px; }
+    .rk-warn ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .rk-warn li { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; padding-left: 14px; position: relative; overflow-wrap: break-word; }
+    .rk-warn li::before { content: '–'; position: absolute; left: 0; color: var(--yellow); }
+    /* Przypisy źródłowe */
     .rk-refs { display: inline-flex; gap: 3px; margin-left: 5px; vertical-align: super; }
     .rk-ref {
         font-size: 9.5px;
@@ -1448,9 +1690,18 @@
     }
     .rk-ref:hover { background: rgba(77, 159, 255, 0.15); }
     .rk-srcs { margin: 10px 0 0 18px; display: flex; flex-direction: column; gap: 6px; }
-    .rk-srcs li { font-size: 12px; color: var(--text-muted); }
-    .rk-srcs a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; word-break: break-all; }
+    .rk-srcs li { font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+    .rk-srcs a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
     .rk-srcs a:hover { color: var(--accent); }
+    /* Wjazd rozdziałów przy scrollu (IO dokłada .is-in) */
+    .rk-reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.55s var(--ease), transform 0.55s var(--ease); }
+    .rk-reveal.is-in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+        .rk-reveal { opacity: 1; transform: none; }
+        .rk-dots__grid i { transform: scale(1); }
+        .rk-gauge__fill, .rk-gauge.is-in .rk-gauge__fill { transition: none; }
+        .rk-window .rk-ring { animation: none; opacity: 0.25; transform: translate(-50%, -50%) scale(0.5); }
+    }
 
     /* Widok udostępnionego projektu (?projekt=<id>) — read-only wizytówka:
        bez czatu i sidebara, dane z serwera, na dole CTA „stwórz własny” */
@@ -2935,14 +3186,22 @@
         display: grid;
         place-items: center;
     }
+    /* Grafika zawsze w całości; ewentualne pola wypełnia rozmyta kopia */
     .pv-tile img {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         cursor: zoom-in;
         animation: lbImgIn 0.4s var(--ease);
+    }
+    .pv-tile .pv-tile__blur {
+        object-fit: cover;
+        transform: scale(1.14);
+        filter: blur(22px) saturate(1.2) brightness(0.55);
+        animation: none;
+        pointer-events: none;
     }
     .pv-tile.is-done { border-color: rgba(77, 159, 255, 0.3); }
     .pv-tile__skel {
@@ -3613,19 +3872,19 @@
                 Pulpit projektu
                 <i class="side__dot" id="dot-projekt" hidden></i>
             </button>
-            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="ekrany" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="ekrany" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path></svg>
                 Ekrany narzędzia
             </button>
-            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="karta" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="karta" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
                 Karta projektu
             </button>
-            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="strona" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="strona" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                 Twoja strona
             </button>
-            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="plan" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="plan" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
                 Plan przychodu
             </button>
@@ -4355,7 +4614,8 @@
                 html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
                     return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                         '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
-                        '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
+                        '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(it.url) + '" alt="" aria-hidden="true" loading="lazy">' +
+                        '<img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
             // Działająca strona — jeśli już istnieje
@@ -4766,7 +5026,8 @@
             'Projekt w pigułce</span><span class="pj-plan__tag">jedna grafika — cały projekt</span></div>' +
             '<div class="pv-tile is-done pj-pill__tile" data-pill="' + esc(url) + '">' +
             '<span class="pv-tile__label">Podsumowanie graficzne</span>' +
-            '<div class="pv-tile__body"><img src="' + esc(url) + '" alt="Projekt w pigułce" loading="lazy"></div></div></div>';
+            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(url) + '" alt="" aria-hidden="true" loading="lazy">' +
+            '<img src="' + esc(url) + '" alt="Projekt w pigułce" loading="lazy"></div></div></div>';
     }
 
     function extrasWaitHTML(kind) {
@@ -4977,7 +5238,9 @@
                 ? ' href="' + esc(opts.href) + '" target="_blank" rel="noopener"'
                 : ' type="button"' + (opts.data ? ' ' + opts.data : '');
             return '<' + tag + ' class="pjd-tile pjd-tile--media ' + (opts.cls || '') + '"' + attrs + '>' +
-                '<span class="pjd-tile__media"><img src="' + esc(opts.img) + '" alt="" loading="lazy"></span>' +
+                '<span class="pjd-tile__media">' +
+                '<img class="pjd-tile__blur" src="' + esc(opts.img) + '" alt="" aria-hidden="true" loading="lazy">' +
+                '<img src="' + esc(opts.img) + '" alt="" loading="lazy"></span>' +
                 pjGoIcon() +
                 '<span class="pjd-tile__pad">' +
                 '<span class="pjd-tile__t">' + opts.title + '</span>' +
@@ -5131,7 +5394,8 @@
                 html += '<div class="pj2-shots n' + ctx.items.length + '">' + ctx.items.map(function (it, i) {
                     return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                         '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
-                        '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
+                        '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(it.url) + '" alt="" aria-hidden="true" loading="lazy">' +
+                        '<img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
             if (ctx.oldShots.length) {
@@ -5139,7 +5403,8 @@
                     '<div class="shots shots--old" style="margin-bottom:4px">' + ctx.oldShots.map(function (s, i) {
                         return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
                             '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
-                            '<div class="pv-tile__body"><img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
+                            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(s.url) + '" alt="" aria-hidden="true" loading="lazy">' +
+                            '<img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
                     }).join('') + '</div>';
             }
         }
@@ -5311,8 +5576,25 @@
         return out ? '<span class="rk-refs">' + out + '</span>' : '';
     }
 
+    // „7–17 tys." / „ok. 120 tys." / „2 mln" → dolna granica jako liczba (albo null)
+    function rkParseLow(liczba) {
+        if (typeof liczba !== 'string') return null;
+        var s = liczba.toLowerCase();
+        var m = s.replace(/\s/g, '').match(/(\d+(?:[.,]\d+)?)/);
+        if (!m) return null;
+        var v = parseFloat(m[1].replace(',', '.'));
+        if (/tys/.test(s)) v *= 1000;
+        else if (/mln|milion/.test(s)) v *= 1000000;
+        return v >= 200 ? Math.round(v) : null; // poniżej 200 nie ufamy parsowaniu
+    }
+
+    var rkIO = null, rkSpy = null; // obserwatory poprzedniego renderu — sprzątane przy każdym wejściu
+
     function renderPaneRynek() {
         var body = el('pane-rynek-body');
+        var pane = el('pane-rynek');
+        if (rkIO) { rkIO.disconnect(); rkIO = null; }
+        if (rkSpy) { rkSpy.disconnect(); rkSpy = null; }
         var nazwa = (state.lastBrief && state.lastBrief.nazwa) || 'Twoje narzędzie';
         var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Potencjał rynku</div>' +
             '<h2 class="tabpane__title">' + esc(nazwa) + ' na tle rynku</h2>' +
@@ -5346,101 +5628,169 @@
         (Array.isArray(r.zrodla) ? r.zrodla : []).forEach(function (s) {
             if (s && s.nr != null) srcMap[s.nr] = s;
         });
-        function rkHead(icon, title, sub) {
-            return '<div class="pj-sechead"><span class="pj-sechead__ico">' + pjIco(icon) + '</span>' +
-                '<div><h3>' + title + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>';
-        }
-
-        var html = head;
-
-        // Werdykt analityka — teza całego researchu
-        var oc = typeof r.ocena_potencjalu === 'string' ? r.ocena_potencjalu : '';
-        html += '<div class="rk-verdict rk-verdict--' + esc(oc) + '">' +
-            '<span class="rk-verdict__badge">Potencjał: ' + esc(oc || 'w ocenie') + '</span>' +
-            '<p class="rk-verdict__teza">' + esc(r.teza || '') + '</p>' +
-            (r.ocena_uzasadnienie ? '<p class="rk-verdict__why">' + esc(r.ocena_uzasadnienie) + '</p>' : '') +
-            '</div>';
-
-        // Wielkość niszy
-        if (r.rynek && typeof r.rynek === 'object') {
-            html += '<section class="pj-section">' +
-                rkHead('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
-                    'Wielkość niszy', 'ilu potencjalnych klientów działa w Polsce') +
-                '<div class="rk-market">' +
-                '<div class="rk-market__num">' + esc(r.rynek.liczba || '—') + '<span>' + esc(r.rynek.kogo || '') + '</span></div>' +
-                (r.rynek.opis ? '<p class="rk-market__desc">' + esc(r.rynek.opis) + rkRefs(r.rynek.zrodla, srcMap) + '</p>' : '') +
-                '</div></section>';
-        }
-
-        // Konkurencja
-        if (Array.isArray(r.konkurenci) && r.konkurenci.length) {
-            html += '<section class="pj-section">' +
-                rkHead('<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>',
-                    'Konkurencja', 'istniejące narzędzia — i czego im brakuje') +
-                '<div class="rk-comps">';
-            r.konkurenci.slice(0, 6).forEach(function (c) {
-                if (!c || typeof c !== 'object') return;
-                html += '<div class="rk-comp">' +
-                    '<div class="rk-comp__top"><b>' + esc(c.nazwa || '') + '</b>' +
-                    (c.kraj ? '<span class="rk-comp__kraj">' + esc(c.kraj) + '</span>' : '') +
-                    (c.cena ? '<span class="rk-comp__price">' + esc(c.cena) + '</span>' : '') + '</div>' +
-                    (c.czym_jest ? '<p class="rk-comp__what">' + esc(c.czym_jest) + '</p>' : '') +
-                    (c.luka ? '<p class="rk-comp__gap">' + esc(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
-                    '</div>';
-            });
-            html += '</div></section>';
-        }
-
-        // Okno rynkowe — serce raportu
-        if (r.luka_rynkowa) {
-            html += '<div class="rk-gap"><div class="rk-gap__t">' +
-                pjIco('<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>') +
-                'Okno rynkowe</div><p>' + esc(r.luka_rynkowa) + '</p></div>';
-        }
-
-        // Trendy
-        if (Array.isArray(r.trendy) && r.trendy.length) {
-            html += '<section class="pj-section">' +
-                rkHead('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
-                    'Trendy wokół projektu', 'co się dzieje na rynku — z liczbami') +
-                '<div class="rk-trends">';
-            r.trendy.slice(0, 4).forEach(function (t) {
-                if (!t || typeof t !== 'object') return;
-                html += '<div class="rk-trend"><b>' + esc(t.tytul || '') + '</b>' +
-                    (t.opis ? '<p>' + esc(t.opis) + rkRefs(t.zrodla, srcMap) + '</p>' : '') + '</div>';
-            });
-            html += '</div></section>';
-        }
-
-        // Wnioski dla projektu
-        if (Array.isArray(r.co_to_oznacza) && r.co_to_oznacza.length) {
-            html += '<section class="pj-section">' +
-                rkHead('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>',
-                    'Co to oznacza dla projektu', 'wnioski z researchu — dla pierwszej wersji i sprzedaży') +
-                '<ul class="rk-means">' +
-                r.co_to_oznacza.slice(0, 6).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
-                '</ul></section>';
-        }
-
-        // Uczciwe zastrzeżenia
-        if (Array.isArray(r.zastrzezenia) && r.zastrzezenia.length) {
-            html += '<div class="rk-warn"><div class="rk-warn__t">Uczciwie o ryzykach</div><ul>' +
-                r.zastrzezenia.slice(0, 4).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
-                '</ul></div>';
-        }
-
-        // Źródła
+        var oc = (typeof r.ocena_potencjalu === 'string' && /^(wysoki|umiarkowany|niszowy)$/.test(r.ocena_potencjalu))
+            ? r.ocena_potencjalu : '';
+        var hasRynek = r.rynek && typeof r.rynek === 'object';
+        var konk = Array.isArray(r.konkurenci) ? r.konkurenci.filter(function (c) { return c && typeof c === 'object'; }).slice(0, 6) : [];
+        var trendy = Array.isArray(r.trendy) ? r.trendy.filter(function (t) { return t && typeof t === 'object'; }).slice(0, 4) : [];
+        var wnioski = Array.isArray(r.co_to_oznacza) ? r.co_to_oznacza.slice(0, 6) : [];
+        var ryzyka = Array.isArray(r.zastrzezenia) ? r.zastrzezenia.slice(0, 4) : [];
         var srcs = Array.isArray(r.zrodla) ? r.zrodla.filter(function (s) { return s && s.url; }) : [];
+
+        // Pasek rozdziałów (sticky, scroll-spy) — tylko sekcje obecne w danych
+        var chapters = [['werdykt', 'Werdykt']];
+        if (hasRynek) chapters.push(['nisza', 'Nisza']);
+        if (konk.length) chapters.push(['konkurencja', 'Konkurencja']);
+        if (r.luka_rynkowa) chapters.push(['okno', 'Okno rynkowe']);
+        if (trendy.length) chapters.push(['trendy', 'Trendy']);
+        if (wnioski.length) chapters.push(['wnioski', 'Wnioski']);
+        if (ryzyka.length) chapters.push(['ryzyka', 'Ryzyka']);
+        if (srcs.length) chapters.push(['zrodla', 'Źródła']);
+
+        var html = '<nav class="rk-rail" aria-label="Rozdziały raportu">' + chapters.map(function (c, i) {
+            return '<button type="button" class="rk-rail__chip' + (i === 0 ? ' is-on' : '') + '" data-sec="' + c[0] + '">' + c[1] + '</button>';
+        }).join('') + '</nav>' + head;
+
+        var rkNo = 0;
+        function rkSec(id, title, sub, inner) {
+            rkNo++;
+            return '<section class="rk-sec rk-reveal" id="rk-sec-' + id + '">' +
+                '<div class="rk-sec__head"><span class="rk-sec__no" aria-hidden="true">' + (rkNo < 10 ? '0' + rkNo : rkNo) + '</span>' +
+                '<h3>' + title + '<span>' + sub + '</span></h3></div>' + inner + '</section>';
+        }
+
+        // 1. WERDYKT — teza serifem + zegar potencjału (łuk SVG, długość 264)
+        html += '<section class="rk-sec rk-reveal" id="rk-sec-werdykt"><div class="rk-hero">' +
+            '<div><p class="rk-hero__teza">' + esc(r.teza || '') + '</p>' +
+            (r.ocena_uzasadnienie ? '<p class="rk-hero__why">' + esc(r.ocena_uzasadnienie) + '</p>' : '') +
+            '</div>' +
+            '<div class="rk-gauge rk-gauge--' + (oc || 'brak') + '" role="img" aria-label="Potencjał projektu: ' + esc(oc || 'w ocenie') + '">' +
+            '<svg viewBox="0 0 200 116" aria-hidden="true">' +
+            '<path class="rk-gauge__track" d="M16 108 A 84 84 0 0 1 184 108"></path>' +
+            '<path class="rk-gauge__fill" d="M16 108 A 84 84 0 0 1 184 108"></path>' +
+            '</svg>' +
+            '<div class="rk-gauge__val">' + esc(oc || 'w ocenie') + '</div>' +
+            '<div class="rk-gauge__cap">potencjał projektu</div>' +
+            '</div></div></section>';
+
+        // 2. NISZA — liczba + siatka 100 kropek przeliczona na cel 50 klientów
+        if (hasRynek) {
+            var low = rkParseLow(r.rynek.liczba);
+            var youCount = 1, pctTxt = '';
+            if (low) {
+                var pct = 50 / low * 100;
+                pctTxt = pct < 0.1 ? 'mniej niż 0,1%'
+                    : 'ok. ' + (pct < 1 ? pct.toFixed(1).replace('.', ',') : String(Math.round(pct))) + '%';
+                youCount = Math.min(100, Math.max(1, Math.round(pct)));
+            }
+            var dots = '';
+            for (var di = 0; di < 100; di++) {
+                dots += '<i' + (di < youCount ? ' class="is-you"' : '') + ' style="transition-delay:' + (di * 9) + 'ms"></i>';
+            }
+            var cap = youCount === 1
+                ? '<b>Zielona kropka</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby przejąć stery.'
+                : '<b>Zielone kropki</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby przejąć stery.';
+            html += rkSec('nisza', 'Wielkość niszy', 'ilu potencjalnych klientów działa w Polsce — i jak mało z nich potrzebujesz',
+                '<div class="rk-niche"><div>' +
+                '<div class="rk-niche__num">' + esc(r.rynek.liczba || '—') + '</div>' +
+                '<div class="rk-niche__kogo">' + esc(r.rynek.kogo || '') + '</div>' +
+                (r.rynek.opis ? '<p class="rk-niche__desc">' + esc(r.rynek.opis) + rkRefs(r.rynek.zrodla, srcMap) + '</p>' : '') +
+                '</div><div class="rk-dots"><div class="rk-dots__grid" aria-hidden="true">' + dots + '</div>' +
+                '<p class="rk-dots__cap">' + cap + '</p></div></div>');
+        }
+
+        // 3. KONKURENCJA — karty: cena chipem, luka jako „Twoje wejście"
+        if (konk.length) {
+            var cards = konk.map(function (c) {
+                return '<div class="rk-comp">' +
+                    '<div class="rk-comp__top"><b>' + esc(c.nazwa || '') + '</b>' +
+                    (c.kraj ? '<span class="rk-comp__kraj">' + esc(c.kraj) + '</span>' : '') + '</div>' +
+                    (c.cena ? '<span class="rk-comp__price">' + esc(c.cena) + '</span>' : '') +
+                    (c.czym_jest ? '<p class="rk-comp__what">' + esc(c.czym_jest) + '</p>' : '') +
+                    (c.luka ? '<p class="rk-comp__gap"><span>Czego brakuje — Twoje wejście</span>' + esc(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
+                    '</div>';
+            }).join('');
+            html += rkSec('konkurencja', 'Konkurencja', konk.length + ' ' + (konk.length === 1 ? 'narzędzie' : konk.length < 5 ? 'narzędzia' : 'narzędzi') + ' na rynku — i czego każdemu brakuje',
+                '<div class="rk-comps">' + cards + '</div>');
+        }
+
+        // 4. OKNO RYNKOWE — spotlight z radarem (bez numerowanego nagłówka)
+        if (r.luka_rynkowa) {
+            html += '<section class="rk-sec rk-reveal" id="rk-sec-okno"><div class="rk-window">' +
+                '<i class="rk-ring" aria-hidden="true"></i><i class="rk-ring" aria-hidden="true"></i>' +
+                '<span class="rk-window__label">' +
+                pjIco('<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>') +
+                'Okno rynkowe</span>' +
+                '<p>' + esc(r.luka_rynkowa) + '</p></div></section>';
+        }
+
+        // 5. TRENDY — karty z numerem-duchem
+        if (trendy.length) {
+            var tcards = trendy.map(function (t, ti) {
+                return '<div class="rk-trend"><span class="rk-trend__no" aria-hidden="true">0' + (ti + 1) + '</span>' +
+                    '<b>' + esc(t.tytul || '') + '</b>' +
+                    (t.opis ? '<p>' + esc(t.opis) + rkRefs(t.zrodla, srcMap) + '</p>' : '') + '</div>';
+            }).join('');
+            html += rkSec('trendy', 'Trendy wokół projektu', 'co się dzieje na rynku — z liczbami', '<div class="rk-trends">' + tcards + '</div>');
+        }
+
+        // 6. WNIOSKI — ponumerowana lista
+        if (wnioski.length) {
+            html += rkSec('wnioski', 'Co to oznacza dla projektu', 'wnioski z researchu — dla pierwszej wersji i sprzedaży',
+                '<ul class="rk-means">' + wnioski.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>');
+        }
+
+        // 7. RYZYKA — uczciwie, bez lukru
+        if (ryzyka.length) {
+            html += '<section class="rk-sec rk-reveal" id="rk-sec-ryzyka"><div class="rk-warn">' +
+                '<div class="rk-warn__t">Uczciwie o ryzykach</div><ul>' +
+                ryzyka.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') +
+                '</ul></div></section>';
+        }
+
+        // 8. ŹRÓDŁA
         if (srcs.length) {
-            html += '<details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
+            html += '<section class="rk-sec" id="rk-sec-zrodla"><details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
                 srcs.map(function (s) {
                     return '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener nofollow">' + esc(s.tytul || s.url) + '</a></li>';
-                }).join('') + '</ol></details>';
+                }).join('') + '</ol></details></section>';
         }
 
         html += '<div class="pj-plan__note">Wstępny research przygotowany automatycznie na podstawie publicznych źródeł. Pełną analizę rynku i plan przedsięwzięcia przygotowuje Tomek po rezerwacji rozmowy.</div>';
 
         body.innerHTML = html;
+
+        // Pasek rozdziałów: klik = płynny zjazd do sekcji
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        body.querySelectorAll('.rk-rail__chip').forEach(function (ch) {
+            ch.addEventListener('click', function () {
+                var sec = el('rk-sec-' + ch.getAttribute('data-sec'));
+                if (sec) sec.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+            });
+        });
+
+        if ('IntersectionObserver' in window) {
+            // Wjazd sekcji + start animacji zegara i kropek
+            rkIO = new IntersectionObserver(function (ents) {
+                ents.forEach(function (en) {
+                    if (en.isIntersecting) { en.target.classList.add('is-in'); rkIO.unobserve(en.target); }
+                });
+            }, { root: pane, threshold: 0.05, rootMargin: '0px 0px -36px 0px' });
+            body.querySelectorAll('.rk-reveal, .rk-gauge, .rk-dots').forEach(function (n) { rkIO.observe(n); });
+            // Scroll-spy: rozdział pod górną krawędzią podświetla swój chip
+            rkSpy = new IntersectionObserver(function (ents) {
+                ents.forEach(function (en) {
+                    if (!en.isIntersecting) return;
+                    var id = en.target.id.replace('rk-sec-', '');
+                    body.querySelectorAll('.rk-rail__chip').forEach(function (c) {
+                        c.classList.toggle('is-on', c.getAttribute('data-sec') === id);
+                    });
+                });
+            }, { root: pane, rootMargin: '-12% 0px -68% 0px' });
+            body.querySelectorAll('.rk-sec').forEach(function (s) { rkSpy.observe(s); });
+        } else {
+            body.querySelectorAll('.rk-reveal, .rk-gauge, .rk-dots').forEach(function (n) { n.classList.add('is-in'); });
+        }
     }
 
     // Hero state: przed pierwszą wiadomością usera wszystko (powitanie + pasek)
@@ -6972,8 +7322,9 @@
             if (!tile) return;
             tile.classList.add('is-done');
             var body = tile.querySelector('.pv-tile__body');
-            body.innerHTML = '<img src="' + esc(url) + '" alt="' + esc(viewLabel(view)) + ' — kliknij, aby powiększyć" loading="lazy">';
-            body.querySelector('img').addEventListener('click', function () { openLightbox(view); });
+            body.innerHTML = '<img class="pv-tile__blur" src="' + esc(url) + '" alt="" aria-hidden="true" loading="lazy">' +
+                '<img src="' + esc(url) + '" alt="' + esc(viewLabel(view)) + ' — kliknij, aby powiększyć" loading="lazy">';
+            body.querySelector('img:not(.pv-tile__blur)').addEventListener('click', function () { openLightbox(view); });
         }
         function tileError(view, message, retryFn) {
             var tile = wrap.querySelector('.pv-tile[data-view="' + view + '"]');
