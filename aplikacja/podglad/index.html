@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podgląd strony narzędzia — Aplikacja</title>
+<meta name="description" content="Interaktywny podgląd strony sprzedażowej narzędzia zaprojektowanego w tomekniedzwiecki.pl/aplikacja.">
+<meta name="robots" content="noindex">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:#0b0d12;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:#0b0d12;color:#fff;flex-shrink:0}
+.bar .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;text-decoration:none;color:#fff;min-width:0}
+.bar .brand .dot{width:24px;height:24px;border-radius:7px;background:#4d9fff;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+.bar .brand span.lbl{color:#8b96a8;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .cta{font-size:13px;font-weight:700;color:#0b0d12;background:#4d9fff;border-radius:9px;padding:8px 14px;text-decoration:none;white-space:nowrap;transition:filter .15s}
+.bar .cta:hover{filter:brightness(1.1)}
+.stage{flex:1;position:relative;background:#fff}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.msg{position:absolute;inset:0;display:grid;place-items:center;background:#fff;color:#0b0d12;text-align:center;padding:24px}
+.msg .in{max-width:420px}
+.msg h1{font-size:19px;margin-bottom:8px}
+.msg p{font-size:15px;color:#4b5668;line-height:1.6}
+.spin{width:34px;height:34px;border:3px solid #e6eaef;border-top-color:#4d9fff;border-radius:50%;margin:0 auto 18px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none}
+@media(max-width:560px){.bar .brand span.lbl{display:none}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a class="brand" href="https://tomekniedzwiecki.pl/aplikacja/">
+    <span class="dot">⚡</span>Aplikacja<span class="lbl">&nbsp;· podgląd koncepcyjny strony narzędzia</span>
+  </a>
+  <a class="cta" href="https://tomekniedzwiecki.pl/aplikacja/sparing/">Stwórz swój projekt →</a>
+</div>
+<div class="stage">
+  <div class="msg" id="loading"><div class="in"><div class="spin"></div><p>Wczytuję podgląd…</p></div></div>
+  <div class="msg hidden" id="error"><div class="in">
+    <h1>Nie znaleźliśmy tego podglądu</h1>
+    <p>Strona mogła jeszcze się nie wygenerować — odśwież za chwilę. Jeśli link pochodzi z udostępnienia, poproś autora o aktualny adres.</p>
+  </div></div>
+</div>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var sid = (q.get('sid') || '').trim();
+  var t = (q.get('t') || '').trim();
+  var loading = document.getElementById('loading');
+  var error = document.getElementById('error');
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid) || !/^\d{10,16}$/.test(t)) {
+    loading.classList.add('hidden');
+    error.classList.remove('hidden');
+    return;
+  }
+  var src = 'https://yxmavwkwnfuphjqbelws.supabase.co/storage/v1/object/public/attachments/spar/'
+    + sid + '/landing-' + t + '.html';
+  fetch(src)
+    .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
+    .then(function (html) {
+      var frame = document.createElement('iframe');
+      // Bez allow-same-origin: HTML generuje model — pełna izolacja od domeny.
+      frame.setAttribute('sandbox', 'allow-scripts');
+      frame.setAttribute('title', 'Podgląd strony narzędzia');
+      frame.srcdoc = html;
+      frame.addEventListener('load', function () { loading.classList.add('hidden'); });
+      document.querySelector('.stage').appendChild(frame);
+    })
+    .catch(function () {
+      loading.classList.add('hidden');
+      error.classList.remove('hidden');
+    });
+})();
+</script>
+</body>
+</html>
