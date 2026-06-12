@@ -1379,6 +1379,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     border: 0;
     background: none;
     resize: none;
+    overflow: hidden;
     font-family: var(--sans);
     font-size: 16.5px;
     line-height: 1.5;
@@ -2195,9 +2196,15 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             } catch (err) {}
             location.href = '/aplikacja/sparing/' + (q || '');
         });
-        // placeholder pisze przykładowe pomysły (pauza, gdy user pisze)
+        // placeholder pisze przykładowe pomysły (pauza, gdy user pisze;
+        // na wąskim ekranie krótsze — dłuższe zawijałyby pole)
         if (!reduceMotion) {
-            var HINTS = [
+            var HINTS = window.matchMedia('(max-width: 700px)').matches ? [
+                'Prowadzę salon groomerski…',
+                'Jestem elektrykiem…',
+                'Uczę matematyki…',
+                'Mam pasiekę…'
+            ] : [
                 'Prowadzę salon groomerski i klienci zapominają o wizytach…',
                 'Jestem elektrykiem — protokoły pomiarów robię po nocach…',
                 'Uczę matematyki i tonę w zeszytach z zaległościami…',
