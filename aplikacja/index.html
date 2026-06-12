@@ -1371,26 +1371,57 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     gap: 8px;
 }
 .cta__path {
+    position: relative;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     gap: 9px;
     padding: 13px 20px;
     border: 0;
     border-radius: 16px 16px 5px 16px;
-    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, #2f7fe6 100%);
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 45%, #2f7fe6 90%);
+    background-size: 170% 170%;
+    background-position: 0% 0%;
     font-size: 14.5px;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--accent-ink);
     box-shadow: 0 12px 32px -10px rgba(77, 159, 255, 0.55);
-    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background-position 0.6s var(--ease);
 }
 .cta__path::after { content: '→'; color: var(--accent-ink); opacity: 0.75; transition: transform 0.25s var(--ease); }
-.cta__path:hover {
-    transform: translateX(-3px) translateY(-1px);
-    box-shadow: 0 18px 44px -12px rgba(77, 159, 255, 0.75);
+/* AI-shine: błysk przelatujący przez dymek przy najechaniu */
+.cta__path::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.55) 50%, transparent 68%);
+    transform: translateX(-130%);
+    pointer-events: none;
 }
-.cta__path:hover::after { transform: translateX(3px); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .cta__path:hover {
+        transform: translateX(-3px) translateY(-1px);
+        background-position: 100% 100%;
+        box-shadow: 0 18px 44px -12px rgba(77, 159, 255, 0.8);
+    }
+    .cta__path:hover::after { transform: translateX(3px); }
+    .cta__path:hover::before { animation: pathShine 0.7s ease; }
+}
+@keyframes pathShine { to { transform: translateX(130%); } }
+/* poświata podążająca za kursorem wewnątrz karty rozmowy */
+.talk { position: relative; }
+.talk__glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+    background: radial-gradient(320px circle at var(--tx, 50%) var(--ty, 50%), rgba(77, 159, 255, 0.1), transparent 70%);
+}
+.talk:hover .talk__glow { opacity: 1; }
+.talk .live__bar, .talk__body { position: relative; z-index: 1; }
 /* chipy wjeżdżają po dopisaniu openera */
 .talk__chips .cta__path { opacity: 0; transform: translateY(8px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
 .talk.is-ready .talk__chips .cta__path { opacity: 1; transform: none; }
@@ -1800,6 +1831,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             </h2>
 
             <form class="talk" id="idea-form" data-reveal data-delay="300">
+                <span class="talk__glow" aria-hidden="true"></span>
                 <div class="live__bar">
                     <span class="live__dot"></span><span class="live__dot"></span><span class="live__dot"></span>
                     <span class="live__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja/sparing</span>
@@ -2222,6 +2254,14 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     var talkBox = document.getElementById('idea-form');
     var talkOpener = document.getElementById('talk-opener');
     var talkCaret = document.getElementById('talk-caret');
+    // poświata za kursorem w karcie rozmowy (desktop)
+    if (talkBox && supportsHover && !reduceMotion) {
+        talkBox.addEventListener('pointermove', function (e) {
+            var r = talkBox.getBoundingClientRect();
+            talkBox.style.setProperty('--tx', (e.clientX - r.left) + 'px');
+            talkBox.style.setProperty('--ty', (e.clientY - r.top) + 'px');
+        }, { passive: true });
+    }
     var OPENER_TXT = 'Cześć! Tu AI Tomka. Zamienię Twój pomysł w aplikację, za którą ludzie płacą co miesiąc. Od czego zaczynamy?';
     if (talkBox && talkOpener) {
         if (reduceMotion) {
