@@ -1038,36 +1038,77 @@
     .pjd-grid {
         display: grid;
         grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 14px;
+        gap: 16px;
     }
     .pjd-tile {
         position: relative;
         grid-column: span 2;
-        min-height: 185px;
+        min-height: 215px;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
         gap: 7px;
         text-align: left;
-        padding: 18px;
+        padding: 20px;
         border: 1px solid var(--glass-border);
-        border-radius: 18px;
+        border-radius: 20px;
         background: rgba(255, 255, 255, 0.02);
         color: inherit;
         font: inherit;
         cursor: pointer;
         overflow: hidden;
         text-decoration: none;
-        transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
+        transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
     }
-    .pjd-tile:hover { border-color: rgba(77, 159, 255, 0.5); transform: translateY(-2px); background: rgba(255, 255, 255, 0.035); }
+    .pjd-tile:hover {
+        border-color: rgba(77, 159, 255, 0.55);
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.035);
+        box-shadow: 0 22px 48px -24px rgba(77, 159, 255, 0.4);
+    }
     .pjd-tile--static { cursor: default; justify-content: flex-start; }
-    .pjd-tile--static:hover { border-color: var(--glass-border); transform: none; background: rgba(255, 255, 255, 0.02); }
+    .pjd-tile--static:hover { border-color: var(--glass-border); transform: none; background: rgba(255, 255, 255, 0.02); box-shadow: none; }
     .pjd-tile--dim { opacity: 0.55; cursor: default; }
-    .pjd-tile--dim:hover { border-color: var(--glass-border); transform: none; }
-    .pjd-tile--hero { grid-column: span 4; min-height: 250px; }
-    .pjd-tile--w3 { grid-column: span 3; }
+    .pjd-tile--dim:hover { border-color: var(--glass-border); transform: none; box-shadow: none; }
+    .pjd-tile--hero { grid-column: span 4; min-height: 300px; }
+    .pjd-tile--w3 { grid-column: span 3; min-height: 235px; }
     .pjd-tile--img { background-size: cover; background-position: top center; }
+    /* Kafel ze strefą MEDIA: obraz w kontrolowanym kontenerze (object-fit),
+       tekst pod nim na tle karty — grafika nigdy nie „wyjeżdża" poza box */
+    .pjd-tile--media { padding: 0; justify-content: flex-start; gap: 0; }
+    .pjd-tile__media {
+        position: relative;
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 130px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .pjd-tile--hero .pjd-tile__media { min-height: 190px; }
+    .pjd-tile__media img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+        transition: transform 0.45s var(--ease, ease);
+    }
+    .pjd-tile:hover .pjd-tile__media img { transform: scale(1.045); }
+    .pjd-tile__media::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 0 0;
+        height: 46px;
+        background: linear-gradient(180deg, transparent, rgba(5, 6, 10, 0.55));
+        pointer-events: none;
+    }
+    .pjd-tile__pad {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 15px 20px 17px;
+    }
     .pjd-tile__ico {
         width: 36px;
         height: 36px;
@@ -1147,14 +1188,6 @@
         padding: 3px 11px;
     }
     .pjd-badge--wysoki { color: #5dd39e; border-color: rgba(93, 211, 158, 0.45); }
-    .pjd-mini { display: flex; gap: 8px; }
-    .pjd-mini img {
-        width: calc(50% - 4px);
-        aspect-ratio: 3 / 2;
-        object-fit: cover;
-        border-radius: 10px;
-        border: 1px solid var(--glass-border);
-    }
     /* Pasek postępu generacji (ETA) */
     .pjd-gen { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
     .pjd-gen__top { display: flex; align-items: center; gap: 9px; }
@@ -1201,19 +1234,22 @@
     .pjd-detailhead__txt span { font-size: 12.5px; color: var(--text-muted); }
     @media (max-width: 920px) {
         .pjd-grid { grid-template-columns: 1fr; }
-        .pjd-tile, .pjd-tile--hero, .pjd-tile--w3 { grid-column: span 1; min-height: 150px; }
-        .pjd-tile--hero { min-height: 200px; }
+        .pjd-tile, .pjd-tile--hero, .pjd-tile--w3 { grid-column: span 1; min-height: 165px; }
+        .pjd-tile--hero { min-height: 230px; }
+        .pjd-tile__media { min-height: 110px; }
+        .pjd-tile--hero .pjd-tile__media { min-height: 150px; }
     }
 
-    /* ── Sekcja „Twoja marka": sklep + telefon + działająca strona ── */
-    .pj-brand {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 16px;
+    /* Podpozycje sekcji pulpitu w menu po lewej */
+    .side__item--sub {
+        padding-left: 36px;
+        font-size: 12.5px;
+        opacity: 0.82;
     }
-    @media (max-width: 700px) { .pj-brand { grid-template-columns: 1fr; } }
-    .pj-brand .pv-tile { cursor: zoom-in; }
+    .side__item--sub svg { width: 14px; height: 14px; }
+    .side__item--sub.is-active { opacity: 1; }
+
+    /* ── Sekcja „Twoja strona": działająca strona narzędzia ── */
     .pj-land {
         margin-top: 16px;
         border: 1px solid var(--glass-border);
@@ -3573,9 +3609,25 @@
                 Rozmowa
             </button>
             <button type="button" class="side__item" data-tab="projekt">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
-                Twój projekt
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"></rect><rect x="14" y="4" width="7" height="7" rx="1.5"></rect><rect x="3" y="15" width="7" height="7" rx="1.5"></rect><rect x="14" y="15" width="7" height="7" rx="1.5"></rect></svg>
+                Pulpit projektu
                 <i class="side__dot" id="dot-projekt" hidden></i>
+            </button>
+            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="ekrany" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path></svg>
+                Ekrany narzędzia
+            </button>
+            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="karta" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
+                Karta projektu
+            </button>
+            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="strona" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                Twoja strona
+            </button>
+            <button type="button" class="side__item side__item--sub" data-tab="projekt" data-pjview="plan" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
+                Plan przychodu
             </button>
             <button type="button" class="side__item" data-tab="rynek">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
@@ -3701,12 +3753,6 @@
     // Infografika karty — osobny widok spar-image: nie wchodzi do VIEW_META
     // (pętle ekranów/skeletonów/limitów jej nie dotyczą), sync i archiwum tak
     var SUMMARY_META = ['podsumowanie', 'Projekt w pigułce'];
-    // Zestaw „marka istnieje" — widoki extra spar-image (poza pulą ekranów),
-    // generowane po zielonym werdykcie do sekcji „Twoja marka"
-    var BRAND_META = [
-        ['sklep', 'Twoja aplikacja w sklepie'],
-        ['telefon', 'W rękach klienta']
-    ];
     function viewLabel(v) {
         for (var i = 0; i < VIEW_META.length; i++) if (VIEW_META[i][0] === v) return VIEW_META[i][1];
         return 'Podgląd';
@@ -3786,21 +3832,21 @@
     };
     // Dane z powrotu OAuth (implicit flow) — czekają na bramkę z telefonem
     var pendingAuth = null; // {userId, provider, email, name}
-    // Dogrywane elementy projektu (pigułka, plan, raport rynku, marka, landing):
+    // Dogrywane elementy projektu (pigułka, plan, raport rynku, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', sklep: 'idle', telefon: 'idle', landing: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
     var pjNewPlan = false;
     // Kropka na zakładce „Potencjał rynku", gdy raport policzył się w tle
     var rkNew = false;
-    // Dashboard projektu: aktywny widok ('dash' | 'ekrany' | 'marka' | 'karta' | 'plan')
+    // Dashboard projektu: aktywny widok ('dash' | 'ekrany' | 'strona' | 'karta' | 'plan')
     var pjView = 'dash';
     // Timestampy startu generacji (klucz extras → Date.now()) — paski ETA na kaflach
     var extrasStart = {};
     // Orientacyjny czas generacji w sekundach (z pomiarów produkcyjnych)
-    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, sklep: 85, telefon: 85 };
+    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75 };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -3936,8 +3982,6 @@
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
-        extras.sklep = 'idle';
-        extras.telefon = 'idle';
         extras.landing = 'idle';
         extrasStart = {};
         pjView = 'dash';
@@ -3990,7 +4034,7 @@
             var p = d.projekt;
             var changed = false;
             // Świeże urządzenie (?id= bez LS): werdykt/karta/brief z serwera,
-            // żeby sekcje po-werdyktowe (plan, marka, rynek) nie były puste —
+            // żeby sekcje po-werdyktowe (plan, strona, rynek) nie były puste —
             // lokalny stan (z markerów rozmowy) ma pierwszeństwo
             if (!state.verdict && typeof p.verdict === 'string' && p.verdict) {
                 state.verdict = p.verdict;
@@ -4014,7 +4058,7 @@
                 }
             }
             if (p.preview_images && typeof p.preview_images === 'object') {
-                VIEW_META.concat([SUMMARY_META], BRAND_META).forEach(function (vm) {
+                VIEW_META.concat([SUMMARY_META]).forEach(function (vm) {
                     var v = vm[0];
                     var su = p.preview_images[v];
                     if (typeof su === 'string' && state.previews[v] !== su) {
@@ -4126,11 +4170,20 @@
         el('side-backdrop').hidden = true;
     }
 
+    // Podświetlenie menu: pozycje główne wg zakładki, podpozycje sekcji
+    // pulpitu wg otwartego detalu (pjView)
+    function updateSideNav() {
+        document.querySelectorAll('.side__item').forEach(function (b) {
+            if (b.dataset.pjview) {
+                b.classList.toggle('is-active', activeTab === 'projekt' && pjView === b.dataset.pjview);
+            } else {
+                b.classList.toggle('is-active', b.dataset.tab === activeTab && !(activeTab === 'projekt' && pjView !== 'dash'));
+            }
+        });
+    }
     function switchTab(tab) {
         activeTab = tab;
-        document.querySelectorAll('.side__item').forEach(function (b) {
-            b.classList.toggle('is-active', b.dataset.tab === tab);
-        });
+        updateSideNav();
         var isPane = tab !== 'chat';
         el('view-chat').classList.toggle('is-pane', isPane);
         ['projekt', 'rynek', 'wspolpraca'].forEach(function (t) {
@@ -4152,17 +4205,28 @@
         } catch (e) { }
     }
     function applyHashTab() {
-        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|marka|karta|plan))?$/);
+        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|strona|marka|karta|plan))?$/);
         if (!m) return;
-        if (m[1] === 'projekt' && m[2]) pjView = m[2]; // hash otwiera detal kafla
+        var sub = m[2] === 'marka' ? 'strona' : m[2]; // stare linki #projekt-marka → Twoja strona
+        if (m[1] === 'projekt' && sub) pjView = sub; // hash otwiera detal kafla
         switchTab(m[1]); // nadpisze hash samą zakładką…
-        if (m[1] === 'projekt' && m[2]) setTabHash(m[1] + '-' + m[2]); // …przywracamy pełny
+        if (m[1] === 'projekt' && sub) setTabHash(m[1] + '-' + sub); // …przywracamy pełny
     }
 
     function updateSideBadges() {
         // kropka = jest nowa zawartość, a user nie patrzy na tę zakładkę
         var hasProjekt = (state.verdict === 'zielony' && !!state.karta) || lightboxItems().length > 0;
         el('dot-projekt').hidden = !(hasProjekt && activeTab !== 'projekt');
+        // podpozycje sekcji pulpitu pokazują się, gdy sekcja ma już treść
+        var subShow = {
+            ekrany: lightboxItems().length > 0 || Object.keys(state.previewHistory || {}).length > 0,
+            karta: kartaVersions().length > 0,
+            strona: state.verdict === 'zielony',
+            plan: state.verdict === 'zielony'
+        };
+        document.querySelectorAll('.side__item[data-pjview]').forEach(function (b) {
+            b.hidden = !subShow[b.dataset.pjview];
+        });
         el('dot-rynek').hidden = !(state.raport && rkNew && activeTab !== 'rynek');
         var cta = el('side-cta');
         var show = state.verdict === 'zielony';
@@ -4294,16 +4358,7 @@
                         '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
-            // Marka (sklep + telefon) i działająca strona — jeśli już istnieją
-            var brandTiles = '';
-            BRAND_META.forEach(function (vm) {
-                var burl = state.previews[vm[0]];
-                if (!burl) return;
-                brandTiles += '<div class="pv-tile is-done" data-burl="' + esc(burl) + '" data-blabel="' + esc(vm[1]) + '">' +
-                    '<span class="pv-tile__label">' + esc(vm[1]) + '</span>' +
-                    '<div class="pv-tile__body"><img src="' + esc(burl) + '" alt="' + esc(vm[1]) + '" loading="lazy"></div></div>';
-            });
-            if (brandTiles) html += '<div class="pj-brand">' + brandTiles + '</div>';
+            // Działająca strona — jeśli już istnieje
             if (pr.landing_url) {
                 html += '<a class="share-land" href="' + esc(pr.landing_url) + '" target="_blank" rel="noopener">' +
                     pjIco('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>') +
@@ -4334,7 +4389,6 @@
             body.querySelectorAll('.pv-tile').forEach(function (t) {
                 t.addEventListener('click', function () {
                     if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
-                    else if (t.dataset.burl !== undefined) openLightbox({ url: t.dataset.burl, label: t.dataset.blabel || 'Twoja marka' });
                     else openLightbox(t.dataset.view);
                 });
             });
@@ -4535,37 +4589,9 @@
         });
     }
 
-    // Zestaw „marka istnieje": sklep + telefon (widoki extra spar-image).
-    // Generują się raz po werdykcie; brak regeneracji przy poprawkach
-    // (limit 3 wersji/widok po stronie serwera — szkoda puli na automat).
-    function ensureBrandImage(view) {
-        if (extras[view] === 'gen' || extras[view] === 'fail' || state.previews[view]) return;
-        if (state.verdict !== 'zielony' || !state.sessionId) return;
-        extras[view] = 'gen';
-        extrasStart[view] = Date.now();
-        var sid = state.sessionId;
-        fetch(SPAR_IMAGE_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
-            body: JSON.stringify({ sessionId: sid, view: view })
-        }).then(function (r) {
-            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
-        }).then(function (res) {
-            if (state.sessionId !== sid) return;
-            if (res.ok && res.d && res.d.url) {
-                state.previews[view] = res.d.url;
-                saveJSON(previewKey(sid), { images: state.previews, history: state.previewHistory });
-                extras[view] = 'idle';
-            } else {
-                extras[view] = (res.d && res.d.error === 'limit_podsumowan') ? 'idle' : 'fail';
-            }
-            if (activeTab === 'projekt') renderPaneProjekt();
-        }).catch(function () {
-            if (state.sessionId !== sid) return;
-            extras[view] = 'fail';
-            if (activeTab === 'projekt') renderPaneProjekt();
-        });
-    }
+    // (Grafiki „marka istnieje" — sklep/telefon — wycofane decyzją Tomka
+    //  2026-06-12: na razie nie robimy marki; widoki w spar-image zostają
+    //  nieużywane, front ich nie zamawia i nie pokazuje.)
 
     // Działająca strona narzędzia: spar-landing odpowiada 202 i buduje w tle
     // (1-4 min) — gotowość poznajemy po landing_url w spar-project (poll)
@@ -4641,11 +4667,9 @@
     function ensureKartaExtras(force) {
         ensureSummaryImage(force);
         ensureBizplan(force);
-        // raport / marka / strona: generują się raz (bez force przy poprawkach —
-        // rynek się nie zmienia, a brand i landing mają twarde limity wersji)
+        // raport / strona: generują się raz (bez force przy poprawkach —
+        // rynek się nie zmienia, a landing ma twardy limit wersji)
         ensureRaport(false);
-        ensureBrandImage('sklep');
-        ensureBrandImage('telefon');
         ensureLanding();
     }
 
@@ -4809,7 +4833,6 @@
     var PJ_ICONS = {
         ekrany: '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
         strona: '<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
-        marka: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path>',
         karta: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
         plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>',
         raport: '<path d="M3 3v18h18"></path><path d="M7 13l3-3 4 4 5-6"></path>',
@@ -4890,7 +4913,7 @@
 
         // Pusty stan: nic jeszcze nie powstało
         if (!hasKarta && !items.length) {
-            body.innerHTML = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój projekt</div>' +
+            body.innerHTML = '<div class="tabpane__head"><div class="tabpane__eyebrow">Pulpit projektu</div>' +
                 '<h2 class="tabpane__title">Tu rośnie Twój projekt</h2>' +
                 '<p class="tabpane__sub">Ekrany narzędzia i karta projektu pojawią się tu w trakcie rozmowy — kilka pytań i zobaczysz pierwsze efekty.</p></div>' +
                 '<div class="tabpane__empty">Wszystko zaczyna się w rozmowie.<br>' +
@@ -4926,14 +4949,16 @@
         pjView = view;
         if (view === 'plan') pjNewPlan = false;
         setTabHash('projekt-' + view);
-        renderPaneProjekt();
+        if (activeTab !== 'projekt') { switchTab('projekt'); setTabHash('projekt-' + view); }
+        else renderPaneProjekt();
+        updateSideNav();
         var pane = el('pane-projekt');
         if (pane) pane.scrollTop = 0;
     }
 
     // ── DASHBOARD: duże kafle elementów projektu ──
     function renderProjektDash(body, ctx) {
-        var html = '<div class="tabpane__head pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Twój projekt</div>' +
+        var html = '<div class="tabpane__head pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Pulpit projektu</div>' +
             '<h2 class="tabpane__title">' + esc(ctx.nazwa) + '</h2>' +
             (ctx.brief.opis ? '<p class="tabpane__sub">' + esc(ctx.brief.opis) + '</p>' : '') +
             '</div>' +
@@ -4944,16 +4969,30 @@
 
         var tiles = '';
 
-        // EKRANY — kafel-bohater z głównym ekranem w tle
+        // Kafel ze strefą media: obraz w <img> (object-fit) + tekst pod spodem —
+        // grafika zawsze równo wpasowana w box, hover delikatnie ją przybliża
+        function mediaTile(opts) {
+            var tag = opts.href ? 'a' : 'button';
+            var attrs = opts.href
+                ? ' href="' + esc(opts.href) + '" target="_blank" rel="noopener"'
+                : ' type="button"' + (opts.data ? ' ' + opts.data : '');
+            return '<' + tag + ' class="pjd-tile pjd-tile--media ' + (opts.cls || '') + '"' + attrs + '>' +
+                '<span class="pjd-tile__media"><img src="' + esc(opts.img) + '" alt="" loading="lazy"></span>' +
+                pjGoIcon() +
+                '<span class="pjd-tile__pad">' +
+                '<span class="pjd-tile__t">' + opts.title + '</span>' +
+                (opts.sub ? '<span class="pjd-tile__sub">' + opts.sub + '</span>' : '') +
+                '</span></' + tag + '>';
+        }
+
+        // EKRANY — kafel-bohater z głównym ekranem
         if (ctx.hasShots) {
             var thumb = ctx.items.length ? ctx.items[0].url : (ctx.oldShots.length ? ctx.oldShots[0].url : '');
-            tiles += '<button type="button" class="pjd-tile pjd-tile--hero pjd-tile--img" data-pjd="ekrany"' +
-                (thumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.12) 0%, rgba(5,5,7,0.88) 78%), url(\'' + esc(thumb) + '\')"' : '') + '>' +
-                pjGoIcon() +
-                '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.ekrany) + '</span>' +
-                '<span class="pjd-tile__t">Ekrany narzędzia</span>' +
-                '<span class="pjd-tile__sub">' + (ctx.items.length ? ctx.items.length + ' ' + (ctx.items.length === 1 ? 'widok' : 'widoki') + ' — kliknij, żeby obejrzeć' : 'wcześniejsze wersje w archiwum') + '</span>' +
-                '</button>';
+            tiles += mediaTile({
+                cls: 'pjd-tile--hero', data: 'data-pjd="ekrany"', img: thumb,
+                title: 'Ekrany narzędzia',
+                sub: ctx.items.length ? ctx.items.length + ' ' + (ctx.items.length === 1 ? 'widok' : 'widoki') + ' — kliknij, żeby obejrzeć' : 'wcześniejsze wersje w archiwum'
+            });
         }
 
         // KARTA — cytat problemu jako treść kafla
@@ -4971,23 +5010,25 @@
             '</button>';
 
         if (ctx.hasBrandSec) {
-            // STRONA — działająca strona narzędzia (klik → nowa karta)
+            // TWOJA STRONA — sekcja z działającą stroną narzędzia (klik → detal)
             var landThumb = state.previews.landing || '';
-            if (state.landingUrl) {
-                tiles += '<a class="pjd-tile pjd-tile--w3 pjd-tile--img" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener"' +
-                    (landThumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.15) 0%, rgba(5,5,7,0.9) 78%), url(\'' + esc(landThumb) + '\')"' : '') + '>' +
-                    '<span class="pjd-tile__go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"></path><path d="M8 7h9v9"></path></svg></span>' +
+            if (state.landingUrl && landThumb) {
+                tiles += mediaTile({
+                    cls: 'pjd-tile--w3', data: 'data-pjd="strona"', img: landThumb,
+                    title: 'Twoja strona <em class="pjd-live">działa</em>',
+                    sub: 'prawdziwa strona w przeglądarce, nie grafika — wejdź i poklikaj'
+                });
+            } else if (state.landingUrl) {
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="strona">' +
+                    pjGoIcon() +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.strona) + '</span>' +
-                    '<span class="pjd-tile__t">Strona narzędzia <em class="pjd-live">działa</em></span>' +
-                    '<span class="pjd-tile__sub">prawdziwa strona w przeglądarce, nie grafika — otwórz i poklikaj</span>' +
-                    '</a>';
+                    '<span class="pjd-tile__t">Twoja strona <em class="pjd-live">działa</em></span>' +
+                    '<span class="pjd-tile__sub">prawdziwa strona w przeglądarce, nie grafika — wejdź i poklikaj</span>' +
+                    '</button>';
             } else {
-                var landGenBg = state.previews.landing
-                    ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.78) 0%, rgba(5,5,7,0.94) 80%), url(\'' + esc(state.previews.landing) + '\')"'
-                    : '';
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static pjd-tile--img"' + landGenBg + '>' +
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.strona) + '</span>' +
-                    '<span class="pjd-tile__t">Strona narzędzia</span>' +
+                    '<span class="pjd-tile__t">Twoja strona</span>' +
                     (extras.landing === 'fail'
                         ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować strony.</b><button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>'
                         : extras.landing === 'limit'
@@ -5017,33 +5058,10 @@
                     '</div>';
             }
 
-            // MARKA — sklep + telefon (mini-kolaż)
-            var sklepUrl = state.previews.sklep, telUrl = state.previews.telefon;
-            if (sklepUrl || telUrl) {
-                tiles += '<button type="button" class="pjd-tile" data-pjd="marka">' +
-                    pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.marka) + '</span>' +
-                    '<span class="pjd-tile__t">Twoja marka</span>' +
-                    '<span class="pjd-mini">' +
-                    (sklepUrl ? '<img src="' + esc(sklepUrl) + '" alt="W sklepie" loading="lazy">' : '') +
-                    (telUrl ? '<img src="' + esc(telUrl) + '" alt="W rękach klienta" loading="lazy">' : '') +
-                    '</span>' +
-                    '<span class="pjd-tile__sub">aplikacja w sklepie i w rękach klienta</span>' +
-                    '</button>';
-            } else {
-                tiles += '<div class="pjd-tile pjd-tile--static">' +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.marka) + '</span>' +
-                    '<span class="pjd-tile__t">Twoja marka</span>' +
-                    ((extras.sklep === 'fail' && extras.telefon === 'fail')
-                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się wygenerować grafik.</b><button type="button" class="preview-retry" data-retry="sklep">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('sklep', 'Rysuję markę…', 'aplikacja w sklepie i w rękach klienta — 2 grafiki')) +
-                    '</div>';
-            }
-
             // RAPORT — ocena potencjału (klik → zakładka Potencjał rynku)
             if (state.raport) {
                 var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
-                tiles += '<button type="button" class="pjd-tile" data-pjd-rynek>' +
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd-rynek>' +
                     pjGoIcon() +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
                     '<span class="pjd-tile__t">Potencjał rynku</span>' +
@@ -5051,7 +5069,7 @@
                     (state.raport.teza ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.teza) + '</span>' : '') +
                     '</button>';
             } else {
-                tiles += '<div class="pjd-tile pjd-tile--static">' +
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
                     '<span class="pjd-tile__t">Potencjał rynku</span>' +
                     (extras.raport === 'fail'
@@ -5063,15 +5081,13 @@
             // PIGUŁKA — miniatura (klik → lightbox)
             var pillUrl = state.previews[SUMMARY_META[0]];
             if (pillUrl) {
-                tiles += '<button type="button" class="pjd-tile pjd-tile--img" data-pjd-pill="' + esc(pillUrl) + '"' +
-                    ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.12) 0%, rgba(5,5,7,0.88) 78%), url(\'' + esc(pillUrl) + '\')">' +
-                    pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.pigulka) + '</span>' +
-                    '<span class="pjd-tile__t">Projekt w pigułce</span>' +
-                    '<span class="pjd-tile__sub">jedna grafika — cały projekt</span>' +
-                    '</button>';
+                tiles += mediaTile({
+                    cls: 'pjd-tile--w3', data: 'data-pjd-pill="' + esc(pillUrl) + '"', img: pillUrl,
+                    title: 'Projekt w pigułce',
+                    sub: 'jedna grafika — cały projekt'
+                });
             } else {
-                tiles += '<div class="pjd-tile pjd-tile--static">' +
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.pigulka) + '</span>' +
                     '<span class="pjd-tile__t">Projekt w pigułce</span>' +
                     (extras.summary === 'fail'
@@ -5099,7 +5115,7 @@
     function renderProjektDetail(body, ctx) {
         var TITLES = {
             ekrany: ['Ekrany narzędzia', 'kliknij ekran, żeby obejrzeć w powiększeniu'],
-            marka: ['Twoja marka', 'tak „' + esc(ctx.nazwa) + '" wygląda w świecie'],
+            strona: ['Twoja strona', 'działająca strona „' + esc(ctx.nazwa) + '" — prawdziwa, nie grafika'],
             karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
             plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy']
         };
@@ -5107,7 +5123,7 @@
         var html = '<div class="pjd-detailhead">' +
             '<button type="button" class="pjd-back" id="pjd-back">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>' +
-            'Twój projekt</button>' +
+            'Pulpit</button>' +
             '<div class="pjd-detailhead__txt"><h2>' + t[0] + '</h2><span>' + t[1] + '</span></div></div>';
 
         if (pjView === 'ekrany') {
@@ -5128,7 +5144,7 @@
             }
         }
 
-        if (pjView === 'marka') {
+        if (pjView === 'strona') {
             if (state.landingUrl) {
                 html += '<div class="pj-land">' +
                     '<div class="pj-land__bar"><span class="pj-land__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
@@ -5142,25 +5158,12 @@
                 html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować strony narzędzia.</b>' +
                     '<span>Spróbuj jeszcze raz — budowa trwa około 4 minut.</span></div>' +
                     '<button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>';
+            } else if (extras.landing === 'limit') {
+                html += '<div class="pj-wait"><div class="pj-wait__txt"><b>Pula wersji strony wykorzystana.</b>' +
+                    '<span>Finalną wersję dopracujesz bezpośrednio z Tomkiem po rezerwacji.</span></div></div>';
             } else {
-                html += genProgressHTML('landing', 'Buduję działającą stronę narzędzia…', 'prawdziwa strona w przeglądarce, nie grafika');
+                html += genProgressHTML('landing', 'Buduję działającą stronę narzędzia…', 'prawdziwa strona w przeglądarce, nie grafika — ok. 4 minuty');
             }
-            html += '<div class="pj-brand">';
-            BRAND_META.forEach(function (vm) {
-                var v = vm[0], burl = state.previews[v];
-                if (burl) {
-                    html += '<div class="pv-tile is-done" data-burl="' + esc(burl) + '" data-blabel="' + esc(vm[1]) + '">' +
-                        '<span class="pv-tile__label">' + esc(vm[1]) + '</span>' +
-                        '<div class="pv-tile__body"><img src="' + esc(burl) + '" alt="' + esc(vm[1]) + '" loading="lazy"></div></div>';
-                } else if (extras[v] === 'fail') {
-                    html += '<div class="pj-wait pj-wait--fail pj-wait--tile"><div class="pj-wait__txt"><b>' + esc(vm[1]) + '</b>' +
-                        '<span>nie udało się wygenerować</span></div>' +
-                        '<button type="button" class="preview-retry" data-retry="' + v + '">Ponów</button></div>';
-                } else {
-                    html += '<div class="pjd-gentile">' + genProgressHTML(v, esc(vm[1]), 'generuję grafikę') + '</div>';
-                }
-            });
-            html += '</div>';
         }
 
         if (pjView === 'karta') {
@@ -5221,7 +5224,6 @@
         body.querySelectorAll('.pv-tile').forEach(function (t) {
             t.addEventListener('click', function () {
                 if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
-                else if (t.dataset.burl !== undefined) openLightbox({ url: t.dataset.burl, label: t.dataset.blabel || 'Twoja marka' });
                 else if (t.dataset.old !== undefined) openLightbox(oldList[parseInt(t.dataset.old, 10)].url);
                 else openLightbox(t.dataset.view);
             });
@@ -5230,7 +5232,6 @@
             b.addEventListener('click', function () {
                 var kind = b.getAttribute('data-retry');
                 if (kind === 'plan') { extras.plan = 'idle'; ensureBizplan(false); }
-                else if (kind === 'sklep' || kind === 'telefon') { extras[kind] = 'idle'; ensureBrandImage(kind); }
                 else if (kind === 'landing') { extras.landing = 'idle'; ensureLanding(); }
                 else if (kind === 'raport') { extras.raport = 'idle'; ensureRaport(false); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
@@ -6035,8 +6036,6 @@
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
-        extras.sklep = 'idle';
-        extras.telefon = 'idle';
         extras.landing = 'idle';
         extrasStart = {};
         pjView = 'dash';
@@ -7471,9 +7470,15 @@
         }, { passive: true });
         el('btn-restart').addEventListener('click', newConvo);
 
-        // Sidebar: zakładki + mobile off-canvas
+        // Sidebar: zakładki + podpozycje sekcji pulpitu + mobile off-canvas
         document.querySelectorAll('.side__item').forEach(function (b) {
-            b.addEventListener('click', function () { switchTab(b.dataset.tab); });
+            b.addEventListener('click', function () {
+                if (b.dataset.pjview) { pjOpenDetail(b.dataset.pjview); closeSide(); }
+                else {
+                    if (b.dataset.tab === 'projekt') pjView = 'dash'; // główna pozycja = zawsze pulpit
+                    switchTab(b.dataset.tab);
+                }
+            });
         });
         el('btn-side').addEventListener('click', openSide);
         el('side-backdrop').addEventListener('click', closeSide);
