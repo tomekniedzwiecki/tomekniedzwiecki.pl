@@ -997,15 +997,45 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     font-weight: 500;
     text-shadow: 0 0 80px rgba(77, 159, 255, 0.28);
 }
+/* kontrtypy: kluczowe słowa sans-bold — cytat nie może być w całości kursywą */
+.motto__word--strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 700;
+    color: var(--text-strong);
+    font-size: 0.88em;
+    letter-spacing: -0.025em;
+}
+.motto__word--punch {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.88em;
+    letter-spacing: -0.025em;
+    text-shadow: 0 0 80px rgba(77, 159, 255, 0.35);
+}
 .motto__attribution {
     margin-top: clamp(32px, 5vh, 56px);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.motto__attribution img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.motto__attribution span {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--text-faint);
 }
-.motto__attribution::before { content: '— '; }
 
 /* ============================================================
    SCENE 5 — PROCES (4 kroki)
@@ -1488,40 +1518,38 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                 <span class="motto__line motto__line--words" data-reveal data-delay="200">
                     <span class="motto__word" style="--wi:0">Że</span>
                     <span class="motto__word" style="--wi:1">ktoś</span>
-                    <em class="motto__word" style="--wi:2">bierze</em>
-                    <em class="motto__word" style="--wi:3">Twój</em>
-                    <em class="motto__word" style="--wi:4">pomysł</em>
-                    <span class="motto__word" style="--wi:5">na</span>
-                    <span class="motto__word" style="--wi:6">poważnie.</span>
+                    <span class="motto__word" style="--wi:2">bierze</span>
+                    <span class="motto__word" style="--wi:3">Twój</span>
+                    <span class="motto__word" style="--wi:4">pomysł</span>
+                    <span class="motto__word motto__word--strong" style="--wi:5">na</span>
+                    <span class="motto__word motto__word--strong" style="--wi:6">poważnie.</span>
                 </span>
                 <span class="motto__line motto__line--words" data-reveal data-delay="800">
-                    <span class="motto__word" style="--wi:0">Buduje</span>
-                    <span class="motto__word" style="--wi:1">z</span>
-                    <span class="motto__word" style="--wi:2">niego</span>
-                    <span class="motto__word" style="--wi:3">aplikację.</span>
-                    <span class="motto__word" style="--wi:4">Zdobywa</span>
-                    <span class="motto__word" style="--wi:5">klientów.</span>
+                    <span class="motto__word motto__word--strong" style="--wi:0">Buduje.</span>
+                    <span class="motto__word motto__word--strong" style="--wi:1">Sprzedaje.</span>
+                    <span class="motto__word" style="--wi:2">I</span>
+                    <span class="motto__word" style="--wi:3">oddaje</span>
+                    <span class="motto__word" style="--wi:4">Ci</span>
+                    <span class="motto__word" style="--wi:5">prowadzenie,</span>
+                    <span class="motto__word" style="--wi:6">gdy</span>
+                    <span class="motto__word" style="--wi:7">biznes</span>
+                    <span class="motto__word" style="--wi:8">działa.</span>
                 </span>
-                <span class="motto__line motto__line--words" data-reveal data-delay="1500">
-                    <span class="motto__word" style="--wi:0">I</span>
-                    <span class="motto__word motto__word--accent" style="--wi:1">oddaje</span>
-                    <span class="motto__word motto__word--accent" style="--wi:2">Ci</span>
-                    <span class="motto__word motto__word--accent" style="--wi:3">prowadzenie,</span>
-                    <span class="motto__word motto__word--accent" style="--wi:4">gdy</span>
-                    <span class="motto__word motto__word--accent" style="--wi:5">biznes</span>
-                    <span class="motto__word motto__word--accent" style="--wi:6">działa.</span>
-                </span>
-                <span class="motto__line motto__line--words" data-reveal data-delay="2200">
-                    <span class="motto__word" style="--wi:0">A</span>
-                    <span class="motto__word" style="--wi:1">potem</span>
-                    <span class="motto__word" style="--wi:2">zostaje</span>
-                    <em class="motto__word" style="--wi:3">po</em>
-                    <em class="motto__word" style="--wi:4">Twojej</em>
-                    <em class="motto__word" style="--wi:5">stronie.</em>
+                <span class="motto__line motto__line--words" data-reveal data-delay="1600">
+                    <span class="motto__word" style="--wi:0">Bo</span>
+                    <span class="motto__word motto__word--accent" style="--wi:1">zarabia</span>
+                    <span class="motto__word motto__word--accent" style="--wi:2">dopiero</span>
+                    <span class="motto__word motto__word--accent" style="--wi:3">wtedy,</span>
+                    <span class="motto__word motto__word--punch" style="--wi:4">gdy</span>
+                    <span class="motto__word motto__word--punch" style="--wi:5">Ty</span>
+                    <span class="motto__word motto__word--punch" style="--wi:6">zarabiasz.</span>
                 </span>
             </blockquote>
 
-            <p class="motto__attribution" data-reveal data-delay="2900">Tomek Niedźwiecki</p>
+            <p class="motto__attribution" data-reveal data-delay="2400">
+                <img src="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" alt="" width="34" height="34" loading="lazy">
+                <span>Tomek Niedźwiecki</span>
+            </p>
         </div>
     </section>
 
