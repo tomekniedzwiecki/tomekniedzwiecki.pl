@@ -1335,45 +1335,9 @@
     .share-land em { font-style: normal; font-size: 18px; color: var(--accent); }
 
     /* ── Zakładka „Potencjał rynku" — raport analityczny v2 ──
-       Czyta się jak rozdziały: sticky pasek nawigacji ze scroll-spy,
-       werdykt z zegarem potencjału, nisza przeliczona na cel 50 klientów,
+       Werdykt z zegarem potencjału, nisza przeliczona na cel 50 klientów,
        konkurencja w kartach, okno rynkowe jako spotlight z radarem. */
-    .rk-rail {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        display: flex;
-        gap: 6px;
-        align-items: center;
-        overflow-x: auto;
-        scrollbar-width: none;
-        margin: -28px calc(-1 * clamp(14px, 4vw, 26px)) 4px;
-        padding: 12px clamp(14px, 4vw, 26px) 10px;
-        background: linear-gradient(180deg, rgba(5, 5, 7, 0.94) 72%, rgba(5, 5, 7, 0));
-        -webkit-backdrop-filter: blur(14px);
-        backdrop-filter: blur(14px);
-    }
-    .rk-rail::-webkit-scrollbar { display: none; }
-    .rk-rail__chip {
-        flex-shrink: 0;
-        font-size: 11.5px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        color: var(--text-muted);
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 99px;
-        padding: 6px 13px;
-        transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-    }
-    .rk-rail__chip:hover { color: var(--text-strong); border-color: var(--border-strong); }
-    .rk-rail__chip.is-on {
-        color: var(--accent);
-        border-color: rgba(77, 159, 255, 0.5);
-        background: var(--accent-dim);
-    }
-    /* Rozdział: numer serif + tytuł; scroll-margin pod sticky pasek */
-    .rk-sec { margin-bottom: 36px; scroll-margin-top: 58px; }
+    .rk-sec { margin-bottom: 36px; }
     .rk-sec__head { display: flex; align-items: baseline; gap: 13px; margin-bottom: 16px; }
     .rk-sec__no {
         font-family: var(--serif);
@@ -5576,13 +5540,12 @@
         return v >= 200 ? Math.round(v) : null; // poniżej 200 nie ufamy parsowaniu
     }
 
-    var rkIO = null, rkSpy = null; // obserwatory poprzedniego renderu — sprzątane przy każdym wejściu
+    var rkIO = null; // obserwator poprzedniego renderu — sprzątany przy każdym wejściu
 
     function renderPaneRynek() {
         var body = el('pane-rynek-body');
         var pane = el('pane-rynek');
         if (rkIO) { rkIO.disconnect(); rkIO = null; }
-        if (rkSpy) { rkSpy.disconnect(); rkSpy = null; }
         var nazwa = (state.lastBrief && state.lastBrief.nazwa) || 'Twoje narzędzie';
         var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Potencjał rynku</div>' +
             '<h2 class="tabpane__title">' + esc(nazwa) + ' na tle rynku</h2>' +
@@ -5624,18 +5587,7 @@
         var wnioski = Array.isArray(r.co_to_oznacza) ? r.co_to_oznacza.slice(0, 6) : [];
         var srcs = Array.isArray(r.zrodla) ? r.zrodla.filter(function (s) { return s && s.url; }) : [];
 
-        // Pasek rozdziałów (sticky, scroll-spy) — tylko sekcje obecne w danych
-        var chapters = [['werdykt', 'Werdykt']];
-        if (hasRynek) chapters.push(['nisza', 'Nisza']);
-        if (konk.length) chapters.push(['konkurencja', 'Konkurencja']);
-        if (r.luka_rynkowa) chapters.push(['okno', 'Okno rynkowe']);
-        if (trendy.length) chapters.push(['trendy', 'Trendy']);
-        if (wnioski.length) chapters.push(['wnioski', 'Wnioski']);
-        if (srcs.length) chapters.push(['zrodla', 'Źródła']);
-
-        var html = '<nav class="rk-rail" aria-label="Rozdziały raportu">' + chapters.map(function (c, i) {
-            return '<button type="button" class="rk-rail__chip' + (i === 0 ? ' is-on' : '') + '" data-sec="' + c[0] + '">' + c[1] + '</button>';
-        }).join('') + '</nav>' + head;
+        var html = head;
 
         var rkNo = 0;
         function rkSec(id, title, sub, inner) {
@@ -5738,15 +5690,6 @@
 
         body.innerHTML = html;
 
-        // Pasek rozdziałów: klik = płynny zjazd do sekcji
-        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        body.querySelectorAll('.rk-rail__chip').forEach(function (ch) {
-            ch.addEventListener('click', function () {
-                var sec = el('rk-sec-' + ch.getAttribute('data-sec'));
-                if (sec) sec.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-            });
-        });
-
         if ('IntersectionObserver' in window) {
             // Wjazd sekcji + start animacji zegara i kropek
             rkIO = new IntersectionObserver(function (ents) {
@@ -5755,17 +5698,6 @@
                 });
             }, { root: pane, threshold: 0.05, rootMargin: '0px 0px -36px 0px' });
             body.querySelectorAll('.rk-reveal, .rk-gauge, .rk-dots').forEach(function (n) { rkIO.observe(n); });
-            // Scroll-spy: rozdział pod górną krawędzią podświetla swój chip
-            rkSpy = new IntersectionObserver(function (ents) {
-                ents.forEach(function (en) {
-                    if (!en.isIntersecting) return;
-                    var id = en.target.id.replace('rk-sec-', '');
-                    body.querySelectorAll('.rk-rail__chip').forEach(function (c) {
-                        c.classList.toggle('is-on', c.getAttribute('data-sec') === id);
-                    });
-                });
-            }, { root: pane, rootMargin: '-12% 0px -68% 0px' });
-            body.querySelectorAll('.rk-sec').forEach(function (s) { rkSpy.observe(s); });
         } else {
             body.querySelectorAll('.rk-reveal, .rk-gauge, .rk-dots').forEach(function (n) { n.classList.add('is-in'); });
         }
