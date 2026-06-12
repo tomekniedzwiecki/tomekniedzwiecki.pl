@@ -4412,7 +4412,9 @@
     }
 
     function ensureSummaryImage(force) {
-        if (extras.summary === 'gen') return;
+        // fail blokuje auto-retry (render po każdym sync odpalałby POST w pętli);
+        // ponowienie wyłącznie przyciskiem retry, który ustawia 'idle'
+        if (extras.summary === 'gen' || (!force && extras.summary === 'fail')) return;
         if (!force && state.previews[SUMMARY_META[0]]) return;
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.summary = 'gen';
@@ -4448,7 +4450,7 @@
     }
 
     function ensureBizplan(force) {
-        if (extras.plan === 'gen') return;
+        if (extras.plan === 'gen' || (!force && extras.plan === 'fail')) return;
         if (!force && state.bizplan) return;
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.plan = 'gen';
@@ -4466,7 +4468,17 @@
                 state.bizplan = res.d.plan;
                 persistSession();
                 extras.plan = 'idle';
-                pjNewPlan = true; // kropka na chipie Przychody — spy zdejmie przy sekcji
+                pjNewPlan = true; // kropka na kaflu Plan — zdejmuje wejście w detal
+            } else if (res.ok && res.d && res.d.pending) {
+                // generacja trwa w innej karcie/inwokacji — pasek zostaje,
+                // wynik dociągnie cykliczny sync; po TTL locka ponawiamy claim
+                setTimeout(function () {
+                    if (state.sessionId === sid && !state.bizplan && extras.plan === 'gen') {
+                        extras.plan = 'idle';
+                        ensureBizplan(false);
+                    }
+                }, 90000);
+                return;
             } else {
                 extras.plan = 'fail';
             }
@@ -4481,7 +4493,7 @@
     // Raport potencjału rynku — realny web search po stronie spar-raport
     // (1-2 min); generuje się raz, kolejne wejścia czytają zapisany
     function ensureRaport(force) {
-        if (extras.raport === 'gen') return;
+        if (extras.raport === 'gen' || (!force && extras.raport === 'fail')) return;
         if (!force && state.raport) return;
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.raport = 'gen';
@@ -4501,15 +4513,25 @@
                 persistSession();
                 extras.raport = 'idle';
                 if (activeTab !== 'rynek') rkNew = true;
+            } else if (res.ok && res.d && res.d.pending) {
+                setTimeout(function () {
+                    if (state.sessionId === sid && !state.raport && extras.raport === 'gen') {
+                        extras.raport = 'idle';
+                        ensureRaport(false);
+                    }
+                }, 120000);
+                return;
             } else {
                 extras.raport = 'fail';
             }
             updateSideBadges();
             if (activeTab === 'rynek') renderPaneRynek();
+            if (activeTab === 'projekt') renderPaneProjekt();
         }).catch(function () {
             if (state.sessionId !== sid) return;
             extras.raport = 'fail';
             if (activeTab === 'rynek') renderPaneRynek();
+            if (activeTab === 'projekt') renderPaneProjekt();
         });
     }
 
@@ -4517,7 +4539,7 @@
     // Generują się raz po werdykcie; brak regeneracji przy poprawkach
     // (limit 3 wersji/widok po stronie serwera — szkoda puli na automat).
     function ensureBrandImage(view) {
-        if (extras[view] === 'gen' || state.previews[view]) return;
+        if (extras[view] === 'gen' || extras[view] === 'fail' || state.previews[view]) return;
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras[view] = 'gen';
         extrasStart[view] = Date.now();
@@ -4548,8 +4570,9 @@
     // Działająca strona narzędzia: spar-landing odpowiada 202 i buduje w tle
     // (1-4 min) — gotowość poznajemy po landing_url w spar-project (poll)
     function ensureLanding() {
-        // 'limit' = pula wersji wyczerpana (429) — bez kolejnych POST-ów co render
-        if (extras.landing === 'gen' || extras.landing === 'limit' || state.landingUrl) return;
+        // 'limit' = pula wyczerpana (429), 'fail' = czeka na ręczny retry —
+        // żadne z nich nie może POST-ować w pętli przy każdym renderze
+        if (extras.landing === 'gen' || extras.landing === 'limit' || extras.landing === 'fail' || state.landingUrl) return;
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras.landing = 'gen';
         extrasStart.landing = Date.now();
@@ -4596,7 +4619,8 @@
                 extras.landing = 'idle';
                 persistSession();
                 if (activeTab === 'projekt') renderPaneProjekt();
-            } else if (res.ok && res.d && res.d.status === 'started') {
+            } else if (res.ok && res.d && (res.d.status === 'started' || res.d.status === 'pending')) {
+                // pending = budowa trwa w innej karcie/inwokacji — czekamy tak samo
                 pollReady(15); // ~5 min okna na generację
             } else if (res.status === 429) {
                 // limit — jeśli strona istnieje, sync przyniesie landing_url;
@@ -4829,6 +4853,20 @@
     function startPjTicker() {
         tickGenProgress();
         if (!pjTicker) pjTicker = setInterval(tickGenProgress, 1000);
+        schedulePjSync();
+    }
+
+    // Cykliczny re-sync z serwera, dopóki na ekranie trwa jakaś generacja —
+    // domyka reload/drugą kartę (generacja w innej inwokacji, wynik w DB)
+    var pjSyncTimer = null;
+    function schedulePjSync() {
+        if (pjSyncTimer) return;
+        pjSyncTimer = setTimeout(function tick() {
+            pjSyncTimer = null;
+            if (!document.querySelector('[data-gen-key]')) return;
+            syncProjectFromServer();
+            pjSyncTimer = setTimeout(tick, 25000);
+        }, 25000);
     }
 
     function pjGoIcon() {
