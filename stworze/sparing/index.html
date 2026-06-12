@@ -962,6 +962,75 @@
     }
     .pj-fact b { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
     .pj-fact span { font-size: 13px; color: var(--text); line-height: 1.6; }
+    /* Symulator skali: „a gdyby klientów było więcej?" (suwak na danych planu) */
+    .pj-sim {
+        margin: 2px 0 16px;
+        padding: 16px 16px 10px;
+        border: 1px solid rgba(77, 159, 255, 0.22);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.07) 0%, rgba(77, 159, 255, 0.02) 100%);
+    }
+    .pj-sim__top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 2px;
+    }
+    .pj-sim__label { font-size: 12.5px; font-weight: 700; color: var(--text); }
+    .pj-sim__val {
+        font-size: clamp(20px, 2.6vw, 26px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+    }
+    .pj-sim__val small { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+    .pj-sim__row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 11.5px;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+    }
+    .pj-sim__row b { color: var(--text); font-weight: 700; }
+
+    /* „Inni właśnie budują" — social proof pod werdyktem w czacie */
+    .others {
+        align-self: flex-start;
+        width: 100%;
+        max-width: min(560px, 92%);
+        margin-left: 34px;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.012) 100%);
+        padding: 14px 16px;
+        animation: msgIn 0.4s var(--ease) both;
+    }
+    .others__t { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .others__row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .others__card {
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 11px;
+        overflow: hidden;
+        background: var(--bg-elev);
+    }
+    .others__card img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; }
+    .others__card span {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--text-muted);
+        padding: 5px 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .others__sub { margin-top: 9px; font-size: 11px; color: var(--text-faint); }
+    @media (max-width: 540px) { .others { margin-left: 0; max-width: 100%; } }
+
     .pj-assume { margin-top: 8px; }
     .pj-assume summary {
         font-size: 12px;
@@ -3145,6 +3214,7 @@
     var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
     var SPAR_PROJECT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-project';
     var SPAR_PLAN_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-plan';
+    var SPAR_FEED_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
     var SB_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Pierwsza Makieta — Stworzę" (500 zł)
@@ -3719,6 +3789,7 @@
                     else openLightbox(t.dataset.view);
                 });
             });
+            bindPlanSim(body);
         }).catch(function () {
             fail('Nie udało się wczytać projektu. Sprawdź połączenie i odśwież stronę.');
         });
@@ -3892,6 +3963,7 @@
             (plan.cena_uzasadnienie ? '<div class="pj-plan__why">' + esc(plan.cena_uzasadnienie) + '</div>' : '') +
             '</div><span class="pj-plan__tag">szacunki z rozmowy</span></div>' +
             '<div class="pj-chart">' + bars + '</div>' +
+            planSimHTML(plan, kamienie) +
             '<div class="pj-facts">' +
             fact('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>', 'Rynek', plan.rynek) +
             fact('<polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>', 'Zwrot Twojego wkładu', plan.zwrot_wkladu) +
@@ -3899,6 +3971,49 @@
             '</div>' + zal +
             '<div class="pj-plan__note">Wstępne wyliczenia na podstawie rozmowy — szczegółowy plan przedsięwzięcia przygotowuje Tomek po rezerwacji.</div>' +
             '</div>';
+    }
+
+    // Symulator skali: suwak 10–150 klientów, kwota liczona ze stawki planu
+    // (efektywna stawka = MRR celu / liczba klientów celu; fallback: cena).
+    // Czysty frontend — klient „dotyka" skali swojego biznesu.
+    function planSimHTML(plan, kamienie) {
+        var goal = kamienie[kamienie.length - 1];
+        var rate = (goal && typeof goal.mies === 'number' && typeof goal.klienci === 'number' && goal.klienci > 0)
+            ? goal.mies / goal.klienci
+            : (typeof plan.cena === 'number' ? plan.cena : 0);
+        if (!rate) return '';
+        var startN = (goal && typeof goal.klienci === 'number') ? goal.klienci : 50;
+        return '<div class="pj-sim" data-rate="' + rate + '" data-goal="' + startN + '">' +
+            '<div class="pj-sim__top"><span class="pj-sim__label">A gdyby klientów było więcej?</span>' +
+            '<span class="pj-sim__val" data-sim-val>' + fmtZl(rate * startN) + ' zł<small>/mies.</small></span></div>' +
+            '<input type="range" class="wg-range" data-sim-range min="10" max="150" step="5" value="' + startN + '" aria-label="Liczba klientów">' +
+            '<div class="pj-sim__row"><b data-sim-n>' + startN + ' klientów</b><span data-sim-note></span></div>' +
+            '</div>';
+    }
+
+    function bindPlanSim(root) {
+        root.querySelectorAll('.pj-sim').forEach(function (sim) {
+            var range = sim.querySelector('[data-sim-range]');
+            if (!range || range.dataset.bound) return;
+            range.dataset.bound = '1';
+            var rate = parseFloat(sim.getAttribute('data-rate')) || 0;
+            var goal = parseInt(sim.getAttribute('data-goal'), 10) || 50;
+            var val = sim.querySelector('[data-sim-val]');
+            var nEl = sim.querySelector('[data-sim-n]');
+            var note = sim.querySelector('[data-sim-note]');
+            function paint() {
+                var n = parseInt(range.value, 10);
+                var min = parseInt(range.min, 10), max = parseInt(range.max, 10);
+                range.style.setProperty('--fill', ((n - min) / (max - min) * 100) + '%');
+                val.innerHTML = fmtZl(rate * n) + ' zł<small>/mies.</small>';
+                nEl.textContent = n + ' klientów';
+                note.textContent = n < goal
+                    ? ('pierwszych ' + goal + ' pozyskuje Tomek')
+                    : (n === goal ? 'tu przejmujesz stery' : 'Twoja skala — rok 2 i dalej');
+            }
+            range.addEventListener('input', paint);
+            paint();
+        });
     }
 
     function pillHTML(url) {
@@ -4174,6 +4289,7 @@
         }
         bindAnchors(body);
         bindAnchors(dock);
+        bindPlanSim(body);
         bindPjSpy();
         updatePjSpy();
         // Desktop: wszystkie sekcje otwarte (jest miejsce); mobile: pierwsza
@@ -5766,6 +5882,35 @@
             '</div>';
     }
 
+    // „Inni właśnie budują" — 3 ostatnie cudze projekty z publicznego feedu,
+    // doklejane pod zielonym werdyktem (social proof w momencie decyzji)
+    var othersCache = null;
+    function renderOthersBar() {
+        if (el('spar-others') || state.verdict !== 'zielony') return;
+        function paint(list) {
+            if (el('spar-others')) return;
+            var own = ((state.lastBrief && state.lastBrief.nazwa) || '').toLowerCase();
+            var items = (list || []).filter(function (p) {
+                return p && p.nazwa && p.img && p.nazwa.toLowerCase() !== own;
+            }).slice(0, 3);
+            if (items.length < 2) return; // bez fejków — pasek dopiero przy realnych projektach
+            var div = document.createElement('div');
+            div.className = 'others';
+            div.id = 'spar-others';
+            div.innerHTML = '<div class="others__t">W tym samym czasie inni budują swoje narzędzia:</div>' +
+                '<div class="others__row">' + items.map(function (p) {
+                    var img = String(p.img).replace('/object/public/', '/render/image/public/') + '?format=webp&width=240&quality=70';
+                    return '<div class="others__card"><img src="' + esc(img) + '" alt="" loading="lazy"><span>' + esc(p.nazwa) + '</span></div>';
+                }).join('') + '</div>' +
+                '<div class="others__sub">Po starcie współpracy dołączasz do społeczności, która buduje razem z Tomkiem — spotkania online i na żywo.</div>';
+            el('chat-msgs').appendChild(div);
+        }
+        if (othersCache) { paint(othersCache); return; }
+        fetch(SPAR_FEED_ENDPOINT).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (d && d.projekty) { othersCache = d.projekty; paint(d.projekty); }
+        }).catch(function () { });
+    }
+
     function renderVerdict(color, karta) {
         var wrap = document.createElement('div');
         wrap.className = 'verdict';
@@ -5788,6 +5933,7 @@
             if (activeTab === 'projekt' || activeTab === 'wspolpraca') switchTab(activeTab); // odśwież otwartą zakładkę
             updateSideBadges();
             unlockComposer();
+            renderOthersBar();
         } else if (color === 'zolty') {
             wrap.innerHTML =
                 '<div class="vbanner vbanner--yellow">' +
