@@ -1394,12 +1394,17 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .cta__path::before {
     content: '';
     position: absolute;
-    inset: -3px;
-    z-index: -1;
-    border-radius: 19px 19px 8px 19px;
+    inset: -4px;
+    border-radius: 20px 20px 9px 20px;
     background: conic-gradient(from var(--aiAng),
         #4d9fff, #7d6bff, #c46bff, #4dd2ff, #4d9fff);
-    filter: blur(7px);
+    /* ring: maska wycina środek — aura świeci tylko WOKÓŁ dymka */
+    padding: 4px;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    filter: blur(2px);
     opacity: 0;
     transition: opacity 0.35s var(--ease);
     pointer-events: none;
@@ -1424,12 +1429,16 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .cta__bar::before {
     content: '';
     position: absolute;
-    inset: -2.5px;
-    z-index: -1;
-    border-radius: 24px;
+    inset: -3px;
+    border-radius: 25px;
     background: conic-gradient(from var(--aiAng),
         #4d9fff, #7d6bff, #c46bff, #4dd2ff, #4d9fff);
-    filter: blur(6px);
+    padding: 3px;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    filter: blur(1.5px);
     opacity: 0;
     transition: opacity 0.4s var(--ease);
     pointer-events: none;
