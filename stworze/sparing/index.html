@@ -664,6 +664,60 @@
     .pj-edit__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin: 0 0 11px; }
     .pj-edit--done .pj-edit__d { margin-bottom: 0; }
 
+    /* Taby sekcji w zakładce „Twój projekt”: Ekrany / Karta / Przychody.
+       Sticky u góry panelu — na mobile długie sekcje, przełączanie zawsze
+       pod ręką; na desktop ten sam wzorzec (mniej scrollowania) */
+    .pj-tabs {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 14px;
+        background: rgba(5, 5, 7, 0.82);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        margin-bottom: 20px;
+    }
+    .pj-tab {
+        position: relative;
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 42px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        transition: color 0.2s var(--ease), background 0.2s var(--ease);
+    }
+    .pj-tab svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .pj-tab:hover { color: var(--text); }
+    .pj-tab.is-on {
+        background: var(--accent-dim);
+        color: var(--text-strong);
+        box-shadow: inset 0 0 0 1px rgba(77, 159, 255, 0.3);
+    }
+    .pj-tab.is-on svg { color: var(--accent); }
+    .pj-tab__dot {
+        position: absolute;
+        top: 7px;
+        right: 9px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 8px rgba(77, 159, 255, 0.8);
+    }
+    @media (max-width: 560px) {
+        .pj-tab { font-size: 12px; gap: 5px; min-height: 44px; }
+        .pj-tab svg { width: 14px; height: 14px; }
+    }
+
     /* Dogrywane elementy karty: plan przychodu + pigułka + loadery */
     .pj-plan, .pj-pill {
         margin-top: 18px;
@@ -700,29 +754,101 @@
         padding: 4px 10px;
         white-space: nowrap;
     }
-    .pj-plan__model { font-size: 13.5px; color: var(--text); line-height: 1.6; margin-bottom: 14px; }
-    .pj-plan__model b { color: var(--text-strong); }
-    .pj-plan__why { display: block; font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-    .pj-plan__miles {
+    /* Plan: nagłówek z modelem i dużą ceną */
+    .pj-plan__top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+    .pj-plan__badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: var(--accent);
+        border: 1px solid rgba(77, 159, 255, 0.35);
+        background: var(--accent-dim);
+        border-radius: 999px;
+        padding: 5px 12px;
+        margin-bottom: 10px;
+    }
+    .pj-plan__price {
+        font-size: clamp(27px, 4vw, 34px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text-strong);
+        line-height: 1.1;
+    }
+    .pj-plan__price small { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-left: 3px; }
+    .pj-plan__why { font-size: 12px; color: var(--text-muted); margin-top: 5px; max-width: 52ch; line-height: 1.55; }
+
+    /* Kamienie 10/25/50 klientów jako wykres słupkowy */
+    .pj-chart {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-bottom: 14px;
+        gap: clamp(8px, 2vw, 16px);
+        align-items: end;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, rgba(255, 255, 255, 0) 100%);
+        padding: 18px 16px 14px;
+        margin: 16px 0;
     }
-    @media (max-width: 560px) { .pj-plan__miles { grid-template-columns: 1fr; } }
-    .pj-mile {
+    .pj-bar { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+    .pj-bar b {
+        font-size: clamp(13.5px, 1.8vw, 16.5px);
+        font-weight: 800;
+        color: var(--text-strong);
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        margin-bottom: 8px;
+    }
+    .pj-bar b small { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+    .pj-bar i {
+        display: block;
+        width: 100%;
+        max-width: 92px;
+        border-radius: 9px 9px 4px 4px;
+        border: 1px solid rgba(77, 159, 255, 0.22);
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.22) 0%, rgba(77, 159, 255, 0.05) 100%);
+        transform-origin: bottom;
+        animation: pjBarIn 0.6s var(--ease) backwards;
+    }
+    .pj-bar:nth-child(2) i { animation-delay: 0.12s; }
+    .pj-bar:nth-child(3) i { animation-delay: 0.24s; }
+    @keyframes pjBarIn { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    .pj-bar span { font-size: 12px; font-weight: 600; color: var(--text); margin-top: 9px; }
+    .pj-bar em { font-style: normal; font-size: 10.5px; color: var(--text-muted); margin-top: 2px; text-align: center; line-height: 1.4; }
+    .pj-bar--goal b { color: var(--accent); }
+    .pj-bar--goal i {
+        border-color: rgba(77, 159, 255, 0.55);
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.55) 0%, rgba(77, 159, 255, 0.14) 100%);
+        box-shadow: 0 0 22px -4px rgba(77, 159, 255, 0.45);
+    }
+    .pj-bar--goal span { color: var(--text-strong); }
+
+    /* Fakty: rynek / zwrot wkładu / rok 2 — wiersze z ikonami */
+    .pj-facts { display: flex; flex-direction: column; gap: 8px; }
+    .pj-fact {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
         border: 1px solid var(--glass-border-soft);
         border-radius: 13px;
-        background: rgba(255, 255, 255, 0.02);
-        padding: 13px 14px;
+        background: rgba(255, 255, 255, 0.018);
+        padding: 12px 14px;
     }
-    .pj-mile b { display: block; font-size: clamp(17px, 2vw, 21px); font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
-    .pj-mile b small { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
-    .pj-mile span { display: block; font-size: 12px; color: var(--text); margin-top: 3px; }
-    .pj-mile em { display: block; font-style: normal; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-    .pj-mile--goal { border-color: rgba(77, 159, 255, 0.45); background: var(--accent-dim); }
-    .pj-mile--goal b { color: var(--accent); }
-    .pj-plan__rows { margin-bottom: 4px; }
+    .pj-fact > svg {
+        width: 17px;
+        height: 17px;
+        color: var(--accent);
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .pj-fact b { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+    .pj-fact span { font-size: 13px; color: var(--text); line-height: 1.6; }
     .pj-assume { margin-top: 8px; }
     .pj-assume summary {
         font-size: 12px;
@@ -2960,6 +3086,10 @@
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
     var extras = { summary: 'idle', plan: 'idle' };
     var activeTab = 'chat';
+    // Aktywny tab sekcji w zakładce „Twój projekt" (null = wylicz przy renderze);
+    // pjNewPlan = kropka na tabie Przychody, gdy plan policzył się w tle
+    var pjTab = null;
+    var pjNewPlan = false;
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -3081,6 +3211,8 @@
         state.bizplan = saved.bizplan || null;
         extras.summary = 'idle';
         extras.plan = 'idle';
+        pjTab = null;
+        pjNewPlan = false;
         state.previews = {};
         state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
@@ -3133,6 +3265,7 @@
                 && JSON.stringify(p.business_plan) !== JSON.stringify(state.bizplan)) {
                 state.bizplan = p.business_plan;
                 persistSession();
+                if (pjTab !== 'plan') pjNewPlan = true;
                 changed = true;
             }
             if (p.preview_history && typeof p.preview_history === 'object') {
@@ -3517,6 +3650,8 @@
                 state.bizplan = res.d.plan;
                 persistSession();
                 extras.plan = 'idle';
+                // kropka na tabie Przychody, jeśli user nie patrzy właśnie na plan
+                if (pjTab !== 'plan') pjNewPlan = true;
             } else {
                 extras.plan = 'fail';
             }
@@ -3539,31 +3674,37 @@
 
     function bizplanHTML(plan) {
         if (!plan || !Array.isArray(plan.kamienie) || !plan.kamienie.length) return '';
-        var miles = plan.kamienie.slice(0, 3).map(function (m, i, arr) {
-            if (!m || typeof m.mies !== 'number') return '';
-            var goal = i === arr.length - 1;
-            return '<div class="pj-mile' + (goal ? ' pj-mile--goal' : '') + '">' +
+        var kamienie = plan.kamienie.slice(0, 3).filter(function (m) { return m && typeof m.mies === 'number'; });
+        var maxMies = kamienie.reduce(function (mx, m) { return Math.max(mx, m.mies); }, 1);
+        // słupki: wysokość proporcjonalna do MRR (min 26px, max 96px)
+        var bars = kamienie.map(function (m, i) {
+            var goal = i === kamienie.length - 1;
+            var h = Math.round(26 + (m.mies / maxMies) * 70);
+            return '<div class="pj-bar' + (goal ? ' pj-bar--goal' : '') + '">' +
                 '<b>' + fmtZl(m.mies) + ' zł<small>/mies.</small></b>' +
+                '<i style="height:' + h + 'px" aria-hidden="true"></i>' +
                 '<span>' + esc(String(m.klienci)) + ' klientów</span>' +
                 (m.etap ? '<em>' + esc(m.etap) + '</em>' : '') + '</div>';
         }).join('');
+        function fact(icon, label, val) {
+            if (!val) return '';
+            return '<div class="pj-fact">' + pjIco(icon) + '<div><b>' + label + '</b><span>' + esc(val) + '</span></div></div>';
+        }
         var zal = Array.isArray(plan.zalozenia) && plan.zalozenia.length
             ? '<details class="pj-assume"><summary>Założenia do tych liczb</summary><ul class="pj-zal">' +
               plan.zalozenia.map(function (z) { return '<li>' + esc(z) + '</li>'; }).join('') + '</ul></details>'
             : '';
         return '<div class="pj-plan">' +
-            '<div class="pj-plan__head"><span class="pj-plan__t">' +
-            pjIco('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>') +
-            'Wstępny plan przychodu</span><span class="pj-plan__tag">szacunki z rozmowy</span></div>' +
-            '<div class="pj-plan__model"><b>' + esc(plan.model_przychodu || 'Abonament') + '</b> — ' +
-            esc(String(plan.cena || '')) + ' ' + esc(plan.cena_jednostka || 'zł/mies.') +
-            (plan.cena_uzasadnienie ? '<span class="pj-plan__why">' + esc(plan.cena_uzasadnienie) + '</span>' : '') +
-            '</div>' +
-            '<div class="pj-plan__miles">' + miles + '</div>' +
-            '<div class="pj-plan__rows">' +
-            pjRow('Rynek', plan.rynek) +
-            pjRow('Zwrot wkładu', plan.zwrot_wkladu) +
-            pjRow('Rok 2', plan.rok2_potencjal) +
+            '<div class="pj-plan__top"><div>' +
+            '<span class="pj-plan__badge">' + esc(plan.model_przychodu || 'Abonament miesięczny') + '</span>' +
+            '<div class="pj-plan__price">' + esc(String(plan.cena || '')) + '<small>' + esc(plan.cena_jednostka || 'zł/mies.') + '</small></div>' +
+            (plan.cena_uzasadnienie ? '<div class="pj-plan__why">' + esc(plan.cena_uzasadnienie) + '</div>' : '') +
+            '</div><span class="pj-plan__tag">szacunki z rozmowy</span></div>' +
+            '<div class="pj-chart">' + bars + '</div>' +
+            '<div class="pj-facts">' +
+            fact('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>', 'Rynek', plan.rynek) +
+            fact('<polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>', 'Zwrot Twojego wkładu', plan.zwrot_wkladu) +
+            fact('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>', 'Rok 2', plan.rok2_potencjal) +
             '</div>' + zal +
             '<div class="pj-plan__note">Wstępne wyliczenia na podstawie rozmowy — szczegółowy plan przedsięwzięcia przygotowuje Tomek po rezerwacji.</div>' +
             '</div>';
@@ -3628,77 +3769,113 @@
             'Udostępnij</button>' +
             '</div>';
 
-        // Przełącznik wersji karty
-        if (versions.length > 1) {
-            html += '<div class="pj-vers">';
-            versions.forEach(function (_, i) {
-                html += '<button type="button" class="pj-ver' + (i === cur ? ' is-on' : '') + '" data-ver="' + i + '">' +
-                    'Wersja ' + (i + 1) + (i === versions.length - 1 ? ' · aktualna' : '') + '</button>';
-            });
-            html += '</div>';
-            if (cur !== versions.length - 1) {
-                html += '<div class="pj-oldnote">Przeglądasz starszą wersję karty — aktualna jest Wersja ' + versions.length + '.</div>';
-            }
-        }
-
-        // Ekrany narzędzia — desktop: główny full-width + rząd mniejszych
-        // (wszystkie grafiki są poziome 3:2 — żadnych pionowych kadrów!);
-        // mobile: karuzela snap
-        if (items.length) {
-            html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
-                return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
-                    '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
-                    '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
-            }).join('') + '</div>';
-        }
-
-        // Wcześniejsze wersje ekranów — nic nie przepada (pigułka też)
+        // Archiwum wersji ekranów (pigułka też) — potrzebne do taba Ekrany
         var oldShots = [];
         VIEW_META.concat([SUMMARY_META]).forEach(function (vm) {
             (state.previewHistory[vm[0]] || []).forEach(function (u, hi) {
                 oldShots.push({ view: vm[0], label: vm[1] + ' — v' + (hi + 1), url: u });
             });
         });
-        if (oldShots.length) {
-            html += '<div class="pj-later" style="margin:0 0 8px">Wcześniejsze wersje ekranów:</div>' +
-                '<div class="shots shots--old" style="margin-bottom:18px">' + oldShots.map(function (s, i) {
-                    return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
-                        '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
-                        '<div class="pv-tile__body"><img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
+
+        // Taby sekcji (Ekrany / Karta / Przychody) — stan trzymany między
+        // renderami; nieosiągalny tab przeskakuje na sensowny fallback
+        var hasShots = items.length > 0 || oldShots.length > 0;
+        var hasPlanTab = hasKarta && state.verdict === 'zielony';
+        if (typeof verIdx === 'number') pjTab = 'karta'; // klik w przełącznik wersji
+        if (!pjTab) pjTab = hasKarta ? 'karta' : 'ekrany';
+        if (pjTab === 'plan' && !hasPlanTab) pjTab = hasKarta ? 'karta' : 'ekrany';
+        if (pjTab === 'ekrany' && !hasShots) pjTab = 'karta';
+        if (pjTab === 'karta' && !hasKarta && hasShots) pjTab = 'ekrany';
+
+        // Generacje planu i pigułki startują niezależnie od aktywnego taba
+        if (hasPlanTab) ensureKartaExtras(false);
+
+        function tabBtn(id, label, icon, enabled, dot) {
+            if (!enabled) return '';
+            return '<button type="button" class="pj-tab' + (pjTab === id ? ' is-on' : '') + '" data-pjtab="' + id + '" role="tab" aria-selected="' + (pjTab === id) + '">' +
+                pjIco(icon) + label + (dot ? '<i class="pj-tab__dot" aria-hidden="true"></i>' : '') + '</button>';
+        }
+        html += '<div class="pj-tabs" role="tablist">' +
+            tabBtn('ekrany', 'Ekrany', '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>', hasShots) +
+            tabBtn('karta', 'Karta', '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>', hasKarta || !hasShots) +
+            tabBtn('plan', 'Przychody', '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>', hasPlanTab, pjNewPlan) +
+            '</div>';
+
+        if (pjTab === 'ekrany') {
+            // Ekrany narzędzia — desktop: główny full-width + rząd mniejszych
+            // (grafiki zawsze poziome 3:2 — żadnych pionowych kadrów!);
+            // mobile: karuzela snap
+            if (items.length) {
+                html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
+                    return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
+                        '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
+                        '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
-        }
-
-        var editHtml = '';
-        if (hasKarta && state.verdict === 'zielony') {
-            var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
-            if (left > 0) {
-                editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
-                    '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
-                    '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
             } else {
-                editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
+                html += '<div class="tabpane__empty">Ekrany narzędzia pojawią się po wygenerowaniu podglądu w rozmowie.</div>';
             }
-        }
-        if (k) {
-            html += kartaGridHTML(k, editHtml);
-        } else if (items.length) {
-            html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
-        }
-
-        // Plan przychodu + pigułka — tylko przy zielonym werdykcie; gdy jeszcze
-        // się liczą (user wszedł szybciej), w ich miejscu stoją loadery
-        if (k && state.verdict === 'zielony') {
-            ensureKartaExtras(false); // no-op gdy dane są albo generacja trwa
+            if (oldShots.length) {
+                html += '<div class="pj-later" style="margin:14px 0 8px">Wcześniejsze wersje ekranów:</div>' +
+                    '<div class="shots shots--old" style="margin-bottom:18px">' + oldShots.map(function (s, i) {
+                        return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
+                            '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
+                            '<div class="pv-tile__body"><img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
+                    }).join('') + '</div>';
+            }
+        } else if (pjTab === 'karta') {
+            // Przełącznik wersji karty
+            if (versions.length > 1) {
+                html += '<div class="pj-vers">';
+                versions.forEach(function (_, i) {
+                    html += '<button type="button" class="pj-ver' + (i === cur ? ' is-on' : '') + '" data-ver="' + i + '">' +
+                        'Wersja ' + (i + 1) + (i === versions.length - 1 ? ' · aktualna' : '') + '</button>';
+                });
+                html += '</div>';
+                if (cur !== versions.length - 1) {
+                    html += '<div class="pj-oldnote">Przeglądasz starszą wersję karty — aktualna jest Wersja ' + versions.length + '.</div>';
+                }
+            }
+            var editHtml = '';
+            if (hasKarta && state.verdict === 'zielony') {
+                var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
+                if (left > 0) {
+                    editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
+                        '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
+                        '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
+                } else {
+                    editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
+                }
+            }
+            if (k) {
+                html += kartaGridHTML(k, editHtml);
+            } else {
+                html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
+            }
+            // Pigułka — graficzne podsumowanie karty (loader, gdy się rysuje)
+            if (hasPlanTab) {
+                var pillUrl = state.previews[SUMMARY_META[0]];
+                if (pillUrl) html += pillHTML(pillUrl);
+                else if (extras.summary === 'fail') html += extrasFailHTML('pill');
+                else html += extrasWaitHTML('pill');
+            }
+        } else {
+            // Przychody — wstępny plan (loader, gdy się liczy)
             if (state.bizplan) html += bizplanHTML(state.bizplan);
             else if (extras.plan === 'fail') html += extrasFailHTML('plan');
             else html += extrasWaitHTML('plan');
-            var pillUrl = state.previews[SUMMARY_META[0]];
-            if (pillUrl) html += pillHTML(pillUrl);
-            else if (extras.summary === 'fail') html += extrasFailHTML('pill');
-            else html += extrasWaitHTML('pill');
         }
 
         body.innerHTML = html;
+        body.querySelectorAll('.pj-tab').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var t = b.getAttribute('data-pjtab');
+                if (t === pjTab) return;
+                pjTab = t;
+                if (t === 'plan') pjNewPlan = false;
+                renderPaneProjekt();
+                el('pane-projekt').scrollTop = 0;
+            });
+        });
         // Desktop: wszystkie sekcje otwarte (jest miejsce); mobile: pierwsza
         // otwarta, reszta zwinięta — user otwiera, co go interesuje
         var pjDesktop = window.matchMedia('(min-width: 1024px)').matches;
@@ -4013,6 +4190,8 @@
         state.bizplan = null;
         extras.summary = 'idle';
         extras.plan = 'idle';
+        pjTab = null;
+        pjNewPlan = false;
         if (activeTab !== 'chat') switchTab('chat');
         if (!state.pSlug) state.profession = null;
         messages = [];
