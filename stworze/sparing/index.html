@@ -664,63 +664,152 @@
     .pj-edit__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin: 0 0 11px; }
     .pj-edit--done .pj-edit__d { margin-bottom: 0; }
 
-    /* Taby sekcji w zakładce „Twój projekt”: Ekrany / Karta / Przychody.
-       Sticky u góry panelu — na mobile długie sekcje, przełączanie zawsze
-       pod ręką; na desktop ten sam wzorzec (mniej scrollowania) */
-    .pj-tabs {
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        display: flex;
-        gap: 4px;
-        padding: 4px;
-        border: 1px solid var(--glass-border-soft);
-        border-radius: 14px;
-        background: rgba(5, 5, 7, 0.82);
-        -webkit-backdrop-filter: blur(14px);
-        backdrop-filter: blur(14px);
-        margin-bottom: 20px;
+    /* Nawigacja sekcji zakładki Projekt — karty-zajawki z danymi na górze
+       (nawigacja, która wygląda jak treść: kwota planu, miniatura ekranów)
+       + pływający dock na dole podczas scrollowania (kciuk na mobile) */
+    .pj-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 28px;
     }
-    .pj-tab {
+    .pj-card {
         position: relative;
-        flex: 1;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 7px;
-        min-height: 42px;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--text-muted);
-        transition: color 0.2s var(--ease), background 0.2s var(--ease);
+        overflow: hidden;
+        text-align: left;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 15px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.012) 100%);
+        background-size: cover;
+        background-position: center;
+        padding: 14px 15px;
+        min-height: 92px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 2px;
+        cursor: pointer;
+        transition: transform 0.22s var(--ease), border-color 0.22s var(--ease), box-shadow 0.22s var(--ease);
     }
-    .pj-tab svg { width: 15px; height: 15px; flex-shrink: 0; }
-    .pj-tab:hover { color: var(--text); }
-    .pj-tab.is-on {
-        background: var(--accent-dim);
-        color: var(--text-strong);
-        box-shadow: inset 0 0 0 1px rgba(77, 159, 255, 0.3);
+    .pj-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(77, 159, 255, 0.45);
+        box-shadow: 0 10px 30px -14px rgba(77, 159, 255, 0.4);
     }
-    .pj-tab.is-on svg { color: var(--accent); }
-    .pj-tab__dot {
+    .pj-card__ico {
         position: absolute;
-        top: 7px;
-        right: 9px;
+        top: 12px;
+        left: 13px;
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        background: rgba(77, 159, 255, 0.14);
+        color: var(--accent);
+    }
+    .pj-card__ico svg { width: 14px; height: 14px; }
+    .pj-card b { font-size: 13.5px; font-weight: 800; color: var(--text-strong); line-height: 1.25; }
+    .pj-card span { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; display: flex; align-items: center; gap: 6px; }
+    .pj-card__go {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        color: var(--text-muted);
+        opacity: 0.55;
+        transition: transform 0.22s var(--ease), color 0.22s var(--ease), opacity 0.22s var(--ease);
+    }
+    .pj-card__go svg { width: 14px; height: 14px; }
+    .pj-card:hover .pj-card__go { color: var(--accent); opacity: 1; transform: translateY(2px); }
+    .pj-card--plan b { font-size: 16px; color: var(--accent); letter-spacing: -0.01em; }
+    .pj-card__spin {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid var(--glass-border);
+        border-top-color: var(--accent);
+        animation: sparSpin 0.8s linear infinite;
+        flex-shrink: 0;
+    }
+    .pj-card__dot {
         width: 7px;
         height: 7px;
         border-radius: 50%;
         background: var(--accent);
         box-shadow: 0 0 8px rgba(77, 159, 255, 0.8);
+        flex-shrink: 0;
     }
-    @media (max-width: 560px) {
-        .pj-tab { font-size: 12px; gap: 5px; min-height: 44px; }
-        .pj-tab svg { width: 14px; height: 14px; }
+    @media (max-width: 640px) {
+        .pj-cards { gap: 7px; margin-bottom: 22px; }
+        .pj-card { padding: 11px 12px; min-height: 96px; border-radius: 13px; }
+        .pj-card__ico { top: 10px; left: 10px; width: 23px; height: 23px; }
+        .pj-card__go { display: none; }
+        .pj-card b { font-size: 12px; }
+        .pj-card--plan b { font-size: 13.5px; }
+        .pj-card span { font-size: 10px; }
+    }
+
+    /* Pływający dock — pojawia się po przescrollowaniu za karty */
+    .pj-dock {
+        position: fixed;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%) translateY(14px);
+        z-index: 40;
+        display: flex;
+        gap: 3px;
+        padding: 5px;
+        border-radius: 999px;
+        border: 1px solid var(--glass-border);
+        background: rgba(10, 12, 17, 0.92);
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 16px 44px -12px rgba(0, 0, 0, 0.75);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+    }
+    .pj-dock.is-visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    @media (min-width: 1024px) { .pj-dock { left: calc(50% + 132px); } }
+    .pj-dock__btn {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 40px;
+        padding: 0 15px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-muted);
+        white-space: nowrap;
+        transition: color 0.2s var(--ease), background 0.2s var(--ease);
+    }
+    .pj-dock__btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .pj-dock__btn:hover { color: var(--text); }
+    .pj-dock__btn.is-on {
+        background: var(--accent-dim);
+        color: var(--text-strong);
+        box-shadow: inset 0 0 0 1px rgba(77, 159, 255, 0.3);
+    }
+    .pj-dock__btn.is-on svg { color: var(--accent); }
+    .pj-dock__dot {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 8px rgba(77, 159, 255, 0.8);
+    }
+    @media (max-width: 480px) {
+        .pj-dock__btn { padding: 0 12px; font-size: 11.5px; gap: 5px; }
     }
 
     /* Sekcje zakładki Projekt — wszystko w jednym scrollu (nic nie jest
-       schowane za przełącznikiem), pasek na górze to scroll-spy + kotwice */
-    .pj-section { scroll-margin-top: 66px; }
+       schowane za przełącznikiem), karty i dock tylko nawigują */
+    .pj-section { scroll-margin-top: 12px; }
     .pj-section + .pj-section {
         margin-top: 34px;
         padding-top: 28px;
@@ -3384,7 +3473,28 @@
         if (tab === 'projekt') { renderPaneProjekt(); el('dot-projekt').hidden = true; }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
         if (tab === 'chat') scrollToBottom(true);
+        setTabHash(tab === 'chat' ? '' : tab);
         closeSide();
+    }
+
+    // Zakładka w hashu URL — odświeżenie strony wraca do tego samego widoku
+    // (#projekt, #wspolpraca, opcjonalnie #projekt-plan = sekcja w projekcie)
+    function setTabHash(h) {
+        try {
+            history.replaceState(null, '', location.pathname + location.search + (h ? '#' + h : ''));
+        } catch (e) { }
+    }
+    function applyHashTab() {
+        var m = (location.hash || '').slice(1).match(/^(projekt|wspolpraca)(?:-(ekrany|karta|plan))?$/);
+        if (!m) return;
+        switchTab(m[1]); // nadpisze hash samą zakładką…
+        if (m[1] === 'projekt' && m[2]) {
+            setTabHash(m[1] + '-' + m[2]); // …więc przywracamy pełny z sekcją
+            setTimeout(function () {
+                var sec = el('pjsec-' + m[2]);
+                if (sec) sec.scrollIntoView({ block: 'start' });
+            }, 80);
+        }
     }
 
     function updateSideBadges() {
@@ -3771,20 +3881,26 @@
     function updatePjSpy() {
         var body = el('pane-projekt-body');
         var pane = el('pane-projekt');
-        if (!body || !pane) return;
+        var dock = el('pj-dock');
+        if (!body || !pane || !dock) return;
         var secs = body.querySelectorAll('.pj-section');
-        if (!secs.length) return;
+        if (!secs.length || !dock.children.length) {
+            dock.classList.remove('is-visible');
+            return;
+        }
+        // dock wjeżdża dopiero, gdy karty-zajawki zniknęły z ekranu
+        dock.classList.toggle('is-visible', pane.scrollTop > 260);
         var paneTop = pane.getBoundingClientRect().top;
         var current = secs[0].getAttribute('data-spy');
         secs.forEach(function (s) {
-            if (s.getBoundingClientRect().top - paneTop <= 100) current = s.getAttribute('data-spy');
+            if (s.getBoundingClientRect().top - paneTop <= 110) current = s.getAttribute('data-spy');
         });
-        body.querySelectorAll('.pj-tab').forEach(function (b) {
+        dock.querySelectorAll('.pj-dock__btn').forEach(function (b) {
             var on = b.getAttribute('data-spy') === current;
             b.classList.toggle('is-on', on);
             if (on && current === 'plan' && pjNewPlan) {
                 pjNewPlan = false;
-                var d = b.querySelector('.pj-tab__dot');
+                var d = b.querySelector('.pj-dock__dot');
                 if (d) d.remove();
             }
         });
@@ -3839,18 +3955,46 @@
         // Generacje planu i pigułki startują od razu (niezależnie od scrolla)
         if (hasPlanSec) ensureKartaExtras(false);
 
-        function navBtn(id, label, icon, enabled, dot) {
-            if (!enabled) return '';
-            return '<button type="button" class="pj-tab" data-spy="' + id + '" data-anchor="pjsec-' + id + '">' +
-                pjIco(icon) + label + (dot ? '<i class="pj-tab__dot" aria-hidden="true"></i>' : '') + '</button>';
-        }
-        var navHtml =
-            navBtn('ekrany', 'Ekrany', '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>', hasShots) +
-            navBtn('karta', 'Karta', '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>', true) +
-            navBtn('plan', 'Przychody', '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>', hasPlanSec, pjNewPlan);
-        // pasek ma sens dopiero przy >1 sekcji
-        if ((hasShots ? 1 : 0) + 1 + (hasPlanSec ? 1 : 0) > 1) {
-            html += '<div class="pj-tabs" role="navigation" aria-label="Sekcje projektu">' + navHtml + '</div>';
+        // Karty-zajawki: nawigacja, która wygląda jak treść — miniatura
+        // ekranów w tle, kwota planu na wierzchu. Klik = płynny scroll.
+        var NAV_ICONS = {
+            ekrany: '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
+            karta: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
+            plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>'
+        };
+        var GO_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M19 12l-7 7-7-7"></path></svg>';
+        var secCount = (hasShots ? 1 : 0) + 1 + (hasPlanSec ? 1 : 0);
+        if (secCount > 1) {
+            var cards = '';
+            if (hasShots) {
+                var thumb = items.length ? items[0].url : '';
+                cards += '<button type="button" class="pj-card" data-anchor="pjsec-ekrany"' +
+                    (thumb ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.55) 0%, rgba(5,5,7,0.93) 80%), url(\'' + esc(thumb) + '\')"' : '') + '>' +
+                    '<span class="pj-card__ico">' + pjIco(NAV_ICONS.ekrany) + '</span>' +
+                    '<span class="pj-card__go">' + GO_ICON + '</span>' +
+                    '<b>Ekrany narzędzia</b><span>' + (items.length ? items.length + ' ' + (items.length === 1 ? 'widok' : 'widoki') : 'wcześniejsze wersje') + '</span></button>';
+            }
+            var kartaSub = hasKarta
+                ? (versions.length > 1 ? 'Wersja ' + versions.length + ' · aktualna' : 'problem, klienci, zakres')
+                : 'w przygotowaniu';
+            cards += '<button type="button" class="pj-card" data-anchor="pjsec-karta">' +
+                '<span class="pj-card__ico">' + pjIco(NAV_ICONS.karta) + '</span>' +
+                '<span class="pj-card__go">' + GO_ICON + '</span>' +
+                '<b>Karta projektu</b><span>' + kartaSub + '</span></button>';
+            if (hasPlanSec) {
+                var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
+                    ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
+                cards += '<button type="button" class="pj-card pj-card--plan" data-anchor="pjsec-plan">' +
+                    '<span class="pj-card__ico">' + pjIco(NAV_ICONS.plan) + '</span>' +
+                    '<span class="pj-card__go">' + GO_ICON + '</span>' +
+                    (goalK && typeof goalK.mies === 'number'
+                        ? '<b>' + fmtZl(goalK.mies) + ' zł/mies.</b><span>' + (pjNewPlan ? '<i class="pj-card__dot" aria-hidden="true"></i>' : '') + 'przy ' + esc(String(goalK.klienci)) + ' klientach — zobacz plan</span>'
+                        : (extras.plan === 'fail'
+                            ? '<b>Plan przychodu</b><span>nie udało się policzyć — otwórz</span>'
+                            : '<b>Plan przychodu</b><span><i class="pj-card__spin" aria-hidden="true"></i>liczę szacunki…</span>')) +
+                    '</button>';
+            }
+            html += '<div class="pj-cards" role="navigation" aria-label="Sekcje projektu">' + cards + '</div>';
         }
 
         function sechead(icon, title, sub) {
@@ -3934,14 +4078,42 @@
         }
 
         body.innerHTML = html;
-        // nav: klik → płynny scroll do sekcji (scroll-margin-top w CSS
-        // zostawia miejsce na sticky pasek)
-        body.querySelectorAll('.pj-tab').forEach(function (b) {
-            b.addEventListener('click', function () {
-                var sec = el(b.getAttribute('data-anchor'));
-                if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Pływający dock (fixed w obrębie zakładki — znika razem z nią);
+        // pojawia się po przescrollowaniu za karty-zajawki
+        var pane = el('pane-projekt');
+        var dock = el('pj-dock');
+        if (!dock && pane) {
+            dock = document.createElement('nav');
+            dock.id = 'pj-dock';
+            dock.className = 'pj-dock';
+            dock.setAttribute('aria-label', 'Sekcje projektu');
+            pane.appendChild(dock);
+        }
+        if (dock) {
+            dock.innerHTML = secCount > 1
+                ? (hasShots ? '<button type="button" class="pj-dock__btn" data-spy="ekrany" data-anchor="pjsec-ekrany">' + pjIco(NAV_ICONS.ekrany) + 'Ekrany</button>' : '') +
+                  '<button type="button" class="pj-dock__btn" data-spy="karta" data-anchor="pjsec-karta">' + pjIco(NAV_ICONS.karta) + 'Karta</button>' +
+                  (hasPlanSec ? '<button type="button" class="pj-dock__btn" data-spy="plan" data-anchor="pjsec-plan">' + pjIco(NAV_ICONS.plan) + 'Przychody' + (pjNewPlan ? '<i class="pj-dock__dot" aria-hidden="true"></i>' : '') + '</button>' : '')
+                : '';
+        }
+
+        // klik w kartę-zajawkę albo przycisk docka → płynny scroll do sekcji
+        // + sekcja w hashu (odświeżenie wraca w to samo miejsce)
+        function bindAnchors(root) {
+            if (!root) return;
+            root.querySelectorAll('[data-anchor]').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var sec = el(b.getAttribute('data-anchor'));
+                    if (sec) {
+                        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        setTabHash('projekt-' + b.getAttribute('data-anchor').replace('pjsec-', ''));
+                    }
+                });
             });
-        });
+        }
+        bindAnchors(body);
+        bindAnchors(dock);
         bindPjSpy();
         updatePjSpy();
         // Desktop: wszystkie sekcje otwarte (jest miejsce); mobile: pierwsza
@@ -5403,7 +5575,8 @@
             var u = new URLSearchParams(location.search);
             if (u.get('id') === state.sessionId) return;
             u.set('id', state.sessionId);
-            history.replaceState(null, '', location.pathname + '?' + u.toString());
+            // hash zakładki (#projekt itd.) musi przetrwać podmianę ?id=
+            history.replaceState(null, '', location.pathname + '?' + u.toString() + (location.hash || ''));
         } catch (e) {}
     }
 
@@ -5692,6 +5865,7 @@
         if (urlId && UUID_RE_URL.test(urlId)) {
             if (loadJSON(sessionKey(urlId))) {
                 loadConvo(urlId);
+                applyHashTab();
                 return;
             }
             state.sessionId = urlId;
@@ -5702,6 +5876,7 @@
             saveMessages();
             enterChat(false);
             sysMsg('Wróciłeś do zapisanej rozmowy — wcześniejsze wiadomości mam zapisane po swojej stronie. Pisz dalej.');
+            applyHashTab();
             return;
         }
 
@@ -5712,12 +5887,14 @@
             applySavedState(saved);
             enterChat(true);
             renderConvoList();
+            applyHashTab();
             return;
         }
         // Brak aktywnej, ale są rozmowy na liście — wróć do najnowszej
         var idx = convoIndex();
         if (idx.length) {
             loadConvo(idx[idx.length - 1].id);
+            applyHashTab();
             return;
         }
 
