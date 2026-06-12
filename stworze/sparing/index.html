@@ -664,6 +664,98 @@
     .pj-edit__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin: 0 0 11px; }
     .pj-edit--done .pj-edit__d { margin-bottom: 0; }
 
+    /* Dogrywane elementy karty: plan przychodu + pigułka + loadery */
+    .pj-plan, .pj-pill {
+        margin-top: 18px;
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.012) 100%);
+        padding: 18px;
+    }
+    .pj-plan__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 13px;
+    }
+    .pj-plan__t {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--text-strong);
+    }
+    .pj-plan__t svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
+    .pj-plan__tag {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 999px;
+        padding: 4px 10px;
+        white-space: nowrap;
+    }
+    .pj-plan__model { font-size: 13.5px; color: var(--text); line-height: 1.6; margin-bottom: 14px; }
+    .pj-plan__model b { color: var(--text-strong); }
+    .pj-plan__why { display: block; font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .pj-plan__miles {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    @media (max-width: 560px) { .pj-plan__miles { grid-template-columns: 1fr; } }
+    .pj-mile {
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 13px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 13px 14px;
+    }
+    .pj-mile b { display: block; font-size: clamp(17px, 2vw, 21px); font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
+    .pj-mile b small { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-left: 2px; }
+    .pj-mile span { display: block; font-size: 12px; color: var(--text); margin-top: 3px; }
+    .pj-mile em { display: block; font-style: normal; font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .pj-mile--goal { border-color: rgba(77, 159, 255, 0.45); background: var(--accent-dim); }
+    .pj-mile--goal b { color: var(--accent); }
+    .pj-plan__rows { margin-bottom: 4px; }
+    .pj-assume { margin-top: 8px; }
+    .pj-assume summary {
+        font-size: 12px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 5px 0;
+        list-style: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pj-assume summary::-webkit-details-marker { display: none; }
+    .pj-assume summary::before { content: '+'; color: var(--accent); font-weight: 700; }
+    .pj-assume[open] summary::before { content: '−'; }
+    .pj-assume summary:hover { color: var(--text-strong); }
+    .pj-zal { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--text); line-height: 1.65; }
+    .pj-zal li { margin-bottom: 3px; }
+    .pj-plan__note { font-size: 11.5px; color: var(--text-muted); margin-top: 12px; opacity: 0.85; }
+    .pj-pill__tile { cursor: zoom-in; }
+    .pj-wait {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border: 1px dashed var(--glass-border);
+        border-radius: 16px;
+        padding: 16px 18px;
+    }
+    .pj-wait .share__spin { flex-shrink: 0; width: 22px; height: 22px; }
+    .pj-wait__txt b { display: block; font-size: 13.5px; color: var(--text-strong); }
+    .pj-wait__txt span { font-size: 12px; color: var(--text-muted); }
+    .pj-wait--fail { border-style: solid; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
     /* Widok udostępnionego projektu (?projekt=<id>) — read-only wizytówka:
        bez czatu i sidebara, dane z serwera, na dole CTA „stwórz własny” */
     .app--share { display: block; }
@@ -2767,6 +2859,7 @@
     var SPAR_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-chat';
     var SPAR_IMAGE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-image';
     var SPAR_PROJECT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-project';
+    var SPAR_PLAN_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-plan';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Pierwsza Makieta — Stworzę" (500 zł)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
@@ -2788,6 +2881,9 @@
         ['dodatkowa', 'Dodatkowa funkcja'],
         ['landing', 'Strona sprzedażowa']
     ];
+    // Infografika karty — osobny widok spar-image: nie wchodzi do VIEW_META
+    // (pętle ekranów/skeletonów/limitów jej nie dotyczą), sync i archiwum tak
+    var SUMMARY_META = ['podsumowanie', 'Projekt w pigułce'];
     function viewLabel(v) {
         for (var i = 0; i < VIEW_META.length; i++) if (VIEW_META[i][0] === v) return VIEW_META[i][1];
         return 'Podgląd';
@@ -2857,8 +2953,12 @@
         emailKnown: false,      // serwer zna maila tej sesji (powrót z linku ?id= — nie pytaj drugi raz)
         lastBrief: null,        // ostatni brief <projekt> (nazwa/opis do nagłówka zakładki Projekt)
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
-        editPending: false      // runda poprawki w toku (kliknięto „Poprawiam projekt", czekamy na nowy werdykt)
+        editPending: false,     // runda poprawki w toku (kliknięto „Poprawiam projekt", czekamy na nowy werdykt)
+        bizplan: null           // wstępny plan przychodu z spar-plan (JSON; liczony po zielonym werdykcie)
     };
+    // Dogrywane elementy karty (pigułka graficzna + plan przychodu):
+    // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
+    var extras = { summary: 'idle', plan: 'idle' };
     var activeTab = 'chat';
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
@@ -2898,7 +2998,8 @@
             emailKnown: !!state.emailKnown,
             lastBrief: state.lastBrief || null,
             editsUsed: state.editsUsed || 0,
-            editPending: !!state.editPending
+            editPending: !!state.editPending,
+            bizplan: state.bizplan || null
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -2977,6 +3078,9 @@
         state.lastBrief = saved.lastBrief || null;
         state.editsUsed = saved.editsUsed || 0;
         state.editPending = !!saved.editPending;
+        state.bizplan = saved.bizplan || null;
+        extras.summary = 'idle';
+        extras.plan = 'idle';
         state.previews = {};
         state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
@@ -3015,7 +3119,7 @@
                 }
             }
             if (p.preview_images && typeof p.preview_images === 'object') {
-                VIEW_META.forEach(function (vm) {
+                VIEW_META.concat([SUMMARY_META]).forEach(function (vm) {
                     var v = vm[0];
                     var su = p.preview_images[v];
                     if (typeof su === 'string' && state.previews[v] !== su) {
@@ -3024,6 +3128,12 @@
                         changed = true;
                     }
                 });
+            }
+            if (p.business_plan && typeof p.business_plan === 'object'
+                && JSON.stringify(p.business_plan) !== JSON.stringify(state.bizplan)) {
+                state.bizplan = p.business_plan;
+                persistSession();
+                changed = true;
             }
             if (p.preview_history && typeof p.preview_history === 'object') {
                 Object.keys(p.preview_history).forEach(function (v) {
@@ -3262,6 +3372,11 @@
                 fail('Ten projekt nie jest jeszcze gotowy albo link jest nieaktualny.');
                 return;
             }
+            // Plan przychodu + pigułka — jeśli już policzone (bez loaderów:
+            // odbiorca dostaje gotową wizytówkę, generuje tylko właściciel)
+            if (pr.business_plan) html += bizplanHTML(pr.business_plan);
+            var pillUrl = state.previews[SUMMARY_META[0]];
+            if (pillUrl) html += pillHTML(pillUrl);
             html += '<div class="share-cta">' +
                 '<div class="share-cta__t">Ten projekt powstał w kilkanaście minut rozmowy z AI.</div>' +
                 '<p>Opowiadasz o swojej branży albo pasji — AI razem z Tobą projektuje narzędzie, pokazuje pierwsze ekrany i mówi wprost, czy pomysł się spina. Za darmo.</p>' +
@@ -3274,7 +3389,10 @@
                 d.open = pjDesktop || di === 0;
             });
             body.querySelectorAll('.pv-tile').forEach(function (t) {
-                t.addEventListener('click', function () { openLightbox(t.dataset.view); });
+                t.addEventListener('click', function () {
+                    if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
+                    else openLightbox(t.dataset.view);
+                });
             });
         }).catch(function () {
             fail('Nie udało się wczytać projektu. Sprawdź połączenie i odśwież stronę.');
@@ -3338,6 +3456,147 @@
         return html;
     }
 
+    /* ── Dogrywane elementy karty: pigułka graficzna + plan przychodu ──
+       Generują się PO zielonym werdykcie (karta musi istnieć w DB); user
+       często jest na karcie szybciej — wtedy widzi loadery. Po poprawce
+       projektu (nowy werdykt) regenerujemy z force. */
+    function pushPreviewHistory(view, url) {
+        if (!url) return;
+        if (!state.previewHistory[view]) state.previewHistory[view] = [];
+        if (state.previewHistory[view].indexOf(url) < 0) state.previewHistory[view].push(url);
+    }
+
+    function ensureSummaryImage(force) {
+        if (extras.summary === 'gen') return;
+        if (!force && state.previews[SUMMARY_META[0]]) return;
+        if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
+        extras.summary = 'gen';
+        var sid = state.sessionId;
+        fetch(SPAR_IMAGE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, view: SUMMARY_META[0] })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.url) {
+                var prev = state.previews[SUMMARY_META[0]];
+                if (res.d.archived && res.d.archived !== res.d.url) pushPreviewHistory(SUMMARY_META[0], res.d.archived);
+                if (prev && prev !== res.d.url) pushPreviewHistory(SUMMARY_META[0], prev);
+                state.previews[SUMMARY_META[0]] = res.d.url;
+                saveJSON(previewKey(sid), { images: state.previews, history: state.previewHistory });
+                extras.summary = 'idle';
+            } else {
+                // limit wersji = pokazujemy ostatnią, bez komunikatu błędu
+                extras.summary = (res.d && res.d.error === 'limit_podsumowan') ? 'idle' : 'fail';
+            }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.summary = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
+    function ensureBizplan(force) {
+        if (extras.plan === 'gen') return;
+        if (!force && state.bizplan) return;
+        if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
+        extras.plan = 'gen';
+        var sid = state.sessionId;
+        fetch(SPAR_PLAN_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, force: !!force })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.plan) {
+                state.bizplan = res.d.plan;
+                persistSession();
+                extras.plan = 'idle';
+            } else {
+                extras.plan = 'fail';
+            }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.plan = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
+    function ensureKartaExtras(force) {
+        ensureSummaryImage(force);
+        ensureBizplan(force);
+    }
+
+    function fmtZl(n) {
+        return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    function bizplanHTML(plan) {
+        if (!plan || !Array.isArray(plan.kamienie) || !plan.kamienie.length) return '';
+        var miles = plan.kamienie.slice(0, 3).map(function (m, i, arr) {
+            if (!m || typeof m.mies !== 'number') return '';
+            var goal = i === arr.length - 1;
+            return '<div class="pj-mile' + (goal ? ' pj-mile--goal' : '') + '">' +
+                '<b>' + fmtZl(m.mies) + ' zł<small>/mies.</small></b>' +
+                '<span>' + esc(String(m.klienci)) + ' klientów</span>' +
+                (m.etap ? '<em>' + esc(m.etap) + '</em>' : '') + '</div>';
+        }).join('');
+        var zal = Array.isArray(plan.zalozenia) && plan.zalozenia.length
+            ? '<details class="pj-assume"><summary>Założenia do tych liczb</summary><ul class="pj-zal">' +
+              plan.zalozenia.map(function (z) { return '<li>' + esc(z) + '</li>'; }).join('') + '</ul></details>'
+            : '';
+        return '<div class="pj-plan">' +
+            '<div class="pj-plan__head"><span class="pj-plan__t">' +
+            pjIco('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>') +
+            'Wstępny plan przychodu</span><span class="pj-plan__tag">szacunki z rozmowy</span></div>' +
+            '<div class="pj-plan__model"><b>' + esc(plan.model_przychodu || 'Abonament') + '</b> — ' +
+            esc(String(plan.cena || '')) + ' ' + esc(plan.cena_jednostka || 'zł/mies.') +
+            (plan.cena_uzasadnienie ? '<span class="pj-plan__why">' + esc(plan.cena_uzasadnienie) + '</span>' : '') +
+            '</div>' +
+            '<div class="pj-plan__miles">' + miles + '</div>' +
+            '<div class="pj-plan__rows">' +
+            pjRow('Rynek', plan.rynek) +
+            pjRow('Zwrot wkładu', plan.zwrot_wkladu) +
+            pjRow('Rok 2', plan.rok2_potencjal) +
+            '</div>' + zal +
+            '<div class="pj-plan__note">Wstępne wyliczenia na podstawie rozmowy — szczegółowy plan przedsięwzięcia przygotowuje Tomek po rezerwacji.</div>' +
+            '</div>';
+    }
+
+    function pillHTML(url) {
+        return '<div class="pj-pill">' +
+            '<div class="pj-plan__head"><span class="pj-plan__t">' +
+            pjIco('<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 9v11"></path>') +
+            'Projekt w pigułce</span><span class="pj-plan__tag">jedna grafika — cały projekt</span></div>' +
+            '<div class="pv-tile is-done pj-pill__tile" data-pill="' + esc(url) + '">' +
+            '<span class="pv-tile__label">Podsumowanie graficzne</span>' +
+            '<div class="pv-tile__body"><img src="' + esc(url) + '" alt="Projekt w pigułce" loading="lazy"></div></div></div>';
+    }
+
+    function extrasWaitHTML(kind) {
+        if (kind === 'plan') {
+            return '<div class="pj-wait"><span class="share__spin" aria-hidden="true"></span>' +
+                '<div class="pj-wait__txt"><b>Liczę wstępny plan przychodu…</b>' +
+                '<span>model, cena i droga do 50 klientów — na podstawie rozmowy</span></div></div>';
+        }
+        return '<div class="pj-wait"><span class="share__spin" aria-hidden="true"></span>' +
+            '<div class="pj-wait__txt"><b>Rysuję projekt w pigułce…</b>' +
+            '<span>graficzne podsumowanie karty — około minuty</span></div></div>';
+    }
+
+    function extrasFailHTML(kind) {
+        return '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>' +
+            (kind === 'plan' ? 'Nie udało się policzyć planu przychodu.' : 'Nie udało się narysować pigułki.') +
+            '</b><span>Spróbuj jeszcze raz — to chwila.</span></div>' +
+            '<button type="button" class="preview-retry" data-retry="' + kind + '">Spróbuj ponownie</button></div>';
+    }
+
     function renderPaneProjekt(verIdx) {
         var body = el('pane-projekt-body');
         var items = lightboxItems();
@@ -3393,9 +3652,9 @@
             }).join('') + '</div>';
         }
 
-        // Wcześniejsze wersje ekranów — nic nie przepada
+        // Wcześniejsze wersje ekranów — nic nie przepada (pigułka też)
         var oldShots = [];
-        VIEW_META.forEach(function (vm) {
+        VIEW_META.concat([SUMMARY_META]).forEach(function (vm) {
             (state.previewHistory[vm[0]] || []).forEach(function (u, hi) {
                 oldShots.push({ view: vm[0], label: vm[1] + ' — v' + (hi + 1), url: u });
             });
@@ -3426,6 +3685,19 @@
             html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
         }
 
+        // Plan przychodu + pigułka — tylko przy zielonym werdykcie; gdy jeszcze
+        // się liczą (user wszedł szybciej), w ich miejscu stoją loadery
+        if (k && state.verdict === 'zielony') {
+            ensureKartaExtras(false); // no-op gdy dane są albo generacja trwa
+            if (state.bizplan) html += bizplanHTML(state.bizplan);
+            else if (extras.plan === 'fail') html += extrasFailHTML('plan');
+            else html += extrasWaitHTML('plan');
+            var pillUrl = state.previews[SUMMARY_META[0]];
+            if (pillUrl) html += pillHTML(pillUrl);
+            else if (extras.summary === 'fail') html += extrasFailHTML('pill');
+            else html += extrasWaitHTML('pill');
+        }
+
         body.innerHTML = html;
         // Desktop: wszystkie sekcje otwarte (jest miejsce); mobile: pierwsza
         // otwarta, reszta zwinięta — user otwiera, co go interesuje
@@ -3436,8 +3708,17 @@
         var oldList = oldShots;
         body.querySelectorAll('.pv-tile').forEach(function (t) {
             t.addEventListener('click', function () {
-                if (t.dataset.old !== undefined) openLightbox(oldList[parseInt(t.dataset.old, 10)].url);
+                if (t.dataset.pill !== undefined) openLightbox({ url: t.dataset.pill, label: 'Projekt w pigułce' });
+                else if (t.dataset.old !== undefined) openLightbox(oldList[parseInt(t.dataset.old, 10)].url);
                 else openLightbox(t.dataset.view);
+            });
+        });
+        body.querySelectorAll('[data-retry]').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var kind = b.getAttribute('data-retry');
+                if (kind === 'plan') { extras.plan = 'idle'; ensureBizplan(false); }
+                else { extras.summary = 'idle'; ensureSummaryImage(false); }
+                renderPaneProjekt();
             });
         });
         body.querySelectorAll('.pj-ver').forEach(function (b) {
@@ -3551,7 +3832,11 @@
     function openLightbox(startView) {
         if (el('spar-lightbox')) return;
         var items;
-        if (typeof startView === 'string' && /^https?:/.test(startView)) {
+        if (startView && typeof startView === 'object' && startView.url) {
+            // pojedynczy obraz z własnym podpisem (np. pigułka projektu)
+            items = [{ view: '_single', label: startView.label || 'Podgląd', url: startView.url }];
+            startView = '_single';
+        } else if (typeof startView === 'string' && /^https?:/.test(startView)) {
             // pojedynczy URL (np. wcześniejsza wersja ekranu z archiwum)
             items = [{ view: 'panel', label: 'Wcześniejsza wersja', url: startView }];
             startView = 'panel';
@@ -3725,6 +4010,9 @@
         state.lastBrief = null;
         state.editsUsed = 0;
         state.editPending = false;
+        state.bizplan = null;
+        extras.summary = 'idle';
+        extras.plan = 'idle';
         if (activeTab !== 'chat') switchTab('chat');
         if (!state.pSlug) state.profession = null;
         messages = [];
@@ -4384,12 +4672,20 @@
                 state.karta = (parsed && parsed.karta) ? parsed.karta : state.karta;
                 if (meta.leadId) state.leadId = meta.leadId;
                 // Runda poprawki domknięta nowym werdyktem — zliczamy do limitu
+                var wasEdit = false;
                 if (verdict === 'zielony' && state.editPending) {
                     state.editsUsed = (state.editsUsed || 0) + 1;
                     state.editPending = false;
+                    wasEdit = true;
                 }
                 persistSession();
                 renderVerdict(verdict, state.karta);
+                // Pigułka + plan przychodu: start zaraz po zielonym werdykcie
+                // (po poprawce force — karta się zmieniła). Mały bufor, żeby
+                // serwer zdążył domknąć zapis karty do DB.
+                if (verdict === 'zielony' && state.karta) {
+                    setTimeout(function () { ensureKartaExtras(wasEdit); }, 1500);
+                }
             } else if (!meta.projekt && gatePending() && !el('inline-gate')) {
                 renderInlineGate();
             }
