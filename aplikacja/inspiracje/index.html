@@ -444,7 +444,7 @@ img { max-width: 100%; display: block; }
     var known = {};          // nazwa -> true (wykrywanie nowych przy refreshu)
     var first = true;
 
-    function cardHTML(p, isNew) {
+    function cardHTML(p, isNew, eager) {
         var imgs = p.imgs || [];
         var views = imgs.length > 1
             ? imgs.map(function (v, i) {
@@ -461,8 +461,14 @@ img { max-width: 100%; display: block; }
             '</div>' +
             '<div class="card__screen" data-open>' +
             imgs.map(function (v, i) {
-                return '<img src="' + esc(lightImg(v.url)) + '" alt="' + esc(p.nazwa + ' — ' + v.label) + '"' +
-                    (i === 0 ? ' class="is-on"' : ' loading="lazy"') + ' decoding="async">';
+                // tylko 1. widok dostaje src od razu (above-fold eager, dalsze lazy);
+                // ukryte widoki = data-src, ładowane dopiero przy hover/przełączeniu — inaczej
+                // strona ciągnie wszystkie widoki wszystkich kart na starcie
+                if (i === 0) {
+                    return '<img src="' + esc(lightImg(v.url)) + '" alt="' + esc(p.nazwa + ' — ' + v.label) + '" class="is-on"' +
+                        (eager ? '' : ' loading="lazy"') + ' decoding="async">';
+                }
+                return '<img data-src="' + esc(lightImg(v.url)) + '" alt="' + esc(p.nazwa + ' — ' + v.label) + '" decoding="async">';
             }).join('') +
             '</div>' +
             '<div class="card__foot">' +
@@ -476,12 +482,18 @@ img { max-width: 100%; display: block; }
         var dots = card.querySelectorAll('.card__view');
         var label = card.querySelector('[data-viewlabel]');
         var vi = 0;
+        function materialize(im) {
+            if (im && im.dataset.src) { im.src = im.dataset.src; delete im.dataset.src; }
+        }
         function goV(i) {
             vi = (i + imgs.length) % imgs.length;
+            materialize(imgs[vi]);
             imgs.forEach(function (im, j) { im.classList.toggle('is-on', j === vi); });
             dots.forEach(function (d, j) { d.classList.toggle('is-on', j === vi); });
             label.textContent = (p.imgs[vi] || {}).label || '';
         }
+        // hover = prefetch pozostałych widoków (desktop; na mobile ładuje klik kropki)
+        card.addEventListener('pointerenter', function () { imgs.forEach(materialize); }, { once: true });
         dots.forEach(function (d) {
             d.addEventListener('click', function () { goV(parseInt(d.dataset.v, 10)); });
         });
@@ -494,7 +506,7 @@ img { max-width: 100%; display: block; }
 
     function render(newNames) {
         grid.innerHTML = items.map(function (p, i) {
-            var html = cardHTML(p, newNames && newNames[p.nazwa]);
+            var html = cardHTML(p, newNames && newNames[p.nazwa], i < 4);
             // CTA wpleciony po 4. projekcie (i potem co 8)
             if (i === 3 || (i > 3 && (i - 3) % 8 === 0)) html += MID_CTA;
             return html;
