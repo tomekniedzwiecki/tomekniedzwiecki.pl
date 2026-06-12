@@ -410,8 +410,9 @@ img { max-width: 100%; display: block; }
     var grid = document.getElementById('grid');
     var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
     function lightImg(url, w) {
+        // resize=contain obowiązkowo — bez niego render API tnie boki (zwraca width×oryginalna_wysokość)
         return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
-            '?format=webp&width=' + (w || 900) + '&quality=72';
+            '?format=webp&width=' + (w || 900) + '&quality=72&resize=contain';
     }
     var q = location.search;
     if (q) document.querySelectorAll('a[href="/aplikacja/sparing/"]').forEach(function (a) { a.href = '/aplikacja/sparing/' + q; });

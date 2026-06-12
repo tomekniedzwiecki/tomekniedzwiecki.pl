@@ -987,8 +987,9 @@ img { max-width: 100%; display: block; }
     var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
     function lightImg(url, w) {
         // storage object URL -> render API z transformacją (webp, szerokość)
+        // resize=contain obowiązkowo — bez niego render API tnie boki (zwraca width×oryginalna_wysokość)
         return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
-            '?format=webp&width=' + (w || 480) + '&quality=70';
+            '?format=webp&width=' + (w || 480) + '&quality=70&resize=contain';
     }
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
