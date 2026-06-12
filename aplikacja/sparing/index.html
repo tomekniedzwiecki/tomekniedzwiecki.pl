@@ -4548,7 +4548,8 @@
     // Działająca strona narzędzia: spar-landing odpowiada 202 i buduje w tle
     // (1-4 min) — gotowość poznajemy po landing_url w spar-project (poll)
     function ensureLanding() {
-        if (extras.landing === 'gen' || state.landingUrl) return;
+        // 'limit' = pula wersji wyczerpana (429) — bez kolejnych POST-ów co render
+        if (extras.landing === 'gen' || extras.landing === 'limit' || state.landingUrl) return;
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras.landing = 'gen';
         extrasStart.landing = Date.now();
@@ -4598,8 +4599,10 @@
             } else if (res.ok && res.d && res.d.status === 'started') {
                 pollReady(15); // ~5 min okna na generację
             } else if (res.status === 429) {
-                // limit — jeśli strona istnieje, sync przyniesie landing_url
-                extras.landing = 'idle';
+                // limit — jeśli strona istnieje, sync przyniesie landing_url;
+                // bez tego statusu kafel pokazywałby wieczny pasek „Buduję…"
+                extras.landing = 'limit';
+                if (activeTab === 'projekt') renderPaneProjekt();
             } else {
                 extras.landing = 'fail';
                 if (activeTab === 'projekt') renderPaneProjekt();
@@ -4941,12 +4944,17 @@
                     '<span class="pjd-tile__sub">prawdziwa strona w przeglądarce, nie grafika — otwórz i poklikaj</span>' +
                     '</a>';
             } else {
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                var landGenBg = state.previews.landing
+                    ? ' style="background-image:linear-gradient(180deg, rgba(5,5,7,0.78) 0%, rgba(5,5,7,0.94) 80%), url(\'' + esc(state.previews.landing) + '\')"'
+                    : '';
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static pjd-tile--img"' + landGenBg + '>' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.strona) + '</span>' +
                     '<span class="pjd-tile__t">Strona narzędzia</span>' +
                     (extras.landing === 'fail'
                         ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować strony.</b><button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('landing', 'Buduję działającą stronę…', 'prawdziwa strona w przeglądarce, nie grafika')) +
+                        : extras.landing === 'limit'
+                            ? '<span class="pjd-tile__sub">pula wersji strony wykorzystana — finalną dopracujesz z Tomkiem</span>'
+                            : genProgressHTML('landing', 'Buduję działającą stronę…', 'prawdziwa strona w przeglądarce, nie grafika')) +
                     '</div>';
             }
 
