@@ -664,6 +664,88 @@
     .pj-edit__d { font-size: 13px; line-height: 1.6; color: var(--text-muted); margin: 0 0 11px; }
     .pj-edit--done .pj-edit__d { margin-bottom: 0; }
 
+    /* Widok udostępnionego projektu (?projekt=<id>) — read-only wizytówka:
+       bez czatu i sidebara, dane z serwera, na dole CTA „stwórz własny” */
+    .app--share { display: block; }
+    .share {
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .share__inner {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 22px clamp(14px, 4vw, 26px) 64px;
+    }
+    .share__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: clamp(24px, 5vh, 42px);
+    }
+    .share__brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        color: var(--text-strong);
+        text-decoration: none;
+    }
+    .share__brand img { border-radius: 7px; }
+    .share__owner {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--glass-border);
+        padding-bottom: 1px;
+        transition: color 0.2s var(--ease);
+    }
+    .share__owner:hover { color: var(--text-strong); }
+    .share__loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding-top: 28vh;
+        color: var(--text-muted);
+        font-size: 14px;
+        text-align: center;
+    }
+    .share__spin {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 2.5px solid var(--glass-border);
+        border-top-color: var(--accent);
+        animation: sparSpin 0.8s linear infinite;
+    }
+    .share-cta {
+        margin-top: 36px;
+        border: 1px solid rgba(77, 159, 255, 0.3);
+        border-radius: 18px;
+        background: var(--accent-dim);
+        padding: clamp(22px, 4.5vw, 32px);
+        text-align: center;
+    }
+    .share-cta__t { font-size: clamp(17px, 2.6vw, 21px); font-weight: 800; color: var(--text-strong); margin-bottom: 8px; }
+    .share-cta p { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; max-width: 54ch; margin: 0 auto 18px; }
+    .share-cta .side-cta__btn { display: inline-flex; min-width: min(260px, 100%); padding: 11px 22px; text-decoration: none; }
+    .share-cta__more {
+        display: block;
+        margin-top: 14px;
+        font-size: 12.5px;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s var(--ease);
+    }
+    .share-cta__more:hover { color: var(--text-strong); }
+    .share .tabpane__empty a.preview-retry { display: inline-block; text-decoration: none; margin-top: 14px; line-height: 26px; }
+
     /* Współpraca — liczby, oś czasu, role (skanowalne, zero ścian tekstu) */
     .cw-stats {
         display: grid;
@@ -3079,16 +3161,124 @@
         setTimeout(function () { t.remove(); }, 2800);
     }
 
+    // Udostępnianie: link prowadzi do publicznego widoku ?projekt=<id> —
+    // odbiorca widzi kartę i ekrany (read-only, dane z serwera), NIE rozmowę.
+    // ?id= zostaje wyłącznie jako powrót właściciela do własnej sesji.
     function shareProject() {
-        var url = location.origin + location.pathname + '?id=' + encodeURIComponent(state.sessionId);
-        function done() { showToast('Link skopiowany — pokaż projekt komu chcesz'); }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(done).catch(function () {
+        var nazwa = (state.lastBrief && state.lastBrief.nazwa) || 'Mój projekt';
+        var url = location.origin + location.pathname + '?projekt=' + encodeURIComponent(state.sessionId);
+        function copyIt() {
+            function done() { showToast('Link skopiowany — odbiorca zobaczy kartę i ekrany projektu'); }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(done).catch(function () {
+                    window.prompt('Skopiuj link do projektu:', url);
+                });
+            } else {
                 window.prompt('Skopiuj link do projektu:', url);
-            });
-        } else {
-            window.prompt('Skopiuj link do projektu:', url);
+            }
         }
+        // Mobile: natywny share-sheet (Messenger/WhatsApp/SMS jednym tapem);
+        // desktop: schowek — przewidywalnie, bez systemowych okien
+        var mobile = window.matchMedia('(max-width: 1023.98px)').matches && 'ontouchstart' in window;
+        if (mobile && navigator.share) {
+            navigator.share({
+                title: nazwa + ' — projekt narzędzia',
+                text: 'Zobacz „' + nazwa + '” — kartę projektu i pierwsze ekrany narzędzia:',
+                url: url
+            }).catch(function (err) {
+                // zamknięcie share-sheet to nie błąd — fallback tylko przy realnym
+                if (!err || err.name !== 'AbortError') copyIt();
+            });
+            return;
+        }
+        copyIt();
+    }
+
+    // Publiczny widok udostępnionego projektu (?projekt=<sessionId>):
+    // czysta wizytówka — ekrany + karta z serwera, zero czatu, na dole CTA
+    // „stwórz własny”. Właściciel z tą sesją w LS dostaje link powrotny.
+    function renderShareView(sid) {
+        document.title = 'Projekt narzędzia — Stworzę';
+        var app = document.querySelector('main.app');
+        app.className = 'app app--share';
+        var isOwner = !!loadJSON(sessionKey(sid));
+        function topBar() {
+            return '<div class="share__top">' +
+                '<a class="share__brand" href="/stworze/"><img src="/img/logo/tn-logo-icon-88.png" alt="" width="26" height="26" aria-hidden="true">Stworzę</a>' +
+                (isOwner ? '<a class="share__owner" href="' + location.pathname + '?id=' + encodeURIComponent(sid) + '">To Twój projekt — wróć do rozmowy</a>' : '') +
+                '</div>';
+        }
+        app.innerHTML = '<div class="share"><div class="share__inner" id="share-body">' +
+            topBar() +
+            '<div class="share__loading"><span class="share__spin" aria-hidden="true"></span>Wczytuję projekt…</div>' +
+            '</div></div>';
+        var body = el('share-body');
+
+        function fail(msg) {
+            body.innerHTML = topBar() +
+                '<div class="tabpane__empty" style="margin-top:8vh">' + msg + '<br>' +
+                '<a class="preview-retry" href="/stworze/sparing/">Stwórz własny projekt</a></div>';
+        }
+
+        fetch(SPAR_PROJECT_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SB_PUBLISHABLE,
+                'apikey': SB_PUBLISHABLE
+            },
+            body: JSON.stringify({ sessionId: sid, action: 'get' })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        }).then(function (res) {
+            if (!res.ok || !res.d || !res.d.projekt) {
+                fail(res.d && res.d.error === 'brak_projektu'
+                    ? 'Ten projekt nie jest jeszcze gotowy albo link jest nieaktualny.'
+                    : 'Nie udało się wczytać projektu. Odśwież stronę i spróbuj jeszcze raz.');
+                return;
+            }
+            var pr = res.d.projekt;
+            var nazwa = pr.nazwa || 'Projekt narzędzia';
+            document.title = nazwa + ' — Stworzę';
+            // lightbox czyta state.previews — zasilamy z serwera
+            state.previews = pr.preview_images || (pr.preview_image_url ? { panel: pr.preview_image_url } : {});
+            var items = lightboxItems();
+            var k = pr.karta || null;
+
+            var html = topBar() +
+                '<div class="tabpane__head"><div class="tabpane__eyebrow">Projekt narzędzia</div>' +
+                '<h2 class="tabpane__title">' + esc(nazwa) + '</h2>' +
+                (pr.opis ? '<p class="tabpane__sub">' + esc(pr.opis) + '</p>' : '') +
+                '</div>';
+            if (items.length) {
+                html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
+                    return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
+                        '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
+                        '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
+                }).join('') + '</div>';
+            }
+            if (k) html += kartaGridHTML(k, '');
+            if (!items.length && !k) {
+                fail('Ten projekt nie jest jeszcze gotowy albo link jest nieaktualny.');
+                return;
+            }
+            html += '<div class="share-cta">' +
+                '<div class="share-cta__t">Ten projekt powstał w kilkanaście minut rozmowy z AI.</div>' +
+                '<p>Opowiadasz o swojej branży albo pasji — AI razem z Tobą projektuje narzędzie, pokazuje pierwsze ekrany i mówi wprost, czy pomysł się spina. Za darmo.</p>' +
+                '<a class="side-cta__btn" href="/stworze/sparing/">Stwórz projekt dla swojej branży</a>' +
+                '<a class="share-cta__more" href="/stworze/">Zobacz, jak działa współpraca z Tomkiem →</a>' +
+                '</div>';
+            body.innerHTML = html;
+            var pjDesktop = window.matchMedia('(min-width: 1024px)').matches;
+            body.querySelectorAll('details.pj-sec').forEach(function (d, di) {
+                d.open = pjDesktop || di === 0;
+            });
+            body.querySelectorAll('.pv-tile').forEach(function (t) {
+                t.addEventListener('click', function () { openLightbox(t.dataset.view); });
+            });
+        }).catch(function () {
+            fail('Nie udało się wczytać projektu. Sprawdź połączenie i odśwież stronę.');
+        });
     }
 
     function pjChips(arr, dim) {
@@ -3104,6 +3294,48 @@
     function pjRow(label, val) {
         if (!val) return '';
         return '<div class="pj-row"><span>' + label + '</span>' + esc(val) + '</div>';
+    }
+
+    // Karta — desktop: dwie kolumny otwartych sekcji; mobile: zwijane akordeony
+    // (cytat problemu zawsze widoczny jako hook). Współdzielone przez zakładkę
+    // „Twój projekt” i publiczny widok udostępnionego projektu (?projekt=).
+    function pjSec(icon, title, inner) {
+        if (!inner) return '';
+        return '<details class="pj-sec"><summary><span class="pj-sec__t">' + icon + title + '</span>' +
+            '<svg class="pj-sec__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>' +
+            '</summary><div class="pj-sec__b">' + inner + '</div></details>';
+    }
+
+    function pjIco(p) {
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+    }
+
+    function kartaGridHTML(k, extraRightHtml) {
+        var html = '';
+        if (k.problem) html += '<div class="pj-quote">' + esc(k.problem) + '</div>';
+        var pierwsza = '';
+        if (Array.isArray(k.ekrany) && k.ekrany.length) pierwsza += pjChips(k.ekrany);
+        if (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) {
+            pierwsza += '<div class="pj-later">Świadomie na później (żeby pierwsza wersja była prosta):</div>' + pjChips(k.poza_zakresem, true);
+        }
+        var rynek = '';
+        if (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) rynek += '<div class="pj-later">Gdzie znajdziemy klientów:</div>' + pjChips(k.kanaly_dystrybucji);
+        rynek += pjRow('Konkurencja', k.konkurencja);
+        if (Array.isArray(k.ryzyka) && k.ryzyka.length) rynek += '<div class="pj-later">Na co uważać:</div>' + pjChips(k.ryzyka, true);
+
+        html += '<div class="pj2-grid">' +
+            '<div class="pj2-col">' +
+            pjSec(pjIco('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>'), 'Dla kogo i kto płaci',
+                pjRow('Dla kogo', k.dla_kogo || k.profesja) + pjRow('Kto płaci', k.kto_placi) + pjRow('Sygnał budżetu', k.sygnal_budzetu)) +
+            pjSec(pjIco('<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>'), 'Pierwsza wersja narzędzia', pierwsza) +
+            '</div>' +
+            '<div class="pj2-col">' +
+            pjSec(pjIco('<path d="M14.7 6.3a4.5 4.5 0 0 0-6.4 6.4l-4.8 4.8 1.4 1.4 1-1 1.6 1.6 1.4-1.4-1.6-1.6 1-1a4.5 4.5 0 0 0 6.4-6.4z"></path>'), 'Jak radzą sobie dziś',
+                k.dzisiejsze_obejscie ? '<p>' + esc(k.dzisiejsze_obejscie) + '</p>' : '') +
+            pjSec(pjIco('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>'), 'Rynek i otoczenie', rynek) +
+            (extraRightHtml || '') +
+            '</div></div>';
+        return html;
     }
 
     function renderPaneProjekt(verIdx) {
@@ -3177,14 +3409,6 @@
                 }).join('') + '</div>';
         }
 
-        // Karta — desktop: dwie kolumny otwartych sekcji; mobile: zwijane akordeony
-        // (cytat problemu zawsze widoczny jako hook, reszta na żądanie)
-        function pjSec(icon, title, inner) {
-            if (!inner) return '';
-            return '<details class="pj-sec"><summary><span class="pj-sec__t">' + icon + title + '</span>' +
-                '<svg class="pj-sec__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>' +
-                '</summary><div class="pj-sec__b">' + inner + '</div></details>';
-        }
         var editHtml = '';
         if (hasKarta && state.verdict === 'zielony') {
             var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
@@ -3197,32 +3421,7 @@
             }
         }
         if (k) {
-            var ICO = function (p) {
-                return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
-            };
-            if (k.problem) html += '<div class="pj-quote">' + esc(k.problem) + '</div>';
-            var pierwsza = '';
-            if (Array.isArray(k.ekrany) && k.ekrany.length) pierwsza += pjChips(k.ekrany);
-            if (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) {
-                pierwsza += '<div class="pj-later">Świadomie na później (żeby pierwsza wersja była prosta):</div>' + pjChips(k.poza_zakresem, true);
-            }
-            var rynek = '';
-            if (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) rynek += '<div class="pj-later">Gdzie znajdziemy klientów:</div>' + pjChips(k.kanaly_dystrybucji);
-            rynek += pjRow('Konkurencja', k.konkurencja);
-            if (Array.isArray(k.ryzyka) && k.ryzyka.length) rynek += '<div class="pj-later">Na co uważać:</div>' + pjChips(k.ryzyka, true);
-
-            html += '<div class="pj2-grid">' +
-                '<div class="pj2-col">' +
-                pjSec(ICO('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>'), 'Dla kogo i kto płaci',
-                    pjRow('Dla kogo', k.dla_kogo || k.profesja) + pjRow('Kto płaci', k.kto_placi) + pjRow('Sygnał budżetu', k.sygnal_budzetu)) +
-                pjSec(ICO('<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>'), 'Pierwsza wersja narzędzia', pierwsza) +
-                '</div>' +
-                '<div class="pj2-col">' +
-                pjSec(ICO('<path d="M14.7 6.3a4.5 4.5 0 0 0-6.4 6.4l-4.8 4.8 1.4 1.4 1-1 1.6 1.6 1.4-1.4-1.6-1.6 1-1a4.5 4.5 0 0 0 6.4-6.4z"></path>'), 'Jak radzą sobie dziś',
-                    k.dzisiejsze_obejscie ? '<p>' + esc(k.dzisiejsze_obejscie) + '</p>' : '') +
-                pjSec(ICO('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>'), 'Rynek i otoczenie', rynek) +
-                editHtml +
-                '</div></div>';
+            html += kartaGridHTML(k, editHtml);
         } else if (items.length) {
             html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
         }
@@ -4926,12 +5125,20 @@
     }
 
     function init() {
+        // ?projekt=<uuid> — publiczny podgląd udostępnionego projektu;
+        // zastępuje całą appkę widokiem read-only, więc sprawdzamy pierwszy
+        var qs = new URLSearchParams(window.location.search);
+        var shareId = (qs.get('projekt') || '').trim();
+        if (shareId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(shareId)) {
+            renderShareView(shareId);
+            return;
+        }
+
         captureTracking();
         bindChat();
         migrateConvos();
 
         // ?p=profesja z reklamy — otwarcie skrojone pod branżę
-        var qs = new URLSearchParams(window.location.search);
         var p = qs.get('p');
         if (p && P_OPENERS[p]) state.pSlug = p;
 
