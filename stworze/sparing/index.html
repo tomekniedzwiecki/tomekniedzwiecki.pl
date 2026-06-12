@@ -718,6 +718,30 @@
         .pj-tab svg { width: 14px; height: 14px; }
     }
 
+    /* Sekcje zakładki Projekt — wszystko w jednym scrollu (nic nie jest
+       schowane za przełącznikiem), pasek na górze to scroll-spy + kotwice */
+    .pj-section { scroll-margin-top: 66px; }
+    .pj-section + .pj-section {
+        margin-top: 34px;
+        padding-top: 28px;
+        border-top: 1px solid var(--glass-border-soft);
+    }
+    .pj-sechead { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .pj-sechead__ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        background: var(--accent-dim);
+        border: 1px solid rgba(77, 159, 255, 0.25);
+        color: var(--accent);
+        flex-shrink: 0;
+    }
+    .pj-sechead__ico svg { width: 18px; height: 18px; }
+    .pj-sechead h3 { font-size: 16.5px; font-weight: 800; color: var(--text-strong); line-height: 1.2; margin: 0; }
+    .pj-sechead > div > span { display: block; font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
     /* Dogrywane elementy karty: plan przychodu + pigułka + loadery */
     .pj-plan, .pj-pill {
         margin-top: 18px;
@@ -3086,9 +3110,8 @@
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
     var extras = { summary: 'idle', plan: 'idle' };
     var activeTab = 'chat';
-    // Aktywny tab sekcji w zakładce „Twój projekt" (null = wylicz przy renderze);
-    // pjNewPlan = kropka na tabie Przychody, gdy plan policzył się w tle
-    var pjTab = null;
+    // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
+    // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
     var pjNewPlan = false;
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
@@ -3211,7 +3234,6 @@
         state.bizplan = saved.bizplan || null;
         extras.summary = 'idle';
         extras.plan = 'idle';
-        pjTab = null;
         pjNewPlan = false;
         state.previews = {};
         state.previewHistory = {};
@@ -3265,7 +3287,7 @@
                 && JSON.stringify(p.business_plan) !== JSON.stringify(state.bizplan)) {
                 state.bizplan = p.business_plan;
                 persistSession();
-                if (pjTab !== 'plan') pjNewPlan = true;
+                pjNewPlan = true;
                 changed = true;
             }
             if (p.preview_history && typeof p.preview_history === 'object') {
@@ -3650,8 +3672,7 @@
                 state.bizplan = res.d.plan;
                 persistSession();
                 extras.plan = 'idle';
-                // kropka na tabie Przychody, jeśli user nie patrzy właśnie na plan
-                if (pjTab !== 'plan') pjNewPlan = true;
+                pjNewPlan = true; // kropka na chipie Przychody — spy zdejmie przy sekcji
             } else {
                 extras.plan = 'fail';
             }
@@ -3738,6 +3759,37 @@
             '<button type="button" class="preview-retry" data-retry="' + kind + '">Spróbuj ponownie</button></div>';
     }
 
+    // Scroll-spy paska sekcji w zakładce Projekt: podświetla chip sekcji,
+    // która jest aktualnie na ekranie; dotarcie do planu zdejmuje kropkę
+    var pjSpyBound = false;
+    function bindPjSpy() {
+        if (pjSpyBound) return;
+        pjSpyBound = true;
+        var pane = el('pane-projekt');
+        if (pane) pane.addEventListener('scroll', updatePjSpy, { passive: true });
+    }
+    function updatePjSpy() {
+        var body = el('pane-projekt-body');
+        var pane = el('pane-projekt');
+        if (!body || !pane) return;
+        var secs = body.querySelectorAll('.pj-section');
+        if (!secs.length) return;
+        var paneTop = pane.getBoundingClientRect().top;
+        var current = secs[0].getAttribute('data-spy');
+        secs.forEach(function (s) {
+            if (s.getBoundingClientRect().top - paneTop <= 100) current = s.getAttribute('data-spy');
+        });
+        body.querySelectorAll('.pj-tab').forEach(function (b) {
+            var on = b.getAttribute('data-spy') === current;
+            b.classList.toggle('is-on', on);
+            if (on && current === 'plan' && pjNewPlan) {
+                pjNewPlan = false;
+                var d = b.querySelector('.pj-tab__dot');
+                if (d) d.remove();
+            }
+        });
+    }
+
     function renderPaneProjekt(verIdx) {
         var body = el('pane-projekt-body');
         var items = lightboxItems();
@@ -3777,105 +3829,121 @@
             });
         });
 
-        // Taby sekcji (Ekrany / Karta / Przychody) — stan trzymany między
-        // renderami; nieosiągalny tab przeskakuje na sensowny fallback
+        // Wszystkie sekcje w JEDNYM scrollu — nic nie chowa się za
+        // przełącznikiem (taby ukrywające treść = słaba odkrywalność).
+        // Pasek na górze to scroll-spy: pokazuje, gdzie jesteś, klik
+        // płynnie przewija do sekcji.
         var hasShots = items.length > 0 || oldShots.length > 0;
-        var hasPlanTab = hasKarta && state.verdict === 'zielony';
-        if (typeof verIdx === 'number') pjTab = 'karta'; // klik w przełącznik wersji
-        if (!pjTab) pjTab = hasKarta ? 'karta' : 'ekrany';
-        if (pjTab === 'plan' && !hasPlanTab) pjTab = hasKarta ? 'karta' : 'ekrany';
-        if (pjTab === 'ekrany' && !hasShots) pjTab = 'karta';
-        if (pjTab === 'karta' && !hasKarta && hasShots) pjTab = 'ekrany';
+        var hasPlanSec = hasKarta && state.verdict === 'zielony';
 
-        // Generacje planu i pigułki startują niezależnie od aktywnego taba
-        if (hasPlanTab) ensureKartaExtras(false);
+        // Generacje planu i pigułki startują od razu (niezależnie od scrolla)
+        if (hasPlanSec) ensureKartaExtras(false);
 
-        function tabBtn(id, label, icon, enabled, dot) {
+        function navBtn(id, label, icon, enabled, dot) {
             if (!enabled) return '';
-            return '<button type="button" class="pj-tab' + (pjTab === id ? ' is-on' : '') + '" data-pjtab="' + id + '" role="tab" aria-selected="' + (pjTab === id) + '">' +
+            return '<button type="button" class="pj-tab" data-spy="' + id + '" data-anchor="pjsec-' + id + '">' +
                 pjIco(icon) + label + (dot ? '<i class="pj-tab__dot" aria-hidden="true"></i>' : '') + '</button>';
         }
-        html += '<div class="pj-tabs" role="tablist">' +
-            tabBtn('ekrany', 'Ekrany', '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>', hasShots) +
-            tabBtn('karta', 'Karta', '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>', hasKarta || !hasShots) +
-            tabBtn('plan', 'Przychody', '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>', hasPlanTab, pjNewPlan) +
-            '</div>';
+        var navHtml =
+            navBtn('ekrany', 'Ekrany', '<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>', hasShots) +
+            navBtn('karta', 'Karta', '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>', true) +
+            navBtn('plan', 'Przychody', '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>', hasPlanSec, pjNewPlan);
+        // pasek ma sens dopiero przy >1 sekcji
+        if ((hasShots ? 1 : 0) + 1 + (hasPlanSec ? 1 : 0) > 1) {
+            html += '<div class="pj-tabs" role="navigation" aria-label="Sekcje projektu">' + navHtml + '</div>';
+        }
 
-        if (pjTab === 'ekrany') {
-            // Ekrany narzędzia — desktop: główny full-width + rząd mniejszych
-            // (grafiki zawsze poziome 3:2 — żadnych pionowych kadrów!);
-            // mobile: karuzela snap
+        function sechead(icon, title, sub) {
+            return '<div class="pj-sechead"><span class="pj-sechead__ico">' + pjIco(icon) + '</span>' +
+                '<div><h3>' + title + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div></div>';
+        }
+
+        // ── SEKCJA: Ekrany narzędzia ──
+        if (hasShots) {
+            html += '<section class="pj-section" id="pjsec-ekrany" data-spy="ekrany">' +
+                sechead('<rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path>',
+                    'Ekrany narzędzia', 'kliknij ekran, żeby obejrzeć w powiększeniu');
+            // desktop: główny full-width + rząd mniejszych (grafiki zawsze
+            // poziome 3:2 — żadnych pionowych kadrów!); mobile: karuzela snap
             if (items.length) {
                 html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
                     return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                         '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
                         '<div class="pv-tile__body"><img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
-            } else {
-                html += '<div class="tabpane__empty">Ekrany narzędzia pojawią się po wygenerowaniu podglądu w rozmowie.</div>';
             }
             if (oldShots.length) {
                 html += '<div class="pj-later" style="margin:14px 0 8px">Wcześniejsze wersje ekranów:</div>' +
-                    '<div class="shots shots--old" style="margin-bottom:18px">' + oldShots.map(function (s, i) {
+                    '<div class="shots shots--old" style="margin-bottom:4px">' + oldShots.map(function (s, i) {
                         return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
                             '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
                             '<div class="pv-tile__body"><img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
                     }).join('') + '</div>';
             }
-        } else if (pjTab === 'karta') {
-            // Przełącznik wersji karty
-            if (versions.length > 1) {
-                html += '<div class="pj-vers">';
-                versions.forEach(function (_, i) {
-                    html += '<button type="button" class="pj-ver' + (i === cur ? ' is-on' : '') + '" data-ver="' + i + '">' +
-                        'Wersja ' + (i + 1) + (i === versions.length - 1 ? ' · aktualna' : '') + '</button>';
-                });
-                html += '</div>';
-                if (cur !== versions.length - 1) {
-                    html += '<div class="pj-oldnote">Przeglądasz starszą wersję karty — aktualna jest Wersja ' + versions.length + '.</div>';
-                }
+            html += '</section>';
+        }
+
+        // ── SEKCJA: Karta projektu (+ pigułka) ──
+        html += '<section class="pj-section" id="pjsec-karta" data-spy="karta">' +
+            sechead('<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
+                'Karta projektu', 'problem, klienci i zakres pierwszej wersji');
+        if (versions.length > 1) {
+            html += '<div class="pj-vers">';
+            versions.forEach(function (_, i) {
+                html += '<button type="button" class="pj-ver' + (i === cur ? ' is-on' : '') + '" data-ver="' + i + '">' +
+                    'Wersja ' + (i + 1) + (i === versions.length - 1 ? ' · aktualna' : '') + '</button>';
+            });
+            html += '</div>';
+            if (cur !== versions.length - 1) {
+                html += '<div class="pj-oldnote">Przeglądasz starszą wersję karty — aktualna jest Wersja ' + versions.length + '.</div>';
             }
-            var editHtml = '';
-            if (hasKarta && state.verdict === 'zielony') {
-                var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
-                if (left > 0) {
-                    editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
-                        '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
-                        '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
-                } else {
-                    editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
-                }
-            }
-            if (k) {
-                html += kartaGridHTML(k, editHtml);
+        }
+        var editHtml = '';
+        if (hasKarta && state.verdict === 'zielony') {
+            var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
+            if (left > 0) {
+                editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
+                    '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
+                    '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
             } else {
-                html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
+                editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
             }
-            // Pigułka — graficzne podsumowanie karty (loader, gdy się rysuje)
-            if (hasPlanTab) {
-                var pillUrl = state.previews[SUMMARY_META[0]];
-                if (pillUrl) html += pillHTML(pillUrl);
-                else if (extras.summary === 'fail') html += extrasFailHTML('pill');
-                else html += extrasWaitHTML('pill');
-            }
+        }
+        if (k) {
+            html += kartaGridHTML(k, editHtml);
         } else {
-            // Przychody — wstępny plan (loader, gdy się liczy)
+            html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
+        }
+        if (hasPlanSec) {
+            var pillUrl = state.previews[SUMMARY_META[0]];
+            if (pillUrl) html += pillHTML(pillUrl);
+            else if (extras.summary === 'fail') html += extrasFailHTML('pill');
+            else html += extrasWaitHTML('pill');
+        }
+        html += '</section>';
+
+        // ── SEKCJA: Wstępny plan przychodu ──
+        if (hasPlanSec) {
+            html += '<section class="pj-section" id="pjsec-plan" data-spy="plan">' +
+                sechead('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>',
+                    'Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy');
             if (state.bizplan) html += bizplanHTML(state.bizplan);
             else if (extras.plan === 'fail') html += extrasFailHTML('plan');
             else html += extrasWaitHTML('plan');
+            html += '</section>';
         }
 
         body.innerHTML = html;
+        // nav: klik → płynny scroll do sekcji (scroll-margin-top w CSS
+        // zostawia miejsce na sticky pasek)
         body.querySelectorAll('.pj-tab').forEach(function (b) {
             b.addEventListener('click', function () {
-                var t = b.getAttribute('data-pjtab');
-                if (t === pjTab) return;
-                pjTab = t;
-                if (t === 'plan') pjNewPlan = false;
-                renderPaneProjekt();
-                el('pane-projekt').scrollTop = 0;
+                var sec = el(b.getAttribute('data-anchor'));
+                if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
+        bindPjSpy();
+        updatePjSpy();
         // Desktop: wszystkie sekcje otwarte (jest miejsce); mobile: pierwsza
         // otwarta, reszta zwinięta — user otwiera, co go interesuje
         var pjDesktop = window.matchMedia('(min-width: 1024px)').matches;
@@ -4190,7 +4258,6 @@
         state.bizplan = null;
         extras.summary = 'idle';
         extras.plan = 'idle';
-        pjTab = null;
         pjNewPlan = false;
         if (activeTab !== 'chat') switchTab('chat');
         if (!state.pSlug) state.profession = null;
