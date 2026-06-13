@@ -7937,15 +7937,38 @@
                     return;
                 }
                 if (ev === 'spar_ocena') {
-                    // Bramka potencjału: między turami AI bada rynek na żywo (spar-assess)
+                    // Bramka potencjału: AI bada rynek na żywo (spar-assess, ~60-90 s).
+                    // Animowany loader = poczucie postępu zamiast zamrożonego tekstu.
                     if (obj && obj.status === 'badam') {
-                        var ow = document.createElement('div');
-                        ow.className = 'msg__work'; ow.id = 'ocena-work';
-                        ow.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>Badam Twój rynek na żywo — konkurencja, ceny, popyt…';
-                        bubble.appendChild(ow); scrollToBottom(false);
+                        var owEl = document.getElementById('ocena-work');
+                        if (!owEl) {
+                            owEl = document.createElement('div');
+                            owEl.className = 'msg__work'; owEl.id = 'ocena-work';
+                            bubble.appendChild(owEl);
+                        }
+                        var ocSteps = [
+                            'Badam Twój rynek na żywo…',
+                            'Sprawdzam konkurencję i podobne narzędzia…',
+                            'Porównuję ceny i abonamenty…',
+                            'Szacuję wielkość niszy…',
+                            'Sprawdzam, kto realnie zapłaciłby co miesiąc…',
+                            'Szukam najmocniejszego kąta…'
+                        ];
+                        var ocI = 0;
+                        var ocPaint = function () {
+                            var e = document.getElementById('ocena-work');
+                            if (!e || ocI > 30) { if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; } return; }
+                            e.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>' + esc(ocSteps[ocI % ocSteps.length]);
+                            ocI++;
+                        };
+                        ocPaint();
+                        if (window.__ocenaTimer) clearInterval(window.__ocenaTimer);
+                        window.__ocenaTimer = setInterval(ocPaint, 4500);
+                        scrollToBottom(false);
                     } else if (obj && obj.status === 'gotowe') {
-                        var ow2 = document.getElementById('ocena-work');
-                        if (ow2) ow2.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>Mam dane z rynku — układam rekomendację…';
+                        if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
+                        var owDone = document.getElementById('ocena-work');
+                        if (owDone) owDone.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>' + esc('Mam dane z rynku — układam rekomendację…');
                     }
                     return;
                 }
