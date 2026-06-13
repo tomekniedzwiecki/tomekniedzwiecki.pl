@@ -7938,14 +7938,18 @@
                 }
                 if (ev === 'spar_ocena') {
                     // Bramka potencjału: AI bada rynek na żywo (spar-assess, ~60-90 s).
-                    // Animowany loader = poczucie postępu zamiast zamrożonego tekstu.
-                    if (obj && obj.status === 'badam') {
-                        var owEl = document.getElementById('ocena-work');
-                        if (!owEl) {
-                            owEl = document.createElement('div');
-                            owEl.className = 'msg__work'; owEl.id = 'ocena-work';
-                            bubble.appendChild(owEl);
+                    // Realny postęp (progress) nadpisuje fallbackowy cykl czasowy.
+                    var ocSet = function (label) {
+                        var e = document.getElementById('ocena-work');
+                        if (!e) {
+                            e = document.createElement('div');
+                            e.className = 'msg__work'; e.id = 'ocena-work';
+                            bubble.appendChild(e);
                         }
+                        e.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>' + esc(label);
+                    };
+                    if (obj && obj.status === 'badam') {
+                        // Fallback: cykl czasowy, gdyby realne zdarzenia progress nie dotarły (tryb buforowany)
                         var ocSteps = [
                             'Badam Twój rynek na żywo…',
                             'Sprawdzam konkurencję i podobne narzędzia…',
@@ -7956,19 +7960,21 @@
                         ];
                         var ocI = 0;
                         var ocPaint = function () {
-                            var e = document.getElementById('ocena-work');
-                            if (!e || ocI > 30) { if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; } return; }
-                            e.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>' + esc(ocSteps[ocI % ocSteps.length]);
-                            ocI++;
+                            if (!document.getElementById('ocena-work') || ocI > 30) { if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; } return; }
+                            ocSet(ocSteps[ocI % ocSteps.length]); ocI++;
                         };
                         ocPaint();
                         if (window.__ocenaTimer) clearInterval(window.__ocenaTimer);
                         window.__ocenaTimer = setInterval(ocPaint, 4500);
                         scrollToBottom(false);
+                    } else if (obj && obj.status === 'progress' && obj.label) {
+                        // Realny postęp z bramki — przejmij stery od cyklu czasowego
+                        if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
+                        ocSet(obj.label);
+                        scrollToBottom(false);
                     } else if (obj && obj.status === 'gotowe') {
                         if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
-                        var owDone = document.getElementById('ocena-work');
-                        if (owDone) owDone.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>' + esc('Mam dane z rynku — układam rekomendację…');
+                        ocSet('Mam dane z rynku — układam rekomendację…');
                     }
                     return;
                 }
