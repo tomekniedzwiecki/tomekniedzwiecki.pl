@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Podgląd strony narzędzia — Aplikacja</title>
-<meta name="description" content="Interaktywny podgląd strony sprzedażowej narzędzia zaprojektowanego w tomekniedzwiecki.pl/aplikacja.">
+<title>Podgląd narzędzia — Aplikacja</title>
+<meta name="description" content="Interaktywny podgląd narzędzia zaprojektowanego w tomekniedzwiecki.pl/aplikacja.">
 <meta name="robots" content="noindex">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -25,13 +25,14 @@ iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .spin{width:34px;height:34px;border:3px solid #e6eaef;border-top-color:#4d9fff;border-radius:50%;margin:0 auto 18px;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hidden{display:none}
+body.is-embed .bar{display:none}
 @media(max-width:560px){.bar .brand span.lbl{display:none}}
 </style>
 </head>
 <body>
 <div class="bar">
   <a class="brand" href="https://tomekniedzwiecki.pl/aplikacja/">
-    <span class="dot">⚡</span>Aplikacja<span class="lbl">&nbsp;· podgląd koncepcyjny strony narzędzia</span>
+    <span class="dot">⚡</span>Aplikacja<span class="lbl" id="lbl">&nbsp;· podgląd koncepcyjny</span>
   </a>
   <a class="cta" href="https://tomekniedzwiecki.pl/aplikacja/sparing/">Stwórz swój projekt →</a>
 </div>
@@ -47,15 +48,23 @@ iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
   var q = new URLSearchParams(location.search);
   var sid = (q.get('sid') || '').trim();
   var t = (q.get('t') || '').trim();
+  // k = rodzaj podglądu: 'prototyp' (klikalne narzędzie) albo 'landing' (domyślnie)
+  var k = (q.get('k') || 'landing').trim();
+  var isProto = k === 'prototyp';
+  // embed=1 → osadzenie w panelu (panel ma już własną ramkę okna): chowamy pasek
+  if (q.get('embed') === '1') { document.body.classList.add('is-embed'); }
   var loading = document.getElementById('loading');
   var error = document.getElementById('error');
+  var lbl = document.getElementById('lbl');
+  if (lbl) lbl.innerHTML = isProto ? '&nbsp;· interaktywny prototyp narzędzia' : '&nbsp;· podgląd koncepcyjny strony';
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid) || !/^\d{10,16}$/.test(t)) {
     loading.classList.add('hidden');
     error.classList.remove('hidden');
     return;
   }
+  var prefix = isProto ? 'prototyp-' : 'landing-';
   var src = 'https://yxmavwkwnfuphjqbelws.supabase.co/storage/v1/object/public/attachments/spar/'
-    + sid + '/landing-' + t + '.html';
+    + sid + '/' + prefix + t + '.html';
   fetch(src)
     .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
     .then(function (html) {

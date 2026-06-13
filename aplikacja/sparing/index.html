@@ -1317,6 +1317,105 @@
         color: var(--text-muted);
         border-top: 1px solid var(--glass-border);
     }
+
+    /* ── Kafel-bohater „Dotknij aplikacji" na pulpicie ── */
+    .pjd-tile--proto {
+        grid-column: span 6;
+        min-height: 168px;
+        border-color: rgba(77, 159, 255, 0.4);
+        background:
+            radial-gradient(130% 160% at 100% 0%, rgba(77, 159, 255, 0.16), transparent 55%),
+            linear-gradient(180deg, rgba(77, 159, 255, 0.07), rgba(255, 255, 255, 0.015));
+    }
+    .pjd-tile--proto:hover { border-color: rgba(77, 159, 255, 0.7); }
+    .pjd-tile--proto.pjd-tile--static { cursor: default; }
+    .pjd-proto__ico {
+        background: rgba(77, 159, 255, 0.18);
+        border: 1px solid rgba(77, 159, 255, 0.3);
+    }
+    .pjd-proto__ico svg { color: var(--accent); }
+    .pjd-proto__glow {
+        position: absolute;
+        right: -40px;
+        top: -40px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(77, 159, 255, 0.28), transparent 70%);
+        pointer-events: none;
+        animation: protoPulse 3.4s ease-in-out infinite;
+    }
+    @keyframes protoPulse {
+        0%, 100% { opacity: 0.55; transform: scale(1); }
+        50%      { opacity: 1; transform: scale(1.12); }
+    }
+    @media (max-width: 920px) { .pjd-tile--proto { grid-column: span 1; } }
+
+    /* ── Detal prototypu: okno aplikacji z INTERAKTYWNYM iframe ── */
+    .pj-proto {
+        margin-top: 16px;
+        border: 1px solid rgba(77, 159, 255, 0.32);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.02);
+        box-shadow: 0 26px 60px -30px rgba(77, 159, 255, 0.4);
+    }
+    .pj-proto__bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .pj-proto__dots { display: inline-flex; gap: 5px; flex-shrink: 0; }
+    .pj-proto__dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); }
+    .pj-proto__name {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text);
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    .pj-proto__name svg { width: 13px; height: 13px; color: var(--accent); flex-shrink: 0; }
+    .pj-proto__open {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--accent);
+        text-decoration: none;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(77, 159, 255, 0.35);
+    }
+    .pj-proto__open:hover { background: rgba(77, 159, 255, 0.12); }
+    .pj-proto__stage {
+        position: relative;
+        height: min(72vh, 720px);
+        background: #fff;
+    }
+    .pj-proto__stage iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        /* INTERAKTYWNY — to działający prototyp, nie podgląd; user klika w środku */
+    }
+    .pj-proto__note {
+        padding: 11px 14px;
+        font-size: 12px;
+        color: var(--text-muted);
+        border-top: 1px solid var(--glass-border);
+        line-height: 1.55;
+    }
+    @media (max-width: 700px) { .pj-proto__stage { height: min(78vh, 640px); } }
     .share-land {
         display: flex;
         align-items: center;
@@ -3831,6 +3930,11 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path></svg>
                 Ekrany narzędzia
             </button>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="prototyp" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path></svg>
+                Dotknij aplikacji
+                <i class="side__dot" id="dot-prototyp" hidden></i>
+            </button>
             <button type="button" class="side__item" data-tab="projekt" data-pjview="karta" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
                 Karta projektu
@@ -3937,6 +4041,7 @@
     var SPAR_PLAN_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-plan';
     var SPAR_RAPORT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-raport';
     var SPAR_LANDING_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-landing';
+    var SPAR_PROTOTYPE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-prototype';
     var SB_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Rezerwacja współpracy — Aplikacja" (500 zł, zwrotne)
@@ -4040,6 +4145,7 @@
         bizplan: null,          // wstępny plan przychodu z spar-plan (JSON; liczony po zielonym werdykcie)
         raport: null,           // raport potencjału rynku z spar-raport (web search; po zielonym werdykcie)
         landingUrl: null,       // adres działającej strony narzędzia (spar-landing → /aplikacja/podglad/)
+        prototypeUrl: null,     // adres klikalnego prototypu narzędzia (spar-prototype → /aplikacja/podglad/?k=prototyp)
         phone: null,            // telefon z bramki rejestracji (Tomek dzwoni po rezerwacji)
         authUserId: null,       // Supabase Auth user id (rejestracja Google/Facebook)
         authProvider: null      // 'google' | 'facebook' | null
@@ -4048,7 +4154,7 @@
     var pendingAuth = null; // {userId, provider, email, name}
     // Dogrywane elementy projektu (pigułka, plan, raport rynku, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
@@ -4060,7 +4166,7 @@
     // Timestampy startu generacji (klucz extras → Date.now()) — paski ETA na kaflach
     var extrasStart = {};
     // Orientacyjny czas generacji w sekundach (z pomiarów produkcyjnych)
-    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75 };
+    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, prototype: 300 };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -4107,7 +4213,8 @@
             editPending: !!state.editPending,
             bizplan: state.bizplan || null,
             raport: state.raport || null,
-            landingUrl: state.landingUrl || null
+            landingUrl: state.landingUrl || null,
+            prototypeUrl: state.prototypeUrl || null
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -4193,10 +4300,12 @@
         state.bizplan = saved.bizplan || null;
         state.raport = saved.raport || null;
         state.landingUrl = saved.landingUrl || null;
+        state.prototypeUrl = saved.prototypeUrl || null;
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
         extras.landing = 'idle';
+        extras.prototype = 'idle';
         extrasStart = {};
         pjView = 'dash';
         pjNewPlan = false;
@@ -4419,7 +4528,7 @@
         } catch (e) { }
     }
     function applyHashTab() {
-        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|strona|marka|karta|plan))?$/);
+        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan))?$/);
         if (!m) return;
         var sub = m[2] === 'marka' ? 'strona' : m[2]; // stare linki #projekt-marka → Twoja strona
         if (m[1] === 'projekt' && sub) pjView = sub; // hash otwiera detal kafla
@@ -4434,6 +4543,7 @@
         // podpozycje sekcji pulpitu pokazują się, gdy sekcja ma już treść
         var subShow = {
             ekrany: lightboxItems().length > 0 || Object.keys(state.previewHistory || {}).length > 0,
+            prototyp: state.verdict === 'zielony',
             karta: kartaVersions().length > 0,
             strona: state.verdict === 'zielony',
             plan: state.verdict === 'zielony'
@@ -4879,13 +4989,74 @@
         });
     }
 
+    // Klikalny prototyp narzędzia: spar-prototype odpowiada 202 i buduje w tle
+    // (gpt-5.5 odtwarza zatwierdzone ekrany jako działającą apkę, ~5 min) —
+    // gotowość poznajemy pollem po action:'status' (URL żyje w spar_usage)
+    function ensurePrototype() {
+        if (extras.prototype === 'gen' || extras.prototype === 'limit' || extras.prototype === 'fail' || state.prototypeUrl) return;
+        if (state.verdict !== 'zielony' || !state.sessionId) return;
+        extras.prototype = 'gen';
+        extrasStart.prototype = Date.now();
+        var sid = state.sessionId;
+        function pollReady(triesLeft) {
+            if (state.sessionId !== sid) return;
+            if (triesLeft <= 0) { extras.prototype = 'fail'; if (activeTab === 'projekt') renderPaneProjekt(); return; }
+            setTimeout(function () {
+                if (state.sessionId !== sid) return;
+                fetch(SPAR_PROTOTYPE_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    body: JSON.stringify({ sessionId: sid, action: 'status' })
+                }).then(function (r) { return r.json(); }).then(function (d) {
+                    if (state.sessionId !== sid) return;
+                    if (d && typeof d.viewUrl === 'string' && d.viewUrl) {
+                        state.prototypeUrl = d.viewUrl;
+                        extras.prototype = 'idle';
+                        persistSession();
+                        if (activeTab === 'projekt') renderPaneProjekt();
+                    } else {
+                        pollReady(triesLeft - 1);
+                    }
+                }).catch(function () { pollReady(triesLeft - 1); });
+            }, 20000);
+        }
+        fetch(SPAR_PROTOTYPE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid })
+        }).then(function (r) {
+            return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; });
+        }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.status === 'exists' && res.d.viewUrl) {
+                state.prototypeUrl = res.d.viewUrl;
+                extras.prototype = 'idle';
+                persistSession();
+                if (activeTab === 'projekt') renderPaneProjekt();
+            } else if (res.ok && res.d && (res.d.status === 'started' || res.d.status === 'pending')) {
+                pollReady(18); // ~6 min okna (pass1 + krytyk)
+            } else if (res.status === 429) {
+                extras.prototype = 'limit';
+                if (activeTab === 'projekt') renderPaneProjekt();
+            } else {
+                extras.prototype = 'fail';
+                if (activeTab === 'projekt') renderPaneProjekt();
+            }
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.prototype = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
     function ensureKartaExtras(force) {
         ensureSummaryImage(force);
         ensureBizplan(force);
-        // raport / strona: generują się raz (bez force przy poprawkach —
-        // rynek się nie zmienia, a landing ma twardy limit wersji)
+        // raport / strona / prototyp: generują się raz (bez force przy
+        // poprawkach — rynek się nie zmienia, landing/prototyp mają limit wersji)
         ensureRaport(false);
         ensureLanding();
+        ensurePrototype();
     }
 
     function fmtZl(n) {
@@ -5052,7 +5223,8 @@
         karta: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path>',
         plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>',
         raport: '<path d="M3 3v18h18"></path><path d="M7 13l3-3 4 4 5-6"></path>',
-        pigulka: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 9v11"></path>'
+        pigulka: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 9v11"></path>',
+        prototyp: '<path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path>'
     };
 
     function fmtEta(sec) {
@@ -5228,6 +5400,37 @@
             '</button>';
 
         if (ctx.hasBrandSec) {
+            // PROTOTYP — klikalne narzędzie w działaniu (kafel-bohater, klik → detal).
+            // Najmocniejszy element pulpitu: nie obrazek, nie strona — sama apka.
+            if (state.prototypeUrl) {
+                tiles += '<button type="button" class="pjd-tile pjd-tile--proto" data-pjd="prototyp">' +
+                    pjGoIcon() +
+                    '<span class="pjd-proto__glow" aria-hidden="true"></span>' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Dotknij swojej aplikacji <em class="pjd-live">działa</em></span>' +
+                    '<span class="pjd-tile__sub">to nie zrzut ani makieta — klikalny prototyp Twojego narzędzia. Wejdź, wpisz, sprawdź jak reaguje.</span>' +
+                    '</button>';
+            } else if (extras.prototype === 'limit') {
+                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
+                    '<span class="pjd-tile__sub">pula wersji prototypu wykorzystana — finalną dopracujesz z Tomkiem</span>' +
+                    '</div>';
+            } else if (extras.prototype === 'fail') {
+                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
+                    '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować prototypu.</b>' +
+                    '<button type="button" class="preview-retry" data-retry="prototype">Spróbuj ponownie</button></div>' +
+                    '</div>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Buduję klikalny prototyp</span>' +
+                    genProgressHTML('prototype', 'Składam działające narzędzie…', 'odtwarzam Twoje ekrany jako apkę, którą da się kliknąć') +
+                    '</div>';
+            }
+
             // TWOJA STRONA — sekcja z działającą stroną narzędzia (klik → detal)
             var landThumb = state.previews.landing || '';
             if (state.landingUrl && landThumb) {
@@ -5334,6 +5537,7 @@
         var TITLES = {
             ekrany: ['Ekrany narzędzia', 'kliknij ekran, żeby obejrzeć w powiększeniu'],
             strona: ['Twoja strona', 'działająca strona „' + esc(ctx.nazwa) + '" — prawdziwa, nie grafika'],
+            prototyp: ['Dotknij swojej aplikacji', 'klikalny prototyp „' + esc(ctx.nazwa) + '" — wpisz, kliknij, zobacz jak reaguje'],
             karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
             plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy']
         };
@@ -5383,6 +5587,27 @@
                     '<span>Finalną wersję dopracujesz bezpośrednio z Tomkiem po rezerwacji.</span></div></div>';
             } else {
                 html += genProgressHTML('landing', 'Buduję działającą stronę narzędzia…', 'prawdziwa strona w przeglądarce, nie grafika — ok. 4 minuty');
+            }
+        }
+
+        if (pjView === 'prototyp') {
+            if (state.prototypeUrl) {
+                html += '<div class="pj-proto">' +
+                    '<div class="pj-proto__bar"><span class="pj-proto__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
+                    '<span class="pj-proto__name">' + pjIco(PJ_ICONS.prototyp) + esc(ctx.nazwa) + '</span>' +
+                    '<a class="pj-proto__open" href="' + esc(state.prototypeUrl) + '" target="_blank" rel="noopener">Otwórz na pełnym ekranie ↗</a></div>' +
+                    '<div class="pj-proto__stage"><iframe src="' + esc(state.prototypeUrl + (state.prototypeUrl.indexOf('?') >= 0 ? '&' : '?') + 'embed=1') + '" loading="lazy" title="Klikalny prototyp narzędzia" allow="clipboard-write"></iframe></div>' +
+                    '<div class="pj-proto__note">To działający prototyp — klikaj, wpisuj, przełączaj ekrany. Tak będzie działać Twoje narzędzie. Pełną, dopracowaną wersję budujemy wspólnie z Tomkiem.</div>' +
+                    '</div>';
+            } else if (extras.prototype === 'fail') {
+                html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować prototypu.</b>' +
+                    '<span>Spróbuj jeszcze raz — budowa trwa około 5 minut.</span></div>' +
+                    '<button type="button" class="preview-retry" data-retry="prototype">Spróbuj ponownie</button></div>';
+            } else if (extras.prototype === 'limit') {
+                html += '<div class="pj-wait"><div class="pj-wait__txt"><b>Pula wersji prototypu wykorzystana.</b>' +
+                    '<span>Finalną, dopracowaną wersję zbudujemy bezpośrednio z Tomkiem po rezerwacji.</span></div></div>';
+            } else {
+                html += genProgressHTML('prototype', 'Składam działające narzędzie…', 'odtwarzam Twoje ekrany jako klikalną apkę — ok. 5 minut');
             }
         }
 
@@ -5453,6 +5678,7 @@
                 var kind = b.getAttribute('data-retry');
                 if (kind === 'plan') { extras.plan = 'idle'; ensureBizplan(false); }
                 else if (kind === 'landing') { extras.landing = 'idle'; ensureLanding(); }
+                else if (kind === 'prototype') { extras.prototype = 'idle'; ensurePrototype(); }
                 else if (kind === 'raport') { extras.raport = 'idle'; ensureRaport(false); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
                 renderPaneProjekt();
