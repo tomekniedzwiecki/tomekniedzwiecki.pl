@@ -4292,7 +4292,9 @@
         gtm: null,              // go-to-market: playbook + pakiet startowy (spar-gtm; po zielonym werdykcie)
         phone: null,            // telefon z bramki rejestracji (Tomek dzwoni po rezerwacji)
         authUserId: null,       // Supabase Auth user id (rejestracja Google/Facebook)
-        authProvider: null      // 'google' | 'facebook' | null
+        authProvider: null,     // 'google' | 'facebook' | null
+        reveals: {},            // sekwencja odkrywania: {key:status} ze spar-project (drip); pusty = brak planu = pokazuj wszystko
+        paid: false             // wpłacona rezerwacja 500 zł — odblokowuje wszystkie odsłony
     };
     // Dane z powrotu OAuth (implicit flow) — czekają na bramkę z telefonem
     var pendingAuth = null; // {userId, provider, email, name}
@@ -4360,7 +4362,9 @@
             landingUrl: state.landingUrl || null,
             prototypeUrl: state.prototypeUrl || null,
             economics: state.economics || null,
-            gtm: state.gtm || null
+            gtm: state.gtm || null,
+            reveals: state.reveals || {},
+            paid: !!state.paid
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -4449,6 +4453,8 @@
         state.prototypeUrl = saved.prototypeUrl || null;
         state.economics = saved.economics || null;
         state.gtm = saved.gtm || null;
+        state.reveals = (saved.reveals && typeof saved.reveals === 'object') ? saved.reveals : {};
+        state.paid = !!saved.paid;
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
@@ -4575,6 +4581,19 @@
                 persistSession();
                 changed = true;
                 ensureGtmBanners();
+            }
+            // Sekwencja odkrywania: statusy odsłon + opłacenie (bramkują widoczność
+            // głębokich artefaktów). Zmiana = przerysuj (coś mogło się odsłonić).
+            if (p.reveals && typeof p.reveals === 'object'
+                && JSON.stringify(p.reveals) !== JSON.stringify(state.reveals)) {
+                state.reveals = p.reveals;
+                persistSession();
+                changed = true;
+            }
+            if (!!p.paid_at !== !!state.paid) {
+                state.paid = !!p.paid_at;
+                persistSession();
+                changed = true;
             }
             if (p.preview_history && typeof p.preview_history === 'object') {
                 Object.keys(p.preview_history).forEach(function (v) {
@@ -4957,6 +4976,42 @@
         if (state.previewHistory[view].indexOf(url) < 0) state.previewHistory[view].push(url);
     }
 
+    // ── Sekwencja odkrywania: głębokie artefakty (prototyp, strona, rynek,
+    // economics, gtm) odsłaniają się po kolei — odblokowane dopiero, gdy drip
+    // wysłał ich odsłonę mailem. Dopóki sesja nie ma planu reveali (legacy /
+    // przed-drip) albo klient zapłacił — pokazujemy wszystko jak dawniej.
+    // Bazowe elementy (ekrany, karta, plan, pigułka) nigdy nie są bramkowane.
+    var REV_KEY = { prototyp: 'prototyp', strona: 'landing', rynek: 'rynek', economics: 'economics', gtm: 'gtm' };
+    function hasRevealPlan() { return state.reveals && Object.keys(state.reveals).length > 0; }
+    function revUnlocked(view) {
+        var key = REV_KEY[view];
+        if (!key) return true; // niebramkowany element
+        return !!state.paid || !hasRevealPlan() || state.reveals[key] === 'sent';
+    }
+    function lockedTile(icon, title, sub) {
+        return '<div class="pjd-tile pjd-tile--w3 pjd-tile--static" style="position:relative;opacity:.82">' +
+            '<span aria-hidden="true" style="position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#9fb0c8;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:3px 9px;line-height:1">' +
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>wkrótce</span>' +
+            '<span class="pjd-tile__ico">' + pjIco(icon) + '</span>' +
+            '<span class="pjd-tile__t">' + title + '</span>' +
+            '<span class="pjd-tile__sub">' + sub + '</span>' +
+            '</div>';
+    }
+    // Treść teasera odsłony (kafel + pełny pane detalu)
+    var REV_TEASER = {
+        prototyp: ['Klikalny prototyp', 'Odsłonię go wkrótce — napiszę do Ciebie mailem, gdy Twoje narzędzie będzie gotowe do kliknięcia.'],
+        strona: ['Twoja strona', 'Składam działającą stronę sprzedażową. Dostaniesz maila, gdy będzie gotowa do otwarcia.'],
+        rynek: ['Potencjał rynku', 'Sprawdzam Twój rynek w internecie — konkurentów, ceny, wielkość niszy. Raport przyślę mailem.'],
+        economics: ['Czy to się spina', 'Liczę opłacalność: cennik, koszt klienta, zwrot budowy. Odkryjesz to, gdy dam znać mailem.'],
+        gtm: ['Sprzedaż od dnia 1', 'Układam plan zdobycia pierwszych klientów i gotowe reklamy. Napiszę, gdy będą gotowe.']
+    };
+    function revDetailTeaser(view) {
+        var tz = REV_TEASER[view] || ['Wkrótce', ''];
+        return '<div class="pj-wait"><div class="pj-wait__txt">' +
+            '<b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' + tz[0] + ' — odkryjesz wkrótce</b>' +
+            '<span>' + tz[1] + '</span></div></div>';
+    }
+
     function ensureSummaryImage(force) {
         // fail blokuje auto-retry (render po każdym sync odpalałby POST w pętli);
         // ponowienie wyłącznie przyciskiem retry, który ustawia 'idle'
@@ -5041,6 +5096,7 @@
     function ensureRaport(force) {
         if (extras.raport === 'gen' || (!force && extras.raport === 'fail')) return;
         if (!force && state.raport) return;
+        if (!revUnlocked('rynek')) return; // odsłona jeszcze nie odblokowana — nie generujemy
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.raport = 'gen';
         extrasStart.raport = Date.now();
@@ -5091,6 +5147,7 @@
         // 'limit' = pula wyczerpana (429), 'fail' = czeka na ręczny retry —
         // żadne z nich nie może POST-ować w pętli przy każdym renderze
         if (extras.landing === 'gen' || extras.landing === 'limit' || extras.landing === 'fail' || state.landingUrl) return;
+        if (!revUnlocked('strona')) return; // odsłona jeszcze nie odblokowana — nie generujemy
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras.landing = 'gen';
         extrasStart.landing = Date.now();
@@ -5161,6 +5218,7 @@
     // gotowość poznajemy pollem po action:'status' (URL żyje w spar_usage)
     function ensurePrototype() {
         if (extras.prototype === 'gen' || extras.prototype === 'limit' || extras.prototype === 'fail' || state.prototypeUrl) return;
+        if (!revUnlocked('prototyp')) return; // odsłona jeszcze nie odblokowana — nie generujemy
         if (state.verdict !== 'zielony' || !state.sessionId) return;
         extras.prototype = 'gen';
         extrasStart.prototype = Date.now();
@@ -5221,6 +5279,7 @@
     function ensureEconomics(force) {
         if (extras.economics === 'gen' || (!force && extras.economics === 'fail')) return;
         if (!force && state.economics) return;
+        if (!revUnlocked('economics')) return; // odsłona jeszcze nie odblokowana — nie generujemy
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.economics = 'gen';
         extrasStart.economics = Date.now();
@@ -5252,6 +5311,7 @@
     function ensureGtm(force) {
         if (extras.gtm === 'gen' || (!force && extras.gtm === 'fail')) return;
         if (!force && state.gtm) return;
+        if (!revUnlocked('gtm')) return; // odsłona jeszcze nie odblokowana — nie generujemy
         if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
         extras.gtm = 'gen';
         extrasStart.gtm = Date.now();
@@ -5946,7 +6006,9 @@
         if (ctx.hasBrandSec) {
             // PROTOTYP — klikalne narzędzie w działaniu (kafel-bohater, klik → detal).
             // Najmocniejszy element pulpitu: nie obrazek, nie strona — sama apka.
-            if (state.prototypeUrl) {
+            if (!revUnlocked('prototyp')) {
+                tiles += lockedTile(PJ_ICONS.prototyp, REV_TEASER.prototyp[0], REV_TEASER.prototyp[1]);
+            } else if (state.prototypeUrl) {
                 tiles += '<button type="button" class="pjd-tile pjd-tile--proto" data-pjd="prototyp">' +
                     pjGoIcon() +
                     '<span class="pjd-proto__glow" aria-hidden="true"></span>' +
@@ -5977,7 +6039,9 @@
 
             // TWOJA STRONA — sekcja z działającą stroną narzędzia (klik → detal)
             var landThumb = state.previews.landing || '';
-            if (state.landingUrl && landThumb) {
+            if (!revUnlocked('strona')) {
+                tiles += lockedTile(PJ_ICONS.strona, REV_TEASER.strona[0], REV_TEASER.strona[1]);
+            } else if (state.landingUrl && landThumb) {
                 tiles += mediaTile({
                     cls: 'pjd-tile--w3', data: 'data-pjd="strona"', img: landThumb,
                     title: 'Twoja strona <em class="pjd-live">działa</em>',
@@ -6024,7 +6088,9 @@
             }
 
             // RAPORT — ocena potencjału (klik → zakładka Potencjał rynku)
-            if (state.raport) {
+            if (!revUnlocked('rynek')) {
+                tiles += lockedTile(PJ_ICONS.raport, REV_TEASER.rynek[0], REV_TEASER.rynek[1]);
+            } else if (state.raport) {
                 var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
                 tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd-rynek>' +
                     pjGoIcon() +
@@ -6044,7 +6110,9 @@
             }
 
             // CZY TO SIĘ SPINA — unit economics (klik → detal z suwakami)
-            if (state.economics) {
+            if (!revUnlocked('economics')) {
+                tiles += lockedTile(PJ_ICONS.economics, REV_TEASER.economics[0], REV_TEASER.economics[1]);
+            } else if (state.economics) {
                 var ec = econCalc(state.economics, null);
                 tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="economics">' +
                     pjGoIcon() +
@@ -6064,7 +6132,9 @@
             }
 
             // SPRZEDAŻ OD DNIA 1 — go-to-market (klik → detal)
-            if (state.gtm) {
+            if (!revUnlocked('gtm')) {
+                tiles += lockedTile(PJ_ICONS.gtm, REV_TEASER.gtm[0], REV_TEASER.gtm[1]);
+            } else if (state.gtm) {
                 var kanCount = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly.length : 0;
                 var adCount = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy.length : 0;
                 tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="gtm">' +
@@ -6155,7 +6225,9 @@
         }
 
         if (pjView === 'strona') {
-            if (state.landingUrl) {
+            if (!revUnlocked('strona')) {
+                html += revDetailTeaser('strona');
+            } else if (state.landingUrl) {
                 html += '<div class="pj-land">' +
                     '<div class="pj-land__bar"><span class="pj-land__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
                     '<span class="pj-land__addr">' + pjIco('<rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>') + esc(ctx.nazwa.toLowerCase().replace(/[^a-ząćęłńóśźż0-9]+/gi, '')) + '.pl</span>' +
@@ -6177,7 +6249,9 @@
         }
 
         if (pjView === 'prototyp') {
-            if (state.prototypeUrl) {
+            if (!revUnlocked('prototyp')) {
+                html += revDetailTeaser('prototyp');
+            } else if (state.prototypeUrl) {
                 html += '<div class="pj-proto">' +
                     '<div class="pj-proto__bar"><span class="pj-proto__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
                     '<span class="pj-proto__name">' + pjIco(PJ_ICONS.prototyp) + esc(ctx.nazwa) + '</span>' +
@@ -6234,13 +6308,15 @@
         }
 
         if (pjView === 'economics') {
-            if (state.economics) html += economicsHTML(state.economics);
+            if (!revUnlocked('economics')) html += revDetailTeaser('economics');
+            else if (state.economics) html += economicsHTML(state.economics);
             else if (extras.economics === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się policzyć opłacalności.</b><span>Spróbuj jeszcze raz — to chwila.</span></div><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>';
             else html += genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, CAC, LTV, zwrot budowy — na realnych benchmarkach');
         }
 
         if (pjView === 'gtm') {
-            if (state.gtm) { html += gtmHTML(state.gtm); ensureGtmBanners(); }
+            if (!revUnlocked('gtm')) html += revDetailTeaser('gtm');
+            else if (state.gtm) { html += gtmHTML(state.gtm); ensureGtmBanners(); }
             else if (extras.gtm === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować planu sprzedaży.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>';
             else html += genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty i maile');
         }
@@ -6387,6 +6463,10 @@
                 '<div class="tabpane__empty">Raport przygotuje się automatycznie, gdy domkniemy projekt w rozmowie.<br>' +
                 '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
             body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
+            return;
+        }
+        if (!revUnlocked('rynek') && !state.raport) {
+            body.innerHTML = head + revDetailTeaser('rynek');
             return;
         }
         var r = state.raport;
