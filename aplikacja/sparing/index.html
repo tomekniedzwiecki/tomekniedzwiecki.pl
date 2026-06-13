@@ -224,7 +224,11 @@
     }
     .side__new:hover { border-color: var(--border-strong); background: var(--glass-strong); }
     .side__new svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
-    .side__nav { display: flex; flex-direction: column; gap: 2px; }
+    .side__nav { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.14) transparent; margin: 0 -4px; padding: 0 4px; }
+    .side__nav::-webkit-scrollbar { width: 6px; }
+    .side__nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 999px; }
+    .side__nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
+    .side__nav::-webkit-scrollbar-track { background: transparent; }
     .side__sect {
         font-size: 10.5px;
         font-weight: 800;
@@ -327,7 +331,8 @@
     /* statusy pozycji menu */
     .side__status { flex-shrink: 0; font-size: 9.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 2.5px 7px; border-radius: 999px; line-height: 1; border: 1px solid transparent; }
     .side__status--done { color: #6ee7b7; background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.25); }
-    .side__status--locked { color: #93a3b8; background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.09); }
+    .side__status--locked { color: #7c8a9c; background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); padding: 3.5px; }
+    .side__status--locked svg { width: 11px; height: 11px; display: block; }
     .side__status--new { color: #061320; background: var(--accent); box-shadow: 0 0 0 0 rgba(77,159,255,.7); animation: sideNewPulse 1.5s infinite; }
     @keyframes sideNewPulse { 0%{ box-shadow:0 0 0 0 rgba(77,159,255,.55);} 70%{ box-shadow:0 0 0 7px rgba(77,159,255,0);} 100%{ box-shadow:0 0 0 0 rgba(77,159,255,0);} }
     /* widok zablokowany: szkielet + modal */
@@ -356,7 +361,7 @@
     .lock-modal__ico svg { width: 24px; height: 24px; }
     .lock-modal__t { font-size: 20px; font-weight: 800; color: var(--text-strong); margin: 0 0 8px; }
     .lock-modal__d { font-size: 14.5px; line-height: 1.6; color: var(--text-muted); margin: 0 0 20px; }
-    .lock-modal__btn { display: inline-block; padding: 14px 26px; border-radius: 999px; font-weight: 800; font-size: 15px; color: #061320; background: linear-gradient(135deg,#6db3ff,#4d9fff); text-decoration: none; box-shadow: 0 10px 26px rgba(77,159,255,.35); transition: transform .15s var(--ease); }
+    .lock-modal__btn { display: inline-block; padding: 14px 26px; border: 0; border-radius: 999px; font-family: inherit; font-weight: 800; font-size: 15px; color: #061320; background: linear-gradient(135deg,#6db3ff,#4d9fff); text-decoration: none; cursor: pointer; box-shadow: 0 10px 26px rgba(77,159,255,.35); transition: transform .15s var(--ease); }
     .lock-modal__btn:hover { transform: translateY(-1px); }
     .lock-modal__note { font-size: 12.5px; color: var(--text-faint, #7b8694); margin-top: 12px; }
     .side__dot {
@@ -4741,6 +4746,13 @@
         closeSide();
     }
 
+    // CTA z modalu „zablokowane" prowadzi do zakładki Współpraca (nie wprost do płatności).
+    // Delegacja na document — działa dla każdego wyrenderowanego modalu (także wielu naraz).
+    document.addEventListener('click', function (e) {
+        var t = e.target.closest && e.target.closest('[data-lock-cta]');
+        if (t) { e.preventDefault(); switchTab('wspolpraca'); }
+    });
+
     // Zakładka w hashu URL — odświeżenie strony wraca do tego samego widoku
     // (#projekt, #wspolpraca, opcjonalnie #projekt-plan = sekcja w projekcie)
     function setTabHash(h) {
@@ -5066,13 +5078,20 @@
         if (!has) return null;                                 // bez treści → bez labela
         return (state.seen && state.seen[view]) ? { label: 'gotowe', cls: 'done' } : { label: 'nowe', cls: 'new' };
     }
+    var LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
     function updateSideStatus() {
         document.querySelectorAll('.side__status[data-status-for]').forEach(function (el2) {
             var st = viewStatus(el2.getAttribute('data-status-for'));
-            if (!st) { el2.hidden = true; return; }
+            if (!st) { el2.hidden = true; el2.removeAttribute('title'); return; }
             el2.hidden = false;
-            el2.textContent = st.label;
             el2.className = 'side__status side__status--' + st.cls;
+            if (st.cls === 'locked') {
+                el2.innerHTML = LOCK_SVG;          // kompaktowa kłódka zamiast długiego słowa
+                el2.setAttribute('title', 'Odblokujesz po wspólnej rozmowie');
+            } else {
+                el2.textContent = st.label;
+                el2.removeAttribute('title');
+            }
         });
     }
 
@@ -5104,8 +5123,8 @@
             '<div class="lock-modal__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>' +
             '<h3 class="lock-modal__t">' + tz[0] + ' czeka na Ciebie</h3>' +
             '<p class="lock-modal__d">Chcesz dostać dostęp do tego materiału i całej reszty? Zarezerwuj rozmowę ze mną — na osobistym spotkaniu pokażę Ci plan wdrożenia i wspólnie ustalimy szczegóły, jak zbudować to razem.</p>' +
-            '<a class="lock-modal__btn" id="lock-cta" href="' + checkoutURL() + '" target="_blank" rel="noopener">Rezerwuję rozmowę z Tomkiem → 500 zł</a>' +
-            '<div class="lock-modal__note">W pełni zwrotne — to blokada terminu, nie zakup.</div>' +
+            '<button type="button" class="lock-modal__btn" data-lock-cta>Porozmawiajmy o tym →</button>' +
+            '<div class="lock-modal__note">Bez zobowiązań — w zakładce Współpraca pokażę Ci, jak zaczynamy.</div>' +
             '</div></div></div>';
     }
 
