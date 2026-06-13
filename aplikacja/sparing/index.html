@@ -5271,8 +5271,11 @@
     function ensureKartaExtras(force) {
         ensureSummaryImage(force);
         ensureBizplan(force);
-        ensureEconomics(false);
-        ensureGtm(false);
+        // economics (cennik) i gtm (targetowanie) zależą od planu/karty —
+        // po poprawce regenerują się razem z planem (force); limit 4 gen/sesja
+        // po stronie serwera chroni przed nadużyciem
+        ensureEconomics(force);
+        ensureGtm(force);
         // raport / strona / prototyp: generują się raz (bez force przy
         // poprawkach — rynek się nie zmienia, landing/prototyp mają limit wersji)
         ensureRaport(false);
@@ -5610,7 +5613,7 @@
             sec(PJ_ICONS.gtm, 'Gdzie są Twoi pierwsi klienci', kanaly.length + ' konkretnych miejsc — z pierwszym ruchem', '<div class="gtm-chans">' + kanHtml + '</div>') +
             (skrypty ? sec('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>', 'Gotowe skrypty', 'do wklejenia — najpierw wartość, nie „kup”', skrypty) : '') +
             (obHtml ? sec('<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line><circle cx="12" cy="12" r="10"></circle>', 'Obiekcje i odpowiedzi', 'co usłyszysz — i co odpowiedzieć', '<div class="gtm-objs">' + obHtml + '</div>') : '') +
-            (adHtml ? sec('<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>', '3 reklamy gotowe do odpalenia', 'copy + brief wizualny dla projektanta', '<div class="gtm-ads">' + adHtml + '</div>') : '') +
+            (adHtml ? sec('<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>', reklamy.length + ' ' + (reklamy.length === 1 ? 'reklama gotowa' : (reklamy.length < 5 ? 'reklamy gotowe' : 'reklam gotowych')) + ' do odpalenia', 'copy + brief wizualny dla projektanta', '<div class="gtm-ads">' + adHtml + '</div>') : '') +
             (postHtml ? sec('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>', 'Posty organiczne', 'do grup i na profil', '<div class="gtm-posts">' + postHtml + '</div>') : '') +
             (mailHtml ? sec('<rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path>', 'Maile powitalne', 'sekwencja, która prowadzi do pierwszego użycia', '<div class="gtm-mails">' + mailHtml + '</div>') : '') +
             '<div class="pj-plan__note">Gotowe materiały na start. Kampanie i pierwszych 50 klientów rozkręcacie wspólnie z Tomkiem po rezerwacji.</div>' +
@@ -7065,10 +7068,16 @@
         state.bizplan = null;
         state.raport = null;
         state.landingUrl = null;
+        state.prototypeUrl = null;
+        state.economics = null;
+        state.gtm = null;
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
         extras.landing = 'idle';
+        extras.prototype = 'idle';
+        extras.economics = 'idle';
+        extras.gtm = 'idle';
         extrasStart = {};
         pjView = 'dash';
         pjNewPlan = false;
