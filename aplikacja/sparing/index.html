@@ -1520,11 +1520,20 @@
     .gtm-ads { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 760px) { .gtm-ads { grid-template-columns: 1fr; } }
     .gtm-ad { border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .gtm-ad__top { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-    .gtm-ad__no { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); }
-    .gtm-ad__concept { font-size: 11.5px; font-weight: 700; color: var(--text-strong); }
-    .gtm-ad__fmt { font-size: 10px; color: var(--text-faint); border: 1px solid var(--glass-border); border-radius: 99px; padding: 1px 7px; }
-    .gtm-ad__top .gtm-copy { margin-left: auto; }
+    /* Baner kreacji reklamowej (gpt-image-2) */
+    .gtm-ad__banner { display: block; width: 100%; border-radius: 11px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); margin-bottom: 2px; }
+    .gtm-ad__banner img { display: block; width: 100%; max-height: 360px; object-fit: cover; object-position: top center; transition: transform 0.4s var(--ease); }
+    .gtm-ad__banner:hover img { transform: scale(1.03); }
+    .gtm-ad__banner--gen {
+        display: flex; align-items: center; justify-content: center; gap: 9px;
+        aspect-ratio: 16 / 9; color: var(--text-muted); font-size: 12px;
+        border-style: dashed;
+    }
+    .gtm-ad__top { display: flex; align-items: center; gap: 7px; flex-wrap: nowrap; }
+    .gtm-ad__no { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); flex-shrink: 0; }
+    .gtm-ad__concept { font-size: 11.5px; font-weight: 700; color: var(--text-strong); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gtm-ad__fmt { font-size: 10px; color: var(--text-faint); border: 1px solid var(--glass-border); border-radius: 99px; padding: 1px 7px; flex-shrink: 0; }
+    .gtm-ad__top .gtm-copy { margin-left: auto; flex-shrink: 0; }
     .gtm-ad__head { font-size: 15.5px; font-weight: 800; color: var(--text-strong); line-height: 1.3; }
     .gtm-ad__body { font-size: 13px; color: var(--text); line-height: 1.6; }
     .gtm-ad__cta { align-self: flex-start; font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 8px; padding: 6px 12px; }
@@ -4289,7 +4298,7 @@
     var pendingAuth = null; // {userId, provider, email, name}
     // Dogrywane elementy projektu (pigułka, plan, raport rynku, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle', gtmBanners: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
@@ -4565,6 +4574,7 @@
                 extras.gtm = 'idle';
                 persistSession();
                 changed = true;
+                ensureGtmBanners();
             }
             if (p.preview_history && typeof p.preview_history === 'object') {
                 Object.keys(p.preview_history).forEach(function (v) {
@@ -5254,6 +5264,7 @@
             if (state.sessionId !== sid) return;
             if (res.ok && res.d && res.d.gtm) {
                 state.gtm = res.d.gtm; persistSession(); extras.gtm = 'idle';
+                ensureGtmBanners();
             } else if (res.ok && res.d && res.d.pending) {
                 setTimeout(function () {
                     if (state.sessionId === sid && !state.gtm && extras.gtm === 'gen') { extras.gtm = 'idle'; ensureGtm(false); }
@@ -5266,6 +5277,46 @@
             extras.gtm = 'fail';
             if (activeTab === 'projekt') renderPaneProjekt();
         });
+    }
+
+    // Banery reklam (gpt-image-2): odpalamy gdy mamy copy gtm, ale brakuje
+    // banner_url. Generacja w tle po stronie spar-gtm; wynik dociągamy pollem
+    // ze spar-project (banery pojawiają się stopniowo, jeden po drugim).
+    function ensureGtmBanners() {
+        if (extras.gtmBanners === 'gen') return;
+        if (state.verdict !== 'zielony' || !state.sessionId || !state.gtm) return;
+        var rek = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : [];
+        if (!rek.length) return;
+        var missing = rek.some(function (r) { return r && !r.banner_url; });
+        if (!missing) return;
+        extras.gtmBanners = 'gen';
+        var sid = state.sessionId;
+        function poll(triesLeft) {
+            if (state.sessionId !== sid) { return; }
+            if (triesLeft <= 0) { extras.gtmBanners = 'idle'; return; }
+            setTimeout(function () {
+                if (state.sessionId !== sid) return;
+                fetch(SPAR_PROJECT_ENDPOINT, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    body: JSON.stringify({ sessionId: sid, action: 'get' })
+                }).then(function (r) { return r.json(); }).then(function (d) {
+                    if (state.sessionId !== sid) return;
+                    var g = d && d.projekt && d.projekt.gtm;
+                    if (g && typeof g === 'object' && JSON.stringify(g) !== JSON.stringify(state.gtm)) {
+                        state.gtm = g; persistSession();
+                        if (activeTab === 'projekt') renderPaneProjekt();
+                    }
+                    var rk = (g && g.pakiet && Array.isArray(g.pakiet.reklamy)) ? g.pakiet.reklamy : [];
+                    var still = rk.some(function (r) { return r && !r.banner_url; });
+                    if (rk.length && !still) { extras.gtmBanners = 'idle'; return; }
+                    poll(triesLeft - 1);
+                }).catch(function () { poll(triesLeft - 1); });
+            }, 15000);
+        }
+        fetch(SPAR_GTM_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, action: 'banners' })
+        }).then(function () { poll(16); }).catch(function () { extras.gtmBanners = 'idle'; });
     }
 
     function ensureKartaExtras(force) {
@@ -5583,7 +5634,12 @@
         var reklamy = Array.isArray(pk.reklamy) ? pk.reklamy : [];
         var adHtml = reklamy.map(function (r, i) {
             var copyTxt = (r.naglowek || '') + '\n\n' + (r.tekst || '') + '\n\n' + (r.cta || '');
-            return '<div class="gtm-ad"><div class="gtm-ad__top"><span class="gtm-ad__no">Reklama ' + (i + 1) + '</span>' +
+            // Baner kreacji (gpt-image-2). Dopóki nie ma — placeholder „generuję".
+            var banner = r.banner_url
+                ? '<a class="gtm-ad__banner" href="' + esc(r.banner_url) + '" target="_blank" rel="noopener" aria-label="Otwórz baner w pełnym rozmiarze">' +
+                  '<img src="' + esc(r.banner_url) + '" alt="Baner reklamy: ' + esc(r.naglowek || '') + '" loading="lazy"></a>'
+                : '<div class="gtm-ad__banner gtm-ad__banner--gen"><span class="share__spin" aria-hidden="true"></span><span>Generuję baner kreacji…</span></div>';
+            return '<div class="gtm-ad">' + banner + '<div class="gtm-ad__top"><span class="gtm-ad__no">Reklama ' + (i + 1) + '</span>' +
                 (r.koncept ? '<span class="gtm-ad__concept">' + esc(r.koncept) + '</span>' : '') +
                 (r.format ? '<span class="gtm-ad__fmt">' + esc(r.format) + '</span>' : '') + copyBtn(copyTxt) + '</div>' +
                 '<div class="gtm-ad__head">' + esc(r.naglowek || '') + '</div>' +
@@ -6184,7 +6240,7 @@
         }
 
         if (pjView === 'gtm') {
-            if (state.gtm) html += gtmHTML(state.gtm);
+            if (state.gtm) { html += gtmHTML(state.gtm); ensureGtmBanners(); }
             else if (extras.gtm === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować planu sprzedaży.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>';
             else html += genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty i maile');
         }
