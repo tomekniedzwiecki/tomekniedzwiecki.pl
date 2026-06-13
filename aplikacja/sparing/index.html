@@ -188,7 +188,18 @@
         backdrop-filter: blur(18px);
         border-right: 1px solid var(--glass-border-soft);
         z-index: 60;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,.14) transparent;
     }
+    /* żeby przy niskich rozdzielczościach pozycje nie kurczyły się, tylko scrollowały */
+    .side > * { flex-shrink: 0; }
+    .side::-webkit-scrollbar { width: 6px; }
+    .side::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 999px; }
+    .side::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
+    .side::-webkit-scrollbar-track { background: transparent; }
     .side__brand {
         display: flex;
         align-items: center;
@@ -224,11 +235,7 @@
     }
     .side__new:hover { border-color: var(--border-strong); background: var(--glass-strong); }
     .side__new svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
-    .side__nav { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.14) transparent; margin: 0 -4px; padding: 0 4px; }
-    .side__nav::-webkit-scrollbar { width: 6px; }
-    .side__nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 999px; }
-    .side__nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
-    .side__nav::-webkit-scrollbar-track { background: transparent; }
+    .side__nav { display: flex; flex-direction: column; gap: 2px; }
     .side__sect {
         font-size: 10.5px;
         font-weight: 800;
