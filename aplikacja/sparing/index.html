@@ -481,9 +481,10 @@
     .chat-top__spacer { width: 40px; flex-shrink: 0; }
     @media (min-width: 1024px) {
         /* Desktop: brand żyje w sidebarze — w belce zostaje tylko logowanie.
-           Uwaga: `.chat-top { display: none }` nie zadziała — późniejsza reguła
-           `.chat-top { display: flex }` wygrywa kaskadą. */
-        .chat-top__brand, .chat-top__spacer { display: none; }
+           Uwaga: bazowe reguły `.chat-top`/`.chat-top__brand { display: flex }`
+           są PÓŹNIEJ w źródle (ta sama specyficzność = wygrywają kaskadą), więc
+           ukrywanie MUSI mieć wyższą specyficzność (selektor z rodzicem). */
+        .chat-top > .chat-top__brand, .chat-top > .chat-top__spacer { display: none; }
         .chat-top { justify-content: flex-end; }
     }
     @media (max-width: 1023.98px) {
@@ -4270,6 +4271,9 @@
     // Pusty sitekey = wyłączony; po założeniu widgetu w Cloudflare wpisać klucz
     // tu ORAZ TURNSTILE_SECRET_KEY w sekretach Supabase Edge Functions.
     var TURNSTILE_SITEKEY = '0x4AAAAAADkDpJgZb2YBqALV';
+    // Logowanie Facebookiem ukryte do czasu dokończenia konfiguracji providera
+    // w Supabase (App Secret + tryb Live). Wartość true przywraca przycisk.
+    var AUTH_FACEBOOK_ENABLED = false;
     var LS_HAS_ACCOUNT = 'spar_has_account'; // '1' = ktoś na tym urządzeniu logował się kiedyś
 
     // Multi-rozmowy: stan każdej rozmowy żyje pod kluczem per-sesja,
@@ -7068,10 +7072,15 @@
     // Wspólny markup logowania (modal + bramka): OAuth + e-mail z kodem.
     // prefix rozróżnia id-ki obu osadzeń.
     function authFormHTML(prefix, ctaText) {
-        return '<div class="gate-oauth-row">' +
+        // Facebook ukryty do czasu konfiguracji providera w Supabase (App Secret
+        // + Live). Włączenie: AUTH_FACEBOOK_ENABLED = true (+ provider w Supabase).
+        var oauthRow = '<div class="gate-oauth-row"' + (AUTH_FACEBOOK_ENABLED ? '' : ' style="grid-template-columns:1fr"') + '>' +
             '<button type="button" class="gate-oauth" id="' + prefix + '-google">' + AUTH_GOOGLE_ICO + 'Kontynuuj z Google</button>' +
-            '<button type="button" class="gate-oauth" id="' + prefix + '-fb">' + AUTH_FB_ICO + 'Kontynuuj z Facebookiem</button>' +
-            '</div>' +
+            (AUTH_FACEBOOK_ENABLED
+                ? '<button type="button" class="gate-oauth" id="' + prefix + '-fb">' + AUTH_FB_ICO + 'Kontynuuj z Facebookiem</button>'
+                : '') +
+            '</div>';
+        return oauthRow +
             '<div class="gate-divider"><span>albo przez e-mail</span></div>' +
             '<form id="' + prefix + '-otp-form" novalidate>' +
             '<div id="' + prefix + '-otp-step1">' +
