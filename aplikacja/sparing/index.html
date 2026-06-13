@@ -5520,10 +5520,10 @@
                 (sub ? '<div class="eco-metric__sub" data-eco="' + id + '-sub">' + sub + '</div>' : '') + '</div>';
         }
         return '<div class="eco-metrics">' +
-            metric('ltvcac', 'LTV : CAC', econDec(c.ltvCac) + '×', c.ltvCac >= 3 ? 'zdrowo (≥3×)' : (c.ltvCac >= 1.5 ? 'do poprawy' : 'za nisko'), lvlCac) +
-            metric('ltv', 'Wartość klienta (LTV)', fmtZl(Math.round(c.ltv)) + ' zł', 'przez całą współpracę', '') +
-            metric('payback', 'Zwrot kosztu klienta', econDec(c.payback) + ' mies.', 'tyle pracuje na siebie', c.payback <= 6 ? 'good' : (c.payback <= 12 ? 'ok' : 'bad')) +
-            metric('m50', 'Do 50 klientów', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet lub obniż CAC', c.miesiac50 && c.miesiac50 <= 9 ? 'good' : 'ok') +
+            metric('ltvcac', 'Czy reklama się opłaca', econDec(c.ltvCac) + '×', c.ltvCac >= 3 ? 'tyle wraca z każdej 1 zł na zdobycie klienta (dobrze, gdy ≥3×)' : (c.ltvCac >= 1.5 ? 'tyle wraca z 1 zł — do poprawy' : 'za mało wraca z wydanej złotówki'), lvlCac) +
+            metric('ltv', 'Ile zostawia jeden klient', fmtZl(Math.round(c.ltv)) + ' zł', 'średnio, zanim odejdzie', '') +
+            metric('payback', 'Po ilu miesiącach klient się zwraca', econDec(c.payback) + ' mies.', 'tyle pracuje, żeby oddać koszt swojego zdobycia', c.payback <= 6 ? 'good' : (c.payback <= 12 ? 'ok' : 'bad')) +
+            metric('m50', 'Do 50 klientów', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet albo potanij zdobycie klienta', c.miesiac50 && c.miesiac50 <= 9 ? 'good' : 'ok') +
             metric('breakeven', 'Zwrot budowy 30 tys.', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.', c.breakeven ? 'skumulowany zysk > 30 000 zł' : 'przy tych ustawieniach później', c.breakeven && c.breakeven <= 8 ? 'good' : 'ok') +
             metric('mrr50', 'Przychód przy 50', fmtZl(Math.round(50 * c.cena)) + ' zł', '/mies. — tu przejmujesz stery', '') +
             '</div>';
@@ -5540,7 +5540,7 @@
         return '<div class="eco-chart" data-eco="chart">' + bars + '</div>' +
             '<div class="eco-chart__cap" data-eco="chart-cap">' +
             (c.miesiac50 ? 'Aktywni klienci miesiąc po miesiącu — 50 osiągasz w miesiącu ' + c.miesiac50 + ' przy budżecie ' + fmtZl(c.budzet) + ' zł/mies.'
-                : 'Przy tym budżecie i CAC 50 klientów zajmuje ponad 18 miesięcy — pokręć suwakami.') + '</div>';
+                : 'Przy tym budżecie i koszcie zdobycia klienta 50 klientów zajmuje ponad 18 miesięcy — pokręć suwakami.') + '</div>';
     }
     function economicsHTML(e) {
         var c = econCalc(e, null);
@@ -5570,15 +5570,15 @@
         }
         var slidersHtml = '<div class="eco-sliders">' +
             slider('cena', 'Cena (plan Pro)', 49, 600, 10, Math.round(c.cena), ' zł') +
-            slider('churn', 'Churn miesięczny', 1, 12, 0.5, (w.churn_mies_proc || 4), '%') +
-            slider('cac', 'Koszt klienta (CAC)', 80, 900, 10, Math.round(c.cac), ' zł') +
-            slider('budzet', 'Budżet reklam', 500, 6000, 100, Math.round(c.budzet), ' zł/mies.') +
+            slider('churn', 'Ilu klientów odchodzi co miesiąc', 1, 12, 0.5, (w.churn_mies_proc || 4), '%') +
+            slider('cac', 'Koszt zdobycia klienta', 80, 900, 10, Math.round(c.cac), ' zł') +
+            slider('budzet', 'Budżet na reklamy', 500, 6000, 100, Math.round(c.budzet), ' zł/mies.') +
             '</div>';
         var why = '';
         if (w.cac_uzasadnienie || w.churn_uzasadnienie) {
             why = '<div class="eco-why">' +
-                (w.cac_uzasadnienie ? '<div><b>CAC:</b> ' + esc(w.cac_uzasadnienie) + '</div>' : '') +
-                (w.churn_uzasadnienie ? '<div><b>Churn:</b> ' + esc(w.churn_uzasadnienie) + '</div>' : '') + '</div>';
+                (w.cac_uzasadnienie ? '<div><b>Koszt zdobycia klienta:</b> ' + esc(w.cac_uzasadnienie) + '</div>' : '') +
+                (w.churn_uzasadnienie ? '<div><b>Rezygnacje klientów:</b> ' + esc(w.churn_uzasadnienie) + '</div>' : '') + '</div>';
         }
         var zal = Array.isArray(e.zalozenia) && e.zalozenia.length
             ? '<details class="pj-assume"><summary>Założenia do tych liczb</summary><ul class="pj-zal">' +
@@ -5620,10 +5620,10 @@
             // metryki
             var setv = function (id, v) { var el2 = box.querySelector('[data-eco="' + id + '"]'); if (el2) el2.innerHTML = v; };
             var sets = function (id, v) { var el2 = box.querySelector('[data-eco="' + id + '-sub"]'); if (el2) el2.textContent = v; };
-            setv('ltvcac', econDec(c.ltvCac) + '×'); sets('ltvcac', c.ltvCac >= 3 ? 'zdrowo (≥3×)' : (c.ltvCac >= 1.5 ? 'do poprawy' : 'za nisko'));
+            setv('ltvcac', econDec(c.ltvCac) + '×'); sets('ltvcac', c.ltvCac >= 3 ? 'tyle wraca z każdej 1 zł na zdobycie klienta (dobrze, gdy ≥3×)' : (c.ltvCac >= 1.5 ? 'tyle wraca z 1 zł — do poprawy' : 'za mało wraca z wydanej złotówki'));
             setv('ltv', fmtZl(Math.round(c.ltv)) + ' zł');
             setv('payback', econDec(c.payback) + ' mies.');
-            setv('m50', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.'); sets('m50', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet lub obniż CAC');
+            setv('m50', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.'); sets('m50', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet albo potanij zdobycie klienta');
             setv('breakeven', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.'); sets('breakeven', c.breakeven ? 'skumulowany zysk > 30 000 zł' : 'przy tych ustawieniach później');
             setv('mrr50', fmtZl(Math.round(50 * c.cena)) + ' zł');
             // kolory metryk
@@ -5645,7 +5645,7 @@
             var cap = box.querySelector('[data-eco="chart-cap"]');
             if (cap) cap.textContent = c.miesiac50
                 ? ('Aktywni klienci miesiąc po miesiącu — 50 osiągasz w miesiącu ' + c.miesiac50 + ' przy budżecie ' + fmtZl(c.budzet) + ' zł/mies.')
-                : 'Przy tym budżecie i CAC 50 klientów zajmuje ponad 18 miesięcy — pokręć suwakami.';
+                : 'Przy tym budżecie i koszcie zdobycia klienta 50 klientów zajmuje ponad 18 miesięcy — pokręć suwakami.';
         }
         sliders.forEach(function (r) {
             fillRange(r);
@@ -6118,7 +6118,7 @@
                     pjGoIcon() +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
                     '<span class="pjd-tile__t">Czy to się spina</span>' +
-                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;LTV : CAC</small></span>' : '') +
+                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;tyle wraca z 1 zł na klienta</small></span>' : '') +
                     '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
                     '</button>';
             } else {
@@ -6127,7 +6127,7 @@
                     '<span class="pjd-tile__t">Czy to się spina</span>' +
                     (extras.economics === 'fail'
                         ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć.</b><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, CAC, LTV, zwrot budowy — realne benchmarki')) +
+                        : genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, koszt i wartość klienta, zwrot budowy — na realnych danych')) +
                     '</div>';
             }
 
@@ -6311,7 +6311,7 @@
             if (!revUnlocked('economics')) html += revDetailTeaser('economics');
             else if (state.economics) html += economicsHTML(state.economics);
             else if (extras.economics === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się policzyć opłacalności.</b><span>Spróbuj jeszcze raz — to chwila.</span></div><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>';
-            else html += genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, CAC, LTV, zwrot budowy — na realnych benchmarkach');
+            else html += genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, koszt i wartość klienta, zwrot budowy — na realnych danych');
         }
 
         if (pjView === 'gtm') {
