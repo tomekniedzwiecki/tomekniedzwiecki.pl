@@ -1416,6 +1416,129 @@
         line-height: 1.55;
     }
     @media (max-width: 700px) { .pj-proto__stage { height: min(78vh, 640px); } }
+
+    /* ════════ UNIT ECONOMICS („Czy to się spina") + GTM („Sprzedaż od dnia 1") ════════ */
+    .eco-sec { margin-top: 22px; }
+    .eco-sec__h { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; flex-wrap: wrap; }
+    .eco-sec__h svg { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
+    .eco-sec__h h3 { font-size: 16.5px; font-weight: 800; color: var(--text-strong); margin: 0; }
+    .eco-sec__h span { font-size: 12.5px; color: var(--text-muted); flex-basis: 100%; }
+    /* Cennik — tiery */
+    .eco-tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .eco-tier {
+        position: relative; border: 1px solid var(--glass-border); border-radius: 16px;
+        padding: 18px 18px 16px; background: rgba(255, 255, 255, 0.018); display: flex; flex-direction: column; gap: 8px;
+    }
+    .eco-tier--on { border-color: rgba(77, 159, 255, 0.5); background: rgba(77, 159, 255, 0.05); box-shadow: 0 18px 44px -26px rgba(77, 159, 255, 0.45); }
+    .eco-tier__badge {
+        position: absolute; top: -10px; left: 18px; font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+        text-transform: uppercase; color: var(--accent-ink); background: var(--accent); border-radius: 99px; padding: 3px 10px;
+    }
+    .eco-tier__name { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .eco-tier__price { font-size: 30px; font-weight: 900; color: var(--text-strong); letter-spacing: -0.02em; line-height: 1; }
+    .eco-tier__price small { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0; }
+    .eco-tier__for { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .eco-tier__feat { list-style: none; display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+    .eco-tier__feat li { font-size: 12px; color: var(--text); line-height: 1.45; padding-left: 16px; position: relative; }
+    .eco-tier__feat li::before { content: '✓'; position: absolute; left: 0; color: #5dd39e; font-weight: 800; }
+    .eco-tiers__note { margin-top: 10px; font-size: 12px; color: var(--text-muted); }
+    .eco-expansion { margin-top: 12px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .eco-expansion b { color: var(--text); }
+    /* Suwaki + metryki */
+    .eco-sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; margin-bottom: 18px; }
+    @media (max-width: 640px) { .eco-sliders { grid-template-columns: 1fr; } }
+    .eco-slider__top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+    .eco-slider__top span { font-size: 12.5px; color: var(--text-muted); }
+    .eco-slider__top b { font-size: 14px; font-weight: 800; color: var(--text-strong); white-space: nowrap; }
+    .wg-range {
+        -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 99px;
+        background: linear-gradient(90deg, var(--accent) var(--fill, 50%), rgba(255,255,255,0.08) var(--fill, 50%));
+        outline: none;
+    }
+    .wg-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid #0a0a0e; cursor: pointer; box-shadow: 0 2px 8px rgba(77,159,255,0.5); }
+    .wg-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid #0a0a0e; cursor: pointer; }
+    .eco-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 640px) { .eco-metrics { grid-template-columns: repeat(2, 1fr); } }
+    .eco-metric {
+        border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 14px 12px;
+        background: rgba(255, 255, 255, 0.018); transition: border-color 0.2s ease;
+    }
+    .eco-metric--good { border-color: rgba(93, 211, 158, 0.4); background: rgba(93, 211, 158, 0.05); }
+    .eco-metric--bad { border-color: rgba(255, 75, 62, 0.4); background: rgba(255, 75, 62, 0.05); }
+    .eco-metric__val { font-size: 21px; font-weight: 900; color: var(--text-strong); letter-spacing: -0.01em; line-height: 1.1; }
+    .eco-metric--good .eco-metric__val { color: #5dd39e; }
+    .eco-metric--bad .eco-metric__val { color: var(--red); }
+    .eco-metric__lbl { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .eco-metric__sub { font-size: 10.5px; color: var(--text-faint); margin-top: 4px; line-height: 1.4; }
+    .eco-why { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+    .eco-why div { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .eco-why b { color: var(--text); }
+    /* Wykres symulacji */
+    .eco-chart {
+        display: flex; align-items: flex-end; gap: 4px; height: 150px; padding: 8px 2px 0;
+        overflow-x: auto; scrollbar-width: thin;
+    }
+    .eco-bar { flex: 1; min-width: 16px; display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; justify-content: flex-end; }
+    .eco-bar i { display: block; width: 100%; max-width: 26px; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, var(--accent), rgba(77,159,255,0.35)); transition: height 0.3s var(--ease); }
+    .eco-bar--hit i { background: linear-gradient(180deg, #5dd39e, rgba(93,211,158,0.4)); }
+    .eco-bar span { font-size: 9.5px; color: var(--text-faint); }
+    .eco-bar--hit span { color: #5dd39e; font-weight: 700; }
+    .eco-chart__cap { margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+    .eco-verdict {
+        margin-top: 22px; border: 1px solid rgba(77, 159, 255, 0.4); border-radius: 14px; padding: 14px 16px;
+        background: rgba(77, 159, 255, 0.05); font-size: 13.5px; color: var(--text-strong); line-height: 1.6;
+    }
+    .eco-verdict b { color: var(--accent); }
+    /* ── GTM ── */
+    .gtm-chans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 760px) { .gtm-chans { grid-template-columns: 1fr; } }
+    .gtm-chan { border: 1px solid var(--glass-border); border-radius: 14px; padding: 15px 16px; background: rgba(255,255,255,0.018); min-width: 0; }
+    .gtm-chan__top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+    .gtm-chan__top b { font-size: 13.5px; color: var(--text-strong); overflow-wrap: anywhere; }
+    .gtm-chan__type { font-size: 10px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(77,159,255,0.3); border-radius: 99px; padding: 2px 8px; }
+    .gtm-chan__size { font-size: 11px; color: var(--text-faint); }
+    .gtm-chan__why { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+    .gtm-chan__do { margin-top: 8px; font-size: 12.5px; color: #5dd39e; line-height: 1.55; }
+    .gtm-chan__do span { display: block; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(93,211,158,0.75); margin-bottom: 2px; }
+    .gtm-script { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,0.018); margin-bottom: 10px; }
+    .gtm-script__h { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .gtm-script__h b { font-size: 13px; color: var(--text-strong); }
+    .gtm-script p { font-size: 13px; color: var(--text); line-height: 1.65; white-space: pre-wrap; }
+    .gtm-copy {
+        flex-shrink: 0; font-size: 11px; font-weight: 700; color: var(--accent);
+        border: 1px solid rgba(77,159,255,0.35); border-radius: 8px; padding: 4px 10px; background: transparent; cursor: pointer; transition: background 0.15s ease;
+    }
+    .gtm-copy:hover { background: rgba(77,159,255,0.12); }
+    .gtm-copy.is-done { color: #5dd39e; border-color: rgba(93,211,158,0.45); }
+    .gtm-objs { display: flex; flex-direction: column; gap: 8px; }
+    .gtm-obj { border: 1px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.018); overflow: hidden; }
+    .gtm-obj summary { list-style: none; cursor: pointer; padding: 12px 15px; font-size: 13px; font-weight: 600; color: var(--text-strong); position: relative; padding-right: 38px; }
+    .gtm-obj summary::-webkit-details-marker { display: none; }
+    .gtm-obj summary::after { content: '+'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--text-muted); }
+    .gtm-obj[open] summary::after { content: '−'; }
+    .gtm-obj p { padding: 0 15px 13px; font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+    .gtm-ads { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 760px) { .gtm-ads { grid-template-columns: 1fr; } }
+    .gtm-ad { border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .gtm-ad__top { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .gtm-ad__no { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); }
+    .gtm-ad__concept { font-size: 11.5px; font-weight: 700; color: var(--text-strong); }
+    .gtm-ad__fmt { font-size: 10px; color: var(--text-faint); border: 1px solid var(--glass-border); border-radius: 99px; padding: 1px 7px; }
+    .gtm-ad__top .gtm-copy { margin-left: auto; }
+    .gtm-ad__head { font-size: 15.5px; font-weight: 800; color: var(--text-strong); line-height: 1.3; }
+    .gtm-ad__body { font-size: 13px; color: var(--text); line-height: 1.6; }
+    .gtm-ad__cta { align-self: flex-start; font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 8px; padding: 6px 12px; }
+    .gtm-ad__vis { margin-top: 2px; font-size: 11.5px; color: var(--text-muted); line-height: 1.55; border-top: 1px dashed var(--glass-border); padding-top: 8px; }
+    .gtm-ad__vis span { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 3px; }
+    .gtm-posts, .gtm-mails { display: flex; flex-direction: column; gap: 10px; }
+    .gtm-post, .gtm-mail { border: 1px solid var(--glass-border); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,0.018); }
+    .gtm-post__h, .gtm-mail__h { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; flex-wrap: wrap; }
+    .gtm-post__h b { font-size: 13px; color: var(--text-strong); flex: 1; min-width: 0; }
+    .gtm-post__where { font-size: 10.5px; color: var(--text-faint); }
+    .gtm-post__h .gtm-copy, .gtm-mail__h .gtm-copy { margin-left: auto; }
+    .gtm-post p, .gtm-mail p { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; white-space: pre-wrap; }
+    .gtm-mail__when { font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(77,159,255,0.3); border-radius: 99px; padding: 2px 9px; }
+    .gtm-mail__h b { font-size: 13px; color: var(--text-strong); flex: 1; min-width: 0; }
     .share-land {
         display: flex;
         align-items: center;
@@ -3947,6 +4070,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
                 Plan przychodu
             </button>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="economics" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Czy to się spina
+            </button>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="gtm" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg>
+                Sprzedaż od dnia 1
+            </button>
             <button type="button" class="side__item" data-tab="rynek">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
                 Potencjał rynku
@@ -4042,6 +4173,8 @@
     var SPAR_RAPORT_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-raport';
     var SPAR_LANDING_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-landing';
     var SPAR_PROTOTYPE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-prototype';
+    var SPAR_ECONOMICS_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-economics';
+    var SPAR_GTM_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-gtm';
     var SB_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co';
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Rezerwacja współpracy — Aplikacja" (500 zł, zwrotne)
@@ -4146,6 +4279,8 @@
         raport: null,           // raport potencjału rynku z spar-raport (web search; po zielonym werdykcie)
         landingUrl: null,       // adres działającej strony narzędzia (spar-landing → /aplikacja/podglad/)
         prototypeUrl: null,     // adres klikalnego prototypu narzędzia (spar-prototype → /aplikacja/podglad/?k=prototyp)
+        economics: null,        // model cenowy + unit economics (spar-economics; po zielonym werdykcie)
+        gtm: null,              // go-to-market: playbook + pakiet startowy (spar-gtm; po zielonym werdykcie)
         phone: null,            // telefon z bramki rejestracji (Tomek dzwoni po rezerwacji)
         authUserId: null,       // Supabase Auth user id (rejestracja Google/Facebook)
         authProvider: null      // 'google' | 'facebook' | null
@@ -4154,7 +4289,7 @@
     var pendingAuth = null; // {userId, provider, email, name}
     // Dogrywane elementy projektu (pigułka, plan, raport rynku, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
@@ -4166,7 +4301,7 @@
     // Timestampy startu generacji (klucz extras → Date.now()) — paski ETA na kaflach
     var extrasStart = {};
     // Orientacyjny czas generacji w sekundach (z pomiarów produkcyjnych)
-    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, prototype: 300 };
+    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, prototype: 300, economics: 50, gtm: 90 };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var stickBottom = true;
@@ -4214,7 +4349,9 @@
             bizplan: state.bizplan || null,
             raport: state.raport || null,
             landingUrl: state.landingUrl || null,
-            prototypeUrl: state.prototypeUrl || null
+            prototypeUrl: state.prototypeUrl || null,
+            economics: state.economics || null,
+            gtm: state.gtm || null
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -4301,11 +4438,15 @@
         state.raport = saved.raport || null;
         state.landingUrl = saved.landingUrl || null;
         state.prototypeUrl = saved.prototypeUrl || null;
+        state.economics = saved.economics || null;
+        state.gtm = saved.gtm || null;
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
         extras.landing = 'idle';
         extras.prototype = 'idle';
+        extras.economics = 'idle';
+        extras.gtm = 'idle';
         extrasStart = {};
         pjView = 'dash';
         pjNewPlan = false;
@@ -4409,6 +4550,20 @@
                 state.bizplan = p.business_plan;
                 persistSession();
                 pjNewPlan = true;
+                changed = true;
+            }
+            if (p.economics && typeof p.economics === 'object'
+                && JSON.stringify(p.economics) !== JSON.stringify(state.economics)) {
+                state.economics = p.economics;
+                extras.economics = 'idle';
+                persistSession();
+                changed = true;
+            }
+            if (p.gtm && typeof p.gtm === 'object'
+                && JSON.stringify(p.gtm) !== JSON.stringify(state.gtm)) {
+                state.gtm = p.gtm;
+                extras.gtm = 'idle';
+                persistSession();
                 changed = true;
             }
             if (p.preview_history && typeof p.preview_history === 'object') {
@@ -4528,7 +4683,7 @@
         } catch (e) { }
     }
     function applyHashTab() {
-        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan))?$/);
+        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan|economics|gtm))?$/);
         if (!m) return;
         var sub = m[2] === 'marka' ? 'strona' : m[2]; // stare linki #projekt-marka → Twoja strona
         if (m[1] === 'projekt' && sub) pjView = sub; // hash otwiera detal kafla
@@ -4546,7 +4701,9 @@
             prototyp: state.verdict === 'zielony',
             karta: kartaVersions().length > 0,
             strona: state.verdict === 'zielony',
-            plan: state.verdict === 'zielony'
+            plan: state.verdict === 'zielony',
+            economics: state.verdict === 'zielony',
+            gtm: state.verdict === 'zielony'
         };
         document.querySelectorAll('.side__item[data-pjview]').forEach(function (b) {
             b.hidden = !subShow[b.dataset.pjview];
@@ -5049,9 +5206,73 @@
         });
     }
 
+    // Unit economics „czy to się spina" — JSON ze spar-economics (cennik +
+    // wejścia do rachunku; arytmetykę liczy panel). Generuje się raz.
+    function ensureEconomics(force) {
+        if (extras.economics === 'gen' || (!force && extras.economics === 'fail')) return;
+        if (!force && state.economics) return;
+        if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
+        extras.economics = 'gen';
+        extrasStart.economics = Date.now();
+        var sid = state.sessionId;
+        fetch(SPAR_ECONOMICS_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, force: !!force })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.economics) {
+                state.economics = res.d.economics; persistSession(); extras.economics = 'idle';
+            } else if (res.ok && res.d && res.d.pending) {
+                setTimeout(function () {
+                    if (state.sessionId === sid && !state.economics && extras.economics === 'gen') { extras.economics = 'idle'; ensureEconomics(false); }
+                }, 60000);
+                return;
+            } else { extras.economics = 'fail'; }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.economics = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
+    // Go-to-market „sprzedaż od dnia 1" — JSON ze spar-gtm (playbook + pakiet
+    // reklam/postów/maili). gpt-5.5, ~1,5 min; generuje się raz.
+    function ensureGtm(force) {
+        if (extras.gtm === 'gen' || (!force && extras.gtm === 'fail')) return;
+        if (!force && state.gtm) return;
+        if (state.verdict !== 'zielony' || !state.karta || !state.sessionId) return;
+        extras.gtm = 'gen';
+        extrasStart.gtm = Date.now();
+        var sid = state.sessionId;
+        fetch(SPAR_GTM_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, force: !!force })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.gtm) {
+                state.gtm = res.d.gtm; persistSession(); extras.gtm = 'idle';
+            } else if (res.ok && res.d && res.d.pending) {
+                setTimeout(function () {
+                    if (state.sessionId === sid && !state.gtm && extras.gtm === 'gen') { extras.gtm = 'idle'; ensureGtm(false); }
+                }, 120000);
+                return;
+            } else { extras.gtm = 'fail'; }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () {
+            if (state.sessionId !== sid) return;
+            extras.gtm = 'fail';
+            if (activeTab === 'projekt') renderPaneProjekt();
+        });
+    }
+
     function ensureKartaExtras(force) {
         ensureSummaryImage(force);
         ensureBizplan(force);
+        ensureEconomics(false);
+        ensureGtm(false);
         // raport / strona / prototyp: generują się raz (bez force przy
         // poprawkach — rynek się nie zmienia, landing/prototyp mają limit wersji)
         ensureRaport(false);
@@ -5145,6 +5366,268 @@
         });
     }
 
+    /* ── UNIT ECONOMICS — cała arytmetyka po stronie panelu (suwaki przeliczają
+       natychmiast). Model dostarcza tylko wejścia + uzasadnienia. ── */
+    function econCalc(e, ov) {
+        if (!e || !e.wejscia) return null;
+        var w = e.wejscia;
+        var cena = ov && ov.cena != null ? ov.cena : (+w.cena_bazowa || 0);
+        var marza = (ov && ov.marza != null ? ov.marza : (+w.marza_proc || 80)) / 100;
+        var churn = (ov && ov.churn != null ? ov.churn : (+w.churn_mies_proc || 4)) / 100;
+        var cac = ov && ov.cac != null ? ov.cac : (+w.cac || 0);
+        var budzet = ov && ov.budzet != null ? ov.budzet : (+w.budzet_reklam_mies || 0);
+        var kosztBud = +w.koszt_budowy || 30000;
+        var gross = cena * marza;                       // miesięczny zysk brutto z klienta
+        var ltv = churn > 0 ? gross / churn : gross * 36;
+        var ltvCac = cac > 0 ? ltv / cac : 0;
+        var payback = gross > 0 ? cac / gross : 0;       // miesiące
+        var nowiMies = cac > 0 ? Math.floor(budzet / cac) : 0;
+        var sim = [], aktywni = 0, cum = 0, miesiac50 = null, breakeven = null;
+        for (var m = 1; m <= 24; m++) {
+            aktywni = Math.max(0, aktywni - Math.round(aktywni * churn)) + nowiMies;
+            cum += aktywni * gross;
+            sim.push({ m: m, aktywni: aktywni, mrr: aktywni * cena });
+            if (miesiac50 === null && aktywni >= 50) miesiac50 = m;
+            if (breakeven === null && cum >= kosztBud) breakeven = m;
+            if (miesiac50 !== null && (breakeven !== null || m >= 18)) break;
+        }
+        var klienciNaZwrot = gross > 0 ? Math.ceil(kosztBud / gross) : 0; // klient-miesiące
+        return { cena: cena, marza: marza, churn: churn, cac: cac, budzet: budzet, kosztBud: kosztBud,
+            gross: gross, ltv: ltv, ltvCac: ltvCac, payback: payback, nowiMies: nowiMies,
+            sim: sim, miesiac50: miesiac50, breakeven: breakeven, klienciNaZwrot: klienciNaZwrot };
+    }
+    function econDec(n) { return (Math.round(n * 10) / 10).toString().replace('.', ','); }
+    function econMetricsHTML(c) {
+        var lvlCac = c.ltvCac >= 3 ? 'good' : (c.ltvCac >= 1.5 ? 'ok' : 'bad');
+        function metric(id, label, val, sub, lvl) {
+            return '<div class="eco-metric' + (lvl ? ' eco-metric--' + lvl : '') + '">' +
+                '<div class="eco-metric__val" data-eco="' + id + '">' + val + '</div>' +
+                '<div class="eco-metric__lbl">' + label + '</div>' +
+                (sub ? '<div class="eco-metric__sub" data-eco="' + id + '-sub">' + sub + '</div>' : '') + '</div>';
+        }
+        return '<div class="eco-metrics">' +
+            metric('ltvcac', 'LTV : CAC', econDec(c.ltvCac) + '×', c.ltvCac >= 3 ? 'zdrowo (≥3×)' : (c.ltvCac >= 1.5 ? 'do poprawy' : 'za nisko'), lvlCac) +
+            metric('ltv', 'Wartość klienta (LTV)', fmtZl(Math.round(c.ltv)) + ' zł', 'przez całą współpracę', '') +
+            metric('payback', 'Zwrot kosztu klienta', econDec(c.payback) + ' mies.', 'tyle pracuje na siebie', c.payback <= 6 ? 'good' : (c.payback <= 12 ? 'ok' : 'bad')) +
+            metric('m50', 'Do 50 klientów', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet lub obniż CAC', c.miesiac50 && c.miesiac50 <= 9 ? 'good' : 'ok') +
+            metric('breakeven', 'Zwrot budowy 30 tys.', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.', c.breakeven ? 'skumulowany zysk > 30 000 zł' : 'przy tych ustawieniach później', c.breakeven && c.breakeven <= 8 ? 'good' : 'ok') +
+            metric('mrr50', 'Przychód przy 50', fmtZl(Math.round(50 * c.cena)) + ' zł', '/mies. — tu przejmujesz stery', '') +
+            '</div>';
+    }
+    function econChartHTML(c) {
+        var sim = c.sim || [];
+        var max = sim.reduce(function (mx, s) { return Math.max(mx, s.aktywni); }, 1);
+        var bars = sim.map(function (s) {
+            var h = Math.max(6, Math.round(s.aktywni / max * 100));
+            var hit = c.miesiac50 && s.m === c.miesiac50;
+            return '<div class="eco-bar' + (hit ? ' eco-bar--hit' : '') + '" title="Miesiąc ' + s.m + ': ' + s.aktywni + ' klientów, ' + fmtZl(s.mrr) + ' zł/mies.">' +
+                '<i style="height:' + h + '%"></i><span>' + s.m + '</span></div>';
+        }).join('');
+        return '<div class="eco-chart" data-eco="chart">' + bars + '</div>' +
+            '<div class="eco-chart__cap" data-eco="chart-cap">' +
+            (c.miesiac50 ? 'Aktywni klienci miesiąc po miesiącu — 50 osiągasz w miesiącu ' + c.miesiac50 + ' przy budżecie ' + fmtZl(c.budzet) + ' zł/mies.'
+                : 'Przy tym budżecie i CAC 50 klientów zajmuje ponad 18 miesięcy — pokręć suwakami.') + '</div>';
+    }
+    function economicsHTML(e) {
+        var c = econCalc(e, null);
+        if (!c) return '<div class="tabpane__empty">Wyliczenia pojawią się, gdy domkniemy projekt.</div>';
+        var cennik = e.cennik || {};
+        var tiery = Array.isArray(cennik.tiery) ? cennik.tiery : [];
+        var w = e.wejscia || {};
+        // CENNIK
+        var tierCards = tiery.map(function (t) {
+            var funk = Array.isArray(t.funkcje) ? t.funkcje.slice(0, 6) : [];
+            return '<div class="eco-tier' + (t.polecany ? ' eco-tier--on' : '') + '">' +
+                (t.polecany ? '<span class="eco-tier__badge">Polecany</span>' : '') +
+                '<div class="eco-tier__name">' + esc(t.nazwa || '') + '</div>' +
+                '<div class="eco-tier__price">' + esc(String(t.cena)) + '<small> ' + esc(t.jednostka || 'zł/mies.') + '</small></div>' +
+                (t.dla_kogo ? '<div class="eco-tier__for">' + esc(t.dla_kogo) + '</div>' : '') +
+                (funk.length ? '<ul class="eco-tier__feat">' + funk.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>' : '') +
+                '</div>';
+        }).join('');
+        var cennikNote = [];
+        if (cennik.trial_dni) cennikNote.push(esc(cennik.trial_dni) + ' dni za darmo');
+        if (cennik.rabat_roczny_proc) cennikNote.push('-' + esc(cennik.rabat_roczny_proc) + '% przy płatności rocznej');
+        // SUWAKI
+        function slider(id, label, min, max, step, val, unit) {
+            return '<div class="eco-slider">' +
+                '<div class="eco-slider__top"><span>' + label + '</span><b data-eco-out="' + id + '">' + esc(String(val)) + unit + '</b></div>' +
+                '<input type="range" class="wg-range" data-eco-slider="' + id + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + val + '"></div>';
+        }
+        var slidersHtml = '<div class="eco-sliders">' +
+            slider('cena', 'Cena (plan Pro)', 49, 600, 10, Math.round(c.cena), ' zł') +
+            slider('churn', 'Churn miesięczny', 1, 12, 0.5, (w.churn_mies_proc || 4), '%') +
+            slider('cac', 'Koszt klienta (CAC)', 80, 900, 10, Math.round(c.cac), ' zł') +
+            slider('budzet', 'Budżet reklam', 500, 6000, 100, Math.round(c.budzet), ' zł/mies.') +
+            '</div>';
+        var why = '';
+        if (w.cac_uzasadnienie || w.churn_uzasadnienie) {
+            why = '<div class="eco-why">' +
+                (w.cac_uzasadnienie ? '<div><b>CAC:</b> ' + esc(w.cac_uzasadnienie) + '</div>' : '') +
+                (w.churn_uzasadnienie ? '<div><b>Churn:</b> ' + esc(w.churn_uzasadnienie) + '</div>' : '') + '</div>';
+        }
+        var zal = Array.isArray(e.zalozenia) && e.zalozenia.length
+            ? '<details class="pj-assume"><summary>Założenia do tych liczb</summary><ul class="pj-zal">' +
+              e.zalozenia.map(function (z) { return '<li>' + esc(z) + '</li>'; }).join('') + '</ul></details>' : '';
+        return '<div class="eco" data-eco-root>' +
+            // sekcja cennik
+            '<div class="eco-sec"><div class="eco-sec__h">' + pjIco(PJ_ICONS.plan) + '<h3>Model cenowy</h3>' +
+            (cennik.model ? '<span>' + esc(cennik.model) + '</span>' : '') + '</div>' +
+            '<div class="eco-tiers">' + tierCards + '</div>' +
+            (cennikNote.length ? '<div class="eco-tiers__note">' + cennikNote.join(' · ') + '</div>' : '') +
+            (cennik.expansion ? '<p class="eco-expansion"><b>Jak rośnie przychód z klienta:</b> ' + esc(cennik.expansion) + '</p>' : '') +
+            '</div>' +
+            // sekcja rachunek
+            '<div class="eco-sec"><div class="eco-sec__h">' + pjIco(PJ_ICONS.economics) + '<h3>Czy to się spina</h3>' +
+            '<span>pokręć suwakami — wszystko przelicza się na żywo</span></div>' +
+            slidersHtml + econMetricsHTML(c) + why + '</div>' +
+            // sekcja symulacja
+            '<div class="eco-sec"><div class="eco-sec__h">' + pjIco('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>') + '<h3>Droga do 50 klientów</h3>' +
+            '<span>symulacja przy Twoim budżecie reklamowym</span></div>' +
+            econChartHTML(c) + '</div>' +
+            (e.komentarz ? '<div class="eco-verdict"><b>Werdykt analityka:</b> ' + esc(e.komentarz) + '</div>' : '') +
+            zal +
+            '<div class="pj-plan__note">Wstępny rachunek na realnych benchmarkach polskiego rynku SaaS B2B. Pełny model finansowy ułożysz z Tomkiem po rezerwacji.</div>' +
+            '</div>';
+    }
+    function bindEconomics(root, e) {
+        var box = root.querySelector('[data-eco-root]');
+        if (!box || box.dataset.bound) return;
+        box.dataset.bound = '1';
+        var ov = {};
+        var sliders = box.querySelectorAll('[data-eco-slider]');
+        function fillRange(r) {
+            var mn = parseFloat(r.min), mx = parseFloat(r.max);
+            r.style.setProperty('--fill', ((parseFloat(r.value) - mn) / (mx - mn) * 100) + '%');
+        }
+        function repaint() {
+            var c = econCalc(e, ov);
+            if (!c) return;
+            // metryki
+            var setv = function (id, v) { var el2 = box.querySelector('[data-eco="' + id + '"]'); if (el2) el2.innerHTML = v; };
+            var sets = function (id, v) { var el2 = box.querySelector('[data-eco="' + id + '-sub"]'); if (el2) el2.textContent = v; };
+            setv('ltvcac', econDec(c.ltvCac) + '×'); sets('ltvcac', c.ltvCac >= 3 ? 'zdrowo (≥3×)' : (c.ltvCac >= 1.5 ? 'do poprawy' : 'za nisko'));
+            setv('ltv', fmtZl(Math.round(c.ltv)) + ' zł');
+            setv('payback', econDec(c.payback) + ' mies.');
+            setv('m50', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.'); sets('m50', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet lub obniż CAC');
+            setv('breakeven', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.'); sets('breakeven', c.breakeven ? 'skumulowany zysk > 30 000 zł' : 'przy tych ustawieniach później');
+            setv('mrr50', fmtZl(Math.round(50 * c.cena)) + ' zł');
+            // kolory metryk
+            var setLvl = function (id, lvl) { var m = box.querySelector('[data-eco="' + id + '"]'); if (m) { var card = m.closest('.eco-metric'); if (card) card.className = 'eco-metric eco-metric--' + lvl; } };
+            setLvl('ltvcac', c.ltvCac >= 3 ? 'good' : (c.ltvCac >= 1.5 ? 'ok' : 'bad'));
+            setLvl('payback', c.payback <= 6 ? 'good' : (c.payback <= 12 ? 'ok' : 'bad'));
+            setLvl('m50', c.miesiac50 && c.miesiac50 <= 9 ? 'good' : 'ok');
+            setLvl('breakeven', c.breakeven && c.breakeven <= 8 ? 'good' : 'ok');
+            // wykres
+            var chart = box.querySelector('[data-eco="chart"]');
+            if (chart) {
+                var max = c.sim.reduce(function (mx, s) { return Math.max(mx, s.aktywni); }, 1);
+                chart.innerHTML = c.sim.map(function (s) {
+                    var h = Math.max(6, Math.round(s.aktywni / max * 100));
+                    var hit = c.miesiac50 && s.m === c.miesiac50;
+                    return '<div class="eco-bar' + (hit ? ' eco-bar--hit' : '') + '" title="Miesiąc ' + s.m + ': ' + s.aktywni + ' klientów, ' + fmtZl(s.mrr) + ' zł/mies."><i style="height:' + h + '%"></i><span>' + s.m + '</span></div>';
+                }).join('');
+            }
+            var cap = box.querySelector('[data-eco="chart-cap"]');
+            if (cap) cap.textContent = c.miesiac50
+                ? ('Aktywni klienci miesiąc po miesiącu — 50 osiągasz w miesiącu ' + c.miesiac50 + ' przy budżecie ' + fmtZl(c.budzet) + ' zł/mies.')
+                : 'Przy tym budżecie i CAC 50 klientów zajmuje ponad 18 miesięcy — pokręć suwakami.';
+        }
+        sliders.forEach(function (r) {
+            fillRange(r);
+            r.addEventListener('input', function () {
+                var id = r.getAttribute('data-eco-slider');
+                ov[id === 'churn' ? 'churn' : id] = parseFloat(r.value);
+                var out = box.querySelector('[data-eco-out="' + id + '"]');
+                if (out) {
+                    var unit = id === 'churn' ? '%' : (id === 'budzet' ? ' zł/mies.' : ' zł');
+                    out.textContent = (id === 'churn' ? econDec(parseFloat(r.value)) : Math.round(parseFloat(r.value))) + unit;
+                }
+                fillRange(r);
+                repaint();
+            });
+        });
+    }
+
+    /* ── GO-TO-MARKET — playbook + pakiet startowy (reklamy z copy, posty, maile) ── */
+    function gtmHTML(g) {
+        if (!g) return '<div class="tabpane__empty">Plan sprzedaży pojawi się, gdy domkniemy projekt.</div>';
+        var pb = g.playbook || {}, pk = g.pakiet || {};
+        function copyBtn(txt) { return '<button type="button" class="gtm-copy" data-copy="' + esc(txt) + '">Kopiuj</button>'; }
+        // KANAŁY
+        var kanaly = Array.isArray(pb.kanaly) ? pb.kanaly : [];
+        var kanHtml = kanaly.map(function (k) {
+            return '<div class="gtm-chan"><div class="gtm-chan__top"><b>' + esc(k.miejsce || '') + '</b>' +
+                (k.typ ? '<span class="gtm-chan__type">' + esc(k.typ) + '</span>' : '') +
+                (k.wielkosc ? '<span class="gtm-chan__size">' + esc(k.wielkosc) + '</span>' : '') + '</div>' +
+                (k.dlaczego ? '<p class="gtm-chan__why">' + esc(k.dlaczego) + '</p>' : '') +
+                (k.jak_zaczac ? '<p class="gtm-chan__do"><span>Pierwszy ruch</span>' + esc(k.jak_zaczac) + '</p>' : '') + '</div>';
+        }).join('');
+        // SKRYPTY
+        var skrypty = '';
+        if (pb.skrypt_dm && pb.skrypt_dm.tresc) {
+            skrypty += '<div class="gtm-script"><div class="gtm-script__h"><b>Pierwsza wiadomość (DM)</b>' + copyBtn(pb.skrypt_dm.tresc) + '</div><p>' + esc(pb.skrypt_dm.tresc) + '</p></div>';
+        }
+        if (pb.skrypt_email && pb.skrypt_email.tresc) {
+            skrypty += '<div class="gtm-script"><div class="gtm-script__h"><b>Mail na zimno' + (pb.skrypt_email.temat ? ' — „' + esc(pb.skrypt_email.temat) + '”' : '') + '</b>' + copyBtn(pb.skrypt_email.tresc) + '</div><p>' + esc(pb.skrypt_email.tresc) + '</p></div>';
+        }
+        // OBIEKCJE
+        var obiekcje = Array.isArray(pb.obiekcje) ? pb.obiekcje : [];
+        var obHtml = obiekcje.map(function (o) {
+            return '<details class="gtm-obj"><summary>' + esc(o.obiekcja || '') + '</summary><p>' + esc(o.odpowiedz || '') + '</p></details>';
+        }).join('');
+        // REKLAMY
+        var reklamy = Array.isArray(pk.reklamy) ? pk.reklamy : [];
+        var adHtml = reklamy.map(function (r, i) {
+            var copyTxt = (r.naglowek || '') + '\n\n' + (r.tekst || '') + '\n\n' + (r.cta || '');
+            return '<div class="gtm-ad"><div class="gtm-ad__top"><span class="gtm-ad__no">Reklama ' + (i + 1) + '</span>' +
+                (r.koncept ? '<span class="gtm-ad__concept">' + esc(r.koncept) + '</span>' : '') +
+                (r.format ? '<span class="gtm-ad__fmt">' + esc(r.format) + '</span>' : '') + copyBtn(copyTxt) + '</div>' +
+                '<div class="gtm-ad__head">' + esc(r.naglowek || '') + '</div>' +
+                '<p class="gtm-ad__body">' + esc(r.tekst || '') + '</p>' +
+                (r.cta ? '<span class="gtm-ad__cta">' + esc(r.cta) + '</span>' : '') +
+                (r.wizual_brief ? '<div class="gtm-ad__vis"><span>Brief wizualny</span>' + esc(r.wizual_brief) + '</div>' : '') + '</div>';
+        }).join('');
+        // POSTY
+        var posty = Array.isArray(pk.posty) ? pk.posty : [];
+        var postHtml = posty.map(function (p) {
+            var copyTxt = (p.haczyk || '') + '\n' + (p.tresc || '');
+            return '<div class="gtm-post"><div class="gtm-post__h"><b>' + esc(p.haczyk || '') + '</b>' +
+                (p.gdzie ? '<span class="gtm-post__where">' + esc(p.gdzie) + '</span>' : '') + copyBtn(copyTxt) + '</div>' +
+                '<p>' + esc(p.tresc || '') + '</p></div>';
+        }).join('');
+        // MAILE
+        var maile = Array.isArray(pk.maile_powitalne) ? pk.maile_powitalne : [];
+        var mailHtml = maile.map(function (mm, i) {
+            return '<div class="gtm-mail"><div class="gtm-mail__h"><span class="gtm-mail__when">' + esc(mm.kiedy || ('mail ' + (i + 1))) + '</span>' +
+                '<b>' + esc(mm.temat || '') + '</b>' + copyBtn((mm.temat || '') + '\n\n' + (mm.tresc || '')) + '</div>' +
+                '<p>' + esc(mm.tresc || '') + '</p></div>';
+        }).join('');
+        function sec(icon, title, sub, inner) {
+            return '<div class="eco-sec"><div class="eco-sec__h">' + pjIco(icon) + '<h3>' + title + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>' + inner + '</div>';
+        }
+        return '<div class="gtm" data-gtm-root>' +
+            sec(PJ_ICONS.gtm, 'Gdzie są Twoi pierwsi klienci', kanaly.length + ' konkretnych miejsc — z pierwszym ruchem', '<div class="gtm-chans">' + kanHtml + '</div>') +
+            (skrypty ? sec('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>', 'Gotowe skrypty', 'do wklejenia — najpierw wartość, nie „kup”', skrypty) : '') +
+            (obHtml ? sec('<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line><circle cx="12" cy="12" r="10"></circle>', 'Obiekcje i odpowiedzi', 'co usłyszysz — i co odpowiedzieć', '<div class="gtm-objs">' + obHtml + '</div>') : '') +
+            (adHtml ? sec('<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>', '3 reklamy gotowe do odpalenia', 'copy + brief wizualny dla projektanta', '<div class="gtm-ads">' + adHtml + '</div>') : '') +
+            (postHtml ? sec('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>', 'Posty organiczne', 'do grup i na profil', '<div class="gtm-posts">' + postHtml + '</div>') : '') +
+            (mailHtml ? sec('<rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path>', 'Maile powitalne', 'sekwencja, która prowadzi do pierwszego użycia', '<div class="gtm-mails">' + mailHtml + '</div>') : '') +
+            '<div class="pj-plan__note">Gotowe materiały na start. Kampanie i pierwszych 50 klientów rozkręcacie wspólnie z Tomkiem po rezerwacji.</div>' +
+            '</div>';
+    }
+    function bindGtm(root) {
+        root.querySelectorAll('.gtm-copy').forEach(function (b) {
+            if (b.dataset.bound) return; b.dataset.bound = '1';
+            b.addEventListener('click', function () {
+                var txt = b.getAttribute('data-copy') || '';
+                function done() { var o = b.textContent; b.textContent = 'Skopiowano ✓'; b.classList.add('is-done'); setTimeout(function () { b.textContent = o; b.classList.remove('is-done'); }, 1600); }
+                if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(function () { window.prompt('Skopiuj:', txt); });
+                else window.prompt('Skopiuj:', txt);
+            });
+        });
+    }
+
     function pillHTML(url) {
         return '<div class="pj-pill">' +
             '<div class="pj-plan__head"><span class="pj-plan__t">' +
@@ -5224,7 +5707,9 @@
         plan: '<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>',
         raport: '<path d="M3 3v18h18"></path><path d="M7 13l3-3 4 4 5-6"></path>',
         pigulka: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 9v11"></path>',
-        prototyp: '<path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path>'
+        prototyp: '<path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path>',
+        economics: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
+        gtm: '<path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>'
     };
 
     function fmtEta(sec) {
@@ -5499,6 +5984,46 @@
                     '</div>';
             }
 
+            // CZY TO SIĘ SPINA — unit economics (klik → detal z suwakami)
+            if (state.economics) {
+                var ec = econCalc(state.economics, null);
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="economics">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
+                    '<span class="pjd-tile__t">Czy to się spina</span>' +
+                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>LTV : CAC</small></span>' : '') +
+                    '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
+                    '<span class="pjd-tile__t">Czy to się spina</span>' +
+                    (extras.economics === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć.</b><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, CAC, LTV, zwrot budowy — realne benchmarki')) +
+                    '</div>';
+            }
+
+            // SPRZEDAŻ OD DNIA 1 — go-to-market (klik → detal)
+            if (state.gtm) {
+                var kanCount = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly.length : 0;
+                var adCount = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy.length : 0;
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="gtm">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
+                    '<span class="pjd-tile__t">Sprzedaż od dnia 1</span>' +
+                    '<span class="pjd-tile__sub">' + kanCount + ' miejsc z klientami, ' + adCount + ' gotowe reklamy, skrypty i maile</span>' +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
+                    '<span class="pjd-tile__t">Sprzedaż od dnia 1</span>' +
+                    (extras.gtm === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować.</b><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty, maile')) +
+                    '</div>';
+            }
+
             // PIGUŁKA — miniatura (klik → lightbox)
             var pillUrl = state.previews[SUMMARY_META[0]];
             if (pillUrl) {
@@ -5539,7 +6064,9 @@
             strona: ['Twoja strona', 'działająca strona „' + esc(ctx.nazwa) + '" — prawdziwa, nie grafika'],
             prototyp: ['Dotknij swojej aplikacji', 'klikalny prototyp „' + esc(ctx.nazwa) + '" — wpisz, kliknij, zobacz jak reaguje'],
             karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
-            plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy']
+            plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy'],
+            economics: ['Czy to się spina', 'model cenowy, koszt klienta i zwrot — przelicz na suwakach'],
+            gtm: ['Sprzedaż od dnia 1', 'gdzie są klienci, gotowe reklamy, skrypty i maile']
         };
         var t = TITLES[pjView] || TITLES.karta;
         var html = '<div class="pjd-detailhead">' +
@@ -5647,8 +6174,22 @@
             else html += genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów — na podstawie rozmowy');
         }
 
+        if (pjView === 'economics') {
+            if (state.economics) html += economicsHTML(state.economics);
+            else if (extras.economics === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się policzyć opłacalności.</b><span>Spróbuj jeszcze raz — to chwila.</span></div><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>';
+            else html += genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, CAC, LTV, zwrot budowy — na realnych benchmarkach');
+        }
+
+        if (pjView === 'gtm') {
+            if (state.gtm) html += gtmHTML(state.gtm);
+            else if (extras.gtm === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować planu sprzedaży.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>';
+            else html += genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty i maile');
+        }
+
         body.innerHTML = html;
         bindProjektCommon(body, ctx);
+        if (pjView === 'economics' && state.economics) bindEconomics(body, state.economics);
+        if (pjView === 'gtm' && state.gtm) bindGtm(body);
         var back = el('pjd-back');
         if (back) back.addEventListener('click', function () {
             pjView = 'dash';
@@ -5679,6 +6220,8 @@
                 if (kind === 'plan') { extras.plan = 'idle'; ensureBizplan(false); }
                 else if (kind === 'landing') { extras.landing = 'idle'; ensureLanding(); }
                 else if (kind === 'prototype') { extras.prototype = 'idle'; ensurePrototype(); }
+                else if (kind === 'economics') { extras.economics = 'idle'; ensureEconomics(false); }
+                else if (kind === 'gtm') { extras.gtm = 'idle'; ensureGtm(false); }
                 else if (kind === 'raport') { extras.raport = 'idle'; ensureRaport(false); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
                 renderPaneProjekt();
