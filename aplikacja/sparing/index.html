@@ -4782,7 +4782,7 @@
             el('pane-' + t).classList.toggle('is-active', tab === t);
         });
         if (tab === 'projekt') { renderPaneProjekt(); }
-        if (tab === 'rynek') { renderPaneRynek(); rkNew = false; if (revUnlocked('rynek')) markSeen('rynek'); }
+        if (tab === 'rynek') { renderPaneRynek(); rkNew = false; if (revAccessible('rynek')) markSeen('rynek'); }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
         if (tab === 'chat') scrollToBottom(true);
         setTabHash(tab === 'chat' ? '' : tab);
@@ -5077,6 +5077,15 @@
         if (!key) return true; // niebramkowany element
         return !!state.paid || !hasRevealPlan() || state.reveals[key] === 'sent';
     }
+    // Czy treść jest FAKTYCZNIE dostępna (lustro logiki paneli). Rynek to
+    // wyjątek: gdy raport już istnieje, pane pokazuje go mimo braku odsłony
+    // (renderPaneRynek: lockedView tylko gdy !revUnlocked && !state.raport),
+    // więc menu nie może wtedy wisieć z kłódką. Reszta = ściśle revUnlocked.
+    function revAccessible(view) {
+        if (revUnlocked(view)) return true;
+        if (view === 'rynek') return !!state.raport;
+        return false;
+    }
     function lockedTile(icon, title, sub) {
         return '<div class="pjd-tile pjd-tile--w3 pjd-tile--static" style="position:relative;opacity:.82">' +
             '<span aria-hidden="true" style="position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#9fb0c8;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:3px 9px;line-height:1">' +
@@ -5111,7 +5120,7 @@
     }
     function viewStatus(view) {
         if (REV_KEY[view] !== undefined) {                    // pozycja bramkowana (sekwencja)
-            if (!revUnlocked(view)) return { label: 'zablokowane', cls: 'locked' };
+            if (!revAccessible(view)) return { label: 'zablokowane', cls: 'locked' };
             return (state.seen && state.seen[view]) ? { label: 'gotowe', cls: 'done' } : { label: 'nowe', cls: 'new' };
         }
         var has = view === 'ekrany' ? (lightboxItems().length > 0 || Object.keys(state.previewHistory || {}).length > 0)
