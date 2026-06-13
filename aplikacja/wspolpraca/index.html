@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#050507">
+    <title>Współpraca — buduję, rozkręcam, oddaję Ci stery | Tomek Niedźwiecki</title>
+    <meta name="description" content="Jak wygląda wspólny biznes: buduję aplikację z Twojego pomysłu, prowadzę ją do pierwszych 50 stałych klientów i oddaję Ci stery. Płacisz za budowę od 9 000 zł i jesteś właścicielem. Zamiast udziałów — 10% od przychodu.">
+    <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
+    <link rel="canonical" href="https://tomekniedzwiecki.pl/aplikacja/wspolpraca/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tomekniedzwiecki.pl/aplikacja/wspolpraca/">
+    <meta property="og:title" content="Współpraca — buduję, rozkręcam, oddaję Ci stery">
+    <meta property="og:description" content="Buduję aplikację z Twojego pomysłu, prowadzę ją do 50 stałych klientów i oddaję Ci stery. Płacisz za budowę, jesteś właścicielem. 10% od przychodu zamiast udziałów.">
+    <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
+    <meta property="og:locale" content="pl_PL">
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent', 'default', { 'ad_storage': 'granted', 'ad_user_data': 'granted', 'ad_personalization': 'granted', 'analytics_storage': 'granted' });
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var s = document.createElement('script');
+            s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
+            document.head.appendChild(s);
+            s.onload = function() {
+                gtag('js', new Date());
+                gtag('set', 'user_properties', { persona: 'stworze' });
+                gtag('config', 'G-W8CLDSHVFC', { 'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true } });
+            };
+        });
+    </script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init','1668188210820080'); fbq('track','PageView');
+    });
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1" alt=""></noscript>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+
+<style>
+/* ============================================================
+   APLIKACJA / WSPÓŁPRACA — jak wygląda wspólny biznes
+   Self-contained, design 1:1 z /aplikacja/ i /inspiracje/.
+   ============================================================ */
+:root {
+    --bg: #050507;
+    --bg-elev: #0a0a0e;
+    --bg-card: #0c0c12;
+    --glass: rgba(255, 255, 255, 0.035);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-soft: rgba(255, 255, 255, 0.055);
+    --border-strong: #2d2d34;
+    --text: #e9e9ee;
+    --text-strong: #ffffff;
+    --text-muted: #8b8b96;
+    --text-faint: #5a5a64;
+    --accent: #4d9fff;
+    --accent-2: #2f7fe6;
+    --accent-soft: rgba(77, 159, 255, 0.14);
+    --accent-dim: rgba(77, 159, 255, 0.06);
+    --accent-ink: #061320;
+    --green: #00d97e;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --pad-x: clamp(20px, 5vw, 48px);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; border: 0; background: none; cursor: pointer; color: inherit; }
+img { max-width: 100%; display: block; }
+::selection { background: rgba(77, 159, 255, 0.3); color: #fff; }
+
+/* NAV */
+.nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px var(--pad-x);
+    background: rgba(5, 5, 7, 0.72);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border-soft);
+}
+.nav__brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; color: var(--text-strong); letter-spacing: -0.01em; }
+.nav__brand img { width: 26px; height: 26px; border-radius: 7px; }
+.nav__brand span em { font-style: normal; color: var(--accent); }
+.nav__links { display: flex; align-items: center; gap: 26px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); }
+.nav__links a:not(.nav__cta):hover { color: var(--text-strong); }
+.nav__links a.is-current { color: var(--text-strong); }
+.nav__cta {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-weight: 800; font-size: 13px;
+    box-shadow: 0 8px 28px -10px rgba(77, 159, 255, 0.55);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.nav__cta:hover { transform: translateY(-1px); box-shadow: 0 14px 36px -10px rgba(77, 159, 255, 0.7); }
+@media (max-width: 760px) { .nav__links a:not(.nav__cta) { display: none; } }
+
+/* HEADER / HERO */
+.head {
+    position: relative; max-width: 1080px; margin: 0 auto;
+    padding: calc(82px + 7vh) var(--pad-x) clamp(30px, 5vh, 52px);
+    text-align: center; overflow: hidden;
+}
+.head::before {
+    content: ''; position: absolute; inset: 0; z-index: -2;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at 50% 0%, #000 25%, transparent 72%);
+    mask-image: radial-gradient(ellipse 80% 90% at 50% 0%, #000 25%, transparent 72%);
+}
+.head::after {
+    content: ''; position: absolute; z-index: -1;
+    top: -30%; left: 50%; transform: translateX(-50%);
+    width: min(900px, 120vw); height: 60vh;
+    background: radial-gradient(ellipse at center, rgba(77, 159, 255, 0.15) 0%, transparent 70%);
+    filter: blur(40px); pointer-events: none;
+}
+.eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 7px 16px; border-radius: 999px;
+    border: 1px solid rgba(77, 159, 255, 0.3);
+    background: rgba(77, 159, 255, 0.07);
+    font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 22px;
+}
+.head h1 {
+    font-size: clamp(32px, 5.2vw, 60px);
+    line-height: 1.04; letter-spacing: -0.045em; font-weight: 900;
+    color: var(--text-strong); margin-bottom: 20px;
+}
+.head h1 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); letter-spacing: -0.02em; }
+.head p { color: var(--text-muted); font-size: clamp(15px, 1.7vw, 17.5px); max-width: 58ch; margin: 0 auto 30px; }
+.btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 32px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 55%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-weight: 800; font-size: 15px;
+    box-shadow: 0 10px 36px -10px rgba(77, 159, 255, 0.6);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 18px 48px -12px rgba(77, 159, 255, 0.75); }
+.btn .arr { transition: transform 0.25s var(--ease); }
+.btn:hover .arr { transform: translateX(3px); }
+.head__micro { margin-top: 14px; font-size: 12.5px; color: var(--text-faint); }
+
+/* SECTION SHELL */
+.sec { max-width: 1080px; margin: 0 auto; padding: clamp(40px, 7vh, 72px) var(--pad-x); }
+.sec__eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.sec__title { font-size: clamp(24px, 3.4vw, 38px); line-height: 1.1; letter-spacing: -0.035em; font-weight: 900; color: var(--text-strong); margin-bottom: 14px; }
+.sec__title .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.sec__sub { color: var(--text-muted); font-size: clamp(14px, 1.5vw, 16px); max-width: 62ch; margin-bottom: 34px; }
+
+/* ROLES */
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 680px) { .roles { grid-template-columns: 1fr; } }
+.role { padding: 28px 26px; border-radius: 18px; border: 1px solid var(--glass-border); background: var(--glass); }
+.role--ja { border-color: rgba(77, 159, 255, 0.3); background: var(--accent-dim); }
+.role__k { font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
+.role--ja .role__k { color: var(--accent); }
+.role__t { font-size: 19px; font-weight: 800; color: var(--text-strong); margin-bottom: 12px; letter-spacing: -0.02em; }
+.role__d { font-size: 14.5px; line-height: 1.65; color: var(--text-muted); }
+.role__d strong { color: var(--text); font-weight: 700; }
+.roles__note { margin-top: 18px; text-align: center; font-size: 14.5px; color: var(--text); }
+.roles__note strong { color: var(--accent); font-weight: 700; }
+
+/* FLOW */
+.flow { display: grid; gap: 0; }
+.flow__step { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 0 0 26px 0; }
+.flow__step:not(:last-child) .flow__num::after {
+    content: ''; position: absolute; left: 50%; top: 38px; bottom: -8px; width: 2px; transform: translateX(-50%);
+    background: linear-gradient(var(--accent-soft), transparent);
+}
+.flow__num {
+    position: relative; width: 38px; height: 38px; border-radius: 50%;
+    display: grid; place-items: center; flex-shrink: 0;
+    border: 1px solid var(--glass-border); background: var(--bg-card);
+    font-size: 14px; font-weight: 800; color: var(--accent);
+}
+.flow__b { padding-top: 4px; min-width: 0; }
+.flow__t { font-size: 16.5px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
+.flow__t b { color: var(--accent); }
+.flow__d { font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-top: 4px; }
+.flow__d strong { color: var(--text); font-weight: 700; }
+
+/* PRICING */
+.floor {
+    display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
+    padding: 18px 22px; margin-bottom: 22px; border-radius: 14px;
+    border: 1px dashed var(--glass-border); background: var(--glass);
+    font-size: 13.5px; color: var(--text-muted);
+}
+.floor b { color: var(--text-strong); font-weight: 800; font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; margin-right: 4px; }
+.floor span { display: inline-flex; align-items: center; gap: 7px; }
+.floor span::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+@media (max-width: 820px) { .tiers { grid-template-columns: 1fr; } }
+.tier { position: relative; display: flex; flex-direction: column; padding: 26px 24px; border-radius: 18px; border: 1px solid var(--glass-border); background: var(--bg-card); }
+.tier--mid { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 24px 60px -30px rgba(77, 159, 255, 0.6); }
+.tier__badge {
+    position: absolute; top: -11px; left: 24px; padding: 4px 12px; border-radius: 999px;
+    background: linear-gradient(135deg, #6db3ff 0%, var(--accent) 60%, var(--accent-2) 100%);
+    color: var(--accent-ink); font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.tier__name { font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint); }
+.tier--mid .tier__name { color: var(--accent); }
+.tier__price { font-size: 30px; font-weight: 900; color: var(--text-strong); letter-spacing: -0.03em; margin: 8px 0 4px; }
+.tier__price small { font-size: 14px; font-weight: 700; color: var(--text-muted); }
+.tier__tag { font-size: 12.5px; color: var(--text-faint); margin-bottom: 16px; }
+.tier__d { font-size: 14px; line-height: 1.6; color: var(--text-muted); }
+.tier__d strong { color: var(--text); font-weight: 700; }
+.tiers__note { margin-top: 18px; font-size: 13.5px; line-height: 1.6; color: var(--text-faint); text-align: center; }
+.tiers__note strong { color: var(--text); font-weight: 700; }
+
+/* REV-SHARE */
+.rev { padding: 36px clamp(24px, 4vw, 44px); border-radius: 22px; border: 1px solid rgba(77, 159, 255, 0.28); background: var(--accent-dim); }
+.rev__big { font-size: clamp(22px, 3vw, 32px); font-weight: 900; letter-spacing: -0.03em; color: var(--text-strong); margin-bottom: 16px; }
+.rev__big .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.rev p { font-size: 15px; line-height: 1.7; color: var(--text-muted); max-width: 64ch; }
+.rev p + p { margin-top: 12px; }
+.rev p strong { color: var(--text); font-weight: 700; }
+.rev__honest { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--glass-border); font-size: 13.5px; color: var(--text-faint); }
+.rev__honest b { color: var(--accent); font-weight: 700; }
+
+/* FAQ */
+.faq { display: grid; gap: 12px; }
+.faq__item { padding: 20px 24px; border-radius: 14px; border: 1px solid var(--glass-border); background: var(--glass); }
+.faq__q { font-size: 15.5px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
+.faq__a { font-size: 14px; line-height: 1.6; color: var(--text-muted); margin-top: 7px; }
+
+/* FINAL */
+.final { max-width: 760px; margin: 0 auto; padding: clamp(48px, 9vh, 96px) var(--pad-x); text-align: center; }
+.final h2 { font-size: clamp(26px, 4vw, 44px); line-height: 1.08; letter-spacing: -0.04em; font-weight: 900; color: var(--text-strong); margin-bottom: 16px; }
+.final h2 .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.final p { color: var(--text-muted); font-size: clamp(14px, 1.6vw, 16.5px); max-width: 52ch; margin: 0 auto 28px; }
+
+/* FOOTER */
+.foot { border-top: 1px solid var(--glass-border-soft); padding: 28px var(--pad-x); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; max-width: 1240px; margin: 0 auto; }
+.foot span { font-size: 12.5px; color: var(--text-faint); }
+.foot__links { display: flex; gap: 18px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
+.foot__links a:hover { color: var(--text-strong); }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+</style>
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
+
+<nav class="nav">
+    <a class="nav__brand" href="/aplikacja/">
+        <img src="/img/logo/tn-logo-icon-88.png" alt="">
+        <span>Tomek Niedźwiecki <em>/ Aplikacja</em></span>
+    </a>
+    <div class="nav__links">
+        <a href="/aplikacja/">Jak to działa</a>
+        <a href="/aplikacja/wspolpraca/" class="is-current">Współpraca</a>
+        <a href="/aplikacja/inspiracje/">Inspiracje</a>
+        <a class="nav__cta" href="/aplikacja/sparing/" data-cta>Sprawdź pomysł</a>
+    </div>
+</nav>
+
+<header class="head">
+    <div class="eyebrow">Wspólny biznes — nie zlecenie</div>
+    <h1>Buduję aplikację z Twojego pomysłu, rozkręcam sprzedaż i <span class="ser">oddaję Ci stery.</span></h1>
+    <p>Przynosisz pomysł — albo szukamy go razem. Buduję kompletną aplikację, sam prowadzę ją do pierwszych 50 stałych klientów i przekazuję Ci rozkręcony biznes do prowadzenia. Zarabiam dopiero wtedy, gdy Ty zarabiasz.</p>
+    <a class="btn" href="/aplikacja/sparing/" data-cta>Sprawdź swój pomysł za darmo <span class="arr">→</span></a>
+    <div class="head__micro">Najpierw rozmowa z AI. Człowiek pojawia się dopiero, gdy zarezerwujesz rozmowę za 500 zł — w pełni zwrotne.</div>
+</header>
+
+<!-- ROLE -->
+<section class="sec reveal">
+    <div class="sec__eyebrow">Jak dzielimy się rolami</div>
+    <h2 class="sec__title">Ja buduję i rozkręcam. <span class="ser">Ty przejmujesz stery.</span></h2>
+    <p class="sec__sub">To nie jest „zamówienie narzędzia". Buduję aplikację i sam doprowadzam ją do pierwszych 50 stałych klientów — a potem to Ty prowadzisz ten biznes dalej.</p>
+    <div class="roles">
+        <div class="role">
+            <div class="role__k">Ty wnosisz</div>
+            <div class="role__t">Pomysł i chęć prowadzenia</div>
+            <div class="role__d">Przynosisz pomysł — albo szukamy go razem. Najważniejsze: <strong>chcesz poprowadzić ten biznes</strong>, kiedy oddam Ci stery. Nie musisz mieć kontaktów ani znać się na technologii czy sprzedaży. A jeśli znasz swoją branżę od środka — tym lepiej.</div>
+        </div>
+        <div class="role role--ja">
+            <div class="role__k">Tomek wnosi</div>
+            <div class="role__t">Budowę i rozkręcenie do 50 klientów</div>
+            <div class="role__d">15 lat budowania e-biznesów i 70 mln zł sprzedaży online. <strong>Buduję aplikację z zespołem i sam rozkręcam ją do pierwszych 50 stałych klientów</strong> — bo na sprzedaży się znam. Potem oddaję Ci stery i zostaję doradcą.</div>
+        </div>
+    </div>
+    <p class="roles__note">Do <strong>50 stałych klientów</strong> prowadzę ja. Potem biznes operacyjnie przejmujesz Ty — ja zostaję doradcą strategicznym.</p>
+</section>
+
+<!-- DROGA -->
+<section class="sec reveal">
+    <div class="sec__eyebrow">Krok po kroku</div>
+    <h2 class="sec__title">Jak wygląda <span class="ser">cała droga</span></h2>
+    <div class="flow">
+        <div class="flow__step">
+            <div class="flow__num">1</div>
+            <div class="flow__b">
+                <div class="flow__t">Rozmowa z AI — <b>za darmo</b></div>
+                <div class="flow__d">Opowiadasz o pomyśle. AI sprawdza go z Tobą i od razu pokazuje pierwsze ekrany Twojej aplikacji, kartę projektu i wstępny plan przychodu. Bez karty, bez zobowiązań.</div>
+            </div>
+        </div>
+        <div class="flow__step">
+            <div class="flow__num">2</div>
+            <div class="flow__b">
+                <div class="flow__t">Rezerwacja rozmowy — <b>500 zł, w pełni zwrotne</b></div>
+                <div class="flow__d">Blokujesz termin. Przygotowuję plan przedsięwzięcia pod Twój konkretny pomysł i <strong>odzywam się osobiście</strong>. Do tego momentu wszystko dzieje się bez człowieka.</div>
+            </div>
+        </div>
+        <div class="flow__step">
+            <div class="flow__num">3</div>
+            <div class="flow__b">
+                <div class="flow__t">Decyzja i umowa</div>
+                <div class="flow__d">Rozmawiamy. Nie wchodzimy we współpracę — z dowolnego powodu, obojętnie z czyjej strony? <strong>500 zł wraca w całości.</strong> Wchodzimy? 500 zł wliczam w budowę.</div>
+            </div>
+        </div>
+        <div class="flow__step">
+            <div class="flow__num">4</div>
+            <div class="flow__b">
+                <div class="flow__t">Budowa — <b>od 9 000 zł</b></div>
+                <div class="flow__d">Z zespołem buduję kompletną aplikację: logowanie, panel, płatności i abonamenty, strona. Zależnie od zakresu od 9 000 zł — i <strong>to Twoja aplikacja od pierwszego dnia.</strong></div>
+            </div>
+        </div>
+        <div class="flow__step">
+            <div class="flow__num">5</div>
+            <div class="flow__b">
+                <div class="flow__t">Sprzedaż — <b>ok. pół roku</b></div>
+                <div class="flow__d">Prowadzę ten biznes — kampanie, sprzedaż, cały system — aż <strong>razem zdobędziemy 50 stałych klientów.</strong> Ty otwierasz drzwi do swojej branży i uczysz się biznesu od środka.</div>
+            </div>
+        </div>
+        <div class="flow__step">
+            <div class="flow__num">6</div>
+            <div class="flow__b">
+                <div class="flow__t">Stery dla Ciebie</div>
+                <div class="flow__d">Oddaję Ci rozkręcony biznes i zostaję doradcą strategicznym. Dalej prowadzisz go Ty.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CENNIK -->
+<section class="sec reveal">
+    <div class="sec__eyebrow">Ile to kosztuje</div>
+    <h2 class="sec__title">Cennik <span class="ser">jawny i ten sam dla wszystkich</span></h2>
+    <p class="sec__sub">W który pakiet wpada Twój pomysł, widać z karty projektu — z liczby ekranów, ról i tego, czy są płatności. Nie negocjujesz, żeby zapłacić mniej; płacisz za to, czego Twoja aplikacja realnie potrzebuje.</p>
+    <div class="floor">
+        <b>W każdym pakiecie:</b>
+        <span>logowanie i konta</span>
+        <span>główna funkcja, która rozwiązuje problem</span>
+        <span>klienci płacą co miesiąc</span>
+        <span>strona, na której się zapisują</span>
+        <span>działa na żywo + hosting</span>
+    </div>
+    <div class="tiers">
+        <div class="tier">
+            <div class="tier__name">Start</div>
+            <div class="tier__price">9 000 <small>zł</small></div>
+            <div class="tier__tag">okrojona wersja</div>
+            <div class="tier__d">Jedna rola, jeden główny ekran, strona z szablonu. <strong>Działa i sprzedaje od pierwszego dnia</strong>, bez bajerów — najszybciej na rynek.</div>
+        </div>
+        <div class="tier tier--mid">
+            <div class="tier__badge">To, co obiecuję</div>
+            <div class="tier__name">Standard</div>
+            <div class="tier__price">12 500 <small>zł</small></div>
+            <div class="tier__tag">kompletne narzędzie</div>
+            <div class="tier__d">Konta dla Twoich klientów, pełny panel, automatyczne przypomnienia, <strong>strona pod Twoją markę</strong> i statystyki. Dokładnie to, co opisuję na stronie.</div>
+        </div>
+        <div class="tier">
+            <div class="tier__name">Rozszerzony</div>
+            <div class="tier__price">od 16 000 <small>zł</small></div>
+            <div class="tier__tag">coś ponad standard</div>
+            <div class="tier__d">Standard plus coś więcej: <strong>druga funkcja, integracja</strong> z tym, czego już używasz, albo większe ustalenie. Wyceniam wprost, zależnie od zakresu.</div>
+        </div>
+    </div>
+    <p class="tiers__note">Cena budowy broni się sama. <strong>Moje 10% to dodatek od wyniku, nie sposób, żeby odbić zaniżoną wycenę.</strong></p>
+</section>
+
+<!-- 10% -->
+<section class="sec reveal">
+    <div class="rev">
+        <div class="rev__big">Nie biorę udziałów w Twojej firmie. Biorę <span class="ser">10% od przychodu.</span></div>
+        <p>Większość firm, które budują takie narzędzia, znika po wystawieniu faktury. <strong>Ja zostaję — i zarabiam tylko wtedy, kiedy Ty zarabiasz.</strong></p>
+        <p>Zamiast udziałów w Twojej firmie biorę 10% od przychodu, który razem rozkręcimy. To moja skóra w grze — dlatego nie wchodzę w pomysły, w które nie wierzę.</p>
+        <div class="rev__honest"><b>Bez haczyków:</b> jak długo biorę te 10% i do jakiej kwoty — ustalamy wprost w umowie, zanim cokolwiek ruszy. Wszystko na stole.</div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec reveal">
+    <div class="sec__eyebrow">Najczęstsze pytania</div>
+    <h2 class="sec__title">Zanim zapytasz</h2>
+    <div class="faq">
+        <div class="faq__item"><div class="faq__q">Czyja to aplikacja?</div><div class="faq__a">Twoja. Płacisz za budowę i jesteś właścicielem od pierwszego dnia.</div></div>
+        <div class="faq__item"><div class="faq__q">Co, jeśli nie dogadamy się po rozmowie?</div><div class="faq__a">500 zł wraca w całości — obojętnie z czyjej strony jest decyzja. Bez tłumaczenia się.</div></div>
+        <div class="faq__item"><div class="faq__q">Muszę umieć sprzedawać albo programować? Albo mieć kontakty?</div><div class="faq__a">Nie. Wnosisz pomysł i chęć, żeby poprowadzić biznes, gdy przejmiesz stery. Budowę i sprzedaż do pierwszych 50 klientów biorę na siebie.</div></div>
+        <div class="faq__item"><div class="faq__q">Bierzesz udziały w mojej firmie?</div><div class="faq__a">Nie. Biorę 10% od przychodu, póki razem rozkręcamy biznes. Udziałów nie ruszam.</div></div>
+        <div class="faq__item"><div class="faq__q">Czemu akurat 50 klientów?</div><div class="faq__a">To moment, w którym biznes stoi o własnych siłach i ma sens oddać Ci stery. Do tego prowadzę go ja.</div></div>
+    </div>
+</section>
+
+<!-- FINAL -->
+<section class="final reveal">
+    <h2>Masz pomysł? <span class="ser">Sprawdźmy go.</span></h2>
+    <p>Kilkanaście minut rozmowy z AI — karta projektu, ekrany aplikacji i wstępny plan przychodu. Za darmo, bez zobowiązań.</p>
+    <a class="btn" href="/aplikacja/sparing/" data-cta>Sprawdź swój pomysł za darmo <span class="arr">→</span></a>
+</section>
+
+<footer class="foot">
+    <span>© 2026 Tomek Niedźwiecki</span>
+    <div class="foot__links">
+        <a href="/aplikacja/">Aplikacja</a>
+        <a href="/aplikacja/inspiracje/">Inspiracje</a>
+        <a href="https://tomekniedzwiecki.pl/zbuduje/">Zbuduję</a>
+        <a href="https://tomekniedzwiecki.pl/zwolnie/">Zwolnię</a>
+    </div>
+</footer>
+
+<script>
+(function(){
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function(el){ el.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>
