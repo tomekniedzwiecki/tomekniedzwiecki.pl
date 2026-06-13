@@ -5581,7 +5581,7 @@
             planSimHTML(plan, kamienie) +
             '<div class="pj-facts">' +
             fact('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>', 'Rynek', plan.rynek) +
-            fact('<polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>', 'Zwrot Twojego wkładu', plan.zwrot_wkladu) +
+            fact('<polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>', 'Zwrot kosztu budowy', plan.zwrot_wkladu) +
             fact('<polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline>', 'Rok 2', plan.rok2_potencjal) +
             '</div>' + zal +
             '<div class="pj-plan__note">Wstępne wyliczenia na podstawie rozmowy — szczegółowy plan przedsięwzięcia przygotowuje Tomek po rezerwacji.</div>' +
@@ -5641,8 +5641,9 @@
         var churn = (ov && ov.churn != null ? ov.churn : (+w.churn_mies_proc || 4)) / 100;
         var cac = ov && ov.cac != null ? ov.cac : (+w.cac || 0);
         var budzet = ov && ov.budzet != null ? ov.budzet : (+w.budzet_reklam_mies || 0);
-        var kosztBud = +w.koszt_budowy || 30000;
+        var kosztBud = +w.koszt_budowy || 12500;
         var gross = cena * marza;                       // miesięczny zysk brutto z klienta
+        var revShare = cena * 0.10;                     // 10% od przychodu — prowizja Tomka (rev-share)
         var ltv = churn > 0 ? gross / churn : gross * 36;
         var ltvCac = cac > 0 ? ltv / cac : 0;
         var payback = gross > 0 ? cac / gross : 0;       // miesiące
@@ -5650,7 +5651,7 @@
         var sim = [], aktywni = 0, cum = 0, miesiac50 = null, breakeven = null;
         for (var m = 1; m <= 24; m++) {
             aktywni = Math.max(0, aktywni - Math.round(aktywni * churn)) + nowiMies;
-            cum += aktywni * gross;
+            cum += aktywni * Math.max(0, gross - revShare);   // zysk klienta po 10% Tomka
             sim.push({ m: m, aktywni: aktywni, mrr: aktywni * cena });
             if (miesiac50 === null && aktywni >= 50) miesiac50 = m;
             if (breakeven === null && cum >= kosztBud) breakeven = m;
@@ -5675,9 +5676,10 @@
             metric('ltv', 'Ile zostawia jeden klient', fmtZl(Math.round(c.ltv)) + ' zł', 'średnio, zanim odejdzie', '') +
             metric('payback', 'Po ilu miesiącach klient się zwraca', econDec(c.payback) + ' mies.', 'tyle pracuje, żeby oddać koszt swojego zdobycia', c.payback <= 6 ? 'good' : (c.payback <= 12 ? 'ok' : 'bad')) +
             metric('m50', 'Do 50 klientów', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet albo potanij zdobycie klienta', c.miesiac50 && c.miesiac50 <= 9 ? 'good' : 'ok') +
-            metric('breakeven', 'Zwrot budowy 30 tys.', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.', c.breakeven ? 'skumulowany zysk > 30 000 zł' : 'przy tych ustawieniach później', c.breakeven && c.breakeven <= 8 ? 'good' : 'ok') +
+            metric('breakeven', 'Zwrot kosztu budowy', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.', c.breakeven ? ('zysk po 10% Tomka > ' + fmtZl(c.kosztBud) + ' zł') : 'przy tych ustawieniach później', c.breakeven && c.breakeven <= 8 ? 'good' : 'ok') +
             metric('mrr50', 'Przychód przy 50', fmtZl(Math.round(50 * c.cena)) + ' zł', '/mies. — tu przejmujesz stery', '') +
-            '</div>';
+            '</div>' +
+            '<div class="pj-plan__note">Tomek bierze <strong>10% od przychodu</strong> (przy 50 klientach ≈ ' + fmtZl(Math.round(50 * c.cena * 0.10)) + ' zł/mies.) — już odjęte w „zwrot kosztu budowy". Zarabia, gdy Ty zarabiasz.</div>';
     }
     function econChartHTML(c) {
         var sim = c.sim || [];
@@ -5775,7 +5777,7 @@
             setv('ltv', fmtZl(Math.round(c.ltv)) + ' zł');
             setv('payback', econDec(c.payback) + ' mies.');
             setv('m50', c.miesiac50 ? ('miesiąc ' + c.miesiac50) : '> 18 mies.'); sets('m50', c.miesiac50 ? ('+' + c.nowiMies + ' klientów/mies.') : 'zwiększ budżet albo potanij zdobycie klienta');
-            setv('breakeven', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.'); sets('breakeven', c.breakeven ? 'skumulowany zysk > 30 000 zł' : 'przy tych ustawieniach później');
+            setv('breakeven', c.breakeven ? ('miesiąc ' + c.breakeven) : '> 24 mies.'); sets('breakeven', c.breakeven ? ('zysk po 10% Tomka > ' + fmtZl(c.kosztBud) + ' zł') : 'przy tych ustawieniach później');
             setv('mrr50', fmtZl(Math.round(50 * c.cena)) + ' zł');
             // kolory metryk
             var setLvl = function (id, lvl) { var m = box.querySelector('[data-eco="' + id + '"]'); if (m) { var card = m.closest('.eco-metric'); if (card) card.className = 'eco-metric eco-metric--' + lvl; } };
