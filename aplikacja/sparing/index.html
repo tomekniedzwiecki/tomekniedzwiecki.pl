@@ -5478,7 +5478,7 @@
             (cennik.expansion ? '<p class="eco-expansion"><b>Jak rośnie przychód z klienta:</b> ' + esc(cennik.expansion) + '</p>' : '') +
             '</div>' +
             // sekcja rachunek
-            '<div class="eco-sec"><div class="eco-sec__h">' + pjIco(PJ_ICONS.economics) + '<h3>Czy to się spina</h3>' +
+            '<div class="eco-sec"><div class="eco-sec__h">' + pjIco(PJ_ICONS.economics) + '<h3>Rachunek opłacalności</h3>' +
             '<span>pokręć suwakami — wszystko przelicza się na żywo</span></div>' +
             slidersHtml + econMetricsHTML(c) + why + '</div>' +
             // sekcja symulacja
@@ -5991,7 +5991,7 @@
                     pjGoIcon() +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
                     '<span class="pjd-tile__t">Czy to się spina</span>' +
-                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>LTV : CAC</small></span>' : '') +
+                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;LTV : CAC</small></span>' : '') +
                     '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
                     '</button>';
             } else {
