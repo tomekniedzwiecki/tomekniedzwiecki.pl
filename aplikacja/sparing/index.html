@@ -323,6 +323,42 @@
     }
     .side__item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; transition: color 0.2s var(--ease), opacity 0.2s var(--ease); }
     .side__item:hover svg, .side__item.is-active svg { color: var(--accent); opacity: 1; }
+    .side__label { flex: 1 1 auto; min-width: 0; }
+    /* statusy pozycji menu */
+    .side__status { flex-shrink: 0; font-size: 9.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 2.5px 7px; border-radius: 999px; line-height: 1; border: 1px solid transparent; }
+    .side__status--done { color: #6ee7b7; background: rgba(16,185,129,.12); border-color: rgba(16,185,129,.25); }
+    .side__status--locked { color: #93a3b8; background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.09); }
+    .side__status--new { color: #061320; background: var(--accent); box-shadow: 0 0 0 0 rgba(77,159,255,.7); animation: sideNewPulse 1.5s infinite; }
+    @keyframes sideNewPulse { 0%{ box-shadow:0 0 0 0 rgba(77,159,255,.55);} 70%{ box-shadow:0 0 0 7px rgba(77,159,255,0);} 100%{ box-shadow:0 0 0 0 rgba(77,159,255,0);} }
+    /* widok zablokowany: szkielet + modal */
+    .lockwrap { position: relative; min-height: 64vh; }
+    .lock-skel { filter: blur(2px); opacity: .45; pointer-events: none; user-select: none; }
+    .skel { background: rgba(255,255,255,.05); border-radius: 12px; position: relative; overflow: hidden; min-height: 64px; }
+    .skel::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent); animation: skelShimmer 1.5s infinite; }
+    @keyframes skelShimmer { 100% { transform: translateX(100%); } }
+    .skel--line { height: 14px; min-height: 14px; border-radius: 7px; margin: 10px 0; }
+    .skel--hero { height: 200px; }
+    .skel--card { height: 130px; }
+    .skel--metric { height: 84px; }
+    .skel--tile { height: 150px; }
+    .skel--chart { height: 150px; }
+    .skel--dot { width: 10px; height: 10px; min-height: 10px; border-radius: 50%; }
+    .skel--addr { flex: 1; height: 22px; min-height: 22px; border-radius: 8px; }
+    .skel-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .skel-grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .skel-row3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 12px 0; }
+    .skel-browser { border: 1px solid rgba(255,255,255,.08); border-radius: 14px; overflow: hidden; }
+    .skel-browser__bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px; background: rgba(255,255,255,.03); }
+    .skel-browser__body { padding: 16px; }
+    .lock-modal { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 22px; }
+    .lock-modal__card { max-width: 440px; width: 100%; text-align: center; background: rgba(18,21,27,.92); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 30px 26px; box-shadow: 0 24px 70px rgba(0,0,0,.55); }
+    .lock-modal__ico { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--accent); background: var(--accent-dim); }
+    .lock-modal__ico svg { width: 24px; height: 24px; }
+    .lock-modal__t { font-size: 20px; font-weight: 800; color: var(--text-strong); margin: 0 0 8px; }
+    .lock-modal__d { font-size: 14.5px; line-height: 1.6; color: var(--text-muted); margin: 0 0 20px; }
+    .lock-modal__btn { display: inline-block; padding: 14px 26px; border-radius: 999px; font-weight: 800; font-size: 15px; color: #061320; background: linear-gradient(135deg,#6db3ff,#4d9fff); text-decoration: none; box-shadow: 0 10px 26px rgba(77,159,255,.35); transition: transform .15s var(--ease); }
+    .lock-modal__btn:hover { transform: translateY(-1px); }
+    .lock-modal__note { font-size: 12.5px; color: var(--text-faint, #7b8694); margin-top: 12px; }
     .side__dot {
         width: 8px;
         height: 8px;
@@ -4051,50 +4087,48 @@
         <nav class="side__nav">
             <button type="button" class="side__item is-active" data-tab="chat">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Rozmowa
+                <span class="side__label">Rozmowa</span>
             </button>
             <button type="button" class="side__item" data-tab="projekt">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"></rect><rect x="14" y="4" width="7" height="7" rx="1.5"></rect><rect x="3" y="15" width="7" height="7" rx="1.5"></rect><rect x="14" y="15" width="7" height="7" rx="1.5"></rect></svg>
-                Pulpit projektu
-                <i class="side__dot" id="dot-projekt" hidden></i>
+                <span class="side__label">Pulpit projektu</span>
             </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="ekrany" hidden>
+            <!-- kolejność = kolejność powstawania -->
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="ekrany" data-view="ekrany" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path></svg>
-                Ekrany narzędzia
+                <span class="side__label">Ekrany narzędzia</span><span class="side__status" data-status-for="ekrany" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="prototyp" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path></svg>
-                Dotknij aplikacji
-                <i class="side__dot" id="dot-prototyp" hidden></i>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="karta" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="karta" data-view="karta" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
-                Karta projektu
+                <span class="side__label">Karta projektu</span><span class="side__status" data-status-for="karta" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="strona" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                Twoja strona
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="plan" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="plan" data-view="plan" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
-                Plan przychodu
+                <span class="side__label">Plan przychodu</span><span class="side__status" data-status-for="plan" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="economics" hidden>
+            <button type="button" class="side__item" data-tab="rynek" data-view="rynek">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+                <span class="side__label">Potencjał rynku</span><span class="side__status" data-status-for="rynek" hidden></span>
+            </button>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="economics" data-view="economics" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                Czy to się spina
+                <span class="side__label">Czy to się spina</span><span class="side__status" data-status-for="economics" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="gtm" hidden>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="strona" data-view="strona" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span class="side__label">Twoja strona</span><span class="side__status" data-status-for="strona" hidden></span>
+            </button>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="gtm" data-view="gtm" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg>
-                Sprzedaż od dnia 1
+                <span class="side__label">Sprzedaż od dnia 1</span><span class="side__status" data-status-for="gtm" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="rynek">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
-                Potencjał rynku
-                <i class="side__dot" id="dot-rynek" hidden></i>
+            <button type="button" class="side__item" data-tab="projekt" data-pjview="prototyp" data-view="prototyp" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path></svg>
+                <span class="side__label">Dotknij aplikacji</span><span class="side__status" data-status-for="prototyp" hidden></span>
             </button>
             <button type="button" class="side__item" data-tab="wspolpraca">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17a5 5 0 0 1-5 5H3v-3a5 5 0 0 1 5-5"></path><path d="M13 7a5 5 0 0 1 5-5h3v3a5 5 0 0 1-5 5"></path><path d="M8 16l8-8"></path></svg>
-                Współpraca
+                <span class="side__label">Współpraca</span>
             </button>
         </nav>
         <div class="side__foot">
@@ -4294,7 +4328,8 @@
         authUserId: null,       // Supabase Auth user id (rejestracja Google/Facebook)
         authProvider: null,     // 'google' | 'facebook' | null
         reveals: {},            // sekwencja odkrywania: {key:status} ze spar-project (drip); pusty = brak planu = pokazuj wszystko
-        paid: false             // wpłacona rezerwacja 500 zł — odblokowuje wszystkie odsłony
+        paid: false,            // wpłacona rezerwacja 500 zł — odblokowuje wszystkie odsłony
+        seen: {}                // {view:true} — co user już otwierał (status nowe vs gotowe)
     };
     // Dane z powrotu OAuth (implicit flow) — czekają na bramkę z telefonem
     var pendingAuth = null; // {userId, provider, email, name}
@@ -4364,7 +4399,8 @@
             economics: state.economics || null,
             gtm: state.gtm || null,
             reveals: state.reveals || {},
-            paid: !!state.paid
+            paid: !!state.paid,
+            seen: state.seen || {}
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -4454,6 +4490,7 @@
         state.economics = saved.economics || null;
         state.gtm = saved.gtm || null;
         state.reveals = (saved.reveals && typeof saved.reveals === 'object') ? saved.reveals : {};
+        state.seen = (saved.seen && typeof saved.seen === 'object') ? saved.seen : {};
         state.paid = !!saved.paid;
         extras.summary = 'idle';
         extras.plan = 'idle';
@@ -4696,8 +4733,8 @@
         ['projekt', 'rynek', 'wspolpraca'].forEach(function (t) {
             el('pane-' + t).classList.toggle('is-active', tab === t);
         });
-        if (tab === 'projekt') { renderPaneProjekt(); el('dot-projekt').hidden = true; }
-        if (tab === 'rynek') { renderPaneRynek(); rkNew = false; el('dot-rynek').hidden = true; }
+        if (tab === 'projekt') { renderPaneProjekt(); }
+        if (tab === 'rynek') { renderPaneRynek(); rkNew = false; if (revUnlocked('rynek')) markSeen('rynek'); }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
         if (tab === 'chat') scrollToBottom(true);
         setTabHash(tab === 'chat' ? '' : tab);
@@ -4721,10 +4758,8 @@
     }
 
     function updateSideBadges() {
-        // kropka = jest nowa zawartość, a user nie patrzy na tę zakładkę
-        var hasProjekt = (state.verdict === 'zielony' && !!state.karta) || lightboxItems().length > 0;
-        el('dot-projekt').hidden = !(hasProjekt && activeTab !== 'projekt');
-        // podpozycje sekcji pulpitu pokazują się, gdy sekcja ma już treść
+        // podpozycje sekcji pulpitu pokazują się, gdy sekcja ma już treść (albo po
+        // zielonym werdykcie — wtedy bramkowane pozycje pokazują status „zablokowane")
         var subShow = {
             ekrany: lightboxItems().length > 0 || Object.keys(state.previewHistory || {}).length > 0,
             prototyp: state.verdict === 'zielony',
@@ -4737,7 +4772,7 @@
         document.querySelectorAll('.side__item[data-pjview]').forEach(function (b) {
             b.hidden = !subShow[b.dataset.pjview];
         });
-        el('dot-rynek').hidden = !(state.raport && rkNew && activeTab !== 'rynek');
+        updateSideStatus();
         var cta = el('side-cta');
         var show = state.verdict === 'zielony';
         if (show && cta.hidden) cta.classList.add('is-in'); // animacja momentu odblokowania
@@ -5010,6 +5045,68 @@
         return '<div class="pj-wait"><div class="pj-wait__txt">' +
             '<b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' + tz[0] + ' — odkryjesz wkrótce</b>' +
             '<span>' + tz[1] + '</span></div></div>';
+    }
+
+    // ── Status pozycji menu: nowe / gotowe / zablokowane ──
+    function markSeen(view) {
+        if (!view || (state.seen && state.seen[view])) return;
+        state.seen = state.seen || {};
+        state.seen[view] = true;
+        persistSession();
+        updateSideStatus();
+    }
+    function viewStatus(view) {
+        if (REV_KEY[view] !== undefined) {                    // pozycja bramkowana (sekwencja)
+            if (!revUnlocked(view)) return { label: 'zablokowane', cls: 'locked' };
+            return (state.seen && state.seen[view]) ? { label: 'gotowe', cls: 'done' } : { label: 'nowe', cls: 'new' };
+        }
+        var has = view === 'ekrany' ? (lightboxItems().length > 0 || Object.keys(state.previewHistory || {}).length > 0)
+            : view === 'karta' ? (kartaVersions().length > 0)
+                : view === 'plan' ? !!state.bizplan : false;
+        if (!has) return null;                                 // bez treści → bez labela
+        return (state.seen && state.seen[view]) ? { label: 'gotowe', cls: 'done' } : { label: 'nowe', cls: 'new' };
+    }
+    function updateSideStatus() {
+        document.querySelectorAll('.side__status[data-status-for]').forEach(function (el2) {
+            var st = viewStatus(el2.getAttribute('data-status-for'));
+            if (!st) { el2.hidden = true; return; }
+            el2.hidden = false;
+            el2.textContent = st.label;
+            el2.className = 'side__status side__status--' + st.cls;
+        });
+    }
+
+    // ── Widok ZABLOKOWANY: szkielet w tle + modal z CTA na rezerwację ──
+    function skeletonBoxes(view) {
+        function box(cls) { return '<div class="skel ' + (cls || '') + '"></div>'; }
+        function line(w) { return '<div class="skel skel--line" style="width:' + w + '%"></div>'; }
+        if (view === 'strona' || view === 'prototyp') {
+            return '<div class="skel-browser"><div class="skel-browser__bar">' + box('skel--dot') + box('skel--dot') + box('skel--dot') + '<div class="skel skel--addr"></div></div>' +
+                '<div class="skel-browser__body">' + box('skel--hero') + '<div class="skel-row3">' + box() + box() + box() + '</div>' + line(90) + line(70) + '</div></div>';
+        }
+        if (view === 'economics') {
+            return '<div class="skel-grid3">' + box('skel--card') + box('skel--card') + box('skel--card') + '</div>' +
+                '<div class="skel-grid3" style="margin-top:10px">' + box('skel--metric') + box('skel--metric') + box('skel--metric') + '</div>' +
+                '<div class="skel skel--chart" style="margin-top:14px"></div>';
+        }
+        if (view === 'gtm') {
+            return '<div class="skel-grid3">' + box('skel--card') + box('skel--card') + box('skel--card') + '</div>' +
+                '<div class="skel-row3" style="margin-top:12px">' + box('skel--tile') + box('skel--tile') + box('skel--tile') + '</div>';
+        }
+        // rynek / domyślny
+        return line(55) + box('skel--hero') + '<div class="skel-grid2" style="margin-top:12px">' + box('skel--card') + box('skel--card') + '</div>' + line(85) + line(60);
+    }
+    function lockedView(view) {
+        var tz = REV_TEASER[view] || ['Ten materiał', ''];
+        return '<div class="lockwrap">' +
+            '<div class="lock-skel" aria-hidden="true">' + skeletonBoxes(view) + '</div>' +
+            '<div class="lock-modal"><div class="lock-modal__card">' +
+            '<div class="lock-modal__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>' +
+            '<h3 class="lock-modal__t">' + tz[0] + ' czeka na Ciebie</h3>' +
+            '<p class="lock-modal__d">Chcesz dostać dostęp do tego materiału i całej reszty? Zarezerwuj rozmowę ze mną — na osobistym spotkaniu pokażę Ci plan wdrożenia i wspólnie ustalimy szczegóły, jak zbudować to razem.</p>' +
+            '<a class="lock-modal__btn" id="lock-cta" href="' + checkoutURL() + '" target="_blank" rel="noopener">Rezerwuję rozmowę z Tomkiem → 500 zł</a>' +
+            '<div class="lock-modal__note">W pełni zwrotne — to blokada terminu, nie zakup.</div>' +
+            '</div></div></div>';
     }
 
     function ensureSummaryImage(force) {
@@ -5940,6 +6037,7 @@
     function pjOpenDetail(view) {
         pjView = view;
         if (view === 'plan') pjNewPlan = false;
+        if (revUnlocked(view)) markSeen(view); // status: nowe → gotowe po otwarciu (tylko odblokowane)
         setTabHash('projekt-' + view);
         if (activeTab !== 'projekt') { switchTab('projekt'); setTabHash('projekt-' + view); }
         else renderPaneProjekt();
@@ -6226,7 +6324,7 @@
 
         if (pjView === 'strona') {
             if (!revUnlocked('strona')) {
-                html += revDetailTeaser('strona');
+                html += lockedView('strona');
             } else if (state.landingUrl) {
                 html += '<div class="pj-land">' +
                     '<div class="pj-land__bar"><span class="pj-land__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
@@ -6250,7 +6348,7 @@
 
         if (pjView === 'prototyp') {
             if (!revUnlocked('prototyp')) {
-                html += revDetailTeaser('prototyp');
+                html += lockedView('prototyp');
             } else if (state.prototypeUrl) {
                 html += '<div class="pj-proto">' +
                     '<div class="pj-proto__bar"><span class="pj-proto__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
@@ -6308,14 +6406,14 @@
         }
 
         if (pjView === 'economics') {
-            if (!revUnlocked('economics')) html += revDetailTeaser('economics');
+            if (!revUnlocked('economics')) html += lockedView('economics');
             else if (state.economics) html += economicsHTML(state.economics);
             else if (extras.economics === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się policzyć opłacalności.</b><span>Spróbuj jeszcze raz — to chwila.</span></div><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>';
             else html += genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, koszt i wartość klienta, zwrot budowy — na realnych danych');
         }
 
         if (pjView === 'gtm') {
-            if (!revUnlocked('gtm')) html += revDetailTeaser('gtm');
+            if (!revUnlocked('gtm')) html += lockedView('gtm');
             else if (state.gtm) { html += gtmHTML(state.gtm); ensureGtmBanners(); }
             else if (extras.gtm === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować planu sprzedaży.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>';
             else html += genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty i maile');
@@ -6466,7 +6564,7 @@
             return;
         }
         if (!revUnlocked('rynek') && !state.raport) {
-            body.innerHTML = head + revDetailTeaser('rynek');
+            body.innerHTML = head + lockedView('rynek');
             return;
         }
         var r = state.raport;
