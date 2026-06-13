@@ -7390,11 +7390,12 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
             .replace(/<werdykt>[\s\S]*?<\/werdykt>/g, '')
+            .replace(/<ocena>[\s\S]*?<\/ocena>/g, '')
             .replace(/<projekt>[\s\S]*?<\/projekt>/g, '')
             .replace(/<opcje_multi>[\s\S]*?<\/opcje_multi>/g, '')
             .replace(/<opcje>[\s\S]*?<\/opcje>/g, '')
@@ -7933,6 +7934,19 @@
                 if (ev === 'spar_projekt') {
                     meta.projekt = obj || null;
                     if (obj) { state.lastBrief = obj; persistSession(); }
+                    return;
+                }
+                if (ev === 'spar_ocena') {
+                    // Bramka potencjału: między turami AI bada rynek na żywo (spar-assess)
+                    if (obj && obj.status === 'badam') {
+                        var ow = document.createElement('div');
+                        ow.className = 'msg__work'; ow.id = 'ocena-work';
+                        ow.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>Badam Twój rynek na żywo — konkurencja, ceny, popyt…';
+                        bubble.appendChild(ow); scrollToBottom(false);
+                    } else if (obj && obj.status === 'gotowe') {
+                        var ow2 = document.getElementById('ocena-work');
+                        if (ow2) ow2.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>Mam dane z rynku — układam rekomendację…';
+                    }
                     return;
                 }
                 if (obj.type === 'content_block_delta' && obj.delta && obj.delta.type === 'text_delta') {
