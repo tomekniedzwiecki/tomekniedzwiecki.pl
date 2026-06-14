@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
-    <title>Współpraca — buduję, rozkręcam, oddaję Ci stery | Tomek Niedźwiecki</title>
-    <meta name="description" content="Jak wygląda wspólny biznes: buduję aplikację z Twojego pomysłu, prowadzę ją do pierwszych 50 stałych klientów i oddaję Ci stery. Płacisz za budowę od 9 000 zł i jesteś właścicielem. Zamiast udziałów — 10% od przychodu.">
+    <title>Współpraca — buduję, rozkręcam, oddaję Ci prowadzenie | Tomek Niedźwiecki</title>
+    <meta name="description" content="Jak wygląda wspólny biznes: buduję aplikację z Twojego pomysłu, prowadzę ją do pierwszych 50 stałych klientów i oddaję Ci prowadzenie. Płacisz za budowę od 9 000 zł i jesteś właścicielem. Zamiast udziałów — 10% od przychodu.">
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
     <link rel="canonical" href="https://tomekniedzwiecki.pl/aplikacja/wspolpraca/">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tomekniedzwiecki.pl/aplikacja/wspolpraca/">
-    <meta property="og:title" content="Współpraca — buduję, rozkręcam, oddaję Ci stery">
-    <meta property="og:description" content="Buduję aplikację z Twojego pomysłu, prowadzę ją do 50 stałych klientów i oddaję Ci stery. Płacisz za budowę, jesteś właścicielem. 10% od przychodu zamiast udziałów.">
+    <meta property="og:title" content="Współpraca — buduję, rozkręcam, oddaję Ci prowadzenie">
+    <meta property="og:description" content="Buduję aplikację z Twojego pomysłu, prowadzę ją do 50 stałych klientów i oddaję Ci prowadzenie. Płacisz za budowę, jesteś właścicielem. 10% od przychodu zamiast udziałów.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
 
@@ -104,13 +104,17 @@ img { max-width: 100%; display: block; }
 .nav__links a:not(.nav__cta):hover { color: var(--text-strong); }
 .nav__links a.is-current { color: var(--text-strong); }
 .nav__cta {
-    display: inline-flex; align-items: center; gap: 7px;
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; white-space: nowrap;
     padding: 8px 16px; border-radius: 6px;
     background: #fff; color: #000; font-weight: 500; font-size: 13px;
     letter-spacing: -0.01em; transition: background 0.2s var(--ease);
 }
 .nav__cta:hover { background: #ededed; }
+.nav__brand { min-width: 0; }
+.nav__brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 760px) { .nav__links a:not(.nav__cta) { display: none; } }
+/* na małych telefonach nazwa skraca się do samej ikony, żeby CTA nie zawijało headera */
+@media (max-width: 460px) { .nav__brand span { display: none; } }
 
 /* HEADER / HERO */
 .head {
@@ -256,6 +260,18 @@ img { max-width: 100%; display: block; }
 .foot__links { display: flex; gap: 18px; font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
 .foot__links a:hover { color: var(--text-strong); }
 
+/* ── DOPRACOWANIE: ikony ról, znaczniki kto-co (ty/ja), mocniejsze CTA ── */
+.role__ico { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--surface-2); color: var(--text-muted); margin-bottom: 14px; }
+.role--ja .role__ico { background: var(--accent-soft); color: var(--accent); }
+.role__ico svg { width: 19px; height: 19px; }
+.flow__t { padding-right: 54px; }
+.flow__pov { position: absolute; top: 1px; right: 0; font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--glass-border); color: var(--text-faint); background: var(--surface); }
+.flow__pov--ja { color: var(--accent); border-color: rgba(0, 112, 243, 0.35); }
+.final p { margin-bottom: clamp(28px, 4.5vh, 38px); }
+.btn--lg { padding: 16px 36px; font-size: 15.5px; }
+.final__fine { margin-top: 16px; font-size: 12.5px; color: var(--text-faint); }
+@media (max-width: 480px) { .flow__t { padding-right: 0; } .flow__pov { position: static; display: inline-block; margin-top: 8px; } }
+
 /* REVEAL */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
 .reveal.in { opacity: 1; transform: none; }
@@ -280,7 +296,7 @@ img { max-width: 100%; display: block; }
 
 <header class="head">
     <div class="eyebrow">Wspólny biznes — nie zlecenie</div>
-    <h1>Buduję aplikację z Twojego pomysłu, rozkręcam sprzedaż i <span class="ser">oddaję Ci stery.</span></h1>
+    <h1>Buduję aplikację z Twojego pomysłu, rozkręcam sprzedaż i <span class="ser">oddaję Ci prowadzenie.</span></h1>
     <p>Przynosisz pomysł — albo szukamy go razem. Buduję kompletną aplikację, sam prowadzę ją do pierwszych 50 stałych klientów i przekazuję Ci rozkręcony biznes do prowadzenia. Zarabiam dopiero wtedy, gdy Ty zarabiasz.</p>
     <a class="btn" href="/aplikacja/sparing/" data-cta>Sprawdź swój pomysł za darmo <span class="arr">→</span></a>
     <div class="head__micro">Najpierw rozmowa z AI. Człowiek pojawia się dopiero, gdy zarezerwujesz rozmowę za 500 zł — w pełni zwrotne.</div>
@@ -289,18 +305,20 @@ img { max-width: 100%; display: block; }
 <!-- ROLE -->
 <section class="sec reveal">
     <div class="sec__eyebrow">Jak dzielimy się rolami</div>
-    <h2 class="sec__title">Ja buduję i rozkręcam. <span class="ser">Ty przejmujesz stery.</span></h2>
+    <h2 class="sec__title">Ja buduję i rozkręcam. <span class="ser">Ty przejmujesz prowadzenie.</span></h2>
     <p class="sec__sub">To nie jest „zamówienie narzędzia". Buduję aplikację i sam doprowadzam ją do pierwszych 50 stałych klientów — a potem to Ty prowadzisz ten biznes dalej.</p>
     <div class="roles">
         <div class="role">
+            <span class="role__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"></path></svg></span>
             <div class="role__k">Ty wnosisz</div>
             <div class="role__t">Pomysł i chęć prowadzenia</div>
-            <div class="role__d">Przynosisz pomysł — albo szukamy go razem. Najważniejsze: <strong>chcesz poprowadzić ten biznes</strong>, kiedy oddam Ci stery. Nie musisz mieć kontaktów ani znać się na technologii czy sprzedaży. A jeśli znasz swoją branżę od środka — tym lepiej.</div>
+            <div class="role__d">Przynosisz pomysł — albo szukamy go razem. Najważniejsze: <strong>chcesz poprowadzić ten biznes</strong>, kiedy oddam Ci prowadzenie. Nie musisz mieć kontaktów ani znać się na technologii czy sprzedaży. A jeśli znasz swoją branżę od środka — tym lepiej.</div>
         </div>
         <div class="role role--ja">
+            <span class="role__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.7a1.9 1.9 0 0 0-3 -.3z"></path><path d="M12 15l-3-3a22 22 0 0 1 8-10c1.5 0 3 1.5 3 3a22 22 0 0 1-10 8z"></path><path d="M9 12H4s.5-3 2-4 4-.5 4-.5"></path><path d="M12 15v5s3-.5 4-2 .5-4 .5-4"></path></svg></span>
             <div class="role__k">Tomek wnosi</div>
             <div class="role__t">Budowę i rozkręcenie do 50 klientów</div>
-            <div class="role__d">15 lat budowania e-biznesów i 70 mln zł sprzedaży online. <strong>Buduję aplikację z zespołem i sam rozkręcam ją do pierwszych 50 stałych klientów</strong> — bo na sprzedaży się znam. Potem oddaję Ci stery i zostaję doradcą.</div>
+            <div class="role__d">15 lat budowania e-biznesów i 70 mln zł sprzedaży online. <strong>Buduję aplikację z zespołem i sam rozkręcam ją do pierwszych 50 stałych klientów</strong> — bo na sprzedaży się znam. Potem oddaję Ci prowadzenie i zostaję doradcą.</div>
         </div>
     </div>
     <p class="roles__note">Do <strong>50 stałych klientów</strong> prowadzę ja. Potem biznes operacyjnie przejmujesz Ty — ja zostaję doradcą strategicznym.</p>
@@ -313,6 +331,7 @@ img { max-width: 100%; display: block; }
     <div class="flow">
         <div class="flow__step">
             <div class="flow__num">1</div>
+            <span class="flow__pov">ty</span>
             <div class="flow__b">
                 <div class="flow__t">Rozmowa z AI — <b>za darmo</b></div>
                 <div class="flow__d">Opowiadasz o pomyśle. AI sprawdza go z Tobą i od razu pokazuje pierwsze ekrany Twojej aplikacji, kartę projektu i wstępny plan przychodu. Bez karty, bez zobowiązań.</div>
@@ -320,6 +339,7 @@ img { max-width: 100%; display: block; }
         </div>
         <div class="flow__step">
             <div class="flow__num">2</div>
+            <span class="flow__pov">ty</span>
             <div class="flow__b">
                 <div class="flow__t">Rezerwacja rozmowy — <b>500 zł, w pełni zwrotne</b></div>
                 <div class="flow__d">Blokujesz termin. Przygotowuję plan przedsięwzięcia pod Twój konkretny pomysł i <strong>odzywam się osobiście</strong>. Do tego momentu wszystko dzieje się bez człowieka.</div>
@@ -327,6 +347,7 @@ img { max-width: 100%; display: block; }
         </div>
         <div class="flow__step">
             <div class="flow__num">3</div>
+            <span class="flow__pov">razem</span>
             <div class="flow__b">
                 <div class="flow__t">Decyzja i umowa</div>
                 <div class="flow__d">Rozmawiamy. Nie wchodzimy we współpracę — z dowolnego powodu, obojętnie z czyjej strony? <strong>500 zł wraca w całości.</strong> Wchodzimy? 500 zł wliczam w budowę.</div>
@@ -334,6 +355,7 @@ img { max-width: 100%; display: block; }
         </div>
         <div class="flow__step">
             <div class="flow__num">4</div>
+            <span class="flow__pov flow__pov--ja">ja</span>
             <div class="flow__b">
                 <div class="flow__t">Budowa — <b>od 9 000 zł</b></div>
                 <div class="flow__d">Z zespołem buduję kompletną aplikację: logowanie, panel, płatności i abonamenty, strona. Zależnie od zakresu od 9 000 zł — i <strong>to Twoja aplikacja od pierwszego dnia.</strong></div>
@@ -341,15 +363,17 @@ img { max-width: 100%; display: block; }
         </div>
         <div class="flow__step">
             <div class="flow__num">5</div>
+            <span class="flow__pov flow__pov--ja">ja</span>
             <div class="flow__b">
                 <div class="flow__t">Sprzedaż — <b>ok. pół roku</b></div>
-                <div class="flow__d">Prowadzę ten biznes — kampanie, sprzedaż, cały system — aż <strong>razem zdobędziemy 50 stałych klientów.</strong> Ty w tym czasie uczysz się biznesu od środka — bo to Ty przejmiesz stery.</div>
+                <div class="flow__d">Prowadzę ten biznes — kampanie, sprzedaż, cały system — aż <strong>razem zdobędziemy 50 stałych klientów.</strong> Ty w tym czasie uczysz się biznesu od środka — bo to Ty przejmiesz prowadzenie.</div>
             </div>
         </div>
         <div class="flow__step">
             <div class="flow__num">6</div>
+            <span class="flow__pov">ty</span>
             <div class="flow__b">
-                <div class="flow__t">Stery dla Ciebie</div>
+                <div class="flow__t">Prowadzenie w Twoich rękach</div>
                 <div class="flow__d">Oddaję Ci rozkręcony biznes i zostaję doradcą strategicznym. Dalej prowadzisz go Ty.</div>
             </div>
         </div>
@@ -410,17 +434,18 @@ img { max-width: 100%; display: block; }
     <div class="faq">
         <div class="faq__item"><div class="faq__q">Czyja to aplikacja?</div><div class="faq__a">Twoja. Płacisz za budowę i jesteś właścicielem od pierwszego dnia.</div></div>
         <div class="faq__item"><div class="faq__q">Co, jeśli nie dogadamy się po rozmowie?</div><div class="faq__a">500 zł wraca w całości — obojętnie z czyjej strony jest decyzja. Bez tłumaczenia się.</div></div>
-        <div class="faq__item"><div class="faq__q">Muszę umieć sprzedawać albo programować? Albo mieć kontakty?</div><div class="faq__a">Nie. Wnosisz pomysł i chęć, żeby poprowadzić biznes, gdy przejmiesz stery. Budowę i sprzedaż do pierwszych 50 klientów biorę na siebie.</div></div>
+        <div class="faq__item"><div class="faq__q">Muszę umieć sprzedawać albo programować? Albo mieć kontakty?</div><div class="faq__a">Nie. Wnosisz pomysł i chęć, żeby poprowadzić biznes, gdy go przejmiesz. Budowę i sprzedaż do pierwszych 50 klientów biorę na siebie.</div></div>
         <div class="faq__item"><div class="faq__q">Bierzesz udziały w mojej firmie?</div><div class="faq__a">Nie. Biorę 10% od przychodu, póki razem rozkręcamy biznes. Udziałów nie ruszam.</div></div>
-        <div class="faq__item"><div class="faq__q">Czemu akurat 50 klientów?</div><div class="faq__a">To moment, w którym biznes stoi o własnych siłach i ma sens oddać Ci stery. Do tego prowadzę go ja.</div></div>
+        <div class="faq__item"><div class="faq__q">Czemu akurat 50 klientów?</div><div class="faq__a">To moment, w którym biznes stoi o własnych siłach i ma sens oddać Ci prowadzenie. Do tego prowadzę go ja.</div></div>
     </div>
 </section>
 
 <!-- FINAL -->
 <section class="final reveal">
-    <h2>Masz pomysł? <span class="ser">Sprawdźmy go.</span></h2>
-    <p>Kilkanaście minut rozmowy z AI — karta projektu, ekrany aplikacji i wstępny plan przychodu. Za darmo, bez zobowiązań.</p>
-    <a class="btn" href="/aplikacja/sparing/" data-cta>Sprawdź swój pomysł za darmo <span class="arr">→</span></a>
+    <h2>Zobacz swój pomysł <span class="ser">jako aplikację.</span></h2>
+    <p>Kilkanaście minut rozmowy z AI — i masz kartę projektu, pierwsze ekrany narzędzia i wstępny plan przychodu.</p>
+    <a class="btn btn--lg" href="/aplikacja/sparing/" data-cta>Zacznij za darmo <span class="arr">→</span></a>
+    <p class="final__fine">Bez karty i bez zobowiązań</p>
 </section>
 
 <footer class="foot">
