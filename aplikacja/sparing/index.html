@@ -5914,7 +5914,10 @@
     // wysłał ich odsłonę mailem. Dopóki sesja nie ma planu reveali (legacy /
     // przed-drip) albo klient zapłacił — pokazujemy wszystko jak dawniej.
     // Bazowe elementy (ekrany, karta, plan, pigułka) nigdy nie są bramkowane.
-    var REV_KEY = { prototyp: 'prototyp', strona: 'landing', rynek: 'rynek', economics: 'economics', gtm: 'gtm' };
+    // v1 front-load (2026-06-14): bramkujemy TYLKO drogie finałowe artefakty
+    // (prototyp + strona). rynek/economics/gtm są niebramkowane → front generuje
+    // je od razu po werdykcie i pokazuje bez kłódki (revUnlocked: !key → true).
+    var REV_KEY = { prototyp: 'prototyp', strona: 'landing' };
     function hasRevealPlan() { return state.reveals && Object.keys(state.reveals).length > 0; }
     function revUnlocked(view) {
         var key = REV_KEY[view];
