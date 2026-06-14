@@ -4849,6 +4849,65 @@
     .kp2-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .kp2-chips span { font-size: 12px; color: var(--text-muted); background: #161616; border: 1px solid var(--glass-border); border-radius: 6px; padding: 3px 9px; }
     @media (max-width: 640px) { .kp2-grid { grid-template-columns: 1fr; } }
+
+    /* ============================================================
+       AKCENTY „AI" — pozycja Współpraca, przycisk planu współpracy
+       i mini-wizualizacje w kaflach pulpitu. Warstwa NA Geist (po nim
+       w źródle), żeby wygrać specyficznością i naprawić zlewający się
+       przycisk CTA. Sygnatura = animowana obwódka conic (jak composer).
+       ============================================================ */
+    /* Współpraca — pozycja wyróżniona: animowana obwódka + delikatny tint */
+    .side__item--ai {
+        position: relative; overflow: hidden;
+        background: linear-gradient(180deg, rgba(0,112,243,.12), rgba(0,112,243,.03)) !important;
+    }
+    .side__item--ai:hover { background: linear-gradient(180deg, rgba(0,112,243,.18), rgba(0,112,243,.05)) !important; }
+    .side__item--ai svg { color: var(--accent) !important; opacity: 1 !important; }
+    .side__item--ai .side__label { color: var(--text-strong); font-weight: 600; }
+    .side__item--ai::after {
+        content: ''; position: absolute; inset: 0; border-radius: 6px; padding: 1px;
+        background: conic-gradient(from var(--spar-angle),
+            rgba(0,112,243,.75) 0deg, rgba(109,179,255,.95) 90deg, rgba(99,91,255,.70) 180deg,
+            rgba(0,217,126,.50) 270deg, rgba(0,112,243,.75) 360deg);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude;
+        animation: sparSpin 7s linear infinite; opacity: .85; pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) { .side__item--ai::after { animation: none; } }
+
+    /* Plan współpracy — box flat (Geist) + przycisk PEŁNY akcent, biały tekst
+       (poprzednio Geist robił niebieski tekst na niebieskim tle → zlewało się) */
+    .side-cta { background: #0a0a0a !important; border: 1px solid rgba(0,112,243,.28) !important; border-radius: 12px !important; }
+    .side-cta:hover { border-color: rgba(0,112,243,.55) !important; box-shadow: 0 0 34px -18px rgba(0,112,243,.7) !important; }
+    .side-cta__btn {
+        color: #fff !important;
+        background: linear-gradient(135deg, #3b8bff 0%, var(--accent) 55%, var(--accent-2) 100%) !important;
+        border-radius: 8px !important; font-weight: 600 !important; letter-spacing: -.01em !important;
+        box-shadow: 0 1px 0 rgba(255,255,255,.14) inset !important;
+    }
+    .side-cta__btn:hover { filter: brightness(1.06); box-shadow: 0 8px 22px -10px rgba(0,112,243,.65), 0 1px 0 rgba(255,255,255,.14) inset !important; }
+
+    /* Mini-wizualizacje w kaflach pulpitu (plan / economics / rynek) */
+    .pjd-tile__ico, .pjd-tile__t, .pjd-tile__sub, .pjd-tile__go, .pjd-num,
+    .pjd-badge, .pjd-quote, .pjd-spark { position: relative; z-index: 1; }
+    .pjd-spark { display: block; margin-top: 10px; }
+    .pjd-spark--bars { display: flex; align-items: flex-end; gap: 5px; height: 42px; }
+    .pjd-spark--bars i { flex: 1 1 0; background: #1f1f1f; border: 1px solid var(--border-strong); border-bottom: none; border-radius: 4px 4px 0 0; min-height: 8px; }
+    .pjd-spark--bars i.is-goal { background: var(--accent); border-color: var(--accent); }
+    .pjd-spark--line { height: 44px; }
+    .pjd-spark--line svg { width: 100%; height: 100%; display: block; }
+    .pjd-spark--line polyline { fill: none; stroke: var(--accent); stroke-width: 2.5px; stroke-linecap: round; stroke-linejoin: round; }
+    .pjd-spark--line polygon { fill: var(--accent); opacity: .13; }
+    /* tło kafla „Potencjał rynku" — dekoracyjny wykres wzrostu */
+    .pjd-tile--bg > * { position: relative; z-index: 1; }
+    .pjd-bg { position: absolute; inset: 0; z-index: 0 !important; pointer-events: none; }
+    .pjd-bg svg { width: 100%; height: 100%; display: block; }
+    .pjd-bg__area { fill: var(--accent); opacity: .08; }
+    .pjd-bg__line { fill: none; stroke: var(--accent); stroke-width: 1.5px; opacity: .32; }
+    .pjd-tile--rynek-hi .pjd-bg__area { fill: var(--green); }
+    .pjd-tile--rynek-hi .pjd-bg__line { stroke: var(--green); }
+    @media (prefers-reduced-motion: reduce) { .pjd-spark--bars i { transition: none; } }
     </style>
 </head>
 <body>
@@ -4921,7 +4980,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path></svg>
                 <span class="side__label">Dotknij aplikacji</span><span class="side__status" data-status-for="prototyp" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="wspolpraca">
+            <button type="button" class="side__item side__item--ai" data-tab="wspolpraca">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17a5 5 0 0 1-5 5H3v-3a5 5 0 0 1 5-5"></path><path d="M13 7a5 5 0 0 1 5-5h3v3a5 5 0 0 1-5 5"></path><path d="M8 16l8-8"></path></svg>
                 <span class="side__label">Współpraca</span>
             </button>
@@ -6963,6 +7022,46 @@
         return '<span class="pjd-tile__go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg></span>';
     }
 
+    /* ── Mini-wizualizacje w kaflach pulpitu (lekkie, dekoracyjne) ── */
+    // Słupki wzrostu (plan przychodu): ostatni = cel (akcent)
+    function miniBars(vals, accentLast) {
+        var v = (vals || []).filter(function (x) { return typeof x === 'number' && isFinite(x); });
+        if (v.length < 2) return '';
+        var mx = v.reduce(function (a, b) { return Math.max(a, b); }, 1);
+        var bars = v.map(function (n, i) {
+            var h = Math.max(12, Math.round(n / mx * 100));
+            var goal = accentLast && i === v.length - 1;
+            return '<i class="' + (goal ? 'is-goal' : '') + '" style="height:' + h + '%"></i>';
+        }).join('');
+        return '<span class="pjd-spark pjd-spark--bars" aria-hidden="true">' + bars + '</span>';
+    }
+    // Krzywa wzrostu (economics): aktywni klienci miesiąc po miesiącu
+    function miniLine(vals) {
+        var v = (vals || []).filter(function (x) { return typeof x === 'number' && isFinite(x); });
+        if (v.length < 2) return '';
+        var mx = v.reduce(function (a, b) { return Math.max(a, b); }, 1) || 1;
+        var n = v.length;
+        var pts = v.map(function (val, i) {
+            var x = (i / (n - 1)) * 100;
+            var y = 96 - (val / mx) * 88;
+            return x.toFixed(1) + ',' + y.toFixed(1);
+        }).join(' ');
+        return '<span class="pjd-spark pjd-spark--line" aria-hidden="true">' +
+            '<svg viewBox="0 0 100 100" preserveAspectRatio="none">' +
+            '<polygon points="0,100 ' + pts + ' 100,100"></polygon>' +
+            '<polyline points="' + pts + '" vector-effect="non-scaling-stroke"></polyline>' +
+            '</svg></span>';
+    }
+    // Dekoracyjny wykres wzrostu w TLE kafla „Potencjał rynku"
+    function marketBg() {
+        var pts = '0,84 13,76 26,80 39,62 52,66 65,46 78,42 100,24';
+        return '<span class="pjd-bg" aria-hidden="true">' +
+            '<svg viewBox="0 0 100 100" preserveAspectRatio="none">' +
+            '<polygon class="pjd-bg__area" points="0,100 ' + pts + ' 100,100"></polygon>' +
+            '<polyline class="pjd-bg__line" points="' + pts + '" vector-effect="non-scaling-stroke"></polyline>' +
+            '</svg></span>';
+    }
+
     function renderPaneProjekt(verIdx) {
         var body = el('pane-projekt-body');
         var items = lightboxItems();
@@ -7080,36 +7179,100 @@
             '</button>';
 
         if (ctx.hasBrandSec) {
-            // PROTOTYP — klikalne narzędzie w działaniu (kafel-bohater, klik → detal).
-            // Najmocniejszy element pulpitu: nie obrazek, nie strona — sama apka.
-            if (!revUnlocked('prototyp')) {
-                tiles += lockedTile(PJ_ICONS.prototyp, REV_TEASER.prototyp[0], REV_TEASER.prototyp[1]);
-            } else if (state.prototypeUrl) {
-                tiles += '<button type="button" class="pjd-tile pjd-tile--proto" data-pjd="prototyp">' +
+            // Kolejność kafli = kolejność menu: plan → rynek → economics → gtm →
+            // strona → prototyp → pigułka (lekkie/wczesne wyżej, „odsłony" niżej).
+
+            // PLAN — kwota docelowa
+            var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
+                ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
+            if (goalK && typeof goalK.mies === 'number') {
+                var planSeries = (state.bizplan && Array.isArray(state.bizplan.kamienie))
+                    ? state.bizplan.kamienie.map(function (m) { return m && typeof m.mies === 'number' ? m.mies : null; }).filter(function (x) { return x !== null; })
+                    : [];
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="plan">' +
                     pjGoIcon() +
-                    '<span class="pjd-proto__glow" aria-hidden="true"></span>' +
-                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Dotknij swojej aplikacji <em class="pjd-live">działa</em></span>' +
-                    '<span class="pjd-tile__sub">to nie zrzut ani makieta — klikalny prototyp Twojego narzędzia. Wejdź, wpisz, sprawdź jak reaguje.</span>' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
+                    '<span class="pjd-tile__t">Plan przychodu' + (pjNewPlan ? ' <i class="pj-card__dot" aria-hidden="true"></i>' : '') + '</span>' +
+                    '<span class="pjd-num">' + fmtZl(goalK.mies) + ' zł<small>/mies.</small></span>' +
+                    '<span class="pjd-tile__sub">przy ' + esc(String(goalK.klienci)) + ' płacących klientach — zobacz pełne wyliczenia</span>' +
+                    miniBars(planSeries, true) +
                     '</button>';
-            } else if (extras.prototype === 'limit') {
-                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
-                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
-                    '<span class="pjd-tile__sub">pula wersji prototypu wykorzystana — finalną dopracujesz z Tomkiem</span>' +
-                    '</div>';
-            } else if (extras.prototype === 'fail') {
-                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
-                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
-                    '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować prototypu.</b>' +
-                    '<button type="button" class="preview-retry" data-retry="prototype">Spróbuj ponownie</button></div>' +
-                    '</div>';
             } else {
-                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
-                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Buduję klikalny prototyp</span>' +
-                    genProgressHTML('prototype', 'Składam działające narzędzie…', 'odtwarzam Twoje ekrany jako apkę, którą da się kliknąć') +
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
+                    '<span class="pjd-tile__t">Plan przychodu</span>' +
+                    (extras.plan === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć planu.</b><button type="button" class="preview-retry" data-retry="plan">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów')) +
+                    '</div>';
+            }
+
+            // RAPORT — ocena potencjału (klik → zakładka Potencjał rynku)
+            if (!revUnlocked('rynek')) {
+                tiles += lockedTile(PJ_ICONS.raport, REV_TEASER.rynek[0], REV_TEASER.rynek[1]);
+            } else if (state.raport) {
+                var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3 pjd-tile--bg' + (oc === 'wysoki' ? ' pjd-tile--rynek-hi' : '') + '" data-pjd-rynek>' +
+                    marketBg() +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
+                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
+                    (oc ? '<span class="pjd-badge pjd-badge--' + esc(oc) + '">' + esc(oc) + '</span>' : '') +
+                    (state.raport.teza ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.teza) + '</span>' : '') +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
+                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
+                    (extras.raport === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować raportu.</b><button type="button" class="preview-retry" data-retry="raport">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('raport', 'Sprawdzam Twój rynek w internecie…', 'konkurenci, ceny, wielkość niszy — realny research')) +
+                    '</div>';
+            }
+
+            // CZY TO SIĘ SPINA — unit economics (klik → detal z suwakami)
+            if (!revUnlocked('economics')) {
+                tiles += lockedTile(PJ_ICONS.economics, REV_TEASER.economics[0], REV_TEASER.economics[1]);
+            } else if (state.economics) {
+                var ec = econCalc(state.economics, null);
+                var ecSeries = (ec && Array.isArray(ec.sim)) ? ec.sim.map(function (s) { return s.aktywni; }) : [];
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="economics">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
+                    '<span class="pjd-tile__t">Czy to zarabia</span>' +
+                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;tyle wraca z 1 zł na klienta</small></span>' : '') +
+                    '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
+                    miniLine(ecSeries) +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
+                    '<span class="pjd-tile__t">Czy to zarabia</span>' +
+                    (extras.economics === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć.</b><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, koszt i wartość klienta, zwrot budowy — na realnych danych')) +
+                    '</div>';
+            }
+
+            // SPRZEDAŻ OD DNIA 1 — go-to-market (klik → detal)
+            if (!revUnlocked('gtm')) {
+                tiles += lockedTile(PJ_ICONS.gtm, REV_TEASER.gtm[0], REV_TEASER.gtm[1]);
+            } else if (state.gtm) {
+                var kanCount = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly.length : 0;
+                var adCount = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy.length : 0;
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="gtm">' +
+                    pjGoIcon() +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
+                    '<span class="pjd-tile__t">Plan sprzedaży</span>' +
+                    '<span class="pjd-tile__sub">' + kanCount + ' miejsc z klientami, ' + adCount + ' gotowe reklamy, skrypty i maile</span>' +
+                    '</button>';
+            } else {
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
+                    '<span class="pjd-tile__t">Plan sprzedaży</span>' +
+                    (extras.gtm === 'fail'
+                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować.</b><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>'
+                        : genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty, maile')) +
                     '</div>';
             }
 
@@ -7142,90 +7305,36 @@
                     '</div>';
             }
 
-            // PLAN — kwota docelowa
-            var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
-                ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
-            if (goalK && typeof goalK.mies === 'number') {
-                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="plan">' +
+            // PROTOTYP — klikalne narzędzie w działaniu (kafel-bohater, klik → detal).
+            // Najmocniejszy element pulpitu: nie obrazek, nie strona — sama apka.
+            if (!revUnlocked('prototyp')) {
+                tiles += lockedTile(PJ_ICONS.prototyp, REV_TEASER.prototyp[0], REV_TEASER.prototyp[1]);
+            } else if (state.prototypeUrl) {
+                tiles += '<button type="button" class="pjd-tile pjd-tile--proto" data-pjd="prototyp">' +
                     pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
-                    '<span class="pjd-tile__t">Plan przychodu' + (pjNewPlan ? ' <i class="pj-card__dot" aria-hidden="true"></i>' : '') + '</span>' +
-                    '<span class="pjd-num">' + fmtZl(goalK.mies) + ' zł<small>/mies.</small></span>' +
-                    '<span class="pjd-tile__sub">przy ' + esc(String(goalK.klienci)) + ' płacących klientach — zobacz pełne wyliczenia</span>' +
+                    '<span class="pjd-proto__glow" aria-hidden="true"></span>' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Dotknij swojej aplikacji <em class="pjd-live">działa</em></span>' +
+                    '<span class="pjd-tile__sub">to nie zrzut ani makieta — klikalny prototyp Twojego narzędzia. Wejdź, wpisz, sprawdź jak reaguje.</span>' +
                     '</button>';
-            } else {
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
-                    '<span class="pjd-tile__t">Plan przychodu</span>' +
-                    (extras.plan === 'fail'
-                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć planu.</b><button type="button" class="preview-retry" data-retry="plan">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów')) +
+            } else if (extras.prototype === 'limit') {
+                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
+                    '<span class="pjd-tile__sub">pula wersji prototypu wykorzystana — finalną dopracujesz z Tomkiem</span>' +
                     '</div>';
-            }
-
-            // RAPORT — ocena potencjału (klik → zakładka Potencjał rynku)
-            if (!revUnlocked('rynek')) {
-                tiles += lockedTile(PJ_ICONS.raport, REV_TEASER.rynek[0], REV_TEASER.rynek[1]);
-            } else if (state.raport) {
-                var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
-                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd-rynek>' +
-                    pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
-                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
-                    (oc ? '<span class="pjd-badge pjd-badge--' + esc(oc) + '">' + esc(oc) + '</span>' : '') +
-                    (state.raport.teza ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.teza) + '</span>' : '') +
-                    '</button>';
-            } else {
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
-                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
-                    (extras.raport === 'fail'
-                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować raportu.</b><button type="button" class="preview-retry" data-retry="raport">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('raport', 'Sprawdzam Twój rynek w internecie…', 'konkurenci, ceny, wielkość niszy — realny research')) +
+            } else if (extras.prototype === 'fail') {
+                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
+                    '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować prototypu.</b>' +
+                    '<button type="button" class="preview-retry" data-retry="prototype">Spróbuj ponownie</button></div>' +
                     '</div>';
-            }
-
-            // CZY TO SIĘ SPINA — unit economics (klik → detal z suwakami)
-            if (!revUnlocked('economics')) {
-                tiles += lockedTile(PJ_ICONS.economics, REV_TEASER.economics[0], REV_TEASER.economics[1]);
-            } else if (state.economics) {
-                var ec = econCalc(state.economics, null);
-                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="economics">' +
-                    pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
-                    '<span class="pjd-tile__t">Czy to zarabia</span>' +
-                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;tyle wraca z 1 zł na klienta</small></span>' : '') +
-                    '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
-                    '</button>';
             } else {
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
-                    '<span class="pjd-tile__t">Czy to zarabia</span>' +
-                    (extras.economics === 'fail'
-                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć.</b><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, koszt i wartość klienta, zwrot budowy — na realnych danych')) +
-                    '</div>';
-            }
-
-            // SPRZEDAŻ OD DNIA 1 — go-to-market (klik → detal)
-            if (!revUnlocked('gtm')) {
-                tiles += lockedTile(PJ_ICONS.gtm, REV_TEASER.gtm[0], REV_TEASER.gtm[1]);
-            } else if (state.gtm) {
-                var kanCount = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly.length : 0;
-                var adCount = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy.length : 0;
-                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="gtm">' +
-                    pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
-                    '<span class="pjd-tile__t">Plan sprzedaży</span>' +
-                    '<span class="pjd-tile__sub">' + kanCount + ' miejsc z klientami, ' + adCount + ' gotowe reklamy, skrypty i maile</span>' +
-                    '</button>';
-            } else {
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
-                    '<span class="pjd-tile__t">Plan sprzedaży</span>' +
-                    (extras.gtm === 'fail'
-                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować.</b><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty, maile')) +
+                tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
+                    '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
+                    '<span class="pjd-tile__t">Buduję klikalny prototyp</span>' +
+                    genProgressHTML('prototype', 'Składam działające narzędzie…', 'odtwarzam Twoje ekrany jako apkę, którą da się kliknąć') +
                     '</div>';
             }
 
