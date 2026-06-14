@@ -166,6 +166,7 @@
         height: var(--vvh, 100dvh);
         flex: 1;
         min-width: 0;
+        position: relative; /* kontekst dla pływającego przycisku „na dół" */
     }
 
     /* ============================================================
@@ -3994,9 +3995,60 @@
     }
 
     /* ============================================================
+       UX ENHANCEMENTS (1–8)
+       ============================================================ */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    /* #2 — przycisk „na dół / najnowsze" */
+    .jump-btn {
+        position: absolute; left: 50%; bottom: 104px; z-index: 40;
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 14px; border-radius: 999px;
+        background: rgba(20, 22, 28, 0.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border); color: var(--text-strong);
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.75);
+        opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(8px);
+        transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+    }
+    .jump-btn.is-shown { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+    .jump-btn svg { width: 15px; height: 15px; }
+
+    /* #7 — stan przycisku wysyłki wg treści (zamiast ciągłego pulsu) */
+    .composer__send { transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), background 0.2s var(--ease); }
+    .composer__send:not(.is-ready):not(.is-stop) { opacity: 0.45; }
+    .composer__send.is-ready { opacity: 1; }
+    /* #3 — composer w trybie „zatrzymaj" podczas pisania AI */
+    .composer__send.is-stop { opacity: 1; background: rgba(255, 255, 255, 0.12); }
+    .composer__send.is-stop svg { display: none; }
+    .composer__send.is-stop::after { content: ''; width: 12px; height: 12px; border-radius: 3px; background: var(--text-strong); }
+
+    /* #6 — chipy znikają płynnie */
+    .qr.is-leaving { opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity 0.18s var(--ease), transform 0.18s var(--ease); }
+
+    /* #8 — reveal werdyktu/podglądu (raz, z poszanowaniem reduced-motion) */
+    .reveal-in { animation: revealIn 0.5s var(--ease) backwards; }
+    @keyframes revealIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .reveal-in { animation: none; } }
+
+    /* #5 — karta „co wyszło z badania rynku" */
+    .find-card { margin: 10px 0 4px 30px; max-width: 94%; padding: 14px 16px; border-radius: 16px;
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.08), rgba(77, 159, 255, 0.02));
+        border: 1px solid rgba(77, 159, 255, 0.22); }
+    .find-card__h { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    .find-card__h svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .find-card__row { font-size: 13.5px; line-height: 1.55; margin-bottom: 7px; color: var(--text); }
+    .find-card__row b { color: var(--text-strong); font-weight: 600; }
+    .find-card__src { margin-top: 9px; font-size: 12px; color: var(--text-muted); }
+    .find-card__src a { color: var(--accent); text-decoration: none; }
+    .find-card__src a:not(:last-child)::after { content: ' · '; color: var(--text-faint); }
+
+    /* ============================================================
        MOBILE
        ============================================================ */
     @media (max-width: 640px) {
+        /* #1 — composer ≥16px: iOS nie auto-zoomuje pola przy tapnięciu */
+        .composer__bar textarea { font-size: 16px; }
         .chat-top { gap: 10px; padding-left: 14px; padding-right: 14px; }
         .chat-top__brand span { display: none; }
         .stage__label { display: none; }
@@ -4218,6 +4270,11 @@
                 </div>
             </div>
         </div>
+        <button type="button" class="jump-btn" id="jump-btn" aria-label="Przewiń do najnowszej wiadomości">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
+            Najnowsze
+        </button>
+        <div class="sr-only" id="sr-status" aria-live="polite" role="status"></div>
         <div class="chat-locked" id="chat-locked" hidden><span id="chat-locked-text"></span></div>
 
         <!-- Zakładki projektu (projekt = karta + ekrany / potencjał rynku / współpraca) -->
@@ -4393,6 +4450,7 @@
     var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, prototype: 300, economics: 50, gtm: 90 };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
+    var streamAbort = null; // AbortController bieżącego streamu (przycisk „Zatrzymaj")
     var stickBottom = true;
 
     /* ============================================================
@@ -6817,6 +6875,13 @@
         var w = el('spar-widget');
         if (w) w.remove();
     }
+    // #6 — przy wyborze chipa: płynne zniknięcie zamiast nagłego skoku
+    function fadeRemoveChips() {
+        var c = el('qr-chips');
+        if (!c) { removeChips(); return; }
+        c.classList.add('is-leaving');
+        setTimeout(removeChips, 180);
+    }
 
     // Lightbox v2 — podpis widoku, strzałki między ekranami, wyraźny X
     // (Esc / klik tła / X zamyka; ←/→ i strzałki przełączają widoki)
@@ -7578,6 +7643,40 @@
         var len = el('chat-input').value.length;
         el('char-count').textContent = (len >= 1600) ? (len + ' / ' + MAX_MSG_LEN) : '';
     }
+    // #7 — przycisk wysyłki aktywny tylko gdy jest treść (i nie streamujemy)
+    function updateSendState() {
+        if (streaming) return;
+        el('btn-send').classList.toggle('is-ready', el('chat-input').value.trim().length > 0);
+    }
+    // #2 — widoczność pływającego przycisku „na dół"
+    function setJumpVisible(on) {
+        var j = el('jump-btn'); if (j) j.classList.toggle('is-shown', !!on);
+    }
+    // #5 — zwięzła karta „co wyszło z badania rynku" (z wyniku bramki)
+    function renderFindingsCard(o) {
+        if (!o || typeof o !== 'object') return;
+        function row(label, val) {
+            if (!val) return '';
+            return '<div class="find-card__row"><b>' + label + ':</b> ' + esc(String(val).slice(0, 240)) + '</div>';
+        }
+        var inner = row('Konkurencja', o.konkurencja) + row('Nisza', o.odczyt_rynku) + row('Najmocniejszy kąt', o.kierunek);
+        if (!inner) return;
+        var src = '';
+        if (Array.isArray(o.zrodla) && o.zrodla.length) {
+            var links = o.zrodla.slice(0, 4).map(function (z) {
+                if (!z || !z.url) return '';
+                return '<a href="' + esc(String(z.url)) + '" target="_blank" rel="noopener">' + esc(String(z.tytul || z.url).slice(0, 40)) + '</a>';
+            }).filter(Boolean).join('');
+            if (links) src = '<div class="find-card__src">Źródła: ' + links + '</div>';
+        }
+        var card = document.createElement('div');
+        card.className = 'find-card reveal-in';
+        card.innerHTML = '<div class="find-card__h">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>' +
+            'Co wyszło z badania rynku</div>' + inner + src;
+        el('chat-msgs').appendChild(card);
+        scrollToBottom(false);
+    }
 
     /* ============================================================
        WYSYŁKA + STREAMING SSE
@@ -7686,7 +7785,7 @@
                 chipStreak++;
                 maybeNudgeComposer();
                 var msg = selected.join(', ');
-                removeChips();
+                fadeRemoveChips();
                 sendOpening(msg);
             });
         }
@@ -7723,7 +7822,7 @@
                     if (streaming || el('inline-gate')) return;
                     chipStreak++;
                     maybeNudgeComposer();
-                    removeChips();
+                    fadeRemoveChips();
                     sendOpening(text);
                 });
             }
@@ -7883,9 +7982,18 @@
         streaming = true;
         setComposerEnabled(false);
         stickBottom = true;
+        setJumpVisible(false);
+        // #3 — przycisk wysyłki zmienia się w „Zatrzymaj" (aktywny mimo zablokowanego pola)
+        streamAbort = window.AbortController ? new AbortController() : null;
+        var sendBtn = el('btn-send');
+        sendBtn.disabled = false;
+        sendBtn.classList.remove('is-ready');
+        sendBtn.classList.add('is-stop');
+        sendBtn.setAttribute('aria-label', 'Zatrzymaj generowanie');
 
         var bubble = document.createElement('div');
         bubble.className = 'msg msg--ai';
+        bubble.setAttribute('aria-live', 'off'); // #4 — nie ogłaszamy każdego tokenu czytnikowi
         bubble.innerHTML = '<span class="typing" aria-label="Sparing pisze"><i></i><i></i><i></i></span>';
         el('chat-msgs').appendChild(bubble);
         scrollToBottom(true);
@@ -7916,7 +8024,8 @@
             return fetch(SPAR_ENDPOINT, {
                 method: 'POST',
                 headers: authHeaders(),
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                signal: streamAbort ? streamAbort.signal : undefined
             });
         }).then(function (res) {
             if (!res.ok) {
@@ -7997,6 +8106,7 @@
                         if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
                         ocBar(100);
                         ocStep('Mam dane z rynku — układam rekomendację…');
+                        if (obj.ocena) renderFindingsCard(obj.ocena); // #5 — karta „co wyszło z badania"
                     }
                     return;
                 }
@@ -8037,6 +8147,11 @@
             }
             return pump();
         }).catch(function (err) {
+            if (err && err.name === 'AbortError') {
+                // #3 — użytkownik zatrzymał generowanie; zostaje to, co już padło (bez błędu)
+                failedBeforeText = !gotText;
+                return;
+            }
             if (err && (err.code === 'wymagany_email' || err.code === 'wymagane_konto')) {
                 // server-side backstop bramki — pokaż rejestrację, przywróć wiadomość
                 failedBeforeText = !gotText;
@@ -8070,8 +8185,15 @@
             }
         }).then(function () {
             streaming = false;
+            // #3 — przywróć przycisk wysyłki z trybu „Zatrzymaj"
+            var sbDone = el('btn-send');
+            sbDone.classList.remove('is-stop');
+            sbDone.setAttribute('aria-label', 'Wyślij wiadomość');
+            streamAbort = null;
+            setJumpVisible(false);
             // bramka rejestracji blokuje composer — nie odblokowuj pod nią
             if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
+            updateSendState();
 
             if (failedBeforeText && !raw) {
                 bubble.remove();
@@ -8080,6 +8202,7 @@
             }
             if (raw) {
                 bubble.innerHTML = renderRich(visibleText(raw)) || '';
+                try { el('sr-status').textContent = visibleText(raw).slice(0, 400) || 'Odpowiedź gotowa.'; } catch (e) {} // #4 — jedno ogłoszenie dla czytnika
                 messages.push({ role: 'assistant', content: raw });
                 saveMessages();
                 // Postęp kamieni z tej tury
@@ -8340,7 +8463,7 @@
     //   projekt — brief z markera <projekt> (insighty, zmien[])
     function requestPreviews(known, projekt, demo, onSettle) {
         var wrap = document.createElement('div');
-        wrap.className = 'msg msg--ai msg--preview';
+        wrap.className = 'msg msg--ai msg--preview reveal-in';
         el('chat-msgs').appendChild(wrap);
 
         // Jednorazowe odblokowanie rozmowy po zakończeniu (sukces/limit/błąd)
@@ -8660,7 +8783,7 @@
 
     function renderVerdict(color, karta) {
         var wrap = document.createElement('div');
-        wrap.className = 'verdict';
+        wrap.className = 'verdict reveal-in';
 
         if (color === 'zielony') {
             // Rozmowa zostaje OTWARTA — user może dopracowywać projekt dalej.
@@ -8864,8 +8987,11 @@
        ============================================================ */
     function bindChat() {
         var ta = el('chat-input');
-        el('btn-send').addEventListener('click', sendMessage);
-        ta.addEventListener('input', function () { autosize(); updateCharCount(); });
+        el('btn-send').addEventListener('click', function () {
+            if (streaming) { if (streamAbort) { try { streamAbort.abort(); } catch (e) {} } return; } // #3 — Zatrzymaj
+            sendMessage();
+        });
+        ta.addEventListener('input', function () { autosize(); updateCharCount(); updateSendState(); });
         ta.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(hover: hover)').matches) {
                 e.preventDefault();
@@ -8881,8 +9007,13 @@
             if (sc.scrollTop < lastScrollTop - 4) stickBottom = false;
             else if (dist < 60) stickBottom = true;
             lastScrollTop = sc.scrollTop;
+            setJumpVisible(dist > 240); // #2 — „na dół" gdy odjechaliśmy od końca rozmowy
         }, { passive: true });
         el('btn-restart').addEventListener('click', newConvo);
+        el('jump-btn').addEventListener('click', function () { // #2 — skok do najnowszej
+            stickBottom = true; scrollToBottom(true); setJumpVisible(false);
+        });
+        updateSendState();
 
         // Sidebar: zakładki + podpozycje sekcji pulpitu + mobile off-canvas
         document.querySelectorAll('.side__item').forEach(function (b) {
