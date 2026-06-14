@@ -503,9 +503,13 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     .nav { background: rgba(0, 0, 0, 0.88); -webkit-backdrop-filter: none; backdrop-filter: none; }
     .progress { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0, 0, 0, 0.85); }
     .progress__item em { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(0, 0, 0, 0.92); }
-    .scene { scroll-snap-stop: normal; }
-    .footer-mini { scroll-snap-stop: normal; }
-    html { scroll-snap-type: y mandatory; }
+    /* mobile: BEZ snap-scroll — sceny z kartami nie zmieszczą się w 100dvh,
+       więc normalny scroll (snap zostaje tylko na desktopie). Sceny rosną
+       do treści (min-height:auto), hero zostaje pełnoekranowe. */
+    html { scroll-snap-type: none; }
+    .scene { scroll-snap-align: none; scroll-snap-stop: normal; min-height: auto; }
+    .scene--hero { min-height: 100dvh; }
+    .footer-mini { scroll-snap-align: none; scroll-snap-stop: normal; }
     [data-reveal] { transform: translateY(16px); transition-duration: 0.6s; }
     .reveal-mask__inner { transition-duration: 0.8s; }
     .hero__meta-arrow { animation: none; opacity: 0.85; }
@@ -1779,6 +1783,17 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 
 /* CTA — zwykły przycisk */
 .cta__btnwrap { margin-top: clamp(28px, 5vh, 44px); }
+
+/* SPOŁECZNOŚĆ — filary (wsparcie / rozwój / spotkania / sukcesy) */
+.crew__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 1080px; margin: clamp(28px, 4vh, 46px) auto 0; text-align: left; }
+.crew__pillar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: clamp(20px, 2.2vw, 28px); transition: border-color 0.4s var(--ease), transform 0.4s var(--ease); }
+.crew__pillar:hover { border-color: var(--border-strong); transform: translateY(-3px); }
+.crew__ico { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); margin-bottom: 14px; }
+.crew__ico svg { width: 21px; height: 21px; }
+.crew__pt { font-size: clamp(15px, 1.5vw, 18px); font-weight: 800; color: var(--text-strong); letter-spacing: -0.015em; margin-bottom: 7px; }
+.crew__pd { font-size: clamp(12.5px, 1.15vw, 14px); line-height: 1.55; color: var(--text-muted); }
+@media (max-width: 920px) { .crew__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .crew__grid { grid-template-columns: 1fr; gap: 10px; } .crew__pillar { padding: 16px 18px; } }
 </style>
 </head>
 <body>
@@ -1822,10 +1837,9 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     <a href="#act-4" class="progress__item" data-act="3"><span>04</span><em>Uczciwie</em></a>
     <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Obietnica</em></a>
     <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Proces</em></a>
-    <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Cennik</em></a>
-    <a href="#act-8" class="progress__item" data-act="7"><span>08</span><em>Ludzie</em></a>
-    <a href="#act-9" class="progress__item" data-act="8"><span>09</span><em>Galeria</em></a>
-    <a href="#act-10" class="progress__item" data-act="9"><span>10</span><em>Start</em></a>
+    <a href="#act-8" class="progress__item" data-act="7"><span>07</span><em>Ludzie</em></a>
+    <a href="#act-9" class="progress__item" data-act="8"><span>08</span><em>Galeria</em></a>
+    <a href="#act-10" class="progress__item" data-act="9"><span>09</span><em>Start</em></a>
 </aside>
 
 <!-- ============================================================
@@ -2030,57 +2044,41 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         </div>
     </section>
 
-    <!-- SCENE 7 — CENNIK -->
-    <section class="scene scene--pricing" id="act-7" data-act="6">
-        <div class="scene__aurora" aria-hidden="true"></div>
-        <div class="scene__inner">
-            <p class="pc__eyebrow" data-reveal>Ile to kosztuje</p>
-            <h2 class="pc__title" data-reveal data-delay="120">Cennik <em>jawny dla wszystkich.</em></h2>
-            <p class="pc__sub" data-reveal data-delay="220">Pakiet widać z karty projektu — z liczby ekranów, ról i płatności. Płacisz za to, czego Twoja aplikacja realnie potrzebuje.</p>
-            <div class="pc__tiers">
-                <div class="pc__tier" data-reveal data-delay="320">
-                    <div class="pc__name">Start</div>
-                    <div class="pc__price">9 000 <small>zł</small></div>
-                    <div class="pc__tag">najszybciej na rynek</div>
-                    <div class="pc__d">Jedna rola, jeden główny ekran, strona z szablonu. <strong>Działa i sprzedaje od pierwszego dnia.</strong></div>
-                </div>
-                <div class="pc__tier pc__tier--mid" data-reveal data-delay="420">
-                    <div class="pc__badge">To, co obiecuję</div>
-                    <div class="pc__name">Standard</div>
-                    <div class="pc__price">12 500 <small>zł</small></div>
-                    <div class="pc__tag">kompletne narzędzie</div>
-                    <div class="pc__d">Konta klientów, pełny panel, przypomnienia, <strong>strona pod Twoją markę</strong> i statystyki.</div>
-                </div>
-                <div class="pc__tier" data-reveal data-delay="520">
-                    <div class="pc__name">Rozszerzony</div>
-                    <div class="pc__price">od 16 000 <small>zł</small></div>
-                    <div class="pc__tag">coś ponad standard</div>
-                    <div class="pc__d">Standard plus <strong>druga funkcja lub integracja</strong> z tym, czego używasz. Wyceniam wprost.</div>
-                </div>
-            </div>
-            <p class="pc__note" data-reveal data-delay="600">Cena budowy broni się sama. <strong>Moje 10% to dodatek od wyniku, nie sposób na odbicie zaniżonej wyceny.</strong></p>
-        </div>
-    </section>
-
-    <!-- SCENE 8 — SPOŁECZNOŚĆ -->
+    <!-- SCENE 7 — SPOŁECZNOŚĆ -->
     <section class="scene scene--crew" id="act-8" data-act="7">
         <div class="scene__aurora" aria-hidden="true"></div>
         <canvas class="crew__net" id="crew-net" aria-hidden="true"></canvas>
         <div class="scene__inner">
-            <p class="crew__eyebrow" data-reveal>I jeszcze jedno.</p>
+            <p class="crew__eyebrow" data-reveal>To nie kończy się na kodzie.</p>
             <h2 class="crew__title" data-reveal data-delay="150">
-                Nie zostajesz <em>z tym sam.</em>
+                Buduję aplikację — <em>i ludzi wokół niej.</em>
             </h2>
-            <p class="crew__sub" data-reveal data-delay="400">
-                Każdy, kto buduje ze mną aplikację, wchodzi do społeczności ludzi,
-                którzy robią dokładnie to samo. <strong>Jestem tam aktywny codziennie.</strong>
+            <p class="crew__sub" data-reveal data-delay="350">
+                Wchodzisz do społeczności osób, które robią dokładnie to samo. Razem się rozwijamy, spotykamy, cieszymy sukcesami i trzymamy w gorszych dniach. <strong>Jestem tam codziennie.</strong>
             </p>
-            <div class="crew__chips" data-reveal data-delay="650">
-                <span class="crew__chip"><i></i>Spotkania online</span>
-                <span class="crew__chip"><i></i>Spotkania na żywo</span>
-                <span class="crew__chip"><i></i>Wspólne premiery projektów</span>
+            <div class="crew__grid" data-reveal data-delay="500">
+                <div class="crew__pillar">
+                    <span class="crew__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
+                    <div class="crew__pt">Wsparcie w gorszy dzień</div>
+                    <div class="crew__pd">Coś nie idzie? Masz do kogo napisać o każdej porze. Nikt nie buduje sam.</div>
+                </div>
+                <div class="crew__pillar">
+                    <span class="crew__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg></span>
+                    <div class="crew__pt">Wspólny rozwój</div>
+                    <div class="crew__pd">Dzielimy się tym, co realnie działa — kampanie, ceny, pomysły. Uczysz się od innych, nie z teorii.</div>
+                </div>
+                <div class="crew__pillar">
+                    <span class="crew__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                    <div class="crew__pt">Spotkania na żywo i online</div>
+                    <div class="crew__pd">Co tydzień online, cyklicznie na żywo. Realni ludzie, realne rozmowy — nie kolejny martwy czat.</div>
+                </div>
+                <div class="crew__pillar">
+                    <span class="crew__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3"/><path d="M7 5H4v2a3 3 0 0 0 3 3"/></svg></span>
+                    <div class="crew__pt">Sukcesy świętujemy razem</div>
+                    <div class="crew__pd">Pierwszy klient, pierwszy tysiąc, premiera projektu — każdy kamień milowy ma kogo cieszyć.</div>
+                </div>
             </div>
-            <div class="crew__now" data-reveal data-delay="850" id="crew-now" hidden>
+            <div class="crew__now" data-reveal data-delay="700" id="crew-now" hidden>
                 <div class="crew__now-track" id="crew-now-track"></div>
             </div>
         </div>
