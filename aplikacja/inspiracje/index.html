@@ -235,6 +235,24 @@ img { max-width: 100%; display: block; }
 }
 .card__screen img.is-on { opacity: 1; }
 .card:hover .card__screen img.is-on { transform: scale(1.03); }
+/* strzałki przeglądania ekranów na samym podglądzie (jak w lightboxie) */
+.card__arr {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 32px; height: 32px; border-radius: 8px; z-index: 2;
+    display: grid; place-items: center;
+    background: rgba(10, 10, 10, 0.72);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border: 1px solid var(--glass-border);
+    color: var(--text-strong); cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.18s var(--ease), background 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+.card__arr svg { width: 16px; height: 16px; }
+.card__arr--l { left: 8px; }
+.card__arr--r { right: 8px; }
+.card:hover .card__arr, .card:focus-within .card__arr { opacity: 1; }
+.card__arr:hover { background: var(--surface-2); border-color: #454545; }
+@media (hover: none) { .card__arr { opacity: 0.9; } }
 .card__foot {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding: 9px 12px;
@@ -466,6 +484,10 @@ img { max-width: 100%; display: block; }
                 }
                 return '<img data-src="' + esc(lightImg(v.url)) + '" alt="' + esc(p.nazwa + ' — ' + v.label) + '" decoding="async">';
             }).join('') +
+            (imgs.length > 1
+                ? '<button type="button" class="card__arr card__arr--l" data-nav="prev" aria-label="Poprzedni ekran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>' +
+                  '<button type="button" class="card__arr card__arr--r" data-nav="next" aria-label="Następny ekran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg></button>'
+                : '') +
             '</div>' +
             '<div class="card__foot">' +
             '<span class="card__viewlabel" data-viewlabel>' + esc(imgs.length ? imgs[0].label : '') + '</span>' +
@@ -492,6 +514,13 @@ img { max-width: 100%; display: block; }
         card.addEventListener('pointerenter', function () { imgs.forEach(materialize); }, { once: true });
         dots.forEach(function (d) {
             d.addEventListener('click', function () { goV(parseInt(d.dataset.v, 10)); });
+        });
+        // strzałki na podglądzie: przełączają widok, NIE otwierają lightboxa
+        card.querySelectorAll('[data-nav]').forEach(function (b) {
+            b.addEventListener('click', function (e) {
+                e.stopPropagation();
+                goV(vi + (b.getAttribute('data-nav') === 'next' ? 1 : -1));
+            });
         });
         card.querySelector('[data-open]').addEventListener('click', function () { openLb(p, vi); });
     }
