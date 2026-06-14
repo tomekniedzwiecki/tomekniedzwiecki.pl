@@ -5081,6 +5081,7 @@
     var CHECKOUT_BASE = 'https://crm.tomekniedzwiecki.pl/checkout/v2/';
     var OFFER_ID = 'a1656695-db0d-4ae7-b107-230832042076'; // "Rezerwacja współpracy — Aplikacja" (500 zł, zwrotne)
     var CONVO_OFFER_ID = '2a1fbbfe-32fe-4aa3-9f96-3a812da103d4'; // "Aplikacja — kolejna rozmowa" (49 zł)
+    var TPAY_CREATE_ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/tpay-create-transaction';
     var FREE_CONVOS = 1;   // 1. projekt darmowy; każdy kolejny = 49 zł
     var paidConvos = 0;    // dodatkowe opłacone rozmowy (z serwera, per konto)
     var SB_PUBLISHABLE = 'sb_publishable_vT94u2GI4gzYl8gCV5sHbQ_Q94YidaI';
@@ -5565,12 +5566,21 @@
               + '&utm_source=sparing&utm_medium=paywall';
         window.location.href = u;
     }
+    var cpwLink = 'display:block;width:100%;margin-top:10px;background:none;border:0;color:var(--text-muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline';
     function showConvoPaywall() {
         if (activeTab !== 'chat') switchTab('chat');
         var old = el('convo-paywall'); if (old) old.remove();
         var loggedIn = !!authState.user;
         var ov = document.createElement('div');
         ov.className = 'auth-modal'; ov.id = 'convo-paywall'; ov.hidden = false;
+        var blikBody =
+            '<label class="f-label" for="cpw-blik" style="margin-top:4px">Kod BLIK</label>' +
+            '<input class="f-input" id="cpw-blik" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 cyfr z aplikacji banku" style="text-align:center;letter-spacing:6px;font-size:18px">' +
+            '<div class="f-error" id="cpw-blik-err"></div>' +
+            '<button type="button" class="btn" id="cpw-blik-pay" style="width:100%;margin-top:10px">Zapłać BLIK-iem — 49 zł</button>' +
+            '<div id="cpw-status" style="display:none;margin-top:12px;font-size:13px;line-height:1.5;color:var(--text)"></div>' +
+            '<button type="button" id="cpw-other" style="' + cpwLink + '">Inne metody (karta / przelew) →</button>' +
+            '<button type="button" id="cpw-paid" style="' + cpwLink + ';margin-top:4px">Już zapłaciłem — odśwież</button>';
         ov.innerHTML =
             '<div class="auth-modal__backdrop" id="cpw-bd"></div>' +
             '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Otwórz kolejny projekt">' +
@@ -5578,18 +5588,19 @@
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
             '<h2 class="auth-modal__title">Otwórz kolejny projekt</h2>' +
             '<p class="auth-modal__sub">Pierwszy projekt masz za darmo. Każdy następny — nowa rozmowa z AI od pomysłu po plan — kosztuje <strong>49 zł</strong>.</p>' +
-            (loggedIn
-                ? '<button type="button" class="btn" id="cpw-buy" style="width:100%">Otwórz kolejny projekt — 49 zł</button>' +
-                  '<button type="button" id="cpw-paid" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:var(--text-muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline">Już zapłaciłem — odśwież</button>'
-                : '<button type="button" class="btn" id="cpw-login" style="width:100%">Zaloguj się, żeby kupić</button>') +
-            '<p class="auth-modal__note">Płatność BLIK / karta / przelew (Tpay). Po opłaceniu wróć tutaj i otwórz nowy projekt.</p>' +
+            (loggedIn ? blikBody : '<button type="button" class="btn" id="cpw-login" style="width:100%">Zaloguj się, żeby kupić</button>') +
+            '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.</p>' +
             '</div>';
         document.body.appendChild(ov);
         var close = function () { ov.remove(); };
         el('cpw-x').addEventListener('click', close);
         el('cpw-bd').addEventListener('click', close);
         if (loggedIn) {
-            el('cpw-buy').addEventListener('click', openConvoCheckout);
+            var blikInp = el('cpw-blik');
+            blikInp.addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
+            blikInp.addEventListener('keydown', function (e) { if (e.key === 'Enter') buyConvoBlik(); });
+            el('cpw-blik-pay').addEventListener('click', buyConvoBlik);
+            el('cpw-other').addEventListener('click', openConvoCheckout);
             el('cpw-paid').addEventListener('click', function () {
                 var b = el('cpw-paid'); b.textContent = 'Sprawdzam…';
                 refreshConvoEntitlement().then(function () {
@@ -5597,9 +5608,58 @@
                     else b.textContent = 'Jeszcze nie widzę wpłaty — kliknij ponownie';
                 });
             });
+            setTimeout(function () { try { blikInp.focus(); } catch (e) {} }, 120);
         } else {
             el('cpw-login').addEventListener('click', function () { close(); openAuthModal('Zaloguj się, żeby otworzyć kolejny projekt na swoim koncie.'); });
         }
+    }
+    // BLIK inline: utwórz zamówienie (serwer) → tpay-create-transaction z kodem →
+    // potwierdzenie w banku → odpytuj uprawnienia aż +1 → otwórz nową rozmowę.
+    function buyConvoBlik() {
+        if (!authState.user) { showConvoPaywall(); return; }
+        var inp = el('cpw-blik'); if (!inp) return;
+        var code = (inp.value || '').replace(/\D/g, '');
+        var errEl = el('cpw-blik-err'), payBtn = el('cpw-blik-pay'), statusEl = el('cpw-status');
+        if (code.length !== 6) { errEl.textContent = 'Wpisz 6-cyfrowy kod BLIK.'; errEl.classList.add('is-shown'); inp.focus(); return; }
+        errEl.classList.remove('is-shown');
+        payBtn.disabled = true; payBtn.textContent = 'Łączę z bankiem…';
+        statusEl.style.display = 'block'; statusEl.textContent = 'Tworzę płatność…';
+        var startCount = paidConvos;
+        var fail = function (msg) {
+            statusEl.style.display = 'none';
+            errEl.textContent = msg || 'Płatność się nie powiodła. Spróbuj ponownie albo wybierz inne metody.';
+            errEl.classList.add('is-shown');
+            payBtn.disabled = false; payBtn.textContent = 'Zapłać BLIK-iem — 49 zł';
+        };
+        fetch(SPAR_PROJECT_ENDPOINT, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ action: 'buy_conversation', email: (authState.user && authState.user.email) || '' })
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            if (!d || !d.orderId) throw new Error('order');
+            return fetch(TPAY_CREATE_ENDPOINT, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                body: JSON.stringify({ orderId: d.orderId, blikCode: code, paymentType: 'blik' })
+            }).then(function (r) { return r.json(); });
+        }).then(function (tp) {
+            if (!tp || !tp.success) throw new Error('tpay');
+            statusEl.innerHTML = '<strong>Potwierdź płatność w aplikacji banku.</strong><br>Czekam na potwierdzenie…';
+            payBtn.textContent = 'Czekam na potwierdzenie…';
+            var tries = 0;
+            var iv = setInterval(function () {
+                tries++;
+                refreshConvoEntitlement().then(function (n) {
+                    if (n > startCount) {
+                        clearInterval(iv);
+                        var box = el('convo-paywall'); if (box) box.remove();
+                        startFresh(true);
+                    } else if (tries >= 40) {
+                        clearInterval(iv);
+                        statusEl.innerHTML = 'Nie zdążyłem potwierdzić w czasie. Jeśli zapłaciłeś — kliknij „Już zapłaciłem — odśwież".';
+                        payBtn.disabled = false; payBtn.textContent = 'Zapłać BLIK-iem — 49 zł';
+                    }
+                });
+            }, 3000);
+        }).catch(function () { fail(); });
     }
     function newConvo() {
         if (convoIndex().length < allowedConvos()) { startFresh(true); return; }
