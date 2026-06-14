@@ -1277,6 +1277,89 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 }
 
 /* ============================================================
+   SCENE — GALERIA „na żywo": ściana app-okien z feedu (marquee).
+   Styl strony zachowany (Inter + Instrument Serif, niebieski
+   #4d9fff, okno z paskiem). Jeden rząd → mieści się w 100dvh.
+   ============================================================ */
+.scene--gallery .scene__aurora {
+    background: radial-gradient(circle at center,
+        rgba(77, 159, 255, 0.10) 0%, rgba(77, 159, 255, 0.03) 44%, transparent 74%);
+}
+.scene--gallery { padding-left: 0; padding-right: 0; }
+.scene--gallery .scene__inner { max-width: 1400px; text-align: center; }
+.gal__eyebrow {
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(18px, 2.2vw, 30px);
+    color: var(--text-muted);
+    margin-bottom: clamp(10px, 1.6vh, 18px);
+    padding: 0 24px;
+}
+.gal__title {
+    font-family: var(--sans); font-weight: 800;
+    font-size: clamp(28px, 4.4vw, 60px); line-height: 1.03;
+    letter-spacing: -0.045em; color: var(--text-strong);
+    margin-bottom: clamp(22px, 3.4vh, 44px);
+    padding: 0 24px;
+}
+.gal__title .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.gal__strip {
+    overflow: hidden; width: 100%;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.gal__track {
+    display: inline-flex; gap: clamp(14px, 1.6vw, 22px);
+    padding: 6px 0; white-space: nowrap;
+    animation: galScroll 64s linear infinite; will-change: transform;
+}
+.gal__strip:hover .gal__track { animation-play-state: paused; }
+@keyframes galScroll { to { transform: translateX(-50%); } }
+.gal__card {
+    flex: 0 0 auto;
+    width: clamp(238px, 23vw, 336px);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: #0a0a10;
+    overflow: hidden;
+    box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.9);
+    white-space: normal;
+}
+.gal__bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 11px; border-bottom: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.02);
+}
+.gal__dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.13); flex-shrink: 0; }
+.gal__name {
+    margin-left: 4px; flex: 1; min-width: 0;
+    font-size: 11.5px; font-weight: 700; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+}
+.gal__time {
+    flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+    color: var(--text-faint); font-variant-numeric: tabular-nums;
+}
+.gal__time.is-fresh { color: var(--green); }
+.gal__time.is-fresh i { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 1.8s ease-in-out infinite; }
+.gal__screen { position: relative; aspect-ratio: 3 / 2; background: #0b0b11; }
+.gal__screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.gal__more {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: clamp(20px, 3vh, 38px);
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(16px, 1.9vw, 24px); color: var(--accent);
+    transition: gap 0.25s var(--ease);
+}
+.gal__more .arr { transition: transform 0.25s var(--ease); }
+.gal__more:hover { gap: 12px; }
+.gal__more:hover .arr { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) {
+    .gal__track { animation: none; }
+    .gal__strip { overflow-x: auto; }
+}
+
+/* ============================================================
    SCENE 7 — CTA FINAL
    ============================================================ */
 .scene--cta .scene__aurora {
@@ -1658,7 +1741,8 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Obietnica</em></a>
     <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Proces</em></a>
     <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Ludzie</em></a>
-    <a href="#act-8" class="progress__item" data-act="7"><span>08</span><em>Start</em></a>
+    <a href="#act-8" class="progress__item" data-act="7"><span>08</span><em>Galeria</em></a>
+    <a href="#act-9" class="progress__item" data-act="8"><span>09</span><em>Start</em></a>
 </aside>
 
 <!-- ============================================================
@@ -1892,8 +1976,25 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         </div>
     </section>
 
-    <!-- SCENE 8 — CTA -->
-    <section class="scene scene--cta" id="act-8" data-act="7">
+    <!-- SCENE 8 — GALERIA „na żywo" (ściana app-okien z feedu) -->
+    <section class="scene scene--gallery" id="act-8" data-act="7">
+        <div class="scene__aurora" aria-hidden="true"></div>
+        <div class="scene__inner">
+            <p class="gal__eyebrow" data-reveal>to nie są mockupy.</p>
+            <h2 class="gal__title" data-reveal data-delay="150">
+                Aplikacje, które <span class="ser">właśnie powstają</span>.
+            </h2>
+            <div class="gal__strip" data-reveal data-delay="350">
+                <div class="gal__track" id="gal-track"></div>
+            </div>
+            <a class="gal__more" href="/aplikacja/inspiracje/" data-reveal data-delay="500" data-cta-loc="galeria">
+                Zobacz całą galerię <span class="arr">→</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- SCENE 9 — CTA -->
+    <section class="scene scene--cta" id="act-9" data-act="8">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
             <p class="cta__eyebrow" data-reveal>Twoja kolej.</p>
@@ -2217,6 +2318,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         });
         startScene(scs.length ? scs : FALLBACK_SCENE);
         startCrewNow(items);
+        initGallery(items);
     }).catch(function () { startScene(FALLBACK_SCENE); });
 
     // ============================================================
@@ -2233,6 +2335,32 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         }).join('') + '<span class="crew__now-dot">·</span>';
         track.innerHTML = seq + seq; // duplikat = płynna pętla translateX(-50%)
         box.hidden = false;
+    }
+
+    // ============================================================
+    //  SCENA 8 — GALERIA „na żywo" (ściana app-okien z feedu)
+    //  Marquee mini-okien z prawdziwymi ekranami; klik → /inspiracje.
+    // ============================================================
+    function initGallery(items) {
+        var track = document.getElementById('gal-track');
+        if (!track || !items) return;
+        var list = items.filter(function (p) { return p && p.img; }).slice(0, 12);
+        if (!list.length) return;
+        var escG = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+        var fresh = function (iso) { return (Date.now() - new Date(iso).getTime()) < 3600e3; };
+        var cards = list.map(function (p) {
+            var f = fresh(p.generated_at);
+            return '<article class="gal__card">' +
+                '<div class="gal__bar"><span class="gal__dot"></span><span class="gal__dot"></span><span class="gal__dot"></span>' +
+                '<span class="gal__name">' + escG(p.nazwa) + '</span>' +
+                '<span class="gal__time' + (f ? ' is-fresh' : '') + '">' + (f ? '<i></i>' : '') + escG(sceneTime(p.generated_at)) + '</span></div>' +
+                '<div class="gal__screen"><img src="' + escG(lightImg(p.img, 560)) + '" alt="' + escG(p.nazwa + ' — ekran aplikacji') + '" loading="lazy" decoding="async"></div>' +
+                '</article>';
+        }).join('');
+        // co najmniej kilka kart, żeby pętla wypełniła ekran; podwojenie = płynna pętla
+        var unit = cards;
+        while (track && unit.length && (unit.match(/gal__card/g) || []).length < 8) unit += cards;
+        track.innerHTML = unit + unit;
     }
 
     // ============================================================
