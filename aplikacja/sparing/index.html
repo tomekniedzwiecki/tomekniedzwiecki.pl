@@ -5573,10 +5573,18 @@
         var loggedIn = !!authState.user;
         var ov = document.createElement('div');
         ov.className = 'auth-modal'; ov.id = 'convo-paywall'; ov.hidden = false;
+        var blikDigitsHtml = '';
+        for (var bi = 0; bi < 6; bi++) blikDigitsHtml += '<input class="cpw-digit" inputmode="numeric" autocomplete="' + (bi === 0 ? 'one-time-code' : 'off') + '" maxlength="1" data-i="' + bi + '" aria-label="Cyfra ' + (bi + 1) + ' kodu BLIK">';
         var blikBody =
-            '<label class="f-label" for="cpw-blik" style="margin-top:4px">Kod BLIK</label>' +
-            '<input class="f-input" id="cpw-blik" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 cyfr z aplikacji banku" style="text-align:center;letter-spacing:6px;font-size:18px">' +
-            '<div class="f-error" id="cpw-blik-err"></div>' +
+            '<style>' +
+            '.cpw-blik-row{display:flex;gap:8px;justify-content:center;margin:12px 0 2px}' +
+            '.cpw-digit{width:42px;height:52px;text-align:center;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text-strong);background:#000;border:1px solid var(--border-strong);border-radius:8px;caret-color:var(--accent);transition:border-color .15s,box-shadow .15s,background .15s}' +
+            '.cpw-digit:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}' +
+            '.cpw-digit.filled{border-color:var(--accent);background:var(--accent-soft)}' +
+            '</style>' +
+            '<label class="f-label" style="margin-top:4px;text-align:center">Kod BLIK</label>' +
+            '<div class="cpw-blik-row" id="cpw-blik-row">' + blikDigitsHtml + '</div>' +
+            '<div class="f-error" id="cpw-blik-err" style="text-align:center"></div>' +
             '<button type="button" class="btn" id="cpw-blik-pay" style="width:100%;margin-top:10px">Zapłać BLIK-iem — 49 zł</button>' +
             '<div id="cpw-status" style="display:none;margin-top:12px;font-size:13px;line-height:1.5;color:var(--text)"></div>' +
             '<button type="button" id="cpw-other" style="' + cpwLink + '">Inne metody (karta / przelew) →</button>' +
@@ -5596,9 +5604,29 @@
         el('cpw-x').addEventListener('click', close);
         el('cpw-bd').addEventListener('click', close);
         if (loggedIn) {
-            var blikInp = el('cpw-blik');
-            blikInp.addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
-            blikInp.addEventListener('keydown', function (e) { if (e.key === 'Enter') buyConvoBlik(); });
+            var digits = ov.querySelectorAll('.cpw-digit');
+            var syncDigits = function () { for (var k = 0; k < digits.length; k++) digits[k].classList.toggle('filled', !!digits[k].value); };
+            for (var di = 0; di < digits.length; di++) (function (input, idx) {
+                input.addEventListener('input', function () {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 1);
+                    syncDigits();
+                    if (this.value && idx < 5) digits[idx + 1].focus();
+                });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !this.value && idx > 0) { digits[idx - 1].focus(); digits[idx - 1].value = ''; syncDigits(); }
+                    else if (e.key === 'ArrowLeft' && idx > 0) digits[idx - 1].focus();
+                    else if (e.key === 'ArrowRight' && idx < 5) digits[idx + 1].focus();
+                    else if (e.key === 'Enter') buyConvoBlik();
+                });
+                input.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    var p = (((e.clipboardData || window.clipboardData).getData('text')) || '').replace(/\D/g, '').slice(0, 6);
+                    for (var j = 0; j < p.length; j++) if (digits[j]) digits[j].value = p[j];
+                    syncDigits();
+                    digits[Math.min(p.length, 5)].focus();
+                });
+                input.addEventListener('focus', function () { this.select(); });
+            })(digits[di], di);
             el('cpw-blik-pay').addEventListener('click', buyConvoBlik);
             el('cpw-other').addEventListener('click', openConvoCheckout);
             el('cpw-paid').addEventListener('click', function () {
@@ -5608,7 +5636,7 @@
                     else b.textContent = 'Jeszcze nie widzę wpłaty — kliknij ponownie';
                 });
             });
-            setTimeout(function () { try { blikInp.focus(); } catch (e) {} }, 120);
+            setTimeout(function () { try { digits[0].focus(); } catch (e) {} }, 120);
         } else {
             el('cpw-login').addEventListener('click', function () { close(); openAuthModal('Zaloguj się, żeby otworzyć kolejny projekt na swoim koncie.'); });
         }
@@ -5617,10 +5645,12 @@
     // potwierdzenie w banku → odpytuj uprawnienia aż +1 → otwórz nową rozmowę.
     function buyConvoBlik() {
         if (!authState.user) { showConvoPaywall(); return; }
-        var inp = el('cpw-blik'); if (!inp) return;
-        var code = (inp.value || '').replace(/\D/g, '');
+        var row = el('cpw-blik-row'); if (!row) return;
+        var boxes = row.querySelectorAll('.cpw-digit');
+        var code = ''; for (var k = 0; k < boxes.length; k++) code += (boxes[k].value || '');
+        code = code.replace(/\D/g, '');
         var errEl = el('cpw-blik-err'), payBtn = el('cpw-blik-pay'), statusEl = el('cpw-status');
-        if (code.length !== 6) { errEl.textContent = 'Wpisz 6-cyfrowy kod BLIK.'; errEl.classList.add('is-shown'); inp.focus(); return; }
+        if (code.length !== 6) { errEl.textContent = 'Wpisz 6-cyfrowy kod BLIK.'; errEl.classList.add('is-shown'); try { boxes[Math.max(0, code.length)].focus(); } catch (e) {} return; }
         errEl.classList.remove('is-shown');
         payBtn.disabled = true; payBtn.textContent = 'Łączę z bankiem…';
         statusEl.style.display = 'block'; statusEl.textContent = 'Tworzę płatność…';
