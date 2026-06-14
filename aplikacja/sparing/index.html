@@ -2508,7 +2508,9 @@
         overscroll-behavior: contain;
         position: relative;
         z-index: 2;
-        scrollbar-gutter: stable;
+        /* both-edges: kolumna wiadomości centruje się symetrycznie,
+           dzięki czemu pokrywa się z osią composera (ten sam środek) */
+        scrollbar-gutter: stable both-edges;
     }
     .chat-msgs {
         max-width: 760px;
@@ -4451,11 +4453,16 @@
     .side-cta__btn { color: var(--accent) !important; }
 
     /* COMPOSER — płaskie pole, 10px, focus = niebieski ring 1px */
-    .composer__bar { background: #0a0a0a !important; border: 1px solid var(--border-strong) !important; border-radius: 10px !important; box-shadow: none !important; }
+    .composer__bar { background: #0a0a0a !important; border: 1px solid var(--border-strong) !important; border-radius: 10px !important; box-shadow: none !important; padding: 8px 8px 8px 12px !important; gap: 8px !important; }
     .composer__bar::before, .composer__bar::after { display: none !important; }
     .composer__bar:focus-within { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent) !important; }
-    .composer__send { background: #fff !important; color: #000 !important; border-radius: 6px !important; box-shadow: none !important; }
+    .composer__send { width: 36px !important; height: 36px !important; background: #fff !important; color: #000 !important; border-radius: 6px !important; box-shadow: none !important; }
+    .composer__send:hover { transform: none !important; background: #ededed !important; }
     .composer__send svg { color: #000 !important; }
+    .composer__send.is-stop { background: #2e2e2e !important; }
+    .composer__send.is-stop::after { background: #fff !important; }
+    .composer__bar textarea { padding: 7px 0 !important; }
+    .composer__spark { width: 18px !important; height: 18px !important; }
 
     /* TABPANE / MODAL — płaska czerń, drobne promienie */
     .tabpane, .tabpane__inner { background: #000 !important; }
