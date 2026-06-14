@@ -5247,6 +5247,29 @@
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
+    // esc dla PROZY raportu: model z web_searchu czasem wkleja cytaty markdown
+    // („([nazwa](https://...))", „[tekst](url)", gołe URL-e) — w esc() lądują jako
+    // dosłowny brzydki tekst. Źródła i tak mamy w sekcji „Źródła" + odnośnikach [n],
+    // więc inline-cytaty czyścimy zanim wyświetlimy. Działa też na stare raporty w bazie.
+    function escMd(s) {
+        var t = String(s == null ? '' : s);
+        t = t.replace(/\s*\(\s*\[[^\]]*\]\(\s*https?:\/\/[^)]*\)\s*\)/g, ''); // ([nazwa](url))
+        t = t.replace(/\s*\(\s*https?:\/\/[^)\s]+\s*\)/g, '');                 // (url)
+        t = t.replace(/\[([^\]]+)\]\(\s*https?:\/\/[^)]*\)/g, '$1');           // [tekst](url) → tekst
+        t = t.replace(/\s*https?:\/\/\S+/g, '');                               // gołe URL-e
+        return esc(t.replace(/\s{2,}/g, ' ').trim());
+    }
+    // Makiety to ciężkie PNG (≈1,3 MB, Cache-Control: no-cache). Supabase render API
+    // serwuje je jako webp + resize (contain — samo width tnie boki) z cache 1h:
+    // ≈20 KB zamiast 1,3 MB. Rewrite TYLKO dla publicznych URL-i Storage; resztę zwraca
+    // bez zmian. Zawijamy przy wyświetlaniu src — state.previews/items zostają na oryginałach.
+    function imgCdn(url, size) {
+        if (typeof url !== 'string' || url.indexOf('/storage/v1/object/public/') < 0) return url || '';
+        var base = url.split('#')[0].split('?')[0]
+            .replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+        var w = size === 'blur' ? 40 : size === 'full' ? 1100 : 760;
+        return base + '?width=' + w + '&resize=contain&quality=' + (size === 'blur' ? 30 : 72);
+    }
     function getCookie(name) {
         var v = '; ' + document.cookie;
         var parts = v.split('; ' + name + '=');
@@ -5948,8 +5971,8 @@
                 html += '<div class="pj2-shots n' + items.length + '">' + items.map(function (it, i) {
                     return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                         '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
-                        '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(it.url) + '" alt="" aria-hidden="true" loading="lazy">' +
-                        '<img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
+                        '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(imgCdn(it.url, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+                        '<img src="' + esc(imgCdn(it.url, 'tile')) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
             // Działająca strona — jeśli już istnieje
@@ -7039,8 +7062,8 @@
             'Projekt w pigułce</span><span class="pj-plan__tag">jedna grafika — cały projekt</span></div>' +
             '<div class="pv-tile is-done pj-pill__tile" data-pill="' + esc(url) + '">' +
             '<span class="pv-tile__label">Podsumowanie graficzne</span>' +
-            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(url) + '" alt="" aria-hidden="true" loading="lazy">' +
-            '<img src="' + esc(url) + '" alt="Projekt w pigułce" loading="lazy"></div></div></div>';
+            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(imgCdn(url, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+            '<img src="' + esc(imgCdn(url, 'tile')) + '" alt="Projekt w pigułce" loading="lazy"></div></div></div>';
     }
 
     function extrasWaitHTML(kind) {
@@ -7298,8 +7321,8 @@
                 : ' type="button"' + (opts.data ? ' ' + opts.data : '');
             return '<' + tag + ' class="pjd-tile pjd-tile--media ' + (opts.cls || '') + '"' + attrs + '>' +
                 '<span class="pjd-tile__media">' +
-                '<img class="pjd-tile__blur" src="' + esc(opts.img) + '" alt="" aria-hidden="true" loading="lazy">' +
-                '<img src="' + esc(opts.img) + '" alt="" loading="lazy"></span>' +
+                '<img class="pjd-tile__blur" src="' + esc(imgCdn(opts.img, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+                '<img src="' + esc(imgCdn(opts.img, 'tile')) + '" alt="" loading="lazy"></span>' +
                 pjGoIcon() +
                 '<span class="pjd-tile__pad">' +
                 '<span class="pjd-tile__t">' + opts.title + '</span>' +
@@ -7556,8 +7579,8 @@
                 html += '<div class="pj2-shots n' + ctx.items.length + '">' + ctx.items.map(function (it, i) {
                     return '<div class="pv-tile is-done' + (i === 0 ? ' pv-tile--main' : '') + '" data-view="' + it.view + '">' +
                         '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
-                        '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(it.url) + '" alt="" aria-hidden="true" loading="lazy">' +
-                        '<img src="' + esc(it.url) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
+                        '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(imgCdn(it.url, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+                        '<img src="' + esc(imgCdn(it.url, 'tile')) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
                 }).join('') + '</div>';
             }
             if (ctx.oldShots.length) {
@@ -7565,8 +7588,8 @@
                     '<div class="shots shots--old" style="margin-bottom:4px">' + ctx.oldShots.map(function (s, i) {
                         return '<div class="pv-tile is-done pv-tile--old" data-old="' + i + '">' +
                             '<span class="pv-tile__label">' + esc(s.label) + '</span>' +
-                            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(s.url) + '" alt="" aria-hidden="true" loading="lazy">' +
-                            '<img src="' + esc(s.url) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
+                            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(imgCdn(s.url, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+                            '<img src="' + esc(imgCdn(s.url, 'tile')) + '" alt="' + esc(s.label) + '" loading="lazy"></div></div>';
                     }).join('') + '</div>';
             }
         }
@@ -7865,8 +7888,8 @@
 
         // 1. WERDYKT — teza serifem + zegar potencjału (łuk SVG, długość 264)
         html += '<section class="rk-sec rk-reveal" id="rk-sec-werdykt"><div class="rk-hero">' +
-            '<div><p class="rk-hero__teza">' + esc(r.teza || '') + '</p>' +
-            (r.ocena_uzasadnienie ? '<p class="rk-hero__why">' + esc(r.ocena_uzasadnienie) + '</p>' : '') +
+            '<div><p class="rk-hero__teza">' + escMd(r.teza || '') + '</p>' +
+            (r.ocena_uzasadnienie ? '<p class="rk-hero__why">' + escMd(r.ocena_uzasadnienie) + '</p>' : '') +
             '</div>' +
             '<div class="rk-gauge rk-gauge--' + (oc || 'brak') + '" role="img" aria-label="Potencjał projektu: ' + esc(oc || 'w ocenie') + '">' +
             '<svg viewBox="0 0 200 116" aria-hidden="true">' +
@@ -7898,7 +7921,7 @@
                 '<div class="rk-niche"><div>' +
                 '<div class="rk-niche__num">' + esc(r.rynek.liczba || '—') + '</div>' +
                 '<div class="rk-niche__kogo">' + esc(r.rynek.kogo || '') + '</div>' +
-                (r.rynek.opis ? '<p class="rk-niche__desc">' + esc(r.rynek.opis) + rkRefs(r.rynek.zrodla, srcMap) + '</p>' : '') +
+                (r.rynek.opis ? '<p class="rk-niche__desc">' + escMd(r.rynek.opis) + rkRefs(r.rynek.zrodla, srcMap) + '</p>' : '') +
                 '</div><div class="rk-dots"><div class="rk-dots__grid" aria-hidden="true">' + dots + '</div>' +
                 '<p class="rk-dots__cap">' + cap + '</p></div></div>');
         }
@@ -7910,8 +7933,8 @@
                     '<div class="rk-comp__top"><b>' + esc(c.nazwa || '') + '</b>' +
                     (c.kraj ? '<span class="rk-comp__kraj">' + esc(c.kraj) + '</span>' : '') + '</div>' +
                     (c.cena ? '<span class="rk-comp__price">' + esc(c.cena) + '</span>' : '') +
-                    (c.czym_jest ? '<p class="rk-comp__what">' + esc(c.czym_jest) + '</p>' : '') +
-                    (c.luka ? '<p class="rk-comp__gap"><span>Czego brakuje — Twoje wejście</span>' + esc(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
+                    (c.czym_jest ? '<p class="rk-comp__what">' + escMd(c.czym_jest) + '</p>' : '') +
+                    (c.luka ? '<p class="rk-comp__gap"><span>Czego brakuje — Twoje wejście</span>' + escMd(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
                     '</div>';
             }).join('');
             html += rkSec('konkurencja', 'Konkurencja', konk.length + ' ' + (konk.length === 1 ? 'narzędzie' : konk.length < 5 ? 'narzędzia' : 'narzędzi') + ' na rynku — i czego każdemu brakuje',
@@ -7925,7 +7948,7 @@
                 '<span class="rk-window__label">' +
                 pjIco('<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>') +
                 'Okno rynkowe</span>' +
-                '<p>' + esc(r.luka_rynkowa) + '</p></div></section>';
+                '<p>' + escMd(r.luka_rynkowa) + '</p></div></section>';
         }
 
         // 5. TRENDY — karty z numerem-duchem
@@ -7933,7 +7956,7 @@
             var tcards = trendy.map(function (t, ti) {
                 return '<div class="rk-trend"><span class="rk-trend__no" aria-hidden="true">0' + (ti + 1) + '</span>' +
                     '<b>' + esc(t.tytul || '') + '</b>' +
-                    (t.opis ? '<p>' + esc(t.opis) + rkRefs(t.zrodla, srcMap) + '</p>' : '') + '</div>';
+                    (t.opis ? '<p>' + escMd(t.opis) + rkRefs(t.zrodla, srcMap) + '</p>' : '') + '</div>';
             }).join('');
             html += rkSec('trendy', 'Trendy wokół projektu', 'co się dzieje na rynku — z liczbami', '<div class="rk-trends">' + tcards + '</div>');
         }
@@ -7941,7 +7964,7 @@
         // 6. WNIOSKI — ponumerowana lista
         if (wnioski.length) {
             html += rkSec('wnioski', 'Co to oznacza dla projektu', 'wnioski z researchu — dla pierwszej wersji i sprzedaży',
-                '<ul class="rk-means">' + wnioski.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>');
+                '<ul class="rk-means">' + wnioski.map(function (x) { return '<li>' + escMd(x) + '</li>'; }).join('') + '</ul>');
         }
 
         // 7. ŹRÓDŁA
@@ -8093,7 +8116,7 @@
             unzoom();
             img.style.opacity = '0';
             img.onload = function () { img.style.opacity = '1'; };
-            img.src = it.url;
+            img.src = imgCdn(it.url, 'full');
             img.alt = it.label + ' — pełny rozmiar';
             lb.querySelector('#lb-cap').textContent = it.label;
             if (nav) lb.querySelector('#lb-count').textContent = (idx + 1) + ' / ' + items.length;
@@ -8101,7 +8124,7 @@
             if (nav) {
                 [idx - 1, idx + 1].forEach(function (i) {
                     var n = items[(i + items.length) % items.length];
-                    if (n) { var pre = new Image(); pre.src = n.url; }
+                    if (n) { var pre = new Image(); pre.src = imgCdn(n.url, 'full'); }
                 });
             }
         }
@@ -9820,8 +9843,8 @@
             if (!tile) return;
             tile.classList.add('is-done');
             var body = tile.querySelector('.pv-tile__body');
-            body.innerHTML = '<img class="pv-tile__blur" src="' + esc(url) + '" alt="" aria-hidden="true" loading="lazy">' +
-                '<img src="' + esc(url) + '" alt="' + esc(viewLabel(view)) + ' — kliknij, aby powiększyć" loading="lazy">';
+            body.innerHTML = '<img class="pv-tile__blur" src="' + esc(imgCdn(url, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+                '<img src="' + esc(imgCdn(url, 'tile')) + '" alt="' + esc(viewLabel(view)) + ' — kliknij, aby powiększyć" loading="lazy">';
             body.querySelector('img:not(.pv-tile__blur)').addEventListener('click', function () { openLightbox(view); });
         }
         function tileError(view, message, retryFn) {
