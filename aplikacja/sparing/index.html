@@ -6411,16 +6411,13 @@
     function ensureKartaExtras(force) {
         ensureSummaryImage(force);
         ensureBizplan(force);
-        // economics (cennik) i gtm (targetowanie) zależą od planu/karty —
-        // po poprawce regenerują się razem z planem (force); limit 4 gen/sesja
-        // po stronie serwera chroni przed nadużyciem
-        ensureEconomics(force);
-        ensureGtm(force);
-        // raport / strona / prototyp: generują się raz (bez force przy
-        // poprawkach — rynek się nie zmienia, landing/prototyp mają limit wersji)
+        // Design A (2026-06-14): RYNEK pokazujemy od razu (live „Badam rynek") —
+        // generuje się tu. economics / strona / sprzedaż / prototyp NIE generują
+        // się z góry — powstają i odsłaniają się W RYTM sekwencji maili
+        // (spar-drip triggerGeneration w dniu odsłony), panel bramkuje je do 'sent'.
+        // Dzięki temu „reveal" jest prawdziwy i nie palimy ~15 zł na leadach,
+        // które i tak odpadną. (Wcześniej bundle generował wszystko z góry.)
         ensureRaport(false);
-        ensureLanding();
-        ensurePrototype();
     }
 
     function fmtZl(n) {
