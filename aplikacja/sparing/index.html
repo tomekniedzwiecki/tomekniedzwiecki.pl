@@ -7937,44 +7937,46 @@
                     return;
                 }
                 if (ev === 'spar_ocena') {
-                    // Bramka potencjału: AI bada rynek na żywo (spar-assess, ~60-90 s).
-                    // Realny postęp (progress) nadpisuje fallbackowy cykl czasowy.
-                    var ocSet = function (label) {
-                        var e = document.getElementById('ocena-work');
-                        if (!e) {
-                            e = document.createElement('div');
-                            e.className = 'msg__work'; e.id = 'ocena-work';
-                            bubble.appendChild(e);
+                    // Bramka potencjału: pasek postępu jak przy generowaniu ekranów
+                    // (reużywa .gen__bar/.gen__step), napędzany realnymi zdarzeniami
+                    // (progress) + asymptotyczny pełzak jako fallback dla trybu buforowanego.
+                    var ocEnsure = function () {
+                        var w = document.getElementById('ocena-work');
+                        if (!w) {
+                            w = document.createElement('div');
+                            w.className = 'msg__work'; w.id = 'ocena-work';
+                            w.innerHTML =
+                                '<div style="display:flex;align-items:center;gap:8px"><span class="typing"><i></i><i></i><i></i></span>Badam Twój rynek na żywo</div>' +
+                                '<div class="gen__bar" style="margin-top:9px"><i style="width:4%"></i></div>' +
+                                '<div class="gen__step"></div>';
+                            bubble.appendChild(w);
                         }
-                        e.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>' + esc(label);
+                        return w;
                     };
+                    var ocBar = function (pct) { var b = document.querySelector('#ocena-work .gen__bar i'); if (b) b.style.width = pct.toFixed(1) + '%'; };
+                    var ocStep = function (txt) { var s2 = document.querySelector('#ocena-work .gen__step'); if (s2) s2.textContent = txt; };
                     if (obj && obj.status === 'badam') {
-                        // Fallback: cykl czasowy, gdyby realne zdarzenia progress nie dotarły (tryb buforowany)
-                        var ocSteps = [
-                            'Badam Twój rynek na żywo…',
-                            'Sprawdzam konkurencję i podobne narzędzia…',
-                            'Porównuję ceny i abonamenty…',
-                            'Szacuję wielkość niszy…',
-                            'Sprawdzam, kto realnie zapłaciłby co miesiąc…',
-                            'Szukam najmocniejszego kąta…'
-                        ];
-                        var ocI = 0;
-                        var ocPaint = function () {
-                            if (!document.getElementById('ocena-work') || ocI > 30) { if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; } return; }
-                            ocSet(ocSteps[ocI % ocSteps.length]); ocI++;
-                        };
-                        ocPaint();
+                        ocEnsure();
+                        window.__ocenaPct = 4;
+                        ocStep('Łączę się z rynkiem…');
                         if (window.__ocenaTimer) clearInterval(window.__ocenaTimer);
-                        window.__ocenaTimer = setInterval(ocPaint, 4500);
+                        window.__ocenaTimer = setInterval(function () {
+                            if (!document.getElementById('ocena-work')) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; return; }
+                            window.__ocenaPct = Math.min(92, window.__ocenaPct + (92 - window.__ocenaPct) * 0.025);
+                            ocBar(window.__ocenaPct);
+                        }, 450);
                         scrollToBottom(false);
                     } else if (obj && obj.status === 'progress' && obj.label) {
-                        // Realny postęp z bramki — przejmij stery od cyklu czasowego
-                        if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
-                        ocSet(obj.label);
+                        // Realny postęp z bramki — skok paska + realna etykieta
+                        ocEnsure();
+                        window.__ocenaPct = Math.min(92, (window.__ocenaPct || 4) + 9);
+                        ocBar(window.__ocenaPct);
+                        ocStep(obj.label);
                         scrollToBottom(false);
                     } else if (obj && obj.status === 'gotowe') {
                         if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
-                        ocSet('Mam dane z rynku — układam rekomendację…');
+                        ocBar(100);
+                        ocStep('Mam dane z rynku — układam rekomendację…');
                     }
                     return;
                 }
@@ -8506,7 +8508,8 @@
                 settle();
             }
 
-            function fetchView(view) {
+            function fetchView(view, attempt) {
+                attempt = attempt || 0;
                 return fetch(SPAR_IMAGE_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
@@ -8543,12 +8546,17 @@
                     } else if (e && e.code === 'limit_podgladow_dzienny') {
                         anyLimit = true;
                         tileError(view, 'Dzienny limit podglądów osiągnięty — wróć jutro', null);
+                    } else if (attempt < 2) {
+                        // Auto-retry (w tym samym łańcuchu — finishAll poczeka): łapie
+                        // przejściowy blip generowania bez akcji usera
+                        return new Promise(function (r) { setTimeout(r, 1500 * (attempt + 1)); })
+                            .then(function () { return fetchView(view, attempt + 1); });
                     } else {
                         tileError(view, 'Nie udało się wygenerować', function () {
                             var tile = wrap.querySelector('.pv-tile[data-view="' + view + '"]');
                             if (tile) tile.querySelector('.pv-tile__body').innerHTML =
                                 '<div class="pv-tile__skel"><i></i><i></i><i></i><i></i><i></i><i></i></div><i class="pv-tile__scan"></i>';
-                            fetchView(view);
+                            fetchView(view, 0);
                         });
                     }
                 });
