@@ -4503,6 +4503,71 @@
 
     /* drobne akcenty zostają niebieskie (focus/link/eyebrow/gauge) — reszta monochromatyczna */
     .side-cta__eyebrow, .rk-gauge__cap, .blysk__eyebrow { color: var(--accent) !important; }
+
+    /* ============================================================
+       TAB SCREENS — domknięcie audytu (Pulpit/Rynek/Economics/GTM/Karta/
+       Paybox/Strona). Pastylki→6px, karty→10px, wagi→600, zero glow/
+       gradient; liczby w Geist Mono; kolory werdyktu = semantyka.
+       ============================================================ */
+
+    /* nagłówki zakładek */
+    .tabpane__eyebrow { font-weight: 600 !important; letter-spacing: 0.04em !important; }
+    .tabpane__title { font-weight: 600 !important; letter-spacing: -0.03em !important; }
+    .tabpane__empty { border-radius: 10px !important; }
+
+    /* karty (dopełnienie listy) → 10px, płaska czerń, bez glow/gradientu */
+    .pjd-tile, .rk-comp, .rk-trend, .rk-window, .karta, .paybox, .vbanner,
+    .pj-land, .eco-tier { border-radius: 10px !important; box-shadow: none !important; }
+    .pjd-tile, .rk-window, .karta, .paybox, .pjd-tile--proto {
+        background: #0a0a0a !important; border-color: var(--glass-border) !important;
+    }
+    .pjd-tile--proto, .karta { background-image: none !important; }
+    .pjd-tile:hover { border-color: #454545 !important; box-shadow: none !important; }
+    .pv-tile:hover { box-shadow: none !important; }
+    .acc__item.is-open { border-color: #454545 !important; }
+
+    /* pastylki kontrolne → 6px */
+    .pjd-live, .pjd-badge, .chips span, .gtm-chan__type, .gtm-mail__when,
+    .paybox__btn, .pj-share, .pj-ver, .pj-land__open, .pj-land__addr, .rk-comp__kraj {
+        border-radius: 6px !important;
+    }
+    .pj-ver.is-on { border-color: var(--accent) !important; }
+
+    /* wagi → 600 */
+    .pjd-tile__t, .pjd-live, .pjd-badge, .pjd-back,
+    .karta__eyebrow, .karta__label, .paybox__eyebrow, .paybox__btn,
+    .gtm-chan__type, .gtm-chan__do span, .gtm-copy, .gtm-ad__no, .gtm-ad__concept, .gtm-ad__head, .gtm-mail__when,
+    .acc__head, .car__title,
+    .eco-tier__label, .eco-tier__name, .eco-tier__price, .eco-metric__val,
+    .pv-tile__label, .pj-land__open, .pj-ver, .chips span { font-weight: 600 !important; }
+    .karta__eyebrow, .karta__label, .paybox__eyebrow, .gtm-chan__type,
+    .gtm-chan__do span, .eco-tier__label, .eco-tier__name { letter-spacing: 0.03em !important; }
+
+    /* liczby → Geist Mono */
+    .eco-tier__price, .eco-metric__val, .gtm-ad__no, .rk-comp__num {
+        font-family: var(--mono) !important; font-style: normal !important; letter-spacing: -0.02em !important;
+    }
+
+    /* glow / gradienty → płasko */
+    .rk-gauge__fill, .rk-gauge--wysoki .rk-gauge__fill, .rk-gauge--umiarkowany .rk-gauge__fill { filter: none !important; }
+    .car__dots button.is-on { box-shadow: none !important; }
+    .eco-tier--on { box-shadow: none !important; border-color: var(--accent) !important; }
+    .eco-bar i, .pjd-gen__bar i { background: var(--accent) !important; }
+    .pj-land__open { border-color: rgba(0,112,243,.35) !important; }
+
+    /* paybox — Geist: solidna czerń + biały przycisk (bez gradient-border/glow) */
+    .paybox { border: 1px solid var(--glass-border) !important; }
+    .paybox__btn { background: #fff !important; color: #000 !important; border-radius: 6px !important; box-shadow: none !important; }
+    .paybox__btn:hover { background: #ededed !important; transform: none !important; box-shadow: none !important; }
+
+    /* werdykt — kolory zachowane jako semantyka potencjału, tylko spłaszczone */
+    .vbanner { background: #0a0a0a !important; }
+    .vbanner--green  { background: var(--green-soft)  !important; border-color: rgba(69,165,87,.35) !important; }
+    .vbanner--yellow { background: var(--yellow-soft) !important; border-color: rgba(245,166,35,.35) !important; }
+    .vbanner--red    { background: var(--red-soft)    !important; border-color: rgba(229,72,77,.35) !important; }
+
+    /* serif/italic leftover w ekranach → Geist Sans */
+    .pjd-quote { font-family: var(--sans) !important; font-style: normal !important; }
     </style>
 </head>
 <body>
@@ -7923,7 +7988,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kierunki', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -7941,6 +8006,7 @@
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
             .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
             .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
+            .replace(/<kierunki>[\s\S]*?<\/kierunki>/g, '')
             .replace(/<kamien>[\s\S]*?<\/kamien>/g, '');
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
@@ -8712,6 +8778,7 @@
             // Marker <projekt> → generowanie BLOKUJE rozmowę do pokazania efektu
             // (inaczej user klika dalej i nigdy nie widzi podglądu); dymki tej
             // tury renderują się dopiero POD obrazkiem.
+            var kierunki = (!el('inline-gate')) ? parseKierunki(raw) : null;
             var sugg = (!el('inline-gate')) ? suggestionsFrom(raw) : null;
             var widget = (!el('inline-gate')) ? widgetFrom(raw) : null;
             if (meta.projekt) {
@@ -8724,6 +8791,10 @@
                     if (sugg && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
                     else if (gatePending() && !el('inline-gate')) renderInlineGate();
                 });
+            } else if (kierunki) {
+                // Rozwidlenie kierunku — karty wyboru zamiast chipsów (priorytet)
+                el('chat-msgs').appendChild(renderKierunkiEl(kierunki));
+                scrollToBottom(false);
             } else if (widget) {
                 renderWidget(widget);
             } else if (sugg) {
@@ -8883,6 +8954,107 @@
                 });
             }, { passive: true });
         }
+        return wrap;
+    }
+
+    /* ============================================================
+       KIERUNKI — karty WYBORU kierunku (marker <kierunki>)
+       Reużywa wizualnie karuzelę (.car*) + tokeny → łapie redesign.
+       Tap = rozwiń „co dalej" + potwierdź; potwierdzenie prowadzi dalej.
+       Pokazywane przez AI tylko na 1. rozwidleniu (warunki w prompcie).
+       ============================================================ */
+    function parseKierunki(raw) {
+        if (!raw) return null;
+        var ms = raw.match(/<kierunki>([\s\S]*?)<\/kierunki>/g);
+        if (!ms || !ms.length) return null;
+        var inner = ms[ms.length - 1].replace(/^<kierunki>/, '').replace(/<\/kierunki>$/, '');
+        try {
+            var arr = JSON.parse(inner);
+            if (!Array.isArray(arr)) return null;
+            arr = arr.filter(function (x) {
+                return x && typeof x.nazwa === 'string' && x.nazwa.trim() &&
+                       typeof x.opis === 'string' && x.opis.trim();
+            }).slice(0, 3);
+            return arr.length >= 2 ? arr : null; // karuzela ma sens dopiero przy ≥2 kierunkach
+        } catch (e) { return null; }
+    }
+
+    // Wspólna chromówka karuzeli (kropki + strzałki) — dla .car z >1 kartą
+    function addCarChrome(wrap, track, count) {
+        if (count <= 1) return;
+        var dots = document.createElement('div');
+        dots.className = 'car__dots';
+        for (var i = 0; i < count; i++) {
+            (function (i) {
+                var d = document.createElement('button');
+                d.type = 'button';
+                if (i === 0) d.className = 'is-on';
+                d.setAttribute('aria-label', 'Karta ' + (i + 1) + ' z ' + count);
+                d.addEventListener('click', function () { track.scrollTo({ left: track.children[i].offsetLeft - 8, behavior: 'smooth' }); });
+                dots.appendChild(d);
+            })(i);
+        }
+        wrap.appendChild(dots);
+        function mkArrow(dir) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'car__arr car__arr--' + (dir < 0 ? 'l' : 'r');
+            b.setAttribute('aria-label', dir < 0 ? 'Poprzednia karta' : 'Następna karta');
+            b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6') + '"></path></svg>';
+            b.addEventListener('click', function () { track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: 'smooth' }); });
+            return b;
+        }
+        wrap.appendChild(mkArrow(-1));
+        wrap.appendChild(mkArrow(1));
+        track.addEventListener('scroll', function () {
+            var w = track.children[0].offsetWidth + 10;
+            var i = Math.max(0, Math.min(count - 1, Math.round(track.scrollLeft / w)));
+            dots.querySelectorAll('button').forEach(function (d, di) { d.classList.toggle('is-on', di === i); });
+        }, { passive: true });
+    }
+
+    function renderKierunkiEl(arr) {
+        var wrap = document.createElement('div');
+        wrap.className = 'car kr';
+        var track = document.createElement('div');
+        track.className = 'car__track';
+        arr.forEach(function (s) {
+            var c = document.createElement('div');
+            c.className = 'car__card kr-card' + (s.polecany ? ' kr-card--rec' : '');
+            var tag = s.tag ? '<span class="kr-tag">' + esc(String(s.tag).slice(0, 40)) + '</span>' : '';
+            var rec = s.polecany ? '<span class="kr-rec">polecam</span>' : '';
+            var dalej = (typeof s.dalej === 'string' && s.dalej.trim()) ? esc(s.dalej.trim().slice(0, 400)) : '';
+            c.innerHTML =
+                '<div class="kr-head">' + tag + rec + '</div>' +
+                '<div class="car__title kr-title">' + esc(s.nazwa.trim().slice(0, 80)) + '</div>' +
+                '<div class="car__body kr-opis">' + esc(s.opis.trim().slice(0, 180)) + '</div>' +
+                '<div class="kr-next">' + (dalej ? '<div class="kr-next__txt">' + dalej + '</div>' : '') +
+                '<button type="button" class="kr-go">Biorę ten kierunek →</button></div>' +
+                '<div class="kr-hint">Dotknij, aby wybrać</div>';
+            c.addEventListener('click', function (e) {
+                if (e.target.closest('.kr-go')) return;
+                if (streaming || el('inline-gate')) return;
+                var wasOpen = c.classList.contains('is-open');
+                track.querySelectorAll('.kr-card').forEach(function (x) { x.classList.remove('is-open'); });
+                if (!wasOpen) c.classList.add('is-open');
+            });
+            c.querySelector('.kr-go').addEventListener('click', function () {
+                if (streaming || el('inline-gate')) return;
+                wrap.style.transition = 'opacity .25s';
+                wrap.style.opacity = '0';
+                setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 260);
+                sendOpening('Wybieram kierunek: ' + s.nazwa.trim());
+            });
+            track.appendChild(c);
+        });
+        wrap.appendChild(track);
+        addCarChrome(wrap, track, arr.length);
+        var own = document.createElement('button');
+        own.type = 'button';
+        own.className = 'qr-own kr-own';
+        own.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>albo napisz po swojemu';
+        own.addEventListener('click', function () { if (el('inline-gate')) return; el('chat-input').focus(); });
+        wrap.appendChild(own);
         return wrap;
     }
 
@@ -9330,11 +9502,15 @@
                 if (!state.verdict && !el('inline-gate') && !el('qr-chips') && messages.length) {
                     var lm = messages[messages.length - 1];
                     if (lm.role === 'assistant' && !lm.local) {
-                        var rw = widgetFrom(lm.content);
-                        if (rw) renderWidget(rw);
+                        var rk = parseKierunki(lm.content);
+                        if (rk) { el('chat-msgs').appendChild(renderKierunkiEl(rk)); scrollToBottom(false); }
                         else {
-                            var rs = suggestionsFrom(lm.content);
-                            if (rs) renderSuggestions(rs.opts, rs.multi);
+                            var rw = widgetFrom(lm.content);
+                            if (rw) renderWidget(rw);
+                            else {
+                                var rs = suggestionsFrom(lm.content);
+                                if (rs) renderSuggestions(rs.opts, rs.multi);
+                            }
                         }
                     }
                 }
@@ -9368,11 +9544,15 @@
         if (!regenerating && !el('inline-gate') && !el('qr-chips') && messages.length) {
             var lastMsg = messages[messages.length - 1];
             if (lastMsg.role === 'assistant' && !lastMsg.local) {
-                var resumeWidget = widgetFrom(lastMsg.content);
-                if (resumeWidget) renderWidget(resumeWidget);
+                var resumeKier = parseKierunki(lastMsg.content);
+                if (resumeKier) { el('chat-msgs').appendChild(renderKierunkiEl(resumeKier)); scrollToBottom(false); }
                 else {
-                    var resumeSugg = suggestionsFrom(lastMsg.content);
-                    if (resumeSugg) renderSuggestions(resumeSugg.opts, resumeSugg.multi);
+                    var resumeWidget = widgetFrom(lastMsg.content);
+                    if (resumeWidget) renderWidget(resumeWidget);
+                    else {
+                        var resumeSugg = suggestionsFrom(lastMsg.content);
+                        if (resumeSugg) renderSuggestions(resumeSugg.opts, resumeSugg.multi);
+                    }
                 }
             }
         }
