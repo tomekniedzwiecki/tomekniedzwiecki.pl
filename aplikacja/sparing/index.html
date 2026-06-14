@@ -3043,7 +3043,7 @@
     .gate-sub { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
     .gate-msg__note { margin-top: 12px; font-size: 12px; line-height: 1.5; color: var(--text-faint); }
     .msg--gate .f-row { margin: 16px 0 6px; }
-    .msg--gate .btn { margin-top: 16px; width: 100%; min-height: 52px; font-size: 15px; }
+    .msg--gate .btn { width: auto; }
 
     /* Sygnały zaufania — drobne pigułki zamiast akapitu */
     .gate-trust {
@@ -4350,7 +4350,9 @@
     .gate2__form { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
     .gate2__row { display: flex; gap: 8px; }
     .gate2__row .f-input { flex: 1; min-width: 0; }
-    .gate2 .btn { padding: 9px 20px; white-space: nowrap; }
+    .gate2 .btn { padding: 9px 20px; white-space: nowrap; flex: 0 0 auto; width: auto; }
+    .gate2__row { align-items: stretch; }
+    .gate2__row .f-input { flex: 1 1 auto; min-width: 0; }
     .gate2__note { margin-top: 12px; font-size: 12px; line-height: 1.5; color: var(--text-faint); }
     .msg--gate .gate-oauth-done {
         display: inline-flex; align-items: center; gap: 6px;
