@@ -4971,7 +4971,7 @@
             </button>
             <button type="button" class="side__item" data-tab="projekt" data-pjview="gtm" data-view="gtm" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg>
-                <span class="side__label">Plan sprzedaży</span><span class="side__status" data-status-for="gtm" hidden></span>
+                <span class="side__label">Gdzie szukać klientów</span><span class="side__status" data-status-for="gtm" hidden></span>
             </button>
             <button type="button" class="side__item" data-tab="projekt" data-pjview="reklamy" data-view="reklamy" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
@@ -6118,7 +6118,7 @@
         strona: ['Twoja strona', 'Składam działającą stronę sprzedażową. Dostaniesz maila, gdy będzie gotowa do otwarcia.'],
         rynek: ['Potencjał rynku', 'Sprawdzam Twój rynek w internecie — konkurentów, ceny, wielkość niszy. Raport przyślę mailem.'],
         economics: ['Czy to zarabia', 'Liczę opłacalność: cennik, koszt klienta, zwrot budowy. Odkryjesz to, gdy dam znać mailem.'],
-        gtm: ['Plan sprzedaży', 'Układam plan zdobycia pierwszych klientów i gotowe reklamy. Napiszę, gdy będą gotowe.']
+        gtm: ['Gdzie szukać klientów', 'Wynajduję miejsca, gdzie są Twoi klienci — za darmo i przez reklamy. Dam znać mailem.']
     };
     function revDetailTeaser(view) {
         var tz = REV_TEASER[view] || ['Wkrótce', ''];
@@ -6913,7 +6913,7 @@
         }).join('');
     }
     function gtmHTML(g) {
-        if (!g) return '<div class="tabpane__empty">Plan sprzedaży pojawi się, gdy domkniemy projekt.</div>';
+        if (!g) return '<div class="tabpane__empty">Miejsca, gdzie szukać klientów, pojawią się, gdy domkniemy projekt.</div>';
         var pb = g.playbook || {}, pk = g.pakiet || {};
         function copyBtn(txt) { return '<button type="button" class="gtm-copy" data-copy="' + esc(txt) + '">Kopiuj</button>'; }
         // KANAŁY
@@ -6957,13 +6957,21 @@
         function sec(icon, title, sub, inner) {
             return '<div class="eco-sec"><div class="eco-sec__h">' + pjIco(icon) + '<h3>' + title + '</h3>' + (sub ? '<span>' + sub + '</span>' : '') + '</div>' + inner + '</div>';
         }
+        // PŁATNE kampanie + gotowa pierwsza wiadomość (do sekcji darmowej)
+        var platne = Array.isArray(pb.platne) ? pb.platne : [];
+        var platHtml = platne.map(function (p) {
+            return '<div class="gtm-chan"><div class="gtm-chan__top"><b>' + esc(p.platforma || '') + '</b></div>' +
+                (p.kogo ? '<p class="gtm-chan__do"><span>Kogo targetować</span>' + esc(p.kogo) + '</p>' : '') +
+                (p.dlaczego ? '<p class="gtm-chan__why">' + esc(p.dlaczego) + '</p>' : '') + '</div>';
+        }).join('');
+        var dmHtml = (pb.skrypt_dm && pb.skrypt_dm.tresc)
+            ? '<div class="gtm-script"><div class="gtm-script__h"><b>Gotowa pierwsza wiadomość — wklej i wyślij</b>' + copyBtn(pb.skrypt_dm.tresc) + '</div><p>' + esc(pb.skrypt_dm.tresc) + '</p></div>'
+            : '';
+        var adLink = '<button type="button" class="gtm-ad-link" data-go-reklamy style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid var(--glass-border);border-radius:6px;background:#0a0a0a;color:var(--accent);font:inherit;font-size:13px;font-weight:500;cursor:pointer">Zobacz 4 gotowe reklamy →</button>';
         return '<div class="gtm" data-gtm-root>' +
-            sec(PJ_ICONS.gtm, 'Gdzie są Twoi pierwsi klienci', kanaly.length + ' konkretnych miejsc — z pierwszym ruchem', '<div class="gtm-chans">' + kanHtml + '</div>') +
-            (skrypty ? sec('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>', 'Gotowe skrypty', 'do wklejenia — najpierw wartość, nie „kup”', skrypty) : '') +
-            (obHtml ? sec('<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line><circle cx="12" cy="12" r="10"></circle>', 'Obiekcje i odpowiedzi', 'co usłyszysz — i co odpowiedzieć', '<div class="gtm-objs">' + obHtml + '</div>') : '') +
-            (postHtml ? sec('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>', 'Posty organiczne', 'do grup i na profil', '<div class="gtm-posts">' + postHtml + '</div>') : '') +
-            (mailHtml ? sec('<rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-10 5L2 7"></path>', 'Maile powitalne', 'sekwencja, która prowadzi do pierwszego użycia', '<div class="gtm-mails">' + mailHtml + '</div>') : '') +
-            '<div class="pj-plan__note">Gotowe materiały na start. Kampanie i pierwszych 50 klientów rozkręcacie wspólnie z Tomkiem po rezerwacji.</div>' +
+            sec('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>', 'Za darmo — zacznij tu', 'Twoich klientów jest pełno — oto ' + kanaly.length + ' miejsc, gdzie już są', '<div class="gtm-chans">' + kanHtml + '</div>' + dmHtml) +
+            (platHtml ? sec('<rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path>', 'Płatnie — kampanie reklamowe', 'gdzie puścić reklamy i kogo targetować', '<div class="gtm-chans">' + platHtml + '</div>' + adLink) : '') +
+            '<div class="pj-plan__note">Zacznij od darmowych miejsc — tam już są Twoi klienci. Kampanie i pierwszych 50 klientów rozkręcacie wspólnie z Tomkiem po rezerwacji.</div>' +
             '</div>';
     }
     function bindGtm(root) {
@@ -6976,6 +6984,9 @@
                 else window.prompt('Skopiuj:', txt);
             });
         });
+        // „Zobacz gotowe reklamy" → otwórz zakładkę Reklamy
+        var goRek = root.querySelector('[data-go-reklamy]');
+        if (goRek && !goRek.dataset.bound) { goRek.dataset.bound = '1'; goRek.addEventListener('click', function () { pjOpenDetail('reklamy'); }); }
         // Banery reklam → ten sam lightbox z nawigacją (next/prev po wszystkich banerach)
         root.querySelectorAll('.gtm-ad__banner[data-ad-url]').forEach(function (b) {
             if (b.dataset.bound) return; b.dataset.bound = '1';
@@ -7371,24 +7382,24 @@
                 tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="gtm">' +
                     pjGoIcon() +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
-                    '<span class="pjd-tile__t">Plan sprzedaży</span>' +
-                    '<span class="pjd-tile__sub">' + kanCount + ' miejsc z klientami, skrypty i maile na start</span>' +
+                    '<span class="pjd-tile__t">Gdzie szukać klientów</span>' +
+                    '<span class="pjd-tile__sub">' + kanCount + ' miejsc, gdzie już są Twoi klienci — za darmo i przez reklamy</span>' +
                     '</button>';
                 if (adCount) {
                     tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="reklamy">' +
                         pjGoIcon() +
                         '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.reklamy) + '</span>' +
                         '<span class="pjd-tile__t">Gotowe reklamy</span>' +
-                        '<span class="pjd-tile__sub">' + adCount + ' ' + (adCount === 1 ? 'reklama gotowa' : (adCount < 5 ? 'reklamy gotowe' : 'reklam gotowych')) + ' — copy + brief wizualny, od ręki do kampanii</span>' +
+                        '<span class="pjd-tile__sub">' + adCount + ' ' + (adCount === 1 ? 'reklama gotowa' : (adCount < 5 ? 'reklamy gotowe' : 'reklam gotowych')) + ' — kreacja z Twoich ekranów + copy, od ręki do kampanii</span>' +
                         '</button>';
                 }
             } else {
                 tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
-                    '<span class="pjd-tile__t">Plan sprzedaży</span>' +
+                    '<span class="pjd-tile__t">Gdzie szukać klientów</span>' +
                     (extras.gtm === 'fail'
                         ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować.</b><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('gtm', 'Układam plan sprzedaży…', 'gdzie są klienci, reklamy z copy, skrypty, maile')) +
+                        : genProgressHTML('gtm', 'Szukam, gdzie są Twoi klienci…', 'darmowe miejsca + płatne kampanie')) +
                     '</div>';
             }
 
@@ -7496,7 +7507,7 @@
             karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
             plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy'],
             economics: ['Czy to zarabia', 'model cenowy, koszt klienta i zwrot — przelicz na suwakach'],
-            gtm: ['Plan sprzedaży', 'gdzie są klienci, skrypty i maile'],
+            gtm: ['Gdzie szukać klientów', 'darmowe miejsca, gdzie już są — i płatne kampanie'],
             reklamy: ['Gotowe reklamy', 'koncepty z copy i briefem wizualnym — od ręki do kampanii']
         };
         var t = TITLES[pjView] || TITLES.karta;
