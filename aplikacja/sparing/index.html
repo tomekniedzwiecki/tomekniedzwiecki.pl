@@ -4811,6 +4811,36 @@
         border-radius: 6px 6px 2px 2px !important; box-shadow: none !important;
     }
     .pj-bar--goal i { background: var(--accent) !important; border-color: var(--accent) !important; box-shadow: none !important; }
+
+    /* ============================================================
+       KARTA PROJEKTU — one-pager (rethink): nazwa + jedno zdanie +
+       ekran (kotwica) + 3 fakty + reszta w rozwijaku. Mniej gęsto,
+       wyraźna hierarchia, Geist (mono na etykietach, monochrom).
+       ============================================================ */
+    .kp-name { font-size: clamp(23px, 3.4vw, 29px); font-weight: 700; letter-spacing: -.02em; color: var(--text-strong); margin: 0 0 6px; }
+    .kp-tagline { font-size: 15px; line-height: 1.55; color: var(--text-muted); margin: 0 0 22px; max-width: 60ch; }
+    .kp-main { display: grid; grid-template-columns: 230px 1fr; gap: 24px; align-items: start; }
+    .kp-shot { border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; background: var(--bg-elev); }
+    .kp-shot img { width: 100%; height: auto; display: block; }
+    .kp-shot--ph { min-height: 180px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 16px; color: var(--text-faint); font-size: 12px; line-height: 1.5; }
+    .kp-facts { display: flex; flex-direction: column; }
+    .kp-fact { padding: 13px 0; border-bottom: 1px solid var(--glass-border-soft); }
+    .kp-fact:first-child { padding-top: 0; }
+    .kp-fact:last-child { border-bottom: none; }
+    .kp-fact__l { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); font-family: var(--mono); margin-bottom: 5px; }
+    .kp-fact__v { display: block; font-size: 14.5px; line-height: 1.5; color: var(--text); }
+    .kp-fact__v strong { color: var(--text-strong); font-weight: 600; }
+    .kp-more { margin-top: 18px; border: 1px solid var(--glass-border); border-radius: 12px; background: var(--bg-elev); overflow: hidden; }
+    .kp-more > summary { list-style: none; cursor: pointer; padding: 14px 16px; font-size: 13.5px; font-weight: 600; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
+    .kp-more > summary::-webkit-details-marker { display: none; }
+    .kp-more > summary::after { content: ''; width: 9px; height: 9px; border-right: 2px solid var(--text-faint); border-bottom: 2px solid var(--text-faint); transform: rotate(45deg); transition: transform .2s var(--ease); }
+    .kp-more[open] > summary::after { transform: rotate(225deg); }
+    .kp-more__body { padding: 2px 16px 16px; }
+    .kp-sub { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); font-family: var(--mono); margin: 14px 0 6px; }
+    .kp-line { font-size: 13.5px; line-height: 1.6; color: var(--text); margin: 0; }
+    .kp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .kp-chips span { font-size: 12px; color: var(--text-muted); background: #161616; border: 1px solid var(--glass-border); border-radius: 6px; padding: 4px 9px; }
+    @media (max-width: 640px) { .kp-main { grid-template-columns: 1fr; } .kp-shot { max-width: 200px; } }
     </style>
 </head>
 <body>
@@ -5823,32 +5853,51 @@
         return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
     }
 
-    function kartaGridHTML(k, extraRightHtml) {
-        var html = '';
-        if (k.problem) html += '<div class="pj-quote">' + esc(k.problem) + '</div>';
-        var pierwsza = '';
-        if (Array.isArray(k.ekrany) && k.ekrany.length) pierwsza += pjChips(k.ekrany);
-        if (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) {
-            pierwsza += '<div class="pj-later">Świadomie na później (żeby pierwsza wersja była prosta):</div>' + pjChips(k.poza_zakresem, true);
-        }
-        var rynek = '';
-        if (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) rynek += '<div class="pj-later">Gdzie znajdziemy klientów:</div>' + pjChips(k.kanaly_dystrybucji);
-        rynek += pjRow('Konkurencja', k.konkurencja);
-        if (Array.isArray(k.ryzyka) && k.ryzyka.length) rynek += '<div class="pj-later">Na co uważać:</div>' + pjChips(k.ryzyka, true);
+    function kpChips(arr) {
+        return '<div class="kp-chips">' + arr.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>';
+    }
+    // Karta projektu jako one-pager: nazwa + jedno zdanie + ekran (kotwica) + 3
+    // najważniejsze fakty, a reszta (rynek/konkurencja/ryzyka/założenia) w jednym
+    // rozwijaku. full=true (panel) dokłada nagłówek nazwy + ekran; w widoku
+    // udostępnionym (full=false) nazwa/opis/ekrany są już nad kartą.
+    function kartaGridHTML(k, extraRightHtml, full) {
+        var brief = state.lastBrief || {};
+        var nazwa = brief.nazwa || 'Twoje narzędzie';
+        var opis = brief.opis || '';
+        var shot = (state.previews && (state.previews.panel || state.previews.glowna || state.previews.dodatkowa || state.previews.landing || state.previews[SUMMARY_META[0]])) || '';
 
-        html += '<div class="pj2-grid">' +
-            '<div class="pj2-col">' +
-            pjSec(pjIco('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>'), 'Dla kogo i kto płaci',
-                pjRow('Dla kogo', k.dla_kogo || k.profesja) + pjRow('Kto płaci', k.kto_placi) + pjRow('Sygnał budżetu', k.sygnal_budzetu)) +
-            pjSec(pjIco('<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>'), 'Pierwsza wersja narzędzia', pierwsza) +
-            '</div>' +
-            '<div class="pj2-col">' +
-            pjSec(pjIco('<path d="M14.7 6.3a4.5 4.5 0 0 0-6.4 6.4l-4.8 4.8 1.4 1.4 1-1 1.6 1.6 1.4-1.4-1.6-1.6 1-1a4.5 4.5 0 0 0 6.4-6.4z"></path>'), 'Jak radzą sobie dziś',
-                k.dzisiejsze_obejscie ? '<p>' + esc(k.dzisiejsze_obejscie) + '</p>' : '') +
-            pjSec(pjIco('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>'), 'Rynek i otoczenie', rynek) +
-            (extraRightHtml || '') +
-            '</div></div>';
-        return html;
+        // 3 fakty, które się liczą
+        var dlaKogo = k.dla_kogo || k.profesja || '';
+        var ploci = k.kto_placi || '';
+        var ktoVal = dlaKogo && ploci ? (esc(dlaKogo) + '. Płaci <strong>' + esc(ploci) + '</strong>.')
+            : (dlaKogo ? esc(dlaKogo) : (ploci ? 'Płaci <strong>' + esc(ploci) + '</strong>.' : ''));
+        var rdzen = (Array.isArray(k.ekrany) && k.ekrany.length) ? k.ekrany.slice(0, 2).map(esc).join(' · ') : '';
+        function fact(label, valHtml) { return valHtml ? '<div class="kp-fact"><span class="kp-fact__l">' + label + '</span><span class="kp-fact__v">' + valHtml + '</span></div>' : ''; }
+        var facts = fact('Problem', k.problem ? esc(k.problem) : '') + fact('Dla kogo · kto płaci', ktoVal) + fact('Rdzeń pierwszej wersji', rdzen);
+
+        // reszta — schowana w jednym rozwijaku
+        var more = '';
+        function sub(label, inner) { return inner ? '<div class="kp-sub">' + label + '</div>' + inner : ''; }
+        more += sub('Jak radzą sobie dziś', k.dzisiejsze_obejscie ? '<p class="kp-line">' + esc(k.dzisiejsze_obejscie) + '</p>' : '');
+        more += sub('Gdzie znajdziemy klientów', (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) ? kpChips(k.kanaly_dystrybucji) : '');
+        more += sub('Konkurencja', k.konkurencja ? '<p class="kp-line">' + esc(k.konkurencja) + '</p>' : '');
+        more += sub('Sygnał budżetu', k.sygnal_budzetu ? '<p class="kp-line">' + esc(k.sygnal_budzetu) + '</p>' : '');
+        more += sub('Na co uważać', (Array.isArray(k.ryzyka) && k.ryzyka.length) ? kpChips(k.ryzyka) : '');
+        more += sub('Na później (poza pierwszą wersją)', (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) ? kpChips(k.poza_zakresem) : '');
+        var moreHtml = more ? '<details class="kp-more"><summary>Rynek, konkurencja i założenia</summary><div class="kp-more__body">' + more + '</div></details>' : '';
+
+        var hero = full
+            ? '<h2 class="kp-name">' + esc(nazwa) + '</h2>' + (opis ? '<p class="kp-tagline">' + esc(opis) + '</p>' : '')
+            : '';
+        var shotHtml = full
+            ? (shot ? '<div class="kp-shot"><img src="' + esc(shot) + '" alt="Ekran ' + esc(nazwa) + '" loading="lazy"></div>'
+                    : '<div class="kp-shot kp-shot--ph">Ekran narzędzia pojawi się tu, gdy się wygeneruje</div>')
+            : '';
+        var mainHtml = full
+            ? '<div class="kp-main">' + shotHtml + '<div class="kp-facts">' + facts + '</div></div>'
+            : '<div class="kp-facts kp-facts--flat">' + facts + '</div>';
+
+        return '<div class="kp">' + hero + mainHtml + moreHtml + (extraRightHtml || '') + '</div>';
     }
 
     /* ── Dogrywane elementy karty: pigułka graficzna + plan przychodu ──
@@ -7278,7 +7327,7 @@
                 }
             }
             if (ctx.k) {
-                html += kartaGridHTML(ctx.k, editHtml);
+                html += kartaGridHTML(ctx.k, editHtml, true);
             } else {
                 html += '<div class="tabpane__empty">Karta projektu uzupełni się, gdy domkniemy ustalenia w rozmowie.</div>' + editHtml;
             }
