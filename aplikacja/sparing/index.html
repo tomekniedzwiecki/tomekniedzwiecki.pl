@@ -5129,7 +5129,8 @@
     /* ============================================================
        DANE — chipy profesji + otwarcia rozmowy (?p= z reklam)
        ============================================================ */
-    var GATE_AFTER_USER_MSGS = 4; // po tylu wiadomościach rozmówcy pojawia się bramka (imię + mail)
+    var GATE_AFTER_USER_MSGS = 4; // po tylu wiadomościach rozmówcy MOŻE pojawić się bramka (imię + mail)
+    var GATE_HARD_CAP_USER_MSGS = 7; // #10: twardy backstop — bramka najpóźniej tu, nawet bez podglądu
 
     // Otwarcie: lekkie, z obietnicą (podgląd narzędzia za parę minut), zero progów
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
@@ -8515,6 +8516,9 @@
         if (state.verdict) return false;
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
         if (userCount < GATE_AFTER_USER_MSGS) return false;
+        // #10: nie proś o kontakt, zanim rozmówca zobaczył pierwszy podgląd („wow”) —
+        // chyba że rozmowa wlecze się bez podglądu (twardy backstop)
+        if (!state.lastBrief && userCount < GATE_HARD_CAP_USER_MSGS) return false;
         // Zalogowany: konto jest, bramka tylko dobiera telefon (raz)
         if (authState.user) return !state.phone;
         // emailKnown: serwer ma już kontakt tej sesji (powrót z linku ?id=) — nie pytamy drugi raz
@@ -8704,8 +8708,19 @@
         return t.replace(/\s+$/, '');
     }
 
+    // #E-1: gdy model „zrestartował” odpowiedź (powtórzył wiodący akapit ~verbatim),
+    // utnij duplikat — wykrywa ponowne wystąpienie 60-znakowego początku tekstu.
+    function collapseRestart(s) {
+        if (!s || s.length < 120) return s;
+        var head = s.replace(/^\s+/, '').slice(0, 60);
+        if (head.length < 30) return s;
+        var idx = s.indexOf(head, 50);
+        if (idx > 50) return s.slice(0, idx).replace(/\s+$/, '');
+        return s;
+    }
     // Mini-markdown: **bold**, ### nagłówki, listy -/1., separator --- (po escapowaniu)
     function renderRich(s) {
+        s = collapseRestart(s);
         var h = esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
         var lines = h.split('\n');
         var out = [], list = null;
