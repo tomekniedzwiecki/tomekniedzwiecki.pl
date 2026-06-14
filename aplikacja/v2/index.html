@@ -1795,6 +1795,16 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 @media (max-width: 920px) { .crew__grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 520px) { .crew__grid { grid-template-columns: 1fr; gap: 10px; } .crew__pillar { padding: 16px 18px; } }
 
+/* CTA — obietnica + „co dostajesz" + duży, świecący przycisk */
+.cta__lead { font-size: clamp(15px, 1.7vw, 19px); color: var(--text-muted); margin-top: clamp(18px, 2.6vh, 30px); }
+.cta__gets { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 12px; margin-top: clamp(18px, 2.4vh, 26px); }
+.cta__get { display: inline-flex; align-items: center; gap: 8px; padding: 9px 17px 9px 13px; border-radius: 999px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.035); font-size: clamp(13px, 1.3vw, 14.5px); font-weight: 600; color: var(--text); }
+.cta__get svg { width: 15px; height: 15px; color: var(--accent); flex-shrink: 0; }
+.btn--xl { padding: 19px 44px; font-size: clamp(15.5px, 1.7vw, 18px); box-shadow: 0 16px 54px -16px rgba(77, 159, 255, 0.7); animation: ctaPulse 3s ease-in-out infinite; }
+.btn--xl .arr { font-size: 1.1em; }
+@keyframes ctaPulse { 0%, 100% { box-shadow: 0 14px 50px -18px rgba(77, 159, 255, 0.5); } 50% { box-shadow: 0 18px 64px -12px rgba(77, 159, 255, 0.92); } }
+@media (prefers-reduced-motion: reduce) { .btn--xl { animation: none; } }
+
 </style>
 </head>
 <body>
@@ -2009,7 +2019,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                 <article class="step step--final" data-reveal data-delay="800">
                     <span class="step__pov">ty</span>
                     <div class="step__num">04</div>
-                    <span class="step__chip">Prowadzenie · 10% od przychodu</span>
+                    <span class="step__chip">Prowadzenie</span>
                     <p class="step__line">Przejmujesz <em>rozkręcony</em> biznes.</p>
                     <p class="step__desc">Ja zostaję doradcą strategicznym i pomagam w dalszym rozwoju. Zarabiam dopiero wtedy, gdy Ty zarabiasz.</p>
                 </article>
@@ -2106,17 +2116,23 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             <p class="cta__eyebrow" data-reveal>Twoja kolej.</p>
 
             <h2 class="cta__h2" data-reveal data-delay="100">
-                Masz <em class="cta__h2-italic">pomysł?</em><br>
-                <span class="cta__h2-accent">Rozmowa już czeka.</span>
+                Zobacz swój pomysł<br>
+                jako <em class="cta__h2-italic cta__h2-accent">aplikację.</em>
             </h2>
 
-            <p class="cta__note" data-reveal data-delay="250" style="margin-bottom:0">Kilkanaście minut rozmowy z AI — karta projektu, ekrany aplikacji i wstępny plan przychodu. Za darmo, bez zobowiązań.</p>
+            <p class="cta__lead" data-reveal data-delay="220">Kilkanaście minut rozmowy z AI — i wychodzisz z konkretem:</p>
 
-            <div class="cta__btnwrap" data-reveal data-delay="380">
-                <a class="btn" href="/aplikacja/sparing/" data-cta data-cta-loc="final">Sprawdź swój pomysł za darmo <span class="arr">→</span></a>
+            <div class="cta__gets" data-reveal data-delay="300">
+                <span class="cta__get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Karta projektu</span>
+                <span class="cta__get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Pierwsze ekrany narzędzia</span>
+                <span class="cta__get"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>Wstępny plan przychodu</span>
             </div>
 
-            <p class="cta__note" data-reveal data-delay="480">Najpierw AI. Człowiek pojawia się dopiero, gdy zarezerwujesz rozmowę za 500 zł — w pełni zwrotne.</p>
+            <div class="cta__btnwrap" data-reveal data-delay="420">
+                <a class="btn btn--xl" href="/aplikacja/sparing/" data-cta data-cta-loc="final">Zacznij za darmo <span class="arr">→</span></a>
+            </div>
+
+            <p class="cta__note" data-reveal data-delay="520">Bez karty i bez zobowiązań. Najpierw AI — człowiek pojawia się dopiero przy rezerwacji rozmowy (500 zł, w pełni zwrotne).</p>
         </div>
     </section>
 
