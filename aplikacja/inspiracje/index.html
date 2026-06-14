@@ -101,14 +101,17 @@ img { max-width: 100%; display: block; }
 .nav__links a { transition: color 0.18s var(--ease); }
 .nav__links a:hover { color: var(--text-strong); }
 .nav__cta {
-    display: inline-flex; align-items: center; gap: 7px;
+    display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; white-space: nowrap;
     padding: 9px 16px; border-radius: 8px;
     background: var(--accent);
     color: #fff; font-weight: 600; font-size: 13px; letter-spacing: -0.01em;
     transition: filter 0.18s var(--ease), transform 0.18s var(--ease);
 }
 .nav__cta:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.nav__brand { min-width: 0; }
+.nav__brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 760px) { .nav__links a:not(.nav__cta) { display: none; } }
+@media (max-width: 460px) { .nav__brand span { display: none; } }
 
 /* HEADER */
 .head {
