@@ -1604,7 +1604,8 @@
     @media (max-width: 760px) { .gtm-ads { grid-template-columns: 1fr; } }
     .gtm-ad { border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
     /* Baner kreacji reklamowej (gpt-image-2) */
-    .gtm-ad__banner { display: block; width: 100%; border-radius: 11px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); margin-bottom: 2px; }
+    .gtm-ad__banner { display: block; width: 100%; border-radius: 11px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); margin-bottom: 2px; padding: 0; cursor: zoom-in; font: inherit; color: inherit; text-align: left; }
+    .gtm-ad__banner--gen { cursor: default; }
     .gtm-ad__banner img { display: block; width: 100%; max-height: 360px; object-fit: cover; object-position: top center; transition: transform 0.4s var(--ease); }
     .gtm-ad__banner:hover img { transform: scale(1.03); }
     .gtm-ad__banner--gen {
@@ -6901,8 +6902,8 @@
         return reklamy.map(function (r, i) {
             var copyTxt = (r.naglowek || '') + '\n\n' + (r.tekst || '') + '\n\n' + (r.cta || '');
             var banner = r.banner_url
-                ? '<a class="gtm-ad__banner" href="' + esc(r.banner_url) + '" target="_blank" rel="noopener" aria-label="Otwórz baner w pełnym rozmiarze">' +
-                  '<img src="' + esc(r.banner_url) + '" alt="Baner reklamy: ' + esc(r.naglowek || '') + '" loading="lazy"></a>'
+                ? '<button type="button" class="gtm-ad__banner" data-ad-url="' + esc(r.banner_url) + '" data-ad-label="' + esc('Reklama ' + (i + 1) + (r.naglowek ? ' — ' + r.naglowek : '')) + '" aria-label="Powiększ baner reklamy ' + (i + 1) + '">' +
+                  '<img src="' + esc(r.banner_url) + '" alt="Baner reklamy: ' + esc(r.naglowek || '') + '" loading="lazy"></button>'
                 : '<div class="gtm-ad__banner gtm-ad__banner--gen"><span class="share__spin" aria-hidden="true"></span><span>Generuję baner kreacji…</span></div>';
             return '<div class="gtm-ad">' + banner + '<div class="gtm-ad__top"><span class="gtm-ad__no">Reklama ' + (i + 1) + '</span>' +
                 (r.koncept ? '<span class="gtm-ad__concept">' + esc(r.koncept) + '</span>' : '') +
@@ -6974,6 +6975,15 @@
                 function done() { var o = b.textContent; b.textContent = 'Skopiowano ✓'; b.classList.add('is-done'); setTimeout(function () { b.textContent = o; b.classList.remove('is-done'); }, 1600); }
                 if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done).catch(function () { window.prompt('Skopiuj:', txt); });
                 else window.prompt('Skopiuj:', txt);
+            });
+        });
+        // Banery reklam → ten sam lightbox z nawigacją (next/prev po wszystkich banerach)
+        root.querySelectorAll('.gtm-ad__banner[data-ad-url]').forEach(function (b) {
+            if (b.dataset.bound) return; b.dataset.bound = '1';
+            b.addEventListener('click', function () {
+                var all = [].slice.call(root.querySelectorAll('.gtm-ad__banner[data-ad-url]'));
+                var items = all.map(function (x) { return { url: x.getAttribute('data-ad-url'), label: x.getAttribute('data-ad-label') || 'Reklama' }; });
+                openLightbox({ items: items, index: all.indexOf(b) });
             });
         });
     }
@@ -7973,8 +7983,13 @@
 
     function openLightbox(startView) {
         if (el('spar-lightbox')) return;
-        var items;
-        if (startView && typeof startView === 'object' && startView.url) {
+        var items, idx = 0;
+        if (startView && typeof startView === 'object' && Array.isArray(startView.items)) {
+            // własna galeria (np. banery reklam) — { items:[{url,label}], index }
+            items = startView.items.filter(function (x) { return x && x.url; });
+            idx = Math.min(Math.max(0, startView.index || 0), Math.max(0, items.length - 1));
+            startView = null;
+        } else if (startView && typeof startView === 'object' && startView.url) {
             // pojedynczy obraz z własnym podpisem (np. pigułka projektu)
             items = [{ view: '_single', label: startView.label || 'Podgląd', url: startView.url }];
             startView = '_single';
@@ -7986,8 +8001,7 @@
             items = lightboxItems();
         }
         if (!items.length) return;
-        var idx = 0;
-        for (var i = 0; i < items.length; i++) if (items[i].view === startView) { idx = i; break; }
+        if (startView) { for (var i = 0; i < items.length; i++) if (items[i].view === startView) { idx = i; break; } }
 
         var lb = document.createElement('div');
         lb.className = 'lightbox';
