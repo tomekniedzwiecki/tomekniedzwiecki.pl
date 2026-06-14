@@ -4568,6 +4568,55 @@
 
     /* serif/italic leftover w ekranach → Geist Sans */
     .pjd-quote { font-family: var(--sans) !important; font-style: normal !important; }
+
+    /* ============================================================
+       KIERUNKI — karty wyboru kierunku (marker <kierunki>).
+       Reużywa .car/.car__card; tylko warstwa „wybieralności" na tokenach,
+       więc dziedziczy reskin (Geist remapuje wartości, nazwy zostają).
+       ============================================================ */
+    .kr-card { cursor: pointer; display: flex; flex-direction: column; transition: border-color .18s var(--ease), transform .18s var(--ease); }
+    .kr-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .kr-card--rec { border-color: var(--accent); }
+    .kr-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-height: 16px; }
+    .kr-head:empty { display: none; }
+    .kr-tag { font-size: 11px; color: var(--text-muted); background: var(--glass); border: 1px solid var(--glass-border); border-radius: 999px; padding: 2px 9px; }
+    .kr-rec { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 9px; text-transform: uppercase; letter-spacing: .05em; }
+    .kr-title { border-bottom: none !important; padding-bottom: 0 !important; margin: 8px 0 6px !important; }
+    .kr-opis { color: var(--text-muted); }
+    .kr-next { margin-top: 12px; }
+    .kr-card:not(.is-open) .kr-next { display: none; }
+    .kr-next__txt { font-size: 13.5px; line-height: 1.55; color: var(--text); margin-bottom: 10px; }
+    .kr-go { width: 100%; padding: 10px 12px; border-radius: 11px; background: var(--accent); color: #fff; font-weight: 700; font-size: 13.5px; cursor: pointer; border: none; transition: filter .15s var(--ease); }
+    .kr-go:hover { filter: brightness(1.07); }
+    .kr-hint { font-size: 11px; color: var(--text-faint); margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+    .kr-card.is-open .kr-hint { display: none; }
+    .kr-own { margin-top: 12px; }
+
+    /* ============================================================
+       FIX: panel „Badam Twój rynek na żywo" (#ocena-work).
+       .msg__work jest wierszem (dobre dla „kropki + tekst"), ale ten
+       panel ma 3 bloki (nagłówek / pasek / „Czytam: url") — muszą iść
+       w kolumnie, pasek pełnej szerokości, URL z ellipsis.
+       ============================================================ */
+    #ocena-work { flex-direction: column !important; align-items: stretch !important; gap: 0 !important; }
+    #ocena-work > div:first-child { color: var(--accent); }
+    #ocena-work .gen__bar { width: 100% !important; height: 4px !important; background: #1f1f1f !important; }
+    #ocena-work .gen__bar i { background: var(--accent) !important; box-shadow: none !important; }
+    #ocena-work .gen__step {
+        margin-top: 8px; max-width: 100%;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        color: var(--text-muted); font-weight: 400;
+    }
+    /* pasek generowania ogólnie — spłaszczony pod Geist */
+    .gen__bar i { background: var(--accent) !important; box-shadow: none !important; }
+
+    /* karty rekomendacji (.kr-*) → Geist: pastylki 6px, wagi 600, bez liftu */
+    .kr-card:hover { transform: none !important; border-color: #454545 !important; }
+    .kr-card--rec, .kr-card.is-open { border-color: var(--accent) !important; }
+    .kr-tag, .kr-rec { border-radius: 6px !important; }
+    .kr-rec { font-weight: 600 !important; }
+    .kr-go { border-radius: 6px !important; font-weight: 500 !important; }
+    .kr-go:hover { filter: none !important; background: var(--accent-2) !important; }
     </style>
 </head>
 <body>
@@ -8177,11 +8226,12 @@
         if (!inner) return;
         var src = '';
         if (Array.isArray(o.zrodla) && o.zrodla.length) {
-            var links = o.zrodla.slice(0, 4).map(function (z) {
-                if (!z || !z.url) return '';
-                return '<a href="' + esc(String(z.url)) + '" target="_blank" rel="noopener">' + esc(String(z.tytul || z.url).slice(0, 40)) + '</a>';
-            }).filter(Boolean).join('');
-            if (links) src = '<div class="find-card__src">Źródła: ' + links + '</div>';
+            // Bez linków — same nazwy źródeł jako zwykły tekst (nie wyciągamy URL-i)
+            var names = o.zrodla.slice(0, 4).map(function (z) {
+                if (!z || !z.tytul) return '';
+                return esc(String(z.tytul).slice(0, 60));
+            }).filter(Boolean).join(' · ');
+            if (names) src = '<div class="find-card__src">Źródła: ' + names + '</div>';
         }
         var card = document.createElement('div');
         card.className = 'find-card reveal-in';
