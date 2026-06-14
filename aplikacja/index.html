@@ -1736,13 +1736,12 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 <aside class="progress" id="progress" aria-hidden="true">
     <a href="#act-1" class="progress__item is-active" data-act="0"><span>01</span><em>Wstęp</em></a>
     <a href="#act-2" class="progress__item" data-act="1"><span>02</span><em>Układ</em></a>
-    <a href="#act-3" class="progress__item" data-act="2"><span>03</span><em>Na żywo</em></a>
-    <a href="#act-4" class="progress__item" data-act="3"><span>04</span><em>Rynek</em></a>
-    <a href="#act-5" class="progress__item" data-act="4"><span>05</span><em>Obietnica</em></a>
-    <a href="#act-6" class="progress__item" data-act="5"><span>06</span><em>Proces</em></a>
-    <a href="#act-7" class="progress__item" data-act="6"><span>07</span><em>Ludzie</em></a>
-    <a href="#act-8" class="progress__item" data-act="7"><span>08</span><em>Galeria</em></a>
-    <a href="#act-9" class="progress__item" data-act="8"><span>09</span><em>Start</em></a>
+    <a href="#act-4" class="progress__item" data-act="3"><span>03</span><em>Rynek</em></a>
+    <a href="#act-5" class="progress__item" data-act="4"><span>04</span><em>Obietnica</em></a>
+    <a href="#act-6" class="progress__item" data-act="5"><span>05</span><em>Proces</em></a>
+    <a href="#act-7" class="progress__item" data-act="6"><span>06</span><em>Ludzie</em></a>
+    <a href="#act-8" class="progress__item" data-act="7"><span>07</span><em>Galeria</em></a>
+    <a href="#act-9" class="progress__item" data-act="8"><span>08</span><em>Start</em></a>
 </aside>
 
 <!-- ============================================================
@@ -1804,40 +1803,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         </div>
     </section>
 
-    <!-- SCENE 3 — NA ŻYWO (każdy pomysł = inny projekt) -->
-    <section class="scene scene--live" id="act-3" data-act="2">
-        <div class="scene__aurora" aria-hidden="true"></div>
-        <div class="scene__inner">
-            <p class="live__eyebrow" data-reveal>tak to się zaczyna.</p>
-
-            <h2 class="live__title" data-reveal data-delay="150">
-                Aplikacja <span class="ser">dla</span>
-                <span class="live-flip" id="live-flip" aria-live="off"></span>
-            </h2>
-
-            <div class="live__win" data-reveal data-delay="350">
-                <div class="live__bar">
-                    <span class="live__dot"></span><span class="live__dot"></span><span class="live__dot"></span>
-                    <span class="live__url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>tomekniedzwiecki.pl/aplikacja</span>
-                    <span class="live__badge"><i></i>feed na żywo</span>
-                </div>
-                <div class="live__screen" id="live-screen">
-                    <img id="live-img-a" alt="Ekran aplikacji wygenerowany w rozmowie z AI" decoding="async">
-                    <img id="live-img-b" alt="" aria-hidden="true" decoding="async">
-                </div>
-                <div class="live__cap">
-                    <b id="live-name">&nbsp;</b>
-                    <span id="live-meta"></span>
-                </div>
-            </div>
-
-            <a class="live__more" href="/aplikacja/inspiracje/" data-reveal data-delay="550">
-                Każdy projekt wygląda inaczej — zobacz wszystkie <span class="arr">→</span>
-            </a>
-        </div>
-    </section>
-
-    <!-- SCENE 4 — RYNEK (zanim oddam prowadzenie) -->
+    <!-- SCENE — RYNEK (zanim oddam prowadzenie) -->
     <section class="scene scene--market" id="act-4" data-act="3">
         <div class="scene__aurora" aria-hidden="true"></div>
         <div class="scene__inner">
@@ -2226,32 +2192,15 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     });
 
     // ============================================================
-    //  SCENA 3 — „Aplikacja dla [zawodu]" na realnym feedzie
-    //  Flip zawodu zsynchronizowany z crossfade'em PRAWDZIWEGO
-    //  mockupu z feedu (nazwa + godzina generacji). Scenariusz gra
-    //  tylko, jeśli jego projekt faktycznie jest w feedzie.
+    //  FEED PUBLICZNY — zasila pas „budują teraz" (scena Ludzie)
+    //  oraz galerię „na żywo" (scena Galeria).
     // ============================================================
     var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
-    var DEMO_IMG = '/aplikacja/sparing/demo-podglad.png';
     function lightImg(url, w) {
         // resize=contain obowiązkowo — bez niego render API tnie boki
         return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
             '?format=webp&width=' + (w || 760) + '&quality=70&resize=contain';
     }
-    var SCENE_DEFS = [
-        { prof: 'tatuażysty.', name: 'InkBrief' },
-        { prof: 'korepetytorki.', name: 'MatmaPulse' },
-        { prof: 'pszczelarza.', name: 'Pasieczny Porządek' },
-        { prof: 'florystki.', name: 'BukietPlan' },
-        { prof: 'hodowczyni kotów.', name: 'LitterPlan' },
-        { prof: 'elektryka.', name: 'RaportElektryk' }
-    ];
-    var liveFlip = document.getElementById('live-flip');
-    var liveImgA = document.getElementById('live-img-a');
-    var liveImgB = document.getElementById('live-img-b');
-    var liveName = document.getElementById('live-name');
-    var liveMeta = document.getElementById('live-meta');
-
     function sceneTime(iso) {
         var d = new Date(iso);
         if (isNaN(d)) return '';
@@ -2263,63 +2212,11 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ', ' + hm;
     }
 
-    var sceneStarted = false;
-    function startScene(scs) {
-        if (sceneStarted || !liveFlip) return;
-        sceneStarted = true;
-        // flip words
-        liveFlip.innerHTML = scs.map(function (s, i) {
-            return '<span class="live-flip__word' + (i === 0 ? ' is-active' : '') + '">' + s.prof.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>';
-        }).join('');
-        var words = liveFlip.querySelectorAll('.live-flip__word');
-        var frontA = false;
-        function paint(s) {
-            frontA = !frontA;
-            var front = frontA ? liveImgA : liveImgB;
-            var back = frontA ? liveImgB : liveImgA;
-            front.onload = function () {
-                front.classList.add('is-on');
-                back.classList.remove('is-on');
-                liveName.textContent = s.name;
-                liveMeta.innerHTML = s.real
-                    ? 'prawdziwy projekt · <em>' + s.when + '</em>'
-                    : 'ekrany prosto z rozmowy';
-            };
-            front.src = s.img;
-            if (front.complete && front.naturalWidth) front.onload();
-        }
-        var si = 0;
-        paint(scs[0]);
-        if (reduceMotion || scs.length < 2) return;
-        var loopTimer = null;
-        function next() {
-            si = (si + 1) % scs.length;
-            words.forEach(function (w, i) { w.classList.toggle('is-active', i === si); });
-            paint(scs[si]);
-            // preload kolejnego
-            var pre = new Image(); pre.src = scs[(si + 1) % scs.length].img;
-            loopTimer = setTimeout(next, 4200);
-        }
-        loopTimer = setTimeout(next, 4200);
-        document.addEventListener('visibilitychange', function () {
-            if (document.hidden) clearTimeout(loopTimer);
-            else loopTimer = setTimeout(next, 2000);
-        });
-    }
-
-    var FALLBACK_SCENE = [{ prof: 'groomerki.', name: 'Pulpit narzędzia', img: DEMO_IMG, real: false, when: '' }];
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         var items = (d && d.projekty) || [];
-        var byName = {};
-        items.forEach(function (p) { byName[p.nazwa] = p; });
-        var scs = SCENE_DEFS.filter(function (s) { return byName[s.name]; }).map(function (s) {
-            var p = byName[s.name];
-            return { prof: s.prof, name: p.nazwa, img: lightImg(p.img, 760), real: true, when: sceneTime(p.generated_at) };
-        });
-        startScene(scs.length ? scs : FALLBACK_SCENE);
         startCrewNow(items);
         initGallery(items);
-    }).catch(function () { startScene(FALLBACK_SCENE); });
+    }).catch(function () { });
 
     // ============================================================
     //  SCENA 7 — pas „budują teraz" (prawdziwe nazwy z feedu)
