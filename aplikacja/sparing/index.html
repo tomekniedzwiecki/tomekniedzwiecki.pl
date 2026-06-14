@@ -4823,7 +4823,16 @@
     .kp2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
     .kp2-block { border: 1px solid var(--glass-border); border-radius: 10px; background: var(--bg-elev); padding: 13px 15px; min-width: 0; }
     .kp2-block--wide { grid-column: 1 / -1; }
-    .kp2-l { display: block; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-faint); font-family: var(--mono); margin-bottom: 6px; }
+    .kp2-h { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+    .kp2-ico { width: 26px; height: 26px; border-radius: 7px; display: inline-grid; place-items: center; flex-shrink: 0; }
+    .kp2-ico svg { width: 14px; height: 14px; }
+    .kp2-ico--blue   { color: #5b9dff; background: rgba(91,157,255,.13); }
+    .kp2-ico--green  { color: #3ecf8e; background: rgba(62,207,142,.13); }
+    .kp2-ico--amber  { color: #f0b35b; background: rgba(240,179,91,.13); }
+    .kp2-ico--violet { color: #9a93ff; background: rgba(154,147,255,.13); }
+    .kp2-ico--cyan   { color: #5fd2e6; background: rgba(95,210,230,.13); }
+    .kp2-ico--rose   { color: #f0727a; background: rgba(240,114,122,.13); }
+    .kp2-l { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-muted); font-family: var(--mono); }
     .kp2-v { font-size: 14px; line-height: 1.55; color: var(--text); }
     .kp2-v strong { color: var(--text-strong); font-weight: 600; }
     .kp2-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -5856,21 +5865,35 @@
         var ploci = k.kto_placi || '';
         var ktoVal = dlaKogo && ploci ? (esc(dlaKogo) + ' · płaci <strong>' + esc(ploci) + '</strong>')
             : (dlaKogo ? esc(dlaKogo) : (ploci ? 'Płaci <strong>' + esc(ploci) + '</strong>' : ''));
-        function block(label, valHtml, wide) {
+        function kpIco(inner) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + inner + '</svg>'; }
+        function block(label, valHtml, ico, tone, wide) {
             if (!valHtml) return '';
-            return '<div class="kp2-block' + (wide ? ' kp2-block--wide' : '') + '"><span class="kp2-l">' + label + '</span><div class="kp2-v">' + valHtml + '</div></div>';
+            return '<div class="kp2-block' + (wide ? ' kp2-block--wide' : '') + '">' +
+                '<div class="kp2-h"><span class="kp2-ico kp2-ico--' + tone + '">' + kpIco(ico) + '</span><span class="kp2-l">' + label + '</span></div>' +
+                '<div class="kp2-v">' + valHtml + '</div></div>';
         }
         var txt = function (v) { return v ? esc(v) : ''; };
+        var ICO = {
+            problem: '<circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path>',
+            ludzie: '<circle cx="9" cy="7" r="4"></circle><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>',
+            rdzen: '<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>',
+            zegar: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
+            flaga: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line>',
+            cel: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3.5"></circle>',
+            kasa: '<path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
+            alert: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>',
+            kalendarz: '<rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="16" y1="2" x2="16" y2="6"></line>'
+        };
         var blocks =
-            block('Problem', k.problem ? esc(k.problem) : '', true) +
-            block('Dla kogo · kto płaci', ktoVal) +
-            block('Rdzeń pierwszej wersji', (Array.isArray(k.ekrany) && k.ekrany.length) ? kpChips(k.ekrany.slice(0, 4)) : '') +
-            block('Jak radzą sobie dziś', txt(k.dzisiejsze_obejscie)) +
-            block('Konkurencja', txt(k.konkurencja)) +
-            block('Gdzie znajdziemy klientów', (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) ? kpChips(k.kanaly_dystrybucji) : '') +
-            block('Sygnał budżetu', txt(k.sygnal_budzetu)) +
-            block('Na co uważać', (Array.isArray(k.ryzyka) && k.ryzyka.length) ? kpChips(k.ryzyka) : '') +
-            block('Na później (poza pierwszą wersją)', (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) ? kpChips(k.poza_zakresem) : '', true);
+            block('Problem', k.problem ? esc(k.problem) : '', ICO.problem, 'amber', true) +
+            block('Dla kogo · kto płaci', ktoVal, ICO.ludzie, 'blue') +
+            block('Rdzeń pierwszej wersji', (Array.isArray(k.ekrany) && k.ekrany.length) ? kpChips(k.ekrany.slice(0, 4)) : '', ICO.rdzen, 'violet') +
+            block('Jak radzą sobie dziś', txt(k.dzisiejsze_obejscie), ICO.zegar, 'cyan') +
+            block('Konkurencja', txt(k.konkurencja), ICO.flaga, 'rose') +
+            block('Gdzie znajdziemy klientów', (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) ? kpChips(k.kanaly_dystrybucji) : '', ICO.cel, 'green') +
+            block('Sygnał budżetu', txt(k.sygnal_budzetu), ICO.kasa, 'green') +
+            block('Na co uważać', (Array.isArray(k.ryzyka) && k.ryzyka.length) ? kpChips(k.ryzyka) : '', ICO.alert, 'rose') +
+            block('Na później (poza pierwszą wersją)', (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) ? kpChips(k.poza_zakresem) : '', ICO.kalendarz, 'blue', true);
 
         var hero = full ? ('<div class="kp2-head"><h2 class="kp2-name">' + esc(nazwa) + '</h2>' + (opis ? '<p class="kp2-tagline">' + esc(opis) + '</p>' : '') + '</div>') : '';
         return '<div class="kp2">' + hero + '<div class="kp2-grid">' + blocks + '</div>' + (extraRightHtml || '') + '</div>';
