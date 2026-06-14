@@ -359,7 +359,8 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         transform: translateX(-50%);
         flex-direction: row;
         gap: 0;
-        padding: 2px 6px;
+        padding: 2px 5px;
+        max-width: calc(100vw - 16px);
         background: rgba(0, 0, 0, 0.55);
         -webkit-backdrop-filter: blur(14px);
                 backdrop-filter: blur(14px);
@@ -367,10 +368,12 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         border-radius: 999px;
         align-items: center;
     }
+    /* 9 pozycji musi zmieścić się w szerokości telefonu — węższe pola, ale
+       wysokość docka zachowuje wygodny target dotykowy (min-height 44) */
     .progress__item {
         gap: 0;
-        padding: 14px 11px;
-        min-width: 44px;
+        padding: 14px 8px;
+        min-width: 30px;
         min-height: 44px;
         justify-content: center;
         position: relative;
@@ -1804,6 +1807,8 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 .btn--xl .arr { font-size: 1.1em; }
 @keyframes ctaPulse { 0%, 100% { box-shadow: 0 14px 50px -18px rgba(77, 159, 255, 0.5); } 50% { box-shadow: 0 18px 64px -12px rgba(77, 159, 255, 0.92); } }
 @media (prefers-reduced-motion: reduce) { .btn--xl { animation: none; } }
+.cta__trust { display: inline-flex; align-items: center; gap: 9px; margin-top: clamp(20px, 3vh, 30px); padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(77, 159, 255, 0.32); background: rgba(77, 159, 255, 0.07); font-size: clamp(13px, 1.35vw, 14.5px); font-weight: 600; letter-spacing: 0.01em; color: var(--text); }
+.cta__trust svg { width: 16px; height: 16px; color: var(--accent); flex-shrink: 0; }
 
 </style>
 </head>
@@ -2132,7 +2137,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                 <a class="btn btn--xl" href="/aplikacja/sparing/" data-cta data-cta-loc="final">Zacznij za darmo <span class="arr">→</span></a>
             </div>
 
-            <p class="cta__note" data-reveal data-delay="520">Bez karty i bez zobowiązań. Najpierw AI — człowiek pojawia się dopiero przy rezerwacji rozmowy (500 zł, w pełni zwrotne).</p>
+            <p class="cta__trust" data-reveal data-delay="540">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                Za darmo · bez karty · bez zobowiązań
+            </p>
         </div>
     </section>
 
