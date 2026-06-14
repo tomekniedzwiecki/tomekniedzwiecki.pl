@@ -6906,8 +6906,7 @@
                   '<img src="' + esc(r.banner_url) + '" alt="Baner reklamy: ' + esc(r.naglowek || '') + '" loading="lazy"></button>'
                 : '<div class="gtm-ad__banner gtm-ad__banner--gen"><span class="share__spin" aria-hidden="true"></span><span>Generuję baner kreacji…</span></div>';
             return '<div class="gtm-ad">' + banner + '<div class="gtm-ad__top"><span class="gtm-ad__no">Reklama ' + (i + 1) + '</span>' +
-                (r.koncept ? '<span class="gtm-ad__concept">' + esc(r.koncept) + '</span>' : '') +
-                (r.format ? '<span class="gtm-ad__fmt">' + esc(r.format) + '</span>' : '') + copyBtn(copyTxt) + '</div>' +
+                (r.koncept ? '<span class="gtm-ad__concept">' + esc(r.koncept) + '</span>' : '') + '</div>' +
                 '<div class="gtm-ad__head">' + esc(r.naglowek || '') + '</div>' +
                 '<p class="gtm-ad__body">' + esc(r.tekst || '') + '</p>' +
                 (r.cta ? '<span class="gtm-ad__cta">' + esc(r.cta) + '</span>' : '') + '</div>';
