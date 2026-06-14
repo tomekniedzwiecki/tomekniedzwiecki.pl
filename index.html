@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
+
+    <!-- Reset hasła CRM: Supabase ląduje link z maila na Site URL (ta domena).
+         Token type=recovery przerzucamy 1:1 (z hashem) na stronę CRM, która go
+         obsługuje. Musi być PRZED jakimkolwiek skryptem, zanim coś ruszy hash. -->
+    <script>
+        (function () {
+            try {
+                var h = window.location.hash || '';
+                if (h.indexOf('type=recovery') !== -1 && h.indexOf('access_token=') !== -1) {
+                    window.location.replace('https://crm.tomekniedzwiecki.pl/zmiana-hasla' + h);
+                }
+            } catch (e) {}
+        })();
+    </script>
     <title>Tomek Niedźwiecki — w którym kierunku idziemy?</title>
     <meta name="description" content="Buduję biznesy od zera. Optymalizuję istniejące. Wybierz swoją stronę.">
     <meta name="robots" content="index, follow">
