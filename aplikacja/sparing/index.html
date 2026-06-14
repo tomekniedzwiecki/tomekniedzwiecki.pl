@@ -5207,7 +5207,7 @@
     var pendingAuth = null; // {userId, provider, email, name}
     // Dogrywane elementy projektu (pigułka, plan, raport rynku, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle', gtmBanners: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle', reklamy: 'idle', gtmBanners: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
@@ -5223,7 +5223,7 @@
     // Mapa: pozycja menu (data-status-for) → klucz extras, który sygnalizuje
     // generację ('gen'). Dzięki temu menu pokazuje „generuję” + pasek na tej
     // samej zasadzie, na której pulpit pokazuje pasek postępu.
-    var GEN_KEY = { karta: 'summary', plan: 'plan', rynek: 'raport', economics: 'economics', gtm: 'gtm', reklamy: 'gtm', strona: 'landing', prototyp: 'prototype' };
+    var GEN_KEY = { karta: 'summary', plan: 'plan', rynek: 'raport', economics: 'economics', gtm: 'gtm', reklamy: 'reklamy', strona: 'landing', prototyp: 'prototype' };
     var messages = [];          // {role:'user'|'assistant', content, local?:true}
     var streaming = false;
     var streamAbort = null; // AbortController bieżącego streamu (przycisk „Zatrzymaj")
@@ -6570,6 +6570,39 @@
         });
     }
 
+    // Regeneracja SAMYCH kanałów (zakładka „Gdzie szukać klientów") — nie tyka reklam
+    function regenChannels() {
+        if (extras.gtm === 'gen' || !state.sessionId) return;
+        extras.gtm = 'gen'; extrasStart.gtm = Date.now();
+        var sid = state.sessionId;
+        fetch(SPAR_GTM_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, action: 'regen_channels' })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.gtm) { state.gtm = res.d.gtm; persistSession(); extras.gtm = 'idle'; }
+            else if (res.ok && res.d && res.d.pending) { setTimeout(function () { if (state.sessionId === sid && extras.gtm === 'gen') { extras.gtm = 'idle'; regenChannels(); } }, 90000); return; }
+            else { extras.gtm = 'fail'; }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () { if (state.sessionId !== sid) return; extras.gtm = 'fail'; if (activeTab === 'projekt') renderPaneProjekt(); });
+    }
+    // Regeneracja SAMYCH reklam (zakładka „Reklamy") + nowe banery — nie tyka kanałów
+    function regenAds() {
+        if (extras.reklamy === 'gen' || !state.sessionId) return;
+        extras.reklamy = 'gen'; extrasStart.reklamy = Date.now();
+        var sid = state.sessionId;
+        fetch(SPAR_GTM_ENDPOINT, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            body: JSON.stringify({ sessionId: sid, action: 'regen_ads' })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
+            if (state.sessionId !== sid) return;
+            if (res.ok && res.d && res.d.gtm) { state.gtm = res.d.gtm; persistSession(); extras.reklamy = 'idle'; extras.gtmBanners = 'idle'; ensureGtmBanners(); }
+            else if (res.ok && res.d && res.d.pending) { setTimeout(function () { if (state.sessionId === sid && extras.reklamy === 'gen') { extras.reklamy = 'idle'; regenAds(); } }, 90000); return; }
+            else { extras.reklamy = 'fail'; }
+            if (activeTab === 'projekt') renderPaneProjekt();
+        }).catch(function () { if (state.sessionId !== sid) return; extras.reklamy = 'fail'; if (activeTab === 'projekt') renderPaneProjekt(); });
+    }
+
     // Banery reklam (gpt-image-2): odpalamy gdy mamy copy gtm, ale brakuje
     // banner_url. Generacja w tle po stronie spar-gtm; wynik dociągamy pollem
     // ze spar-project (banery pojawiają się stopniowo, jeden po drugim).
@@ -7637,8 +7670,8 @@
         if (pjView === 'reklamy') {
             var rek = (state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : null;
             if (rek && rek.length) { html += '<div class="gtm-ads">' + adsHtml(rek) + '</div>'; ensureGtmBanners(); }
-            else if (extras.gtm === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować reklam.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="gtm">Spróbuj ponownie</button></div>';
-            else html += genProgressHTML('gtm', 'Przygotowuję reklamy…', 'koncepty z copy i briefem wizualnym dla projektanta');
+            else if (extras.reklamy === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować reklam.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="ads">Spróbuj ponownie</button></div>';
+            else html += genProgressHTML('reklamy', 'Przygotowuję reklamy…', 'koncepty z copy i baner z Twoich ekranów');
         }
 
         body.innerHTML = html;
@@ -7676,7 +7709,8 @@
                 else if (kind === 'landing') { extras.landing = 'idle'; ensureLanding(); }
                 else if (kind === 'prototype') { extras.prototype = 'idle'; ensurePrototype(); }
                 else if (kind === 'economics') { extras.economics = 'idle'; ensureEconomics(false); }
-                else if (kind === 'gtm') { extras.gtm = 'idle'; ensureGtm(false); }
+                else if (kind === 'gtm') { extras.gtm = 'idle'; if (state.gtm) regenChannels(); else ensureGtm(true); }
+                else if (kind === 'ads') { extras.reklamy = 'idle'; regenAds(); }
                 else if (kind === 'raport') { extras.raport = 'idle'; ensureRaport(false); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
                 renderPaneProjekt();
