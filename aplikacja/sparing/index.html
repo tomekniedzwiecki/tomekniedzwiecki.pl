@@ -4813,34 +4813,22 @@
     .pj-bar--goal i { background: var(--accent) !important; border-color: var(--accent) !important; box-shadow: none !important; }
 
     /* ============================================================
-       KARTA PROJEKTU — one-pager (rethink): nazwa + jedno zdanie +
-       ekran (kotwica) + 3 fakty + reszta w rozwijaku. Mniej gęsto,
-       wyraźna hierarchia, Geist (mono na etykietach, monochrom).
+       KARTA PROJEKTU — czytelne bloki: zwarte kafle (mono-etykieta +
+       zwięzła wartość), wszystko widoczne naraz, bez ekranu/rozwijaka.
+       Wyraźna separacja kafli, żeby się NIE zlewało.
        ============================================================ */
-    .kp-name { font-size: clamp(23px, 3.4vw, 29px); font-weight: 700; letter-spacing: -.02em; color: var(--text-strong); margin: 0 0 6px; }
-    .kp-tagline { font-size: 15px; line-height: 1.55; color: var(--text-muted); margin: 0 0 22px; max-width: 60ch; }
-    .kp-main { display: grid; grid-template-columns: 230px 1fr; gap: 24px; align-items: start; }
-    .kp-shot { border: 1px solid var(--glass-border); border-radius: 12px; overflow: hidden; background: var(--bg-elev); }
-    .kp-shot img { width: 100%; height: auto; display: block; }
-    .kp-shot--ph { min-height: 180px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 16px; color: var(--text-faint); font-size: 12px; line-height: 1.5; }
-    .kp-facts { display: flex; flex-direction: column; }
-    .kp-fact { padding: 13px 0; border-bottom: 1px solid var(--glass-border-soft); }
-    .kp-fact:first-child { padding-top: 0; }
-    .kp-fact:last-child { border-bottom: none; }
-    .kp-fact__l { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); font-family: var(--mono); margin-bottom: 5px; }
-    .kp-fact__v { display: block; font-size: 14.5px; line-height: 1.5; color: var(--text); }
-    .kp-fact__v strong { color: var(--text-strong); font-weight: 600; }
-    .kp-more { margin-top: 18px; border: 1px solid var(--glass-border); border-radius: 12px; background: var(--bg-elev); overflow: hidden; }
-    .kp-more > summary { list-style: none; cursor: pointer; padding: 14px 16px; font-size: 13.5px; font-weight: 600; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
-    .kp-more > summary::-webkit-details-marker { display: none; }
-    .kp-more > summary::after { content: ''; width: 9px; height: 9px; border-right: 2px solid var(--text-faint); border-bottom: 2px solid var(--text-faint); transform: rotate(45deg); transition: transform .2s var(--ease); }
-    .kp-more[open] > summary::after { transform: rotate(225deg); }
-    .kp-more__body { padding: 2px 16px 16px; }
-    .kp-sub { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); font-family: var(--mono); margin: 14px 0 6px; }
-    .kp-line { font-size: 13.5px; line-height: 1.6; color: var(--text); margin: 0; }
-    .kp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .kp-chips span { font-size: 12px; color: var(--text-muted); background: #161616; border: 1px solid var(--glass-border); border-radius: 6px; padding: 4px 9px; }
-    @media (max-width: 640px) { .kp-main { grid-template-columns: 1fr; } .kp-shot { max-width: 200px; } }
+    .kp2-head { margin-bottom: 16px; }
+    .kp2-name { font-size: 19px; font-weight: 600; letter-spacing: -.01em; color: var(--text-strong); margin: 0 0 4px; }
+    .kp2-tagline { font-size: 13.5px; line-height: 1.5; color: var(--text-muted); margin: 0; max-width: 64ch; }
+    .kp2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
+    .kp2-block { border: 1px solid var(--glass-border); border-radius: 10px; background: var(--bg-elev); padding: 13px 15px; min-width: 0; }
+    .kp2-block--wide { grid-column: 1 / -1; }
+    .kp2-l { display: block; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-faint); font-family: var(--mono); margin-bottom: 6px; }
+    .kp2-v { font-size: 14px; line-height: 1.55; color: var(--text); }
+    .kp2-v strong { color: var(--text-strong); font-weight: 600; }
+    .kp2-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .kp2-chips span { font-size: 12px; color: var(--text-muted); background: #161616; border: 1px solid var(--glass-border); border-radius: 6px; padding: 3px 9px; }
+    @media (max-width: 640px) { .kp2-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -5854,50 +5842,38 @@
     }
 
     function kpChips(arr) {
-        return '<div class="kp-chips">' + arr.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>';
+        return '<div class="kp2-chips">' + arr.map(function (x) { return '<span>' + esc(x) + '</span>'; }).join('') + '</div>';
     }
-    // Karta projektu jako one-pager: nazwa + jedno zdanie + ekran (kotwica) + 3
-    // najważniejsze fakty, a reszta (rynek/konkurencja/ryzyka/założenia) w jednym
-    // rozwijaku. full=true (panel) dokłada nagłówek nazwy + ekran; w widoku
-    // udostępnionym (full=false) nazwa/opis/ekrany są już nad kartą.
+    // Karta projektu = CZYTELNE BLOKI: zwarte kafle (etykieta mono + zwięzła
+    // wartość), wszystko widoczne naraz (bez rozwijaka, bez wielkiego ekranu).
+    // Wyraźna separacja kafli, żeby się nie zlewało. full=true (panel) dokłada
+    // skromny nagłówek nazwy; udostępniony — same kafle (nazwa/opis są nad kartą).
     function kartaGridHTML(k, extraRightHtml, full) {
         var brief = state.lastBrief || {};
         var nazwa = brief.nazwa || 'Twoje narzędzie';
         var opis = brief.opis || '';
-        var shot = (state.previews && (state.previews.panel || state.previews.glowna || state.previews.dodatkowa || state.previews.landing || state.previews[SUMMARY_META[0]])) || '';
-
-        // 3 fakty, które się liczą
         var dlaKogo = k.dla_kogo || k.profesja || '';
         var ploci = k.kto_placi || '';
-        var ktoVal = dlaKogo && ploci ? (esc(dlaKogo) + '. Płaci <strong>' + esc(ploci) + '</strong>.')
-            : (dlaKogo ? esc(dlaKogo) : (ploci ? 'Płaci <strong>' + esc(ploci) + '</strong>.' : ''));
-        var rdzen = (Array.isArray(k.ekrany) && k.ekrany.length) ? k.ekrany.slice(0, 2).map(esc).join(' · ') : '';
-        function fact(label, valHtml) { return valHtml ? '<div class="kp-fact"><span class="kp-fact__l">' + label + '</span><span class="kp-fact__v">' + valHtml + '</span></div>' : ''; }
-        var facts = fact('Problem', k.problem ? esc(k.problem) : '') + fact('Dla kogo · kto płaci', ktoVal) + fact('Rdzeń pierwszej wersji', rdzen);
+        var ktoVal = dlaKogo && ploci ? (esc(dlaKogo) + ' · płaci <strong>' + esc(ploci) + '</strong>')
+            : (dlaKogo ? esc(dlaKogo) : (ploci ? 'Płaci <strong>' + esc(ploci) + '</strong>' : ''));
+        function block(label, valHtml, wide) {
+            if (!valHtml) return '';
+            return '<div class="kp2-block' + (wide ? ' kp2-block--wide' : '') + '"><span class="kp2-l">' + label + '</span><div class="kp2-v">' + valHtml + '</div></div>';
+        }
+        var txt = function (v) { return v ? esc(v) : ''; };
+        var blocks =
+            block('Problem', k.problem ? esc(k.problem) : '', true) +
+            block('Dla kogo · kto płaci', ktoVal) +
+            block('Rdzeń pierwszej wersji', (Array.isArray(k.ekrany) && k.ekrany.length) ? kpChips(k.ekrany.slice(0, 4)) : '') +
+            block('Jak radzą sobie dziś', txt(k.dzisiejsze_obejscie)) +
+            block('Konkurencja', txt(k.konkurencja)) +
+            block('Gdzie znajdziemy klientów', (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) ? kpChips(k.kanaly_dystrybucji) : '') +
+            block('Sygnał budżetu', txt(k.sygnal_budzetu)) +
+            block('Na co uważać', (Array.isArray(k.ryzyka) && k.ryzyka.length) ? kpChips(k.ryzyka) : '') +
+            block('Na później (poza pierwszą wersją)', (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) ? kpChips(k.poza_zakresem) : '', true);
 
-        // reszta — schowana w jednym rozwijaku
-        var more = '';
-        function sub(label, inner) { return inner ? '<div class="kp-sub">' + label + '</div>' + inner : ''; }
-        more += sub('Jak radzą sobie dziś', k.dzisiejsze_obejscie ? '<p class="kp-line">' + esc(k.dzisiejsze_obejscie) + '</p>' : '');
-        more += sub('Gdzie znajdziemy klientów', (Array.isArray(k.kanaly_dystrybucji) && k.kanaly_dystrybucji.length) ? kpChips(k.kanaly_dystrybucji) : '');
-        more += sub('Konkurencja', k.konkurencja ? '<p class="kp-line">' + esc(k.konkurencja) + '</p>' : '');
-        more += sub('Sygnał budżetu', k.sygnal_budzetu ? '<p class="kp-line">' + esc(k.sygnal_budzetu) + '</p>' : '');
-        more += sub('Na co uważać', (Array.isArray(k.ryzyka) && k.ryzyka.length) ? kpChips(k.ryzyka) : '');
-        more += sub('Na później (poza pierwszą wersją)', (Array.isArray(k.poza_zakresem) && k.poza_zakresem.length) ? kpChips(k.poza_zakresem) : '');
-        var moreHtml = more ? '<details class="kp-more"><summary>Rynek, konkurencja i założenia</summary><div class="kp-more__body">' + more + '</div></details>' : '';
-
-        var hero = full
-            ? '<h2 class="kp-name">' + esc(nazwa) + '</h2>' + (opis ? '<p class="kp-tagline">' + esc(opis) + '</p>' : '')
-            : '';
-        var shotHtml = full
-            ? (shot ? '<div class="kp-shot"><img src="' + esc(shot) + '" alt="Ekran ' + esc(nazwa) + '" loading="lazy"></div>'
-                    : '<div class="kp-shot kp-shot--ph">Ekran narzędzia pojawi się tu, gdy się wygeneruje</div>')
-            : '';
-        var mainHtml = full
-            ? '<div class="kp-main">' + shotHtml + '<div class="kp-facts">' + facts + '</div></div>'
-            : '<div class="kp-facts kp-facts--flat">' + facts + '</div>';
-
-        return '<div class="kp">' + hero + mainHtml + moreHtml + (extraRightHtml || '') + '</div>';
+        var hero = full ? ('<div class="kp2-head"><h2 class="kp2-name">' + esc(nazwa) + '</h2>' + (opis ? '<p class="kp2-tagline">' + esc(opis) + '</p>' : '') + '</div>') : '';
+        return '<div class="kp2">' + hero + '<div class="kp2-grid">' + blocks + '</div>' + (extraRightHtml || '') + '</div>';
     }
 
     /* ── Dogrywane elementy karty: pigułka graficzna + plan przychodu ──
