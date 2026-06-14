@@ -112,7 +112,7 @@
     * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
     *::-webkit-scrollbar { width: 8px; height: 8px; }
     *::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
-    *::-webkit-scrollbar-thumb:hover { background: var(--accent-2); }
+    *::-webkit-scrollbar-thumb:hover { background: #454545; }
     *::-webkit-scrollbar-track { background: transparent; }
 
     /* ============================================================
@@ -2478,9 +2478,9 @@
     }
     .stage.is-active .stage__dot {
         color: var(--accent);
-        border-color: rgba(77, 159, 255, 0.6);
+        border-color: var(--accent);
         background: var(--accent-dim);
-        box-shadow: 0 0 0 4px rgba(77, 159, 255, 0.08), 0 0 18px rgba(77, 159, 255, 0.25);
+        box-shadow: none;
     }
     .stage.is-active .stage__label { color: var(--text-strong); }
     .stage.is-done .stage__dot {
@@ -4049,7 +4049,7 @@
         font-size: 11.5px;
         color: var(--text-faint);
     }
-    #char-count { color: var(--yellow); font-variant-numeric: tabular-nums; }
+    #char-count { color: var(--text-faint); font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 11px; }
 
     .chat-locked {
         position: relative;
