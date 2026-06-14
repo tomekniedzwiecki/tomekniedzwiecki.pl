@@ -4043,7 +4043,7 @@
     .composer__send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
     .composer__meta {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         gap: 12px;
         padding: 7px 16px 0;
         font-size: 11.5px;
@@ -4599,7 +4599,9 @@
     .kr-alt__chev { width: 16px; height: 16px; color: var(--text-faint); transition: transform .2s var(--ease); flex-shrink: 0; }
     .kr-alt.is-open .kr-alt__chev { transform: rotate(180deg); }
     .kr-alt__body { padding: 0 14px 14px; }
-    .kr-own { align-self: flex-start; margin-top: 2px; }
+    .kr-own { align-self: flex-start; margin-top: 2px; display: inline-flex; align-items: center; gap: 7px; padding: 8px 4px; background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; transition: color .15s var(--ease); }
+    .kr-own:hover { color: var(--text); }
+    .kr-own svg { width: 14px; height: 14px; opacity: .8; flex-shrink: 0; }
 
     /* ============================================================
        FIX: panel „Badam Twój rynek na żywo" (#ocena-work).
@@ -4717,6 +4719,69 @@
 
     /* liczby (statystyki współpracy) → Geist Mono */
     .cw-stat b { font-family: var(--mono) !important; letter-spacing: -0.02em !important; }
+
+    /* ============================================================
+       C1 — poświata composera „w stylu AI" (warstwa NA Geist).
+       Świadomie przywraca charakter spłaszczonemu polu: miękka
+       poświata oddychająca POD paskiem + subtelny krążący pierścień
+       (jaśnieje na fokusie). Dostrojone do płaskiej geometrii 10px.
+       ============================================================ */
+    .composer__inner { position: relative; }
+    .composer__inner::before {
+        content: ''; position: absolute; left: 8%; right: 8%; top: 34%; bottom: -20%;
+        border-radius: 40px; z-index: 0; pointer-events: none;
+        background: radial-gradient(62% 110% at 50% 60%, rgba(0,112,243,.42), transparent 72%);
+        filter: blur(26px); opacity: .5; animation: csGlow 5s ease-in-out infinite;
+    }
+    .composer__bar { position: relative; z-index: 1; }
+    .composer__bar::before {
+        display: block !important; content: ''; position: absolute; inset: -1px;
+        border-radius: 11px; padding: 1px; pointer-events: none;
+        background: conic-gradient(from var(--spar-angle),
+            rgba(0,112,243,.60) 0deg, rgba(109,179,255,.92) 80deg, rgba(99,91,255,.62) 160deg,
+            rgba(0,112,243,.40) 230deg, rgba(0,217,126,.45) 300deg, rgba(0,112,243,.60) 360deg);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude;
+        animation: sparSpin 8s linear infinite; opacity: .32;
+        transition: opacity .4s var(--ease);
+    }
+    .composer__bar:focus-within::before { opacity: .95 !important; }
+    @keyframes csGlow { 0%,100% { opacity: .3; transform: scaleX(.97); } 50% { opacity: .58; transform: scaleX(1.03); } }
+    @media (max-width: 640px) { .composer__inner::before { filter: blur(20px); opacity: .4; } }
+    @media (prefers-reduced-motion: reduce) {
+        .composer__inner::before { animation: none; opacity: .4; }
+        .composer__bar::before { animation: none; opacity: .4; }
+    }
+
+    /* ============================================================
+       L1 — ikona TN jako orb (warstwa NA Geist). Znak (badge z favicona)
+       na niebieskim orbie z miękkim halo, które delikatnie pulsuje.
+       Dotyczy iskry w composerze i avatara przy wiadomościach AI.
+       ============================================================ */
+    .composer__spark {
+        filter: none !important; opacity: 1 !important;
+        width: 24px !important; height: 24px !important; border-radius: 50% !important;
+        background:
+            url("/img/logo/tn-logo-icon-88.png") center / 58% no-repeat,
+            radial-gradient(120% 120% at 30% 25%, #6db3ff 0%, var(--accent) 46%, #1b2a6b 100%) !important;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.08) inset, 0 0 12px rgba(0,112,243,.5) !important;
+        animation: tnPulse 4.2s ease-in-out infinite !important;
+    }
+    .msg--ai::before {
+        background:
+            url("/img/logo/tn-logo-icon-88.png") center / 58% no-repeat,
+            radial-gradient(120% 120% at 30% 25%, #6db3ff 0%, var(--accent) 46%, #1b2a6b 100%) !important;
+        border: none !important;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.08) inset, 0 0 13px rgba(0,112,243,.5) !important;
+        animation: tnPulse 4.2s ease-in-out infinite;
+    }
+    @keyframes tnPulse {
+        0%,100% { box-shadow: 0 0 0 1px rgba(255,255,255,.08) inset, 0 0 9px rgba(0,112,243,.38); }
+        50%     { box-shadow: 0 0 0 1px rgba(255,255,255,.10) inset, 0 0 17px rgba(0,112,243,.62); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .composer__spark, .msg--ai::before { animation: none !important; }
+    }
     </style>
 </head>
 <body>
@@ -4837,7 +4902,6 @@
                     </button>
                 </div>
                 <div class="composer__meta">
-                    <span class="composer__hint">Enter — wyślij · Shift+Enter — nowa linia</span>
                     <span id="char-count"></span>
                 </div>
             </div>
