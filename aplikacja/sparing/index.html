@@ -2986,12 +2986,14 @@
     .msg--gate {
         width: 100%;
         max-width: 560px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        background:
+            radial-gradient(130% 120% at 100% 0%, rgba(77, 159, 255, 0.13), transparent 52%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 100%);
         border: 1px solid var(--glass-border);
         -webkit-backdrop-filter: blur(14px);
         backdrop-filter: blur(14px);
-        border-radius: 20px;
-        padding: 22px;
+        border-radius: 22px;
+        padding: 24px 24px 22px;
         position: relative;
         overflow: hidden;
         margin-left: 34px;
@@ -3005,9 +3007,52 @@
         background: linear-gradient(90deg, transparent, var(--accent), transparent);
     }
     .msg--gate p { font-size: 15px; }
+
+    /* Nagłówek bramki: eyebrow z iskrą + serifowa teza (moment przekazania) */
+    .gate-hd { display: flex; align-items: center; gap: 8px; }
+    .gate-hd__spark {
+        width: 16px; height: 16px; flex-shrink: 0;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3z' fill='%234d9fff'/%3E%3C/svg%3E") center / 16px no-repeat;
+        filter: drop-shadow(0 0 7px rgba(77, 159, 255, 0.65));
+        animation: sparkBreathe 3.4s ease-in-out infinite;
+    }
+    .gate-hd__eyebrow {
+        font-size: 10.5px; font-weight: 800; letter-spacing: 0.16em;
+        text-transform: uppercase; color: var(--accent);
+    }
+    .gate-title {
+        margin-top: 9px;
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: clamp(21px, 3.4vw, 26px);
+        line-height: 1.25;
+        letter-spacing: 0.01em;
+        color: var(--text-strong);
+    }
+    .gate-title em { font-style: italic; color: var(--accent); }
+    .gate-sub { margin-top: 8px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+    .gate-msg__note { margin-top: 12px; font-size: 12px; line-height: 1.5; color: var(--text-faint); }
     .msg--gate .f-row { margin: 16px 0 6px; }
-    .msg--gate .btn { margin-top: 8px; }
-    .gate-msg__note { margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+    .msg--gate .btn { margin-top: 16px; width: 100%; min-height: 52px; font-size: 15px; }
+
+    /* Sygnały zaufania — drobne pigułki zamiast akapitu */
+    .gate-trust {
+        list-style: none; display: flex; flex-wrap: wrap; gap: 7px;
+        margin-top: 14px; padding: 0;
+    }
+    .gate-trust li {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11.5px; font-weight: 500; color: var(--text-muted);
+        padding: 4px 10px 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--glass-border-soft);
+        background: rgba(255, 255, 255, 0.025);
+    }
+    .gate-trust li::before {
+        content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+        background: var(--accent); box-shadow: 0 0 6px rgba(77, 159, 255, 0.7);
+    }
 
     /* Rejestracja przez Google/Facebook w bramce */
     .gate-oauth-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
@@ -3041,19 +3086,21 @@
     }
     .gate-divider::before, .gate-divider::after { content: ''; flex: 1; height: 1px; background: var(--glass-border-soft); }
     .gate-oauth-done {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 9px;
-        margin-top: 14px;
-        padding: 10px 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(0, 217, 126, 0.35);
-        background: rgba(0, 217, 126, 0.08);
-        color: var(--text-strong);
-        font-size: 13px;
-        font-weight: 600;
+        gap: 7px;
+        margin-top: 10px;
+        padding: 5px 11px 5px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 217, 126, 0.22);
+        background: rgba(0, 217, 126, 0.06);
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 500;
+        max-width: 100%;
     }
-    .gate-oauth-done svg { width: 15px; height: 15px; color: var(--green, #00d97e); flex-shrink: 0; }
+    .gate-oauth-done b, .gate-oauth-done strong { color: var(--text); font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gate-oauth-done svg { width: 13px; height: 13px; color: var(--green, #00d97e); flex-shrink: 0; }
 
     /* ── Konto: przycisk w top barze + modal logowania ── */
     .auth-top { display: flex; align-items: center; gap: 8px; margin-left: auto; }
@@ -3174,8 +3221,23 @@
     .f-hint { margin-top: 6px; font-size: 12.5px; color: var(--text-muted); }
     .f-input--lg { min-height: 54px; font-size: 17px; padding: 14px 16px; letter-spacing: 0.4px; }
     /* Telefon w bramce: wyeksponowane pole (najważniejszy, ostatni krok) — nie do przeoczenia */
-    .gate-phone-field { margin-top: 14px; padding: 14px 14px 12px; border-radius: 16px; background: rgba(77, 159, 255, 0.07); border: 1px solid rgba(77, 159, 255, 0.28); }
+    .gate-phone-field {
+        margin-top: 16px; padding: 15px 16px 14px; border-radius: 18px;
+        background:
+            radial-gradient(120% 140% at 0% 0%, rgba(77, 159, 255, 0.10), transparent 60%),
+            rgba(77, 159, 255, 0.05);
+        border: 1px solid rgba(77, 159, 255, 0.30);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
     .gate-phone-field .f-label { color: var(--accent); }
+    .gate-phone-wrap { position: relative; }
+    .gate-phone-ico {
+        position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+        width: 19px; height: 19px; color: var(--accent); pointer-events: none;
+        opacity: 0.85;
+    }
+    .gate-phone-ico svg { width: 100%; height: 100%; display: block; }
+    .gate-phone-wrap .f-input--lg { padding-left: 46px; }
 
     /* Przycisk wspólny */
     .btn {
@@ -7230,7 +7292,13 @@
         if (modal) modal.hidden = true;
     }
 
-    /* ── Rozmowy konta z serwera (cross-device) ── */
+    /* ── Rozmowy konta z serwera = ŹRÓDŁO PRAWDY (cross-device) ──
+       Sidebar ma odzwierciedlać KONTO, nie historię tej przeglądarki.
+       Dlatego REKONSYLIUJEMY listę z serwerem zamiast tylko doklejać:
+       zostają rozmowy konta + (na wszelki wypadek) aktywna rozmowa, która
+       mogła jeszcze nie zapisać się na serwerze. Resztę — duchy ze starych
+       sesji anonimowych zalegające w localStorage — usuwamy razem z ich
+       kluczami (session/messages/preview). */
     function syncAccountConvos() {
         if (!authState.token) return;
         fetch(SPAR_PROJECT_ENDPOINT, {
@@ -7238,21 +7306,20 @@
             headers: authHeaders(),
             body: JSON.stringify({ action: 'list' })
         }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-            if (!d || !Array.isArray(d.sessions) || !d.sessions.length) return;
-            var idx = convoIndex();
-            var changed = false;
+            // prunujemy TYLKO przy realnej odpowiedzi serwera (nie przy blipie sieci)
+            if (!d || !Array.isArray(d.sessions)) return;
+            var prev = convoIndex();
+            var keep = {};
+            var idx = [];
             d.sessions.forEach(function (s) {
-                var known = idx.some(function (c) { return c.id === s.id; });
-                if (!known) {
-                    idx.push({
-                        id: s.id,
-                        title: s.nazwa || 'Rozmowa',
-                        verdict: s.verdict || null,
-                        thumb: s.thumb || null,
-                        ts: s.updated_at ? new Date(s.updated_at).getTime() : Date.now()
-                    });
-                    changed = true;
-                }
+                keep[s.id] = true;
+                idx.push({
+                    id: s.id,
+                    title: s.nazwa || 'Rozmowa',
+                    verdict: s.verdict || null,
+                    thumb: s.thumb || null,
+                    ts: s.updated_at ? new Date(s.updated_at).getTime() : Date.now()
+                });
                 // minimalny stan lokalny — loadConvo musi mieć co wczytać;
                 // historia wiadomości dociągnie się z serwera w syncProjectFromServer
                 if (!loadJSON(sessionKey(s.id))) {
@@ -7264,11 +7331,24 @@
                     });
                 }
             });
-            if (changed) {
-                idx.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
-                saveJSON(LS_INDEX, idx);
-                renderConvoList();
+            // aktywna rozmowa zostaje na liście, nawet jeśli serwer jeszcze jej nie zna
+            if (state.sessionId && !keep[state.sessionId]) {
+                for (var i = 0; i < prev.length; i++) {
+                    if (prev[i].id === state.sessionId) { keep[state.sessionId] = true; idx.push(prev[i]); break; }
+                }
             }
+            // sprzątanie duchów: rozmowy w localStorage spoza konta
+            prev.forEach(function (c) {
+                if (keep[c.id]) return;
+                try {
+                    localStorage.removeItem(sessionKey(c.id));
+                    localStorage.removeItem(messagesKey(c.id));
+                    localStorage.removeItem(previewKey(c.id));
+                } catch (e) { }
+            });
+            idx.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
+            saveJSON(LS_INDEX, idx);
+            renderConvoList();
         }).catch(function () { });
     }
 
@@ -7333,7 +7413,7 @@
         var label = authState.user ? (authState.user.email || authFirstName() || 'konto') : 'konto';
         return '<div class="gate-oauth-done">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>' +
-            'Konto połączone: ' + esc(label) + '</div>';
+            'Połączono jako <b>' + esc(label) + '</b></div>';
     }
 
     // telefon: min 9 cyfr + CAŁY string w dozwolonym formacie (kotwice ^$ —
@@ -7367,8 +7447,11 @@
         }
 
         var needName = !authFirstName();
+        var phoneIco = '<span class="gate-phone-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>';
         div.innerHTML =
-            '<p><strong>Ostatni krok</strong> — zostaw numer, na który Tomek odezwie się w sprawie Twojego narzędzia. To on osobiście prowadzi rozmowę o budowie.</p>' +
+            '<div class="gate-hd"><span class="gate-hd__spark" aria-hidden="true"></span><span class="gate-hd__eyebrow">Ostatni krok</span></div>' +
+            '<h3 class="gate-title">Dalej prowadzi już Tomek — <em>osobiście</em>.</h3>' +
+            '<p class="gate-sub">Zostaw numer, na który odezwie się w sprawie Twojego narzędzia.</p>' +
             accountDoneHTML() +
             '<form id="gate-form" novalidate>' +
             (needName
@@ -7377,12 +7460,12 @@
                   '<div class="f-error" id="gate-name-error">Podaj imię.</div></div>'
                 : '') +
             '<div class="gate-phone-field"><label class="f-label" for="gate-phone">Twój numer telefonu</label>' +
-            '<input class="f-input f-input--lg" type="tel" inputmode="tel" id="gate-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20" required>' +
-            '<div class="f-hint">Tomek dzwoni lub pisze osobiście — żadnego call center, żadnego spamu.</div>' +
+            '<div class="gate-phone-wrap">' + phoneIco +
+            '<input class="f-input f-input--lg" type="tel" inputmode="tel" id="gate-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20" required></div>' +
             '<div class="f-error" id="gate-phone-error">Podaj numer telefonu (min. 9 cyfr).</div></div>' +
             '<button type="submit" class="btn" id="gate-submit">Idziemy dalej <span class="btn__arrow">→</span></button>' +
             '</form>' +
-            '<p class="gate-msg__note">Czasem wyślemy SMS z postępem projektu i linkiem do panelu — STOP wypisuje w każdej chwili.</p>';
+            '<ul class="gate-trust"><li>Osobiście, nie call center</li><li>Bez spamu</li><li>SMS o postępie — STOP wypisuje</li></ul>';
         el('chat-msgs').appendChild(div);
         scrollToBottom(true);
         // Telefon nie do przeoczenia: fokus na pierwszym polu + przewinięcie na środek
