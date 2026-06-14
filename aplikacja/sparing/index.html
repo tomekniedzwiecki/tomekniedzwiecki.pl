@@ -4570,27 +4570,36 @@
     .pjd-quote { font-family: var(--sans) !important; font-style: normal !important; }
 
     /* ============================================================
-       KIERUNKI — karty wyboru kierunku (marker <kierunki>).
-       Reużywa .car/.car__card; tylko warstwa „wybieralności" na tokenach,
-       więc dziedziczy reskin (Geist remapuje wartości, nazwy zostają).
+       KIERUNKI — wybór kierunku (marker <kierunki>): rekomendacja na
+       wierzchu + rozwijak „albo zobacz inne". Wszystko na tokenach →
+       dziedziczy reskin Geist (remapuje wartości, nazwy zostają).
        ============================================================ */
-    .kr-card { cursor: pointer; display: flex; flex-direction: column; transition: border-color .18s var(--ease), transform .18s var(--ease); }
-    .kr-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .kr-card--rec { border-color: var(--accent); }
-    .kr-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-height: 16px; }
+    .kr { align-self: flex-start; width: 100%; max-width: min(560px, 92%); margin-left: 34px; display: flex; flex-direction: column; gap: 8px; animation: msgIn .4s var(--ease) backwards; }
+    @media (max-width: 640px) { .kr { margin-left: 0; max-width: 100%; } }
+    .kr-card { border: 1px solid var(--glass-border-soft); border-radius: 16px; background: var(--glass); padding: 16px; }
+    .kr-card--primary { border-color: var(--accent); background: var(--accent-soft); }
+    .kr-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .kr-head:empty { display: none; }
-    .kr-tag { font-size: 11px; color: var(--text-muted); background: var(--glass); border: 1px solid var(--glass-border); border-radius: 999px; padding: 2px 9px; }
-    .kr-rec { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 9px; text-transform: uppercase; letter-spacing: .05em; }
-    .kr-title { border-bottom: none !important; padding-bottom: 0 !important; margin: 8px 0 6px !important; }
-    .kr-opis { color: var(--text-muted); }
-    .kr-next { margin-top: 12px; }
-    .kr-card:not(.is-open) .kr-next { display: none; }
-    .kr-next__txt { font-size: 13.5px; line-height: 1.55; color: var(--text); margin-bottom: 10px; }
-    .kr-go { width: 100%; padding: 10px 12px; border-radius: 11px; background: var(--accent); color: #fff; font-weight: 700; font-size: 13.5px; cursor: pointer; border: none; transition: filter .15s var(--ease); }
+    .kr-rec { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--bg-elev); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 9px; text-transform: uppercase; letter-spacing: .05em; }
+    .kr-tag { font-size: 11px; color: var(--text-muted); background: var(--glass-strong); border: 1px solid var(--glass-border); border-radius: 999px; padding: 2px 9px; }
+    .kr-title { font-size: 16px; font-weight: 800; letter-spacing: -.01em; color: var(--text-strong); margin: 9px 0 5px; }
+    .kr-opis { font-size: 14px; line-height: 1.55; color: var(--text); }
+    .kr-next__txt { font-size: 13.5px; line-height: 1.55; color: var(--text-muted); margin-top: 8px; }
+    .kr-go { width: 100%; margin-top: 14px; padding: 11px 12px; border-radius: 11px; background: var(--accent); color: #fff; font-weight: 700; font-size: 14px; cursor: pointer; border: none; transition: filter .15s var(--ease); }
     .kr-go:hover { filter: brightness(1.07); }
-    .kr-hint { font-size: 11px; color: var(--text-faint); margin-top: 10px; display: flex; align-items: center; gap: 5px; }
-    .kr-card.is-open .kr-hint { display: none; }
-    .kr-own { margin-top: 12px; }
+    .kr-go--sm { margin-top: 10px; padding: 9px 12px; font-size: 13px; }
+    .kr-more { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 8px 4px; background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; transition: color .15s var(--ease); }
+    .kr-more:hover { color: var(--text); }
+    .kr-more__chev { width: 15px; height: 15px; transition: transform .2s var(--ease); }
+    .kr-more.is-open .kr-more__chev { transform: rotate(180deg); }
+    .kr-alts { display: flex; flex-direction: column; gap: 8px; }
+    .kr-alt { border: 1px solid var(--glass-border-soft); border-radius: 13px; background: var(--glass); overflow: hidden; }
+    .kr-alt__head { width: 100%; display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: none; border: none; color: var(--text-strong); font-size: 14px; font-weight: 600; cursor: pointer; text-align: left; }
+    .kr-alt__name { flex: 1; }
+    .kr-alt__chev { width: 16px; height: 16px; color: var(--text-faint); transition: transform .2s var(--ease); flex-shrink: 0; }
+    .kr-alt.is-open .kr-alt__chev { transform: rotate(180deg); }
+    .kr-alt__body { padding: 0 14px 14px; }
+    .kr-own { align-self: flex-start; margin-top: 2px; }
 
     /* ============================================================
        FIX: panel „Badam Twój rynek na żywo" (#ocena-work).
@@ -4661,6 +4670,51 @@
     }
     .lock-modal__btn:hover { background: #ededed !important; transform: none !important; }
     .find-card__h { font-weight: 600 !important; letter-spacing: 0.03em !important; }
+
+    /* ============================================================
+       TAB SCREENS — DOPEŁNIENIE (audyt #2): Współpraca (cw-*),
+       Plan przychodu/Karta (pj-sec/card/plan), Dotknij apl. (pj-proto),
+       widgety interaktywne (wg-*), makieta (mk-card).
+       ============================================================ */
+
+    /* karty → 10px, płaska czerń, bez glow/gradientu */
+    .cw-stat, .cw-role, .cw-fin, .pj-sec, .pj-card, .pj-plan, .pj-pill,
+    .pj-proto, .widget, .wg-style, .mk-card {
+        border-radius: 10px !important;
+        background: #0a0a0a !important;
+        box-shadow: none !important;
+    }
+    .cw-fin { border: 1px dashed var(--glass-border) !important; }
+    .cw-role--tomek { border-color: var(--accent) !important; background: var(--accent-dim) !important; }
+    .pj-card:hover, .wg-style:hover { box-shadow: none !important; border-color: #454545 !important; }
+    .pj-proto { border-color: var(--glass-border) !important; }
+    .mk-card { border: 1px solid var(--glass-border) !important; }
+    .wg-rank button { border-radius: 10px !important; }
+
+    /* pastylki → 6px; suwak → 6px */
+    .wg-btn, .wg-range { border-radius: 6px !important; }
+
+    /* osie czasu / kropki / paski — solidne, bez glow/gradientu */
+    .cw-tl__item:not(:last-child)::before { background: var(--border-strong) !important; }
+    .cw-tl__item.is-now .cw-tl__dot, .pj-card__dot { box-shadow: none !important; }
+    .cw-stat b { text-shadow: none !important; }
+    .wg-range::-webkit-slider-thumb { box-shadow: none !important; }
+    .wg-range::-moz-range-thumb { box-shadow: none !important; }
+
+    /* przyciski widgetów → primary biały/czarny (spójnie z resztą) */
+    .wg-btn { background: #fff !important; color: #000 !important; box-shadow: none !important; }
+    .wg-btn:hover { background: #ededed !important; box-shadow: none !important; transform: none !important; }
+    .wg-rank button.is-ranked .wg-rank__num { background: var(--accent) !important; box-shadow: none !important; }
+
+    /* wagi → 600 */
+    .cw-stat b, .cw-tl__t, .cw-role__t, .pj-plan__t, .pj-land__open, .pj-proto__open,
+    .wg-btn, .wg-rank__num, .wg-style__name, .mk-card__eyebrow, .mk-card__title {
+        font-weight: 600 !important;
+    }
+    .cw-role__t { letter-spacing: 0.03em !important; }
+
+    /* liczby (statystyki współpracy) → Geist Mono */
+    .cw-stat b { font-family: var(--mono) !important; letter-spacing: -0.02em !important; }
     </style>
 </head>
 <body>
@@ -9073,76 +9127,79 @@
         } catch (e) { return null; }
     }
 
-    // Wspólna chromówka karuzeli (kropki + strzałki) — dla .car z >1 kartą
-    function addCarChrome(wrap, track, count) {
-        if (count <= 1) return;
-        var dots = document.createElement('div');
-        dots.className = 'car__dots';
-        for (var i = 0; i < count; i++) {
-            (function (i) {
-                var d = document.createElement('button');
-                d.type = 'button';
-                if (i === 0) d.className = 'is-on';
-                d.setAttribute('aria-label', 'Karta ' + (i + 1) + ' z ' + count);
-                d.addEventListener('click', function () { track.scrollTo({ left: track.children[i].offsetLeft - 8, behavior: 'smooth' }); });
-                dots.appendChild(d);
-            })(i);
-        }
-        wrap.appendChild(dots);
-        function mkArrow(dir) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'car__arr car__arr--' + (dir < 0 ? 'l' : 'r');
-            b.setAttribute('aria-label', dir < 0 ? 'Poprzednia karta' : 'Następna karta');
-            b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6') + '"></path></svg>';
-            b.addEventListener('click', function () { track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: 'smooth' }); });
-            return b;
-        }
-        wrap.appendChild(mkArrow(-1));
-        wrap.appendChild(mkArrow(1));
-        track.addEventListener('scroll', function () {
-            var w = track.children[0].offsetWidth + 10;
-            var i = Math.max(0, Math.min(count - 1, Math.round(track.scrollLeft / w)));
-            dots.querySelectorAll('button').forEach(function (d, di) { d.classList.toggle('is-on', di === i); });
-        }, { passive: true });
-    }
 
     function renderKierunkiEl(arr) {
+        // Rekomendacja na wierzchu (pęd do werdyktu), reszta pod dyskretnym
+        // rozwijakiem „albo zobacz inne". Wszystkie interakcje to <button> (a11y).
+        var primary = null, alts = [];
+        arr.forEach(function (s) { if (!primary && s.polecany) primary = s; else alts.push(s); });
+        if (!primary) { primary = arr[0]; alts = arr.slice(1); }
+
         var wrap = document.createElement('div');
-        wrap.className = 'car kr';
-        var track = document.createElement('div');
-        track.className = 'car__track';
-        arr.forEach(function (s) {
-            var c = document.createElement('div');
-            c.className = 'car__card kr-card' + (s.polecany ? ' kr-card--rec' : '');
-            var tag = s.tag ? '<span class="kr-tag">' + esc(String(s.tag).slice(0, 40)) + '</span>' : '';
-            var rec = s.polecany ? '<span class="kr-rec">polecam</span>' : '';
-            var dalej = (typeof s.dalej === 'string' && s.dalej.trim()) ? esc(s.dalej.trim().slice(0, 400)) : '';
-            c.innerHTML =
-                '<div class="kr-head">' + tag + rec + '</div>' +
-                '<div class="car__title kr-title">' + esc(s.nazwa.trim().slice(0, 80)) + '</div>' +
-                '<div class="car__body kr-opis">' + esc(s.opis.trim().slice(0, 180)) + '</div>' +
-                '<div class="kr-next">' + (dalej ? '<div class="kr-next__txt">' + dalej + '</div>' : '') +
-                '<button type="button" class="kr-go">Biorę ten kierunek →</button></div>' +
-                '<div class="kr-hint">Dotknij, aby wybrać</div>';
-            c.addEventListener('click', function (e) {
-                if (e.target.closest('.kr-go')) return;
-                if (streaming || el('inline-gate')) return;
-                var wasOpen = c.classList.contains('is-open');
-                track.querySelectorAll('.kr-card').forEach(function (x) { x.classList.remove('is-open'); });
-                if (!wasOpen) c.classList.add('is-open');
-            });
-            c.querySelector('.kr-go').addEventListener('click', function () {
+        wrap.className = 'kr';
+        function pick(nazwa) {
+            return function () {
                 if (streaming || el('inline-gate')) return;
                 wrap.style.transition = 'opacity .25s';
                 wrap.style.opacity = '0';
                 setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 260);
-                sendOpening('Wybieram kierunek: ' + s.nazwa.trim());
+                sendOpening('Wybieram kierunek: ' + nazwa);
+            };
+        }
+        function tagHtml(s) { return s.tag ? '<span class="kr-tag">' + esc(String(s.tag).slice(0, 40)) + '</span>' : ''; }
+        function dalejHtml(s) { var d = (typeof s.dalej === 'string' && s.dalej.trim()) ? esc(s.dalej.trim().slice(0, 400)) : ''; return d ? '<div class="kr-next__txt">' + d + '</div>' : ''; }
+
+        var pc = document.createElement('div');
+        pc.className = 'kr-card kr-card--primary';
+        pc.innerHTML =
+            '<div class="kr-head"><span class="kr-rec">polecam</span>' + tagHtml(primary) + '</div>' +
+            '<div class="kr-title">' + esc(primary.nazwa.trim().slice(0, 80)) + '</div>' +
+            '<div class="kr-opis">' + esc(primary.opis.trim().slice(0, 180)) + '</div>' +
+            dalejHtml(primary);
+        var pgo = document.createElement('button');
+        pgo.type = 'button'; pgo.className = 'kr-go';
+        pgo.textContent = 'Biorę ten kierunek →';
+        pgo.addEventListener('click', pick(primary.nazwa.trim()));
+        pc.appendChild(pgo);
+        wrap.appendChild(pc);
+
+        if (alts.length) {
+            var toggle = document.createElement('button');
+            toggle.type = 'button'; toggle.className = 'kr-more';
+            toggle.setAttribute('aria-expanded', 'false');
+            var word = alts.length === 1 ? 'inne podejście' : 'inne podejścia';
+            toggle.innerHTML = '<svg class="kr-more__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>albo zobacz ' + alts.length + ' ' + word;
+            var box = document.createElement('div');
+            box.className = 'kr-alts'; box.hidden = true;
+            alts.forEach(function (s) {
+                var a = document.createElement('div');
+                a.className = 'kr-alt';
+                a.innerHTML =
+                    '<button type="button" class="kr-alt__head" aria-expanded="false">' +
+                    '<span class="kr-alt__name">' + esc(s.nazwa.trim().slice(0, 80)) + '</span>' + tagHtml(s) +
+                    '<svg class="kr-alt__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>' +
+                    '<div class="kr-alt__body" hidden><div class="kr-opis">' + esc(s.opis.trim().slice(0, 180)) + '</div>' + dalejHtml(s) +
+                    '<button type="button" class="kr-go kr-go--sm">Biorę ten kierunek →</button></div>';
+                var head = a.querySelector('.kr-alt__head');
+                var bodyEl = a.querySelector('.kr-alt__body');
+                head.addEventListener('click', function () {
+                    var open = !bodyEl.hidden; bodyEl.hidden = open;
+                    head.setAttribute('aria-expanded', String(!open));
+                    a.classList.toggle('is-open', !open);
+                });
+                a.querySelector('.kr-go').addEventListener('click', pick(s.nazwa.trim()));
+                box.appendChild(a);
             });
-            track.appendChild(c);
-        });
-        wrap.appendChild(track);
-        addCarChrome(wrap, track, arr.length);
+            toggle.addEventListener('click', function () {
+                var open = !box.hidden; box.hidden = open;
+                toggle.setAttribute('aria-expanded', String(!open));
+                toggle.classList.toggle('is-open', !open);
+                if (!open) scrollToBottom(false);
+            });
+            wrap.appendChild(toggle);
+            wrap.appendChild(box);
+        }
+
         var own = document.createElement('button');
         own.type = 'button';
         own.className = 'qr-own kr-own';
