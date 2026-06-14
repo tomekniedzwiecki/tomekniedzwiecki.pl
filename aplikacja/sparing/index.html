@@ -4382,7 +4382,61 @@
     .qr button.qr-go { background: #fff !important; color: #000 !important; border: 0 !important; border-radius: 6px !important; box-shadow: none !important; }
     .qr button.qr-go:hover:not(:disabled) { background: #ededed !important; transform: none !important; box-shadow: none !important; }
     .qr button.qr-go:disabled { background: #1a1a1a !important; color: var(--text-faint) !important; }
-    .qr button.qr-ai::before { filter: grayscale(1) brightness(1.6); }
+    /* ── PODPOWIEDZI AI = moment magii (subtelnie, w stylu Geist) ──
+       Plain chip (bez modyfikatora) = propozycja AI: iskra + szept błękitu
+       + delikatna poświata na hover. Kontrast z neutralnym „napisz po swojemu". */
+    .qr button:not([class]) {
+        position: relative;
+        padding-left: 34px !important;
+        border: 1px solid rgba(0, 112, 243, 0.28) !important;
+        background:
+            linear-gradient(180deg, rgba(0, 112, 243, 0.08), rgba(0, 112, 243, 0.02)) padding-box,
+            #0a0a0a !important;
+        color: var(--text) !important;
+        transition: border-color .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease) !important;
+    }
+    .qr button:not([class])::before {
+        content: '';
+        position: absolute; left: 12px; top: 50%; margin-top: -7px;
+        width: 14px; height: 14px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3z' fill='%230070f3'/%3E%3C/svg%3E") center / 14px no-repeat;
+        opacity: 0.85;
+        animation: aiSparkBreathe 3.6s ease-in-out infinite;
+    }
+    .qr button:not([class]):hover {
+        border-color: var(--accent) !important;
+        background:
+            linear-gradient(180deg, rgba(0, 112, 243, 0.15), rgba(0, 112, 243, 0.04)) padding-box,
+            #0a0a0a !important;
+        box-shadow: 0 0 0 1px rgba(0, 112, 243, 0.35), 0 6px 22px -8px rgba(0, 112, 243, 0.5) !important;
+    }
+    @keyframes aiSparkBreathe { 0%, 100% { opacity: 0.6; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.08); } }
+
+    /* „Zaproponuj za mnie" = najmocniejszy akcent AI: animowana obwódka-shimmer */
+    .qr button.qr-ai {
+        position: relative;
+        padding-left: 38px !important;
+        border: 1px solid transparent !important;
+        background:
+            linear-gradient(#0a0a0a, #0a0a0a) padding-box,
+            linear-gradient(110deg, rgba(0,112,243,.55), rgba(0,112,243,.12) 38%, rgba(130,170,255,.6) 60%, rgba(0,112,243,.2)) border-box !important;
+        background-size: 100% 100%, 220% 100% !important;
+        box-shadow: 0 0 22px -10px rgba(0, 112, 243, 0.55) !important;
+        animation: aiBorderPan 4.5s linear infinite !important;
+    }
+    .qr button.qr-ai::before { filter: none !important; opacity: 0.95; }
+    .qr button.qr-ai:hover { box-shadow: 0 0 30px -8px rgba(0, 112, 243, 0.75) !important; }
+    @keyframes aiBorderPan { 0% { background-position: 0% 50%, 0% 50%; } 100% { background-position: 0% 50%, 220% 50%; } }
+
+    /* „Albo napisz po swojemu" = celowo neutralny (kontrast: TO Ty, nie AI) */
+    .qr button.qr-own { color: var(--text-muted) !important; }
+    .qr button.qr-own svg { color: var(--text-muted) !important; }
+
+    /* Awatar AI w rozmowie — drobna tożsamość błękitu (to mówi AI) */
+    .msg--ai::before {
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4L12 3z' fill='%230070f3'/%3E%3C/svg%3E") center / 13px no-repeat, #0b1422 !important;
+        border: 1px solid rgba(0, 112, 243, 0.3) !important;
+    }
 
     /* SIDEBAR — aktywna pozycja = solidna powierzchnia (bez niebieskiego paska) */
     .side__new { border-radius: 6px !important; }
