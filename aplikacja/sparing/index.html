@@ -4006,7 +4006,13 @@
         .acc { margin-left: 30px; max-width: 94%; }
         .composer__hint { display: none; }
         .paybox { padding: 22px 18px; }
-        .view--chat.is-hero .chat-msgs::before { width: 68px; height: 68px; margin-bottom: 16px; }
+        .view--chat.is-hero .chat-msgs::before { width: 60px; height: 60px; margin-bottom: 14px; }
+        /* Mobile hero: composer ZAWSZE widoczny. Zamiast centrowania (które przy
+           małym viewporcie wypychało input poza ekran) dokujemy pasek do dołu,
+           a powitanie siedzi tuż nad nim; obszar wiadomości może się przewinąć. */
+        .view--chat.is-hero .chat-scroll { margin-top: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+        .view--chat.is-hero .chat-msgs { justify-content: flex-end; }
+        .view--chat.is-hero .chat-composer { margin-bottom: 0; }
     }
 
     /* ============================================================
@@ -8852,9 +8858,15 @@
                 sendMessage();
             }
         });
+        var lastScrollTop = 0;
         el('chat-scroll').addEventListener('scroll', function () {
             var sc = el('chat-scroll');
-            stickBottom = (sc.scrollHeight - sc.scrollTop - sc.clientHeight) < 140;
+            var dist = sc.scrollHeight - sc.scrollTop - sc.clientHeight;
+            // Przewinięcie W GÓRĘ = user czyta → odczepiamy auto-scroll (nie szarpiemy go
+            // na dół podczas streamingu). Powrót blisko dołu (<60px) ponownie doczepia.
+            if (sc.scrollTop < lastScrollTop - 4) stickBottom = false;
+            else if (dist < 60) stickBottom = true;
+            lastScrollTop = sc.scrollTop;
         }, { passive: true });
         el('btn-restart').addEventListener('click', newConvo);
 
