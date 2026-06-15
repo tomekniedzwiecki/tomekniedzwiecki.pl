@@ -5390,6 +5390,11 @@
             }).catch(function () {});
         } catch (e) {}
     }
+    // Event GA4 lejka Stworze (zawsze persona; guard na brak gtag). Meta/TikTok dokladamy
+    // punktowo tam, gdzie maja sens (lead, rezerwacja).
+    function gaEvent(name, params) {
+        try { if (typeof gtag === 'function') gtag('event', name, Object.assign({ persona: 'stworze' }, params || {})); } catch (e) {}
+    }
     function getCookie(name) {
         var v = '; ' + document.cookie;
         var parts = v.split('; ' + name + '=');
@@ -5922,6 +5927,7 @@
         });
     }
     function switchTab(tab) {
+        if (tab === 'rynek' || tab === 'wspolpraca') gaEvent('app_tab_view', { tab: tab });
         activeTab = tab;
         updateSideNav();
         var isPane = tab !== 'chat';
@@ -7421,6 +7427,7 @@
 
     function pjOpenDetail(view) {
         pjView = view;
+        gaEvent('app_tab_view', { tab: view });
         if (view === 'plan') pjNewPlan = false;
         if (revUnlocked(view)) markSeen(view); // status: nowe → gotowe po otwarciu (tylko odblokowane)
         setTabHash('projekt-' + view);
@@ -8191,6 +8198,7 @@
 
     function openLightbox(startView) {
         if (el('spar-lightbox')) return;
+        gaEvent('app_preview_view', { view: (typeof startView === 'string' ? startView : (startView && startView.label) || 'podglad') });
         var items, idx = 0;
         if (startView && typeof startView === 'object' && Array.isArray(startView.items)) {
             // własna galeria (np. banery reklam) — { items:[{url,label}], index }
@@ -9189,6 +9197,7 @@
         updateCharCount();
         updateStages();
         updateHero();
+        if (priorUser === 0) gaEvent('app_chat_start', { entry: 'typed' });
         streamReply(text, priorUser === 0);
     }
 
@@ -9201,6 +9210,7 @@
         appendMessage('user', text);
         updateStages();
         updateHero();
+        if (priorUser === 0) gaEvent('app_chat_start', { entry: 'chip' });
         streamReply(text, priorUser === 0);
     }
 
@@ -9551,7 +9561,10 @@
                 }
                 if (ev === 'spar_projekt') {
                     meta.projekt = obj || null;
-                    if (obj) { state.lastBrief = obj; persistSession(); }
+                    if (obj) {
+                        if (!state.lastBrief) gaEvent('app_idea_defined', { niche: state.profession || '' });
+                        state.lastBrief = obj; persistSession();
+                    }
                     return;
                 }
                 if (ev === 'spar_ocena') {
@@ -9596,7 +9609,7 @@
                         if (window.__ocenaTimer) { clearInterval(window.__ocenaTimer); window.__ocenaTimer = null; }
                         ocBar(100);
                         ocStep('Mam dane z rynku — układam rekomendację…');
-                        if (obj.ocena) renderFindingsCard(obj.ocena); // #5 — karta „co wyszło z badania"
+                        if (obj.ocena) { renderFindingsCard(obj.ocena); window.__lastOcena = (obj.ocena && obj.ocena.ocena) || ''; } // #5 — karta „co wyszło z badania"
                     }
                     return;
                 }
@@ -9727,6 +9740,7 @@
             var parsed = parseWerdykt(raw);
             var verdict = meta.verdict || (parsed && parsed.kolor) || null;
             if (verdict) {
+                if (verdict !== state.verdict) gaEvent('app_verdict', { verdict: verdict, ocena: window.__lastOcena || '' });
                 state.verdict = verdict;
                 state.karta = (parsed && parsed.karta) ? parsed.karta : state.karta;
                 if (meta.leadId) state.leadId = meta.leadId;
@@ -10649,6 +10663,18 @@
         });
         el('btn-side').addEventListener('click', openSide);
         el('side-backdrop').addEventListener('click', closeSide);
+
+        // Klik w „Rezerwuję rozmowę → 500 zł" (link do checkoutu) — intencja zakupu.
+        // Delegacja, bo linki renderują się dynamicznie (Współpraca + karta <makieta>).
+        document.addEventListener('click', function (e) {
+            var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+            if (!a || a.href.indexOf(CHECKOUT_BASE) < 0) return;
+            var loc = a.closest('.mk-card') ? 'makieta_card' : (a.closest('#pane-wspolpraca') ? 'wspolpraca' : 'inne');
+            gaEvent('app_reservation_cta', { location: loc });
+            gaEvent('begin_checkout', { value: 500, currency: 'PLN', items: [{ item_id: 'reservation_app', item_name: 'Rezerwacja wspolpracy — Aplikacja', price: 500, quantity: 1 }] });
+            if (window.fbq) fbq('track', 'InitiateCheckout', { value: 500, currency: 'PLN', content_name: 'rezerwacja_aplikacja' });
+            if (window.ttq) ttq.track('InitiateCheckout', { value: 500, currency: 'PLN', content_name: 'rezerwacja_aplikacja' });
+        }, true);
 
         // Klawiatura ekranowa (iOS/Android): layout kurczy się do realnie
         // widocznego viewportu, composer nie znika pod klawiaturą
