@@ -3260,6 +3260,12 @@
     .auth-otp-sent { font-size: 13px; line-height: 1.5; opacity: .85; margin: 0 0 10px; }
     .auth-error { font-size: 12.5px; color: #ff7a7a; margin: 8px 0 0; display: none; }
     .auth-error.is-shown { display: block; }
+    .auth-info { font-size: 12.5px; color: #6ee7a8; margin: 8px 0 0; line-height: 1.5; display: none; }
+    .auth-info.is-shown { display: block; }
+    .gate-forgot { display: inline-block; margin: 10px 0 0; padding: 2px 0; background: none; border: 0;
+        color: inherit; opacity: .6; font: inherit; font-size: 12.5px; cursor: pointer; text-decoration: underline; }
+    .gate-forgot:hover { opacity: .9; }
+    .gate-forgot:disabled { opacity: .35; cursor: default; }
 
     /* Pasek „masz konto — wróć do rozmów" na ekranie startowym */
     .auth-banner {
@@ -5123,7 +5129,7 @@
         <div class="tabpane" id="pane-wspolpraca"><div class="tabpane__inner" id="pane-wspolpraca-body"></div></div>
     </section>
 
-    <!-- Modal logowania / zakładania konta (Google / Facebook / kod e-mail) -->
+    <!-- Modal logowania / zakładania konta (Google / Facebook / e-mail + hasło) -->
     <div class="auth-modal" id="auth-modal" hidden>
         <div class="auth-modal__backdrop" id="auth-modal-backdrop"></div>
         <div class="auth-modal__card" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
@@ -8358,16 +8364,39 @@
         // otwarta bramka rejestracji → przeskocz na tryb „konto połączone"
         var gateBox = el('inline-gate');
         if (gateBox) { gateBox.remove(); renderInlineGate(); }
+        // Dopnij konto/mail do bieżącej sesji od razu (nie czekaj na kolejną turę
+        // — po werdykcie może jej nie być, a sesja zostałaby anonimowa).
+        syncContactToServer();
         syncAccountConvos();
         refreshConvoEntitlement();
+    }
+    // Lekki zapis kontaktu (event:'contact') — przypina konto/mail/telefon do
+    // sesji bez pełnej tury. JWT (gdy zalogowany) decyduje o tożsamości na serwerze.
+    function syncContactToServer() {
+        if (!sbAuth || !state.sessionId) return;
+        try {
+            fetch(SPAR_ENDPOINT, {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({
+                    event: 'contact',
+                    sessionId: state.sessionId,
+                    email: state.email || null,
+                    name: state.name || null,
+                    phone: state.phone || null
+                })
+            }).catch(function () { });
+        } catch (e) { }
     }
     function initAuth() {
         if (!sbAuth) { authState.ready = true; renderAuthUI(); return; }
         sbAuth.auth.getSession().then(function (r) {
             setAuthSession(r && r.data ? r.data.session : null);
         }).catch(function () { authState.ready = true; renderAuthUI(); });
-        sbAuth.auth.onAuthStateChange(function (_evt, session) {
+        sbAuth.auth.onAuthStateChange(function (evt, session) {
             setAuthSession(session);
+            // Powrót z linku „zmiana hasła" → wymuś ustawienie nowego hasła
+            if (evt === 'PASSWORD_RECOVERY') openSetNewPasswordModal();
         });
     }
     function signOutAccount() {
@@ -8492,20 +8521,45 @@
             '<input class="f-input" type="password" id="' + prefix + '-pass" placeholder="min. 8 znaków" autocomplete="current-password">' +
             '<button type="submit" class="btn" id="' + prefix + '-otp-send">' + esc(ctaText || 'Dalej') + ' <span class="btn__arrow">→</span></button>' +
             '</form>' +
+            '<button type="button" class="gate-forgot" id="' + prefix + '-forgot">Nie pamiętasz hasła?</button>' +
+            '<p class="auth-info" id="' + prefix + '-auth-info"></p>' +
             '<p class="auth-error" id="' + prefix + '-auth-error"></p>';
     }
     function bindAuthForm(prefix, onDone) {
         function showError(msg) {
             var e = el(prefix + '-auth-error');
             if (e) { e.textContent = msg; e.classList.add('is-shown'); }
+            var i = el(prefix + '-auth-info');
+            if (i) i.classList.remove('is-shown');
         }
         function clearError() {
             var e = el(prefix + '-auth-error');
             if (e) e.classList.remove('is-shown');
         }
+        function showInfo(msg) {
+            var i = el(prefix + '-auth-info');
+            if (i) { i.textContent = msg; i.classList.add('is-shown'); }
+            clearError();
+        }
         var g = el(prefix + '-google'), f = el(prefix + '-fb');
         if (g) g.addEventListener('click', function () { startOAuthLogin('google'); });
         if (f) f.addEventListener('click', function () { startOAuthLogin('facebook'); });
+        // Reset hasła: bierzemy e-mail z pola, wysyłamy link (Supabase recovery).
+        // Link wraca na tę samą stronę → onAuthStateChange(PASSWORD_RECOVERY) →
+        // modal „Ustaw nowe hasło".
+        var forgot = el(prefix + '-forgot');
+        if (forgot) forgot.addEventListener('click', function () {
+            var email = el(prefix + '-email').value.trim().toLowerCase();
+            if (!GATE_EMAIL_RE.test(email)) { showError('Wpisz najpierw swój e-mail — wyślę na niego link do zmiany hasła.'); return; }
+            if (!sbAuth) { showError('Logowanie chwilowo niedostępne — odśwież stronę.'); return; }
+            forgot.disabled = true;
+            var redirect = location.origin + location.pathname + (state.sessionId ? '?id=' + encodeURIComponent(state.sessionId) : '');
+            sbAuth.auth.resetPasswordForEmail(email, { redirectTo: redirect }).then(function (r) {
+                forgot.disabled = false;
+                if (r && r.error) { showError(/rate/i.test(r.error.message || '') ? 'Za dużo prób — odczekaj minutę.' : 'Nie udało się wysłać linku — spróbuj ponownie.'); return; }
+                showInfo('Wysłałem link do zmiany hasła na ' + email + '. Otwórz go z tej samej przeglądarki.');
+            }).catch(function () { forgot.disabled = false; showError('Błąd sieci — spróbuj ponownie.'); });
+        });
         el(prefix + '-otp-form').addEventListener('submit', function (e) {
             e.preventDefault();
             clearError();
@@ -8539,6 +8593,7 @@
     function openAuthModal(reason) {
         var modal = el('auth-modal');
         if (!modal) return;
+        el('auth-modal-title').textContent = 'Zaloguj się'; // przywróć domyślny tytuł (mógł go zmienić reset hasła)
         el('auth-modal-sub').textContent = reason || 'Wróć do swoich rozmów i projektów — na każdym urządzeniu.';
         el('auth-modal-body').innerHTML = authFormHTML('am', 'Dalej');
         bindAuthForm('am', null);
@@ -8547,6 +8602,41 @@
     function closeAuthModal() {
         var modal = el('auth-modal');
         if (modal) modal.hidden = true;
+    }
+
+    // Po kliknięciu linku „zmiana hasła" z maila Supabase loguje sesją recovery
+    // i emituje PASSWORD_RECOVERY. Tu wymuszamy ustawienie nowego hasła
+    // (updateUser) — bez tego konto zostałoby ze starym/żadnym hasłem.
+    function openSetNewPasswordModal() {
+        var modal = el('auth-modal');
+        if (!modal) return;
+        el('auth-modal-title').textContent = 'Ustaw nowe hasło';
+        el('auth-modal-sub').textContent = 'Wpisz nowe hasło do swojego konta — i jesteś zalogowany.';
+        el('auth-modal-body').innerHTML =
+            '<form id="np-form" novalidate>' +
+            '<label class="f-label" for="np-pass">Nowe hasło</label>' +
+            '<input class="f-input" type="password" id="np-pass" placeholder="min. 8 znaków" autocomplete="new-password">' +
+            '<button type="submit" class="btn" id="np-submit">Zapisz hasło <span class="btn__arrow">→</span></button>' +
+            '</form>' +
+            '<p class="auth-error" id="np-error"></p>';
+        modal.hidden = false;
+        setTimeout(function () { try { el('np-pass').focus(); } catch (e) {} }, 80);
+        el('np-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var errEl = el('np-error');
+            if (errEl) errEl.classList.remove('is-shown');
+            var p = el('np-pass').value;
+            if (!p || p.length < 8) { if (errEl) { errEl.textContent = 'Hasło musi mieć min. 8 znaków.'; errEl.classList.add('is-shown'); } return; }
+            if (!sbAuth) return;
+            var b = el('np-submit'); b.disabled = true;
+            sbAuth.auth.updateUser({ password: p }).then(function (r) {
+                b.disabled = false;
+                if (r && r.error) { if (errEl) { errEl.textContent = 'Nie udało się zapisać hasła — spróbuj ponownie.'; errEl.classList.add('is-shown'); } return; }
+                closeAuthModal();
+                el('auth-modal-title').textContent = 'Zaloguj się';
+                try { sysMsg('Hasło zmienione — jesteś zalogowany.'); } catch (e) {}
+            }).catch(function () { b.disabled = false; if (errEl) { errEl.textContent = 'Błąd sieci — spróbuj ponownie.'; errEl.classList.add('is-shown'); } });
+        });
     }
 
     /* ── Rozmowy konta z serwera = ŹRÓDŁO PRAWDY (cross-device) ──
@@ -8656,17 +8746,25 @@
 
     var GATE_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+    // Czego brakuje do kompletu kontaktu w tej sesji:
+    //  • zalogowany → telefon (raz),
+    //  • niezalogowany → konto/e-mail (emailKnown = serwer już ma kontakt tej sesji,
+    //    np. powrót z linku ?id= — nie pytamy drugi raz).
+    function gateContactMissing() {
+        if (authState.user) return !state.phone;
+        return !(state.email || state.emailKnown);
+    }
     function gatePending() {
-        if (state.verdict) return false;
+        // Werdykt już padł, a kontaktu WCIĄŻ brak → domknij kontakt mimo wszystko
+        // (rozmowa potrafi dojść do zielonego/projektu bez złapania danych — wtedy
+        // i tak pytamy, zamiast tracić leada). To realizuje „ponów, jeśli się nie udało".
+        if (state.verdict) return gateContactMissing();
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
         if (userCount < GATE_AFTER_USER_MSGS) return false;
         // #10: nie proś o kontakt, zanim rozmówca zobaczył pierwszy podgląd („wow”) —
         // chyba że rozmowa wlecze się bez podglądu (twardy backstop)
         if (!state.lastBrief && userCount < GATE_HARD_CAP_USER_MSGS) return false;
-        // Zalogowany: konto jest, bramka tylko dobiera telefon (raz)
-        if (authState.user) return !state.phone;
-        // emailKnown: serwer ma już kontakt tej sesji (powrót z linku ?id=) — nie pytamy drugi raz
-        return !(state.email || state.emailKnown);
+        return gateContactMissing();
     }
 
     function accountDoneHTML() {
@@ -8753,6 +8851,9 @@
             state.email = (authState.user && authState.user.email) || state.email;
             state.phone = phone;
             persistSession();
+            // Telefon prosto do bazy — nie czekamy na kolejną turę (po werdykcie
+            // mogłoby jej nie być, a numer/zgoda SMS by przepadły).
+            syncContactToServer();
             // Event LEAD — kontakt skompletowany (mail wcześniej + telefon teraz).
             // Raz na sesję (sessionStorage). Piksel przeglądarkowy + server-side CAPI
             // (Meta/TikTok) z tym samym event_id = dedup, odporne na iOS/blokery.
@@ -9623,6 +9724,9 @@
                 }
                 persistSession();
                 renderVerdict(verdict, state.karta);
+                // Werdykt padł, a kontakt wciąż nie złapany → poproś o niego teraz
+                // (nie tracimy leada tylko dlatego, że werdykt wyprzedził bramkę)
+                if (gatePending() && !el('inline-gate')) renderInlineGate();
                 // Pigułka + plan przychodu: start zaraz po zielonym werdykcie
                 // (po poprawce force — karta się zmieniła). Mały bufor, żeby
                 // serwer zdążył domknąć zapis karty do DB.
@@ -10386,6 +10490,8 @@
             if (isResume && state.verdict === 'zolty') {
                 sysMsg('Wróciłeś do rozmowy. Werdykt na ten moment: żółty — doprecyzuj i pisz dalej.');
             }
+            // werdykt jest, ale kontakt nie został złapany → domknij go teraz
+            if (gatePending()) renderInlineGate();
         } else if (state.verdict) {
             // werdykt jest, ale lokalnie nie ma historii (sesja adoptowana
             // linkiem ?id= bez logowania — sync dociągnął werdykt z serwera).
@@ -10393,6 +10499,8 @@
             // (zgłoszenie Tomka 2026-06-12) — kierujemy do zakładek dyskretnie.
             var resumedName = (state.lastBrief && state.lastBrief.nazwa) ? '„' + state.lastBrief.nazwa + '"' : '';
             sysMsg('Wróciłeś do projektu ' + resumedName + ' — karta, ekrany i cała reszta czekają w menu obok. Pełna historia rozmowy wróci po zalogowaniu.');
+            // werdykt padł bez kontaktu (typowo: adopcja linkiem ?id=) → poproś o kontakt
+            if (gatePending()) renderInlineGate();
         } else if (userCount === 0) {
             renderChips();
         } else if (gatePending()) {
