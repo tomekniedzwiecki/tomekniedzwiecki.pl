@@ -95,7 +95,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
-    <!-- Supabase Auth (konta: Google / Facebook / kod e-mail) — trwała sesja w localStorage -->
+    <!-- Supabase Auth (konta: Google / Facebook / e-mail + hasło) — trwała sesja w localStorage -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -5343,6 +5343,44 @@
         var w = size === 'blur' ? 40 : size === 'full' ? 1100 : 760;
         return base + '?width=' + w + '&resize=contain&quality=' + (size === 'blur' ? 30 : 72);
     }
+
+    // Server-side CAPI (Meta + TikTok) — piksel przeglądarkowy bywa stratny (iOS/blokery).
+    // Dublujemy event z tym samym event_id = dedup z pikselem. fbc/fbp z cookies Meta,
+    // ttclid z capture. Endpointy --no-verify-jwt (CORS *), bez apikey — jak na /zapisy.
+    // Best-effort: błąd sieci nie blokuje UI (.catch pusty).
+    function metaCapi(eventName, payload) {
+        try {
+            fetch(SB_URL + '/functions/v1/meta-event', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.assign({
+                    event: eventName,
+                    email: state.email || null,
+                    phone: state.phone || null,
+                    fbc: getCookie('_fbc') || null,
+                    fbp: getCookie('_fbp') || null,
+                    url: location.href,
+                    user_agent: navigator.userAgent
+                }, payload || {}))
+            }).catch(function () {});
+        } catch (e) {}
+    }
+    function tiktokCapi(eventName, payload) {
+        try {
+            var tr = {};
+            try { tr = JSON.parse(sessionStorage.getItem('tracking_params') || '{}'); } catch (e) {}
+            fetch(SB_URL + '/functions/v1/tiktok-event', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(Object.assign({
+                    event: eventName,
+                    email: state.email || null,
+                    phone: state.phone || null,
+                    ttclid: tr.ttclid || null,
+                    url: location.href,
+                    user_agent: navigator.userAgent
+                }, payload || {}))
+            }).catch(function () {});
+        } catch (e) {}
+    }
     function getCookie(name) {
         var v = '; ' + document.cookie;
         var parts = v.split('; ' + name + '=');
@@ -8241,7 +8279,7 @@
        ============================================================ */
     /* ============================================================
        KONTO (Supabase Auth) — prawdziwe logowanie: Google / Facebook /
-       kod e-mail. Sesja auth trwała (localStorage, auto-refresh); token JWT
+       e-mail + hasło. Sesja auth trwała (localStorage, auto-refresh); token JWT
        idzie w Authorization do spar-chat/spar-project — to on, nie pola
        z body, decyduje o tożsamości po stronie serwera.
        ============================================================ */
@@ -8408,18 +8446,33 @@
         });
     }
 
-    // E-mail + 6-cyfrowy kod (OTP). Działa też w przeglądarkach in-app (FB/IG),
-    // gdzie magic-linki potrafią otwierać się w innej przeglądarce.
-    function sendOtp(email) {
+    // E-mail + hasło. Jeden formularz obsługuje I rejestrację, I logowanie:
+    // próbujemy signUp (nowe konto → od razu sesja, gdy w projekcie wyłączone
+    // potwierdzanie e-maila); jeśli konto już istnieje (Supabase maskuje to
+    // pustą tablicą identities albo błędem „already registered") — logujemy
+    // hasłem. Brak rundy po skrzynkę: konto i sesja powstają w jednym kroku.
+    function emailPassAuth(email, password) {
         if (!sbAuth) return Promise.reject(new Error('brak_auth'));
-        return sbAuth.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } });
-    }
-    function verifyOtp(email, code) {
-        if (!sbAuth) return Promise.reject(new Error('brak_auth'));
-        return sbAuth.auth.verifyOtp({ email: email, token: code, type: 'email' });
+        return sbAuth.auth.signUp({ email: email, password: password }).then(function (r) {
+            if (r && r.error) {
+                if (/already.*regist|already.*exist/i.test(r.error.message || '')) {
+                    return sbAuth.auth.signInWithPassword({ email: email, password: password });
+                }
+                return r; // np. zbyt słabe hasło — pokaż błąd wyżej
+            }
+            // nowe konto z auto-potwierdzeniem → sesja jest od razu
+            if (r && r.data && r.data.session) return r;
+            // istniejące konto (maskowane: identities === []) → zaloguj hasłem
+            var u = r && r.data && r.data.user;
+            if (u && Array.isArray(u.identities) && u.identities.length === 0) {
+                return sbAuth.auth.signInWithPassword({ email: email, password: password });
+            }
+            // brak sesji i wygląda na nowe → w projekcie WŁĄCZONE potwierdzanie e-maila
+            return r;
+        });
     }
 
-    // Wspólny markup logowania (modal + bramka): OAuth + e-mail z kodem.
+    // Wspólny markup logowania (modal + bramka): OAuth + e-mail z hasłem.
     // prefix rozróżnia id-ki obu osadzeń.
     function authFormHTML(prefix, ctaText) {
         // Facebook ukryty do czasu konfiguracji providera w Supabase (App Secret
@@ -8433,23 +8486,15 @@
         return oauthRow +
             '<div class="gate-divider"><span>albo przez e-mail</span></div>' +
             '<form id="' + prefix + '-otp-form" novalidate>' +
-            '<div id="' + prefix + '-otp-step1">' +
             '<label class="f-label" for="' + prefix + '-email">E-mail</label>' +
             '<input class="f-input" type="email" id="' + prefix + '-email" placeholder="ty@firma.pl" autocomplete="email">' +
-            '<button type="submit" class="btn" id="' + prefix + '-otp-send">' + esc(ctaText || 'Wyślij kod') + ' <span class="btn__arrow">→</span></button>' +
-            '</div>' +
-            '<div id="' + prefix + '-otp-step2" hidden>' +
-            '<p class="auth-otp-sent">Wysłałem 6-cyfrowy kod na <strong id="' + prefix + '-otp-mail"></strong>. Wpisz go poniżej.</p>' +
-            '<label class="f-label" for="' + prefix + '-code">Kod z e-maila</label>' +
-            '<input class="f-input" type="text" inputmode="numeric" autocomplete="one-time-code" id="' + prefix + '-code" placeholder="123456" maxlength="8">' +
-            '<button type="submit" class="btn" id="' + prefix + '-otp-verify">Potwierdzam <span class="btn__arrow">→</span></button>' +
-            '</div>' +
+            '<label class="f-label" for="' + prefix + '-pass">Hasło</label>' +
+            '<input class="f-input" type="password" id="' + prefix + '-pass" placeholder="min. 8 znaków" autocomplete="current-password">' +
+            '<button type="submit" class="btn" id="' + prefix + '-otp-send">' + esc(ctaText || 'Dalej') + ' <span class="btn__arrow">→</span></button>' +
             '</form>' +
             '<p class="auth-error" id="' + prefix + '-auth-error"></p>';
     }
     function bindAuthForm(prefix, onDone) {
-        var step = 1;
-        var emailVal = '';
         function showError(msg) {
             var e = el(prefix + '-auth-error');
             if (e) { e.textContent = msg; e.classList.add('is-shown'); }
@@ -8464,35 +8509,30 @@
         el(prefix + '-otp-form').addEventListener('submit', function (e) {
             e.preventDefault();
             clearError();
-            if (step === 1) {
-                emailVal = el(prefix + '-email').value.trim().toLowerCase();
-                if (!GATE_EMAIL_RE.test(emailVal)) { showError('Podaj poprawny adres e-mail.'); return; }
-                var sendBtn = el(prefix + '-otp-send');
-                sendBtn.disabled = true;
-                sendOtp(emailVal).then(function (r) {
-                    sendBtn.disabled = false;
-                    if (r && r.error) {
-                        showError(/rate/i.test(r.error.message || '') ? 'Za dużo prób — odczekaj minutę i spróbuj ponownie.' : 'Nie udało się wysłać kodu. Sprawdź adres i spróbuj ponownie.');
-                        return;
-                    }
-                    step = 2;
-                    el(prefix + '-otp-step1').hidden = true;
-                    el(prefix + '-otp-step2').hidden = false;
-                    el(prefix + '-otp-mail').textContent = emailVal;
-                    el(prefix + '-code').focus();
-                }).catch(function () { sendBtn.disabled = false; showError('Błąd sieci — spróbuj ponownie.'); });
-            } else {
-                var code = el(prefix + '-code').value.replace(/\D/g, '');
-                if (code.length < 6) { showError('Wpisz 6-cyfrowy kod z e-maila.'); return; }
-                var vBtn = el(prefix + '-otp-verify');
-                vBtn.disabled = true;
-                verifyOtp(emailVal, code).then(function (r) {
-                    vBtn.disabled = false;
-                    if (r && r.error) { showError('Kod nieprawidłowy albo wygasł. Sprawdź e-mail i spróbuj jeszcze raz.'); return; }
-                    // setAuthSession poleci z onAuthStateChange; onDone = dodatkowe kroki osadzenia
+            var emailVal = el(prefix + '-email').value.trim().toLowerCase();
+            var passVal = el(prefix + '-pass').value;
+            if (!GATE_EMAIL_RE.test(emailVal)) { showError('Podaj poprawny adres e-mail.'); return; }
+            if (!passVal || passVal.length < 8) { showError('Hasło musi mieć min. 8 znaków.'); return; }
+            var btn = el(prefix + '-otp-send');
+            btn.disabled = true;
+            emailPassAuth(emailVal, passVal).then(function (r) {
+                btn.disabled = false;
+                if (r && r.error) {
+                    var m = r.error.message || '';
+                    if (/invalid login credentials/i.test(m)) showError('Konto z tym e-mailem już istnieje, a hasło jest błędne. Wpisz poprawne hasło.');
+                    else if (/password/i.test(m)) showError('Hasło zbyt słabe — użyj min. 8 znaków.');
+                    else if (/rate/i.test(m)) showError('Za dużo prób — odczekaj minutę i spróbuj ponownie.');
+                    else showError('Nie udało się. Sprawdź dane i spróbuj ponownie.');
+                    return;
+                }
+                if (r && r.data && r.data.session) {
+                    // zalogowany — setAuthSession poleci z onAuthStateChange; onDone = dodatkowe kroki osadzenia
                     if (onDone) onDone();
-                }).catch(function () { vBtn.disabled = false; showError('Błąd sieci — spróbuj ponownie.'); });
-            }
+                    return;
+                }
+                // brak sesji i brak błędu = w projekcie włączone potwierdzanie e-maila
+                showError('Wysłaliśmy link na e-mail — potwierdź go, żeby dokończyć.');
+            }).catch(function () { btn.disabled = false; showError('Błąd sieci — spróbuj ponownie.'); });
         });
     }
 
@@ -8500,7 +8540,7 @@
         var modal = el('auth-modal');
         if (!modal) return;
         el('auth-modal-sub').textContent = reason || 'Wróć do swoich rozmów i projektów — na każdym urządzeniu.';
-        el('auth-modal-body').innerHTML = authFormHTML('am', 'Wyślij kod');
+        el('auth-modal-body').innerHTML = authFormHTML('am', 'Dalej');
         bindAuthForm('am', null);
         modal.hidden = false;
     }
@@ -8658,7 +8698,7 @@
         if (!authState.user) {
             div.innerHTML =
                 '<p>Dobrze nam idzie. Zanim wejdziemy głębiej — załóż konto (albo zaloguj się), żeby ten projekt był Twój: wrócisz do niego z każdego urządzenia, a Tomek będzie wiedział, z kim buduje.</p>' +
-                authFormHTML('gate', 'Wyślij kod') +
+                authFormHTML('gate', 'Dalej') +
                 '<p class="gate-msg__note">Bez spamu i bez nachalnej sprzedaży. Konto służy tej rozmowie i projektowi, który z niej wyjdzie.</p>';
             el('chat-msgs').appendChild(div);
             scrollToBottom(true);
@@ -8714,14 +8754,19 @@
             state.phone = phone;
             persistSession();
             // Event LEAD — kontakt skompletowany (mail wcześniej + telefon teraz).
-            // Raz na sesję (sessionStorage), na wszystkie piksele. Browser-only.
+            // Raz na sesję (sessionStorage). Piksel przeglądarkowy + server-side CAPI
+            // (Meta/TikTok) z tym samym event_id = dedup, odporne na iOS/blokery.
             try {
                 var leadEvtKey = 'spar_lead_evt_' + state.sessionId;
                 if (state.email && state.phone && !sessionStorage.getItem(leadEvtKey)) {
                     sessionStorage.setItem(leadEvtKey, '1');
+                    var leadEvtId = 'lead_' + state.sessionId; // dedup piksel<->CAPI
                     if (typeof gtag === 'function') gtag('event', 'generate_lead', { persona: 'stworze', method: 'contact_gate' });
-                    if (window.fbq) fbq('track', 'Lead', { content_name: 'sparing_contact' });
-                    if (window.ttq) ttq.track('SubmitForm', { content_name: 'sparing_contact' });
+                    if (window.fbq) fbq('track', 'Lead', { content_name: 'sparing_contact' }, { eventID: leadEvtId });
+                    if (window.ttq) ttq.track('SubmitForm', { content_name: 'sparing_contact' }, { event_id: leadEvtId });
+                    // Server-side CAPI (iOS-resilient) — ten sam event_id = Meta/TikTok dedupują z pikselem
+                    metaCapi('Lead', { event_id: leadEvtId, content_name: 'sparing_contact' });
+                    tiktokCapi('SubmitForm', { event_id: leadEvtId, content_name: 'sparing_contact' });
                 }
             } catch (e) {}
             // imię wpisane ręcznie → dopisz do konta (OAuth ma je z profilu)
