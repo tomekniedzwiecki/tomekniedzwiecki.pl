@@ -18,8 +18,8 @@
             } catch (e) {}
         })();
     </script>
-    <title>Tomek Niedźwiecki — w którym kierunku idziemy?</title>
-    <meta name="description" content="Buduję biznesy od zera. Optymalizuję istniejące. Wybierz swoją stronę.">
+    <title>Tomek Niedźwiecki — zbuduję Ci sklep online albo aplikację</title>
+    <meta name="description" content="Zbuduję Ci sklep online od zera albo aplikację na Twoim pomyśle — i doprowadzę do pierwszych klientów. Prowadzisz już firmę? Zoptymalizuję ją automatyzacjami.">
     <meta name="robots" content="index, follow">
 
     <link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
@@ -27,8 +27,8 @@
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tomekniedzwiecki.pl/">
-    <meta property="og:title" content="Tomek Niedźwiecki — w którym kierunku idziemy?">
-    <meta property="og:description" content="Buduję biznesy od zera. Optymalizuję istniejące. Wybierz swoją stronę.">
+    <meta property="og:title" content="Tomek Niedźwiecki — zbuduję Ci sklep online albo aplikację">
+    <meta property="og:description" content="Zbuduję Ci sklep online od zera albo aplikację na Twoim pomyśle — i doprowadzę do pierwszych klientów. Prowadzisz już firmę? Zoptymalizuję ją automatyzacjami.">
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
 
@@ -108,6 +108,8 @@
 
         --accent-green: #00d97e;
         --accent-green-soft: rgba(0, 217, 126, 0.12);
+        --accent-blue: #4d9fff;
+        --accent-blue-soft: rgba(77, 159, 255, 0.12);
         --accent-red: #ff4b3e;
         --accent-red-soft: rgba(255, 75, 62, 0.12);
 
@@ -613,33 +615,33 @@
         margin-bottom: 2px;
     }
 
-    /* H2 — czasownik DOMINUJĄCY */
+    /* H2 — „Zbuduję" jako kicker (mniejszy), OBIEKT dominujący (sklep online / aplikację) */
     .path__verb {
         font-family: var(--sans);
-        font-size: clamp(48px, 8vw, 116px);
-        font-weight: 900;
-        line-height: 0.92;
-        letter-spacing: -0.055em;
-        color: var(--text-strong);
+        font-size: clamp(26px, 3.2vw, 46px);
+        font-weight: 800;
+        line-height: 1.0;
+        letter-spacing: -0.03em;
+        color: var(--text);
         margin: 6px 0 0;
     }
     .path__object {
         font-family: var(--sans);
-        font-size: clamp(28px, 4.4vw, 60px);
-        font-weight: 700;
-        line-height: 1.0;
-        letter-spacing: -0.04em;
-        color: var(--text);
-        margin-top: 4px;
+        font-size: clamp(42px, 6.4vw, 88px);
+        font-weight: 900;
+        line-height: 0.92;
+        letter-spacing: -0.05em;
+        color: var(--text-strong);
+        margin-top: 2px;
     }
     .path__object em {
         font-family: var(--serif);
         font-style: italic;
         font-weight: 400;
-        font-size: 0.78em;
+        font-size: 0.42em;
         color: var(--text-muted);
         letter-spacing: -0.015em;
-        padding: 0 0.06em;
+        padding: 0 0.1em 0 0;
     }
 
     /* Subtitle italic — opis ścieżki */
@@ -654,6 +656,7 @@
         max-width: 480px;
     }
     .path__sub-accent { color: var(--accent-green); font-weight: 500; }
+    .path__sub-blue   { color: var(--accent-blue);  font-weight: 500; }
     .path__sub-red    { color: var(--accent-red);   font-weight: 500; }
 
     /* Proof — number + caption */
@@ -733,7 +736,7 @@
     .path--a .path__chapter { color: var(--accent-green); }
     .path--a .path__chapter::before { background: var(--accent-green); opacity: 0.7; }
 
-    /* ===== PATH B — ZWOLNIĘ (prawa, accent red→green, dominanta) ===== */
+    /* ===== PATH B — ZBUDUJĘ APLIKACJĘ (prawa, accent blue — persona „stworze") ===== */
     .path--b {
         position: relative;
     }
@@ -746,8 +749,8 @@
         aspect-ratio: 1;
         background: radial-gradient(
             circle at center,
-            rgba(255, 75, 62, 0.13) 0%,
-            rgba(255, 75, 62, 0.04) 35%,
+            rgba(77, 159, 255, 0.13) 0%,
+            rgba(77, 159, 255, 0.04) 35%,
             transparent 70%
         );
         filter: blur(80px);
@@ -758,28 +761,27 @@
     }
     .path--b:hover::before { opacity: 1; }
     .path--b .path__verb {
-        color: var(--accent-red);
-        text-shadow: 0 0 80px rgba(255, 75, 62, 0.25);
+        color: var(--text-strong);
+        text-shadow: 0 0 80px rgba(77, 159, 255, 0.22);
     }
-    .path--b .path__chapter { color: var(--accent-red); }
-    .path--b .path__chapter::before { background: var(--accent-red); opacity: 0.7; }
+    .path--b .path__chapter { color: var(--accent-blue); }
+    .path--b .path__chapter::before { background: var(--accent-blue); opacity: 0.7; }
     .path--b .path__proof-num {
-        color: var(--accent-green);
-        text-shadow: 0 0 60px rgba(0, 217, 126, 0.3);
+        color: var(--accent-blue);
+        text-shadow: 0 0 60px rgba(77, 159, 255, 0.3);
     }
     .path--b .path__cta {
-        background: rgba(255, 75, 62, 0.10);
-        border-color: rgba(255, 75, 62, 0.35);
+        background: rgba(77, 159, 255, 0.10);
+        border-color: rgba(77, 159, 255, 0.35);
     }
-    .path--b .path__cta-arrow { color: var(--accent-red); }
+    .path--b .path__cta-arrow { color: var(--accent-blue); }
     .path--b:hover .path__cta {
-        background: var(--accent-red);
-        border-color: var(--accent-red);
-        color: #1a0604;
-        box-shadow: 0 14px 40px rgba(255, 75, 62, 0.4);
+        background: var(--accent-blue);
+        border-color: var(--accent-blue);
+        color: #04101f;
+        box-shadow: 0 14px 40px rgba(77, 159, 255, 0.4);
     }
-    .path--b:hover .path__cta-arrow { color: #1a0604; }
-    .path--b:hover { transform: translateY(-3px); }
+    .path--b:hover .path__cta-arrow { color: #04101f; }
 
     /* ===== DIVIDER "albo" — pionowa linia + serif italic word ===== */
     .split__divider {
@@ -811,6 +813,180 @@
         letter-spacing: 0.02em;
         padding: 8px 0;
         white-space: nowrap;
+    }
+
+    /* ===================== SIDE PATH — ZWOLNIĘ (poboczny kierunek, accent red) ===== */
+    .side {
+        position: relative;
+        z-index: 2;
+        max-width: 1600px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 clamp(20px, 4vw, 64px) clamp(52px, 8vh, 96px);
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    .side.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    }
+    .side__label {
+        display: flex;
+        align-items: center;
+        gap: clamp(14px, 2vw, 22px);
+        margin-bottom: clamp(18px, 2.6vh, 28px);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(15px, 1.5vw, 18px);
+        color: var(--text-faint);
+        letter-spacing: 0.005em;
+        white-space: nowrap;
+    }
+    .side__label::before, .side__label::after {
+        content: '';
+        height: 1px;
+        flex: 1;
+        background: linear-gradient(90deg, transparent 0%, var(--border-strong) 50%, transparent 100%);
+    }
+
+    .side__card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: clamp(20px, 4vw, 48px);
+        padding: clamp(22px, 2.6vw, 32px) clamp(22px, 3vw, 40px);
+        border: 1px solid var(--border);
+        border-left: 2px solid rgba(255, 75, 62, 0.4);
+        border-radius: 12px;
+        background: linear-gradient(100deg, rgba(255, 75, 62, 0.05) 0%, rgba(255, 255, 255, 0.004) 50%, transparent 100%);
+        cursor: pointer;
+        transition: border-color 0.4s var(--ease), background 0.4s var(--ease), transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+    }
+    .side__card:hover {
+        border-color: rgba(255, 75, 62, 0.4);
+        border-left-color: var(--accent-red);
+        background: linear-gradient(100deg, rgba(255, 75, 62, 0.09) 0%, rgba(255, 255, 255, 0.006) 50%, transparent 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    }
+    .side__lead { min-width: 0; }
+    .side__chapter {
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--accent-red);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    .side__chapter::before {
+        content: '';
+        width: 24px;
+        height: 1px;
+        background: var(--accent-red);
+        opacity: 0.6;
+        transition: width 0.5s var(--ease);
+    }
+    .side__card:hover .side__chapter::before { width: 48px; }
+    .side__verb {
+        font-family: var(--sans);
+        font-size: clamp(26px, 3.4vw, 42px);
+        font-weight: 800;
+        line-height: 1.0;
+        letter-spacing: -0.04em;
+        color: var(--text-strong);
+        margin: 0;
+    }
+    .side__verb b { color: var(--accent-red); font-weight: 800; }
+    .side__verb em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: 0.74em;
+        color: var(--text-muted);
+        letter-spacing: -0.015em;
+    }
+    .side__sub {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(15px, 1.6vw, 19px);
+        color: var(--text-muted);
+        line-height: 1.4;
+        margin-top: 10px;
+        max-width: 58ch;
+    }
+    .side__sub-red { color: var(--accent-red); font-weight: 500; }
+    .side__meta {
+        display: flex;
+        align-items: center;
+        gap: clamp(18px, 2.4vw, 32px);
+        flex-shrink: 0;
+    }
+    .side__proof { text-align: right; }
+    .side__proof-num {
+        display: block;
+        font-family: var(--sans);
+        font-size: clamp(24px, 2.6vw, 34px);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--accent-green);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+    .side__proof-cap {
+        display: block;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 13px;
+        color: var(--text-faint);
+        margin-top: 5px;
+    }
+    .side__arrow {
+        flex-shrink: 0;
+        width: 50px;
+        height: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid var(--border-strong);
+        color: var(--accent-red);
+        font-size: 21px;
+        font-weight: 700;
+        transition: background 0.35s var(--ease), border-color 0.35s var(--ease), color 0.3s var(--ease), transform 0.4s var(--ease);
+    }
+    .side__card:hover .side__arrow {
+        background: var(--accent-red);
+        border-color: var(--accent-red);
+        color: #1a0604;
+        transform: translateX(3px);
+    }
+    /* SIDE — mobile: karta pionowo, meta-rząd pod treścią */
+    @media (max-width: 820px) {
+        .side { padding: 0 20px clamp(40px, 6vh, 64px); }
+        .side__label { margin-bottom: clamp(14px, 2.2vh, 20px); font-size: clamp(14px, 4vw, 17px); }
+        .side__card {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 18px;
+            padding: clamp(20px, 5vw, 26px);
+            border-radius: 8px;
+        }
+        .side__card:hover { transform: none; }
+        .side__verb { font-size: clamp(28px, 8vw, 38px); }
+        .side__sub { font-size: clamp(15px, 4.2vw, 18px); max-width: 100%; }
+        .side__meta { justify-content: space-between; gap: 16px; }
+        .side__proof { text-align: left; }
+        .side__proof-num { font-size: clamp(24px, 7vw, 32px); }
+    }
+    @media (max-width: 380px) {
+        .side { padding: 0 14px 56px; }
+        .side__card { padding: 20px 16px; }
+        .side__verb { font-size: clamp(26px, 8.5vw, 34px); }
     }
 
     /* ===================== FOOTER ===================== */
@@ -852,8 +1028,8 @@
     /* Tablet — split nieco ciaśniejszy */
     @media (max-width: 1100px) {
         .hero__h1 { font-size: clamp(52px, 11vw, 140px); }
-        .path__verb { font-size: clamp(44px, 8.5vw, 96px); }
-        .path__object { font-size: clamp(26px, 4.4vw, 48px); }
+        .path__verb { font-size: clamp(24px, 3.2vw, 42px); }
+        .path__object { font-size: clamp(38px, 5.8vw, 72px); }
     }
 
     /* traveling border-beam — animowany kąt koloru przechodzącego po krawędzi */
@@ -878,7 +1054,7 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
         .path--a { --path-accent: rgba(0, 217, 126, 0.9); }
-        .path--b { --path-accent: rgba(255, 75, 62, 0.95); }
+        .path--b { --path-accent: rgba(77, 159, 255, 0.95); }
 
         /* ŚWIATŁO przechodzące po krawędzi: conic-gradient (miękki łuk) maskowany
            do ringu 1px; kąt animowany przez @property → światło krąży delikatnie.
@@ -913,8 +1089,8 @@
             background: linear-gradient(180deg, rgba(0, 217, 126, 0.07) 0%, rgba(255, 255, 255, 0.006) 55%, rgba(255, 255, 255, 0) 100%);
         }
         .path--b:hover {
-            border-color: rgba(255, 75, 62, 0.45);
-            background: linear-gradient(180deg, rgba(255, 75, 62, 0.07) 0%, rgba(255, 255, 255, 0.006) 55%, rgba(255, 255, 255, 0) 100%);
+            border-color: rgba(77, 159, 255, 0.45);
+            background: linear-gradient(180deg, rgba(77, 159, 255, 0.07) 0%, rgba(255, 255, 255, 0.006) 55%, rgba(255, 255, 255, 0) 100%);
         }
     }
     /* reduced-motion: światło nie krąży (zostaje statyczny, subtelny łuk akcentu) */
@@ -1023,8 +1199,8 @@
             background: linear-gradient(100deg, rgba(0,217,126,0.09) 0%, rgba(0,217,126,0.02) 42%, transparent 72%);
         }
         .path--b {
-            border-left: 1px solid var(--accent-red);
-            background: linear-gradient(100deg, rgba(255,75,62,0.10) 0%, rgba(255,75,62,0.025) 42%, transparent 72%);
+            border-left: 1px solid var(--accent-blue);
+            background: linear-gradient(100deg, rgba(77,159,255,0.10) 0%, rgba(77,159,255,0.025) 42%, transparent 72%);
         }
 
         /* --- GIGANTYCZNA CYFRA-DUCH 01 / 02 (element projektowy editorial) ---
@@ -1046,26 +1222,26 @@
             color: transparent;
         }
         .path--a::after { content: "01"; -webkit-text-stroke-color: rgba(0,217,126,0.14); }
-        /* 02 na DOLE (bottom) — schodzi z czerwonej aury .path--b::before
-           (oba czerwone — inaczej outline znikał na blurze) */
+        /* 02 na DOLE (bottom) — schodzi z niebieskiej aury .path--b::before
+           (oba niebieskie — inaczej outline znikał na blurze) */
         .path--b::after {
             content: "02";
             top: auto;
             bottom: clamp(8px, 2vh, 20px);
-            -webkit-text-stroke-color: rgba(255,75,62,0.16);
+            -webkit-text-stroke-color: rgba(77,159,255,0.18);
         }
         /* cała treść karty nad cyfrą jednym selektorem (odporne na edycje HTML) */
         .path > * { position: relative; z-index: 1; }
 
-        /* czasowniki-bohaterowie */
-        .path__verb { font-size: clamp(44px, 12.5vw, 64px); letter-spacing: -0.06em; margin-top: 2px; }
-        .path__object { font-size: clamp(26px, 6vw, 36px); }
+        /* „Zbuduję" jako kicker, OBIEKT dominujący */
+        .path__verb { font-size: clamp(22px, 5.6vw, 30px); letter-spacing: -0.03em; margin-top: 2px; }
+        .path__object { font-size: clamp(36px, 10vw, 52px); letter-spacing: -0.05em; }
         .path__sub { font-size: clamp(16px, 4.4vw, 20px); max-width: 100%; margin-top: clamp(8px, 1.4vh, 14px); }
         .path__proof-num { font-size: clamp(26px, 6.6vw, 36px); }
         .path__proof-caption { font-size: clamp(13px, 3.6vw, 16px); }
         .path__cta { font-size: clamp(17px, 4.6vw, 20px); margin-top: clamp(10px, 1.6vh, 16px); }
         .path--a .path__chapter { color: var(--accent-green); }
-        .path--b .path__chapter { color: var(--accent-red); }
+        .path--b .path__chapter { color: var(--accent-blue); }
 
         /* --- "albo" — wyśrodkowany serif moment z liniami + kropki person ---
            Jedyny element łamiący lewą oś = CELOWA cezura między opcjami. */
@@ -1083,7 +1259,7 @@
             background: linear-gradient(90deg, transparent 0%, var(--border-strong) 35%, var(--border-strong) 65%, transparent 100%);
             min-height: 0;
         }
-        /* zielona kropka przy linii nad "albo" (A), czerwona pod (B) — sygnał "1 albo 2" */
+        /* zielona kropka przy linii nad "albo" (A), niebieska pod (B) — sygnał "1 albo 2" */
         .split__divider-line:first-child::after {
             content: ''; position: absolute; right: 0; top: 50%;
             width: 5px; height: 5px; border-radius: 50%; transform: translateY(-50%);
@@ -1092,7 +1268,7 @@
         .split__divider-line:last-child::after {
             content: ''; position: absolute; left: 0; top: 50%;
             width: 5px; height: 5px; border-radius: 50%; transform: translateY(-50%);
-            background: var(--accent-red); box-shadow: 0 0 8px rgba(255,75,62,0.5);
+            background: var(--accent-blue); box-shadow: 0 0 8px rgba(77,159,255,0.5);
         }
         .split__divider-word {
             font-size: clamp(16px, 5vw, 20px);
@@ -1123,8 +1299,8 @@
         .hero__sub { font-size: clamp(16px, 4.6vw, 19px); margin-top: 14px; }
         .split { padding: 10px 14px 64px; }
         .path { padding: 26px 15px; }
-        .path__verb { font-size: clamp(46px, 14vw, 62px); }
-        .path__object { font-size: clamp(24px, 6.6vw, 32px); }
+        .path__verb { font-size: clamp(22px, 6vw, 28px); }
+        .path__object { font-size: clamp(32px, 10.5vw, 44px); }
         .path__sub { font-size: clamp(16px, 4.4vw, 19px); margin-top: 12px; }
         .path__proof { margin-top: 14px; padding-top: 12px; }
         .path__proof-num { font-size: clamp(24px, 6.4vw, 30px); }
@@ -1147,8 +1323,8 @@
         .split { padding: 6px 16px 56px; }
         .path { padding: 15px 16px; gap: 6px; }
         .path__eyebrow { font-size: 16px; }
-        .path__verb { font-size: 42px; margin-top: 0; }
-        .path__object { font-size: 24px; }
+        .path__verb { font-size: 22px; margin-top: 0; }
+        .path__object { font-size: 38px; }
         .path__sub { font-size: 15px; margin-top: 8px; }
         .path__proof { margin-top: 9px; padding-top: 7px; }
         .path__proof-num { font-size: 24px; }
@@ -1247,14 +1423,14 @@
     <!-- SPLIT — dwie ścieżki + divider "albo" -->
     <section class="split" aria-label="Dwie ścieżki współpracy">
 
-        <!-- PATH A — ZBUDUJĘ -->
+        <!-- PATH A — ZBUDUJĘ SKLEP ONLINE -->
         <a class="path path--a" href="https://tomekniedzwiecki.pl/zbuduje/" data-reveal data-delay="1700">
-            <div class="path__chapter"><span>01 / Start</span></div>
-            <p class="path__eyebrow">Chcesz mieć swój biznes.</p>
+            <div class="path__chapter"><span>01 / Sklep online</span></div>
+            <p class="path__eyebrow">Chcesz mieć swoją markę?</p>
             <h2 class="path__verb">Zbuduję</h2>
-            <p class="path__object"><em>Ci</em> biznes.</p>
+            <p class="path__object"><em>Ci</em> sklep online.</p>
             <p class="path__sub">
-                Od zera. Razem. Oddaję stery, kiedy <span class="path__sub-accent">działa</span>.
+                Od zera. Razem. Oddaję stery, kiedy <span class="path__sub-accent">sprzedaje</span>.
             </p>
             <div class="path__proof">
                 <span class="path__proof-num">3 firmy</span>
@@ -1273,25 +1449,46 @@
             <span class="split__divider-line"></span>
         </div>
 
-        <!-- PATH B — ZWOLNIĘ -->
-        <a class="path path--b" href="https://tomekniedzwiecki.pl/zwolnie/" data-reveal data-delay="2000">
-            <div class="path__chapter"><span>02 / Optymalizacja</span></div>
-            <p class="path__eyebrow">Masz firmę. Chcesz, żeby działała lepiej.</p>
-            <h2 class="path__verb">Zwolnię</h2>
-            <p class="path__object"><em>Twoich</em> pracowników.</p>
+        <!-- PATH B — ZBUDUJĘ APLIKACJĘ -->
+        <a class="path path--b" href="https://tomekniedzwiecki.pl/aplikacja/" data-reveal data-delay="2000">
+            <div class="path__chapter"><span>02 / Aplikacja</span></div>
+            <p class="path__eyebrow">Masz pomysł na aplikację.</p>
+            <h2 class="path__verb">Zbuduję</h2>
+            <p class="path__object"><em>Ci</em> aplikację.</p>
             <p class="path__sub">
-                ...z roboty, której <span class="path__sub-red">nie powinni robić</span>.
+                Na Twoim pomyśle. Rozkręcam do pierwszych klientów — potem <span class="path__sub-blue">oddaję stery</span>.
             </p>
             <div class="path__proof">
-                <span class="path__proof-num">do 67%</span>
-                <span class="path__proof-caption">— niższe koszty osobowe</span>
+                <span class="path__proof-num">Za darmo</span>
+                <span class="path__proof-caption">— sprawdź pomysł w rozmowie z&nbsp;AI</span>
             </div>
             <span class="path__cta">
-                Zobacz jak optymalizuję
+                Sprawdź swój pomysł
                 <span class="path__cta-arrow" aria-hidden="true">→</span>
             </span>
         </a>
 
+    </section>
+
+    <!-- SIDE — ZWOLNIĘ (poboczny kierunek: dla prowadzących firmę) -->
+    <section class="side" aria-label="Prowadzisz już firmę?" data-reveal data-delay="2200">
+        <div class="side__label" aria-hidden="true">albo — prowadzisz już firmę?</div>
+        <a class="side__card" href="https://tomekniedzwiecki.pl/zwolnie/">
+            <div class="side__lead">
+                <div class="side__chapter"><span>03 / Optymalizacja</span></div>
+                <h2 class="side__verb"><b>Zwolnię</b> <em>Twoich</em> ludzi</h2>
+                <p class="side__sub">
+                    ...z roboty, której <span class="side__sub-red">nie powinni robić</span>. Automatyzacje, które tną koszty.
+                </p>
+            </div>
+            <div class="side__meta">
+                <span class="side__proof">
+                    <span class="side__proof-num">do 67%</span>
+                    <span class="side__proof-cap">niższe koszty osobowe</span>
+                </span>
+                <span class="side__arrow" aria-hidden="true">→</span>
+            </div>
+        </a>
     </section>
 </main>
 
@@ -1461,8 +1658,9 @@
         decorate(a);
         a.addEventListener('click', function () { track(persona); });
     }
-    wire('.path--a', 'build');     // AWE — Zbuduję
-    wire('.path--b', 'optimize');  // Prezesi — Zwolnię
+    wire('.path--a', 'build');     // AWE — Zbuduję sklep online → /zbuduje/
+    wire('.path--b', 'stworze');   // Stworzę — Zbuduję aplikację → /aplikacja/
+    wire('.side__card', 'optimize'); // Prezesi — Zwolnię → /zwolnie/
 })();
 </script>
 
