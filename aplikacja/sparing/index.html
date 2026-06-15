@@ -5356,14 +5356,17 @@
     // Best-effort: błąd sieci nie blokuje UI (.catch pusty).
     function metaCapi(eventName, payload) {
         try {
+            var tr = {}; try { tr = JSON.parse(sessionStorage.getItem('tracking_params') || '{}'); } catch (e) {}
+            var fbc = getCookie('_fbc');
+            if (!fbc && tr.fbclid) fbc = 'fb.1.' + Date.now() + '.' + tr.fbclid; // odtwórz fbc, gdy pixel nie ustawił cookie (iOS/bloker)
             fetch(SB_URL + '/functions/v1/meta-event', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(Object.assign({
                     event: eventName,
                     email: state.email || null,
                     phone: state.phone || null,
-                    fbc: getCookie('_fbc') || null,
-                    fbp: getCookie('_fbp') || null,
+                    fbc: fbc || null,
+                    fbp: getCookie('_fbp') || tr.fbp || null,
                     url: location.href,
                     user_agent: navigator.userAgent
                 }, payload || {}))
@@ -5852,11 +5855,23 @@
        ============================================================ */
     function captureTracking() {
         try {
-            var KEYS = ['gclid', 'fbclid', 'ttclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+            // Pełny zestaw click-ID/UTM wspierany przez lead_tracking (gbraid/wbraid/gad_source
+            // to nowe ID Google — bez nich lead z reklam Google leci jako „direct").
+            var KEYS = ['gclid', 'gbraid', 'wbraid', 'gad_source', 'fbclid', 'ttclid', 'msclkid',
+                'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id',
+                'campaignid', 'adgroupid', 'creative', 'keyword', 'matchtype', 'device', 'network', 'placement', 'ref'];
             var u = new URLSearchParams(window.location.search);
             var stored = loadJSON(LS_TRACKING) || {};
-            KEYS.forEach(function (k) { var val = u.get(k); if (val) stored[k] = val; });
-            var fbp = getCookie('_fbp'); if (fbp) stored.fbp = fbp;
+            // 1) z URL bieżącej strony (gdy ktoś ląduje wprost na /aplikacja/sparing z parametrami)
+            KEYS.forEach(function (k) { var val = u.get(k); if (val && !stored[k]) stored[k] = val; });
+            // 2) z bloku capture w <head> (sessionStorage 'tracking_params') — niesie click-ID
+            //    z POPRZEDNIEJ strony tego samego origin (np. /aplikacja → /aplikacja/sparing),
+            //    której link nie dopisuje click-ID do URL. Bez tego lead w CRM gubi gclid/fbclid.
+            try {
+                var head = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+                Object.keys(head).forEach(function (k) { if (head[k] != null && head[k] !== '' && !stored[k]) stored[k] = head[k]; });
+            } catch (e) {}
+            var fbp = getCookie('_fbp'); if (fbp && !stored.fbp) stored.fbp = fbp;
             if (!stored.landing_page) stored.landing_page = window.location.href;
             if (!stored.referrer && document.referrer) stored.referrer = document.referrer;
             saveJSON(LS_TRACKING, stored);
