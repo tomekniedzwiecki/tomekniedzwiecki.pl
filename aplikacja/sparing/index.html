@@ -8506,7 +8506,7 @@
     // Wspólny markup pola hasła z oczkiem (logowanie + „ustaw nowe hasło")
     function passFieldHTML(id, autocomplete) {
         return '<div class="pass-wrap">' +
-            '<input class="f-input" type="password" id="' + id + '" placeholder="min. 5 znaków" autocomplete="' + autocomplete + '">' +
+            '<input class="f-input" type="password" id="' + id + '" placeholder="min. 6 znaków" autocomplete="' + autocomplete + '">' +
             '<button type="button" class="pass-eye" id="' + id + '-eye" aria-label="Pokaż hasło" tabindex="-1">' + EYE_SVG + '</button>' +
             '</div>';
     }
@@ -8627,7 +8627,7 @@
             var emailVal = el(prefix + '-email').value.trim().toLowerCase();
             var passVal = el(prefix + '-pass').value;
             if (!GATE_EMAIL_RE.test(emailVal)) { showError('Podaj poprawny adres e-mail.'); return; }
-            if (!passVal || passVal.length < 5) { showError('Hasło musi mieć min. 5 znaków.'); return; }
+            if (!passVal || passVal.length < 6) { showError('Hasło musi mieć min. 6 znaków.'); return; }
             var btn = el(prefix + '-otp-send');
             btn.disabled = true;
             emailPassAuth(emailVal, passVal).then(function (r) {
@@ -8635,7 +8635,7 @@
                 if (r && r.error) {
                     var m = r.error.message || '';
                     if (/invalid login credentials/i.test(m)) showError('Konto z tym e-mailem już istnieje, a hasło jest błędne. Wpisz poprawne hasło.');
-                    else if (/password/i.test(m)) showError('Hasło zbyt słabe — użyj min. 5 znaków.');
+                    else if (/password/i.test(m)) showError('Hasło zbyt słabe — użyj min. 6 znaków.');
                     else if (/rate/i.test(m)) showError('Za dużo prób — odczekaj minutę i spróbuj ponownie.');
                     else showError('Nie udało się. Sprawdź dane i spróbuj ponownie.');
                     return;
@@ -8688,7 +8688,7 @@
             var errEl = el('np-error');
             if (errEl) errEl.classList.remove('is-shown');
             var p = el('np-pass').value;
-            if (!p || p.length < 5) { if (errEl) { errEl.textContent = 'Hasło musi mieć min. 5 znaków.'; errEl.classList.add('is-shown'); } return; }
+            if (!p || p.length < 6) { if (errEl) { errEl.textContent = 'Hasło musi mieć min. 6 znaków.'; errEl.classList.add('is-shown'); } return; }
             if (!sbAuth) return;
             var b = el('np-submit'); b.disabled = true;
             sbAuth.auth.updateUser({ password: p }).then(function (r) {
