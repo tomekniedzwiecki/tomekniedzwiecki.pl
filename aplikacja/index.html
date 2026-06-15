@@ -230,7 +230,75 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     border-color: var(--accent);
     color: var(--accent-ink);
 }
-@media (max-width: 640px) { .nav__link { display: none; } }
+/* Hamburger — tylko mobile */
+.nav__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: -4px -8px -4px 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.nav__burger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    margin: 0 auto;
+    background: var(--text-strong);
+    border-radius: 2px;
+    transition: transform 0.3s var(--ease), opacity 0.2s var(--ease);
+}
+.nav.is-menu-open .nav__burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav.is-menu-open .nav__burger span:nth-child(2) { opacity: 0; }
+.nav.is-menu-open .nav__burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 640px) {
+    .nav__burger { display: flex; }
+    .nav__right {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 6px 24px 22px;
+        background: rgba(0, 0, 0, 0.94);
+        -webkit-backdrop-filter: blur(20px);
+                backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s;
+    }
+    .nav.is-menu-open .nav__right {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+    .nav__link {
+        display: block;
+        padding: 15px 2px;
+        font-size: 16px;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+    }
+    .nav__cta {
+        margin-top: 18px;
+        text-align: center;
+        padding: 14px 18px;
+        font-size: 15px;
+    }
+}
 
 /* ============================================================
    INTRO OVERLAY — „Masz pomysł." / „To wystarczy."
@@ -1860,7 +1928,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             <img class="nav__logo nav__logo--icon" src="/img/logo/tn-logo-icon-88.png" alt="tomekniedzwiecki.pl" width="32" height="32">
             <span class="nav__suffix">aplikacja.</span>
         </a>
-        <div class="nav__right">
+        <button class="nav__burger" id="navBurger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navMenu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav__right" id="navMenu">
             <a class="nav__link" href="/aplikacja/wspolpraca/">Współpraca</a>
             <a class="nav__link" href="/aplikacja/inspiracje/">Inspiracje</a>
             <a class="nav__cta" href="/aplikacja/sparing/" data-cta data-cta-loc="nav">Sprawdź pomysł →</a>
@@ -2350,6 +2421,35 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             } catch (e) {}
         });
     });
+
+    // ============================================================
+    //  MENU MOBILNE — hamburger
+    // ============================================================
+    (function () {
+        var nav = document.querySelector('.nav');
+        var burger = document.getElementById('navBurger');
+        if (!nav || !burger) return;
+        function setOpen(open) {
+            nav.classList.toggle('is-menu-open', open);
+            burger.setAttribute('aria-expanded', String(open));
+        }
+        burger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            setOpen(!nav.classList.contains('is-menu-open'));
+        });
+        // klik w link / CTA zamyka menu
+        document.getElementById('navMenu').addEventListener('click', function (e) {
+            if (e.target.closest('a')) setOpen(false);
+        });
+        // klik poza nav zamyka
+        document.addEventListener('click', function (e) {
+            if (nav.classList.contains('is-menu-open') && !nav.contains(e.target)) setOpen(false);
+        });
+        // Escape zamyka
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') setOpen(false);
+        });
+    })();
 
     // ============================================================
     //  FEED PUBLICZNY — zasila pas „budują teraz" (scena Ludzie)
