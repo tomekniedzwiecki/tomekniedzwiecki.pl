@@ -3219,7 +3219,9 @@
         display: inline-flex; align-items: center; justify-content: center;
         background: linear-gradient(135deg, #2d6cdf, #6d4ddf); color: #fff;
         font-size: 12px; font-weight: 800; font-style: normal;
+        object-fit: cover; /* dla img: zdjęcie profilowe wypełnia kółko */
     }
+    img.auth-top__avatar { background: none; }
     .auth-top__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .auth-top__menu {
         position: absolute; top: 54px; right: 12px; z-index: 60; min-width: 210px;
@@ -8368,6 +8370,13 @@
         if (n && n.trim()) return n.trim().split(' ')[0];
         return (authState.user.email || '').split('@')[0] || null;
     }
+    // Zdjęcie profilowe z OAuth (Google podaje avatar_url/picture w user_metadata).
+    function authAvatarUrl() {
+        if (!authState.user) return null;
+        var meta = authState.user.user_metadata || {};
+        var url = meta.avatar_url || meta.picture || '';
+        return (typeof url === 'string' && /^https:\/\//.test(url)) ? url : null;
+    }
     function setAuthSession(session) {
         var was = !!authState.user;
         authState.user = session && session.user ? session.user : null;
@@ -8456,8 +8465,12 @@
         if (top) {
             if (authState.user) {
                 var fn = authFirstName() || 'Konto';
+                var av = authAvatarUrl();
+                var avatarHtml = av
+                    ? '<img class="auth-top__avatar" src="' + esc(av) + '" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<i class=&quot;auth-top__avatar&quot;>' + esc(fn.charAt(0).toUpperCase()) + '</i>\'">'
+                    : '<i class="auth-top__avatar">' + esc(fn.charAt(0).toUpperCase()) + '</i>';
                 top.innerHTML = '<button type="button" class="auth-top__user" id="auth-user-btn" aria-haspopup="true">' +
-                    '<i class="auth-top__avatar">' + esc(fn.charAt(0).toUpperCase()) + '</i>' +
+                    avatarHtml +
                     '<span class="auth-top__name">' + esc(fn) + '</span></button>';
                 el('auth-user-btn').addEventListener('click', toggleAuthMenu);
             } else {
