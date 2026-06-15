@@ -3249,6 +3249,11 @@
     .auth-menu__id span { display: block; font-size: 11.5px; opacity: .6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .side__convos--flash { animation: convosFlash 1.2s var(--ease); border-radius: 10px; }
     @keyframes convosFlash { 0%, 100% { background: transparent; } 30% { background: rgba(0,112,243,.16); } }
+    .auth-top__menu-cta { display: flex; align-items: center; gap: 9px; width: 100%;
+        padding: 10px 12px; margin-top: 2px; border-radius: 9px; text-decoration: none;
+        color: #fff; background: var(--accent); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+    .auth-top__menu-cta:hover { filter: brightness(1.07); }
+    .auth-top__menu-cta svg { width: 15px; height: 15px; opacity: .9; flex-shrink: 0; }
 
     .auth-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 18px; }
     .auth-modal[hidden] { display: none; }
@@ -8531,6 +8536,7 @@
             '</div>' +
             '<button type="button" id="auth-menu-convos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1.5"></rect><rect x="14" y="4" width="7" height="7" rx="1.5"></rect><rect x="3" y="15" width="7" height="7" rx="1.5"></rect><rect x="14" y="15" width="7" height="7" rx="1.5"></rect></svg>Twoje projekty</button>' +
             (hasPassword ? '<button type="button" id="auth-menu-pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.6 7.6a5 5 0 1 0-1 1L14 12l2 2 2-2 2 2 2-2-3-3"></path><circle cx="7.5" cy="15.5" r="1.5"></circle></svg>Zmień hasło</button>' : '') +
+            (!state.paid ? '<a class="auth-top__menu-cta" id="auth-menu-reserve" href="' + esc(checkoutURL()) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg>Zarezerwuj rozmowę → 500 zł</a>' : '') +
             '<button type="button" id="auth-menu-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>Wyloguj</button>';
         document.body.appendChild(menu);
         el('auth-menu-convos').addEventListener('click', function () {
@@ -10801,7 +10807,7 @@
         document.addEventListener('click', function (e) {
             var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
             if (!a || a.href.indexOf(CHECKOUT_BASE) < 0) return;
-            var loc = a.closest('.mk-card') ? 'makieta_card' : (a.closest('#pane-wspolpraca') ? 'wspolpraca' : 'inne');
+            var loc = a.id === 'auth-menu-reserve' ? 'konto_menu' : (a.closest('.mk-card') ? 'makieta_card' : (a.closest('#pane-wspolpraca') ? 'wspolpraca' : 'inne'));
             gaEvent('app_reservation_cta', { location: loc });
         }, true);
 
