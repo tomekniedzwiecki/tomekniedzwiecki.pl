@@ -4834,18 +4834,9 @@
         filter: blur(26px); opacity: .5; animation: csGlow 5s ease-in-out infinite;
     }
     .composer__bar { position: relative; z-index: 1; }
-    .composer__bar::before {
-        display: block !important; content: ''; position: absolute; inset: -1px;
-        border-radius: 11px; padding: 1px; pointer-events: none;
-        background: conic-gradient(from var(--spar-angle),
-            rgba(0,112,243,.60) 0deg, rgba(109,179,255,.92) 80deg, rgba(99,91,255,.62) 160deg,
-            rgba(0,112,243,.40) 230deg, rgba(0,217,126,.45) 300deg, rgba(0,112,243,.60) 360deg);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude;
-        animation: sparSpin 8s linear infinite; opacity: .32;
-        transition: opacity .4s var(--ease);
-    }
-    .composer__bar:focus-within::before { opacity: .95 !important; }
+    /* Gradientowy pierścień wyłączony — kolidował z czystym borderem Geist
+       (blok „COMPOSER — płaskie pole") tworząc PODWÓJNĄ ramkę. Zostaje jedna:
+       subtelny border w spoczynku, niebieski 1px ring na fokusie. */
     @keyframes csGlow { 0%,100% { opacity: .3; transform: scaleX(.97); } 50% { opacity: .58; transform: scaleX(1.03); } }
     @media (max-width: 640px) { .composer__inner::before { filter: blur(20px); opacity: .4; } }
     @media (prefers-reduced-motion: reduce) {
