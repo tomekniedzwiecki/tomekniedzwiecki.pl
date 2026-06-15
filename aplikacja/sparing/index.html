@@ -8713,6 +8713,17 @@
             state.email = (authState.user && authState.user.email) || state.email;
             state.phone = phone;
             persistSession();
+            // Event LEAD — kontakt skompletowany (mail wcześniej + telefon teraz).
+            // Raz na sesję (sessionStorage), na wszystkie piksele. Browser-only.
+            try {
+                var leadEvtKey = 'spar_lead_evt_' + state.sessionId;
+                if (state.email && state.phone && !sessionStorage.getItem(leadEvtKey)) {
+                    sessionStorage.setItem(leadEvtKey, '1');
+                    if (typeof gtag === 'function') gtag('event', 'generate_lead', { persona: 'stworze', method: 'contact_gate' });
+                    if (window.fbq) fbq('track', 'Lead', { content_name: 'sparing_contact' });
+                    if (window.ttq) ttq.track('SubmitForm', { content_name: 'sparing_contact' });
+                }
+            } catch (e) {}
             // imię wpisane ręcznie → dopisz do konta (OAuth ma je z profilu)
             if (needName && name && sbAuth) {
                 sbAuth.auth.updateUser({ data: { full_name: name } }).catch(function () { });
