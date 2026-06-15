@@ -5310,6 +5310,12 @@
     var stickBottom = true;
     var genScreen = null;        // 'badanie' | 'ekrany' | null — ekran generowania, na którym user teraz jest
     var leaveBeaconSent = false; // beacon „wyszedłem" wysyłany raz na dany ekran
+    // Kontakt PRZED generowaniem (decyzja Tomka): żadnych ekranów/raportu, dopóki
+    // nie ma maila + telefonu. Gdy generowanie ma ruszyć bez kontaktu — pokazujemy
+    // bramkę (forceContactGate wymusza ją niezależnie od liczby wiadomości/briefu),
+    // a samo generowanie odkładamy do pendingGen i wznawiamy po domknięciu bramki.
+    var forceContactGate = false;
+    var pendingGen = null;
 
     /* ============================================================
        HELPERS
@@ -6806,6 +6812,9 @@
     }
 
     function ensureKartaExtras(force) {
+        // Kontakt (mail + telefon) PRZED generowaniem raportu/planu/rynku. Brak →
+        // bramka teraz, a generowanie odłożone i wznowione po jej domknięciu.
+        if (requireContactBeforeGen(function () { ensureKartaExtras(force); })) return;
         ensureSummaryImage(force);
         ensureBizplan(force);
         // Design A (2026-06-14): RYNEK pokazujemy od razu (live „Badam rynek") —
@@ -8778,16 +8787,38 @@
         return !(state.email || state.emailKnown);
     }
     function gatePending() {
+        // Generowanie ma ruszyć bez kontaktu → bramka PRZED generowaniem (Tomek):
+        // niezależnie od liczby wiadomości i tego, czy jest już brief.
+        if (forceContactGate) return gateContactMissing();
         // Werdykt już padł, a kontaktu WCIĄŻ brak → domknij kontakt mimo wszystko
         // (rozmowa potrafi dojść do zielonego/projektu bez złapania danych — wtedy
         // i tak pytamy, zamiast tracić leada). To realizuje „ponów, jeśli się nie udało".
         if (state.verdict) return gateContactMissing();
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
         if (userCount < GATE_AFTER_USER_MSGS) return false;
-        // #10: nie proś o kontakt, zanim rozmówca zobaczył pierwszy podgląd („wow”) —
-        // chyba że rozmowa wlecze się bez podglądu (twardy backstop)
-        if (!state.lastBrief && userCount < GATE_HARD_CAP_USER_MSGS) return false;
+        // Decyzja Tomka: po paru wymianach pytamy o kontakt (mail, potem telefon)
+        // PRZED generowaniem ekranów/raportu. Nie czekamy już na pierwszy podgląd
+        // („wow" przychodzi PO kontakcie) — generowanie i tak jest twardo bramkowane
+        // przez requireContactBeforeGen.
         return gateContactMissing();
+    }
+
+    // Bramka kontaktu PRZED generowaniem. Gdy brak maila/telefonu — pokazujemy
+    // bramkę i ODKŁADAMY generowanie (genFn) do pendingGen; zwraca true (odłożono).
+    // Gdy kontakt jest — zwraca false, generuj od razu.
+    function requireContactBeforeGen(genFn) {
+        if (!gateContactMissing()) return false;
+        forceContactGate = true;
+        pendingGen = genFn;
+        renderInlineGate();
+        return true;
+    }
+    // Wznów odłożone generowanie po domknięciu bramki (mail + telefon gotowe).
+    function resumePendingGen() {
+        forceContactGate = false;
+        var pg = pendingGen; pendingGen = null;
+        if (pg) { try { pg(); } catch (e) {} return true; }
+        return false;
     }
 
     function accountDoneHTML() {
@@ -8899,6 +8930,15 @@
                 sbAuth.auth.updateUser({ data: { full_name: name } }).catch(function () { });
             }
             div.remove();
+            renderAuthUI();
+            // Kontakt skompletowany (mail + telefon). Jeśli czekało generowanie
+            // (ekrany/raport odłożone przed bramką) — ruszamy je teraz, zamiast
+            // wracać do pisania.
+            if (pendingGen) {
+                sysMsg('Dzięki, ' + (name || 'super').split(' ')[0] + '. Teraz pokażę Ci, co z tego powstaje.');
+                resumePendingGen();
+                return;
+            }
             sysMsg('Dzięki, ' + (name || 'super').split(' ')[0] + '. Wracamy do rozmowy — pisz śmiało.');
             setComposerEnabled(true);
             // Przywróć dymki odpowiedzi z ostatniej tury AI (bramka je schowała)
@@ -8911,7 +8951,6 @@
                     if (gateSugg) renderSuggestions(gateSugg.opts, gateSugg.multi);
                 }
             }
-            renderAuthUI();
             if (window.matchMedia('(hover: hover)').matches) el('chat-input').focus();
         });
     }
@@ -9774,15 +9813,21 @@
             var sugg = (!el('inline-gate')) ? suggestionsFrom(raw) : null;
             var widget = (!el('inline-gate')) ? widgetFrom(raw) : null;
             if (meta.projekt) {
-                genScreen = 'ekrany'; leaveBeaconSent = false; // jest na ekranie generowania ekranów
-                setComposerEnabled(false);
-                el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
-                requestPreviews(null, meta.projekt, false, function () {
-                    if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
-                    updateHero(); // przywraca standardowy placeholder
-                    if (sugg && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
-                    else if (gatePending() && !el('inline-gate')) renderInlineGate();
-                });
+                var projektToGen = meta.projekt;
+                var runProjektGen = function () {
+                    genScreen = 'ekrany'; leaveBeaconSent = false; // jest na ekranie generowania ekranów
+                    setComposerEnabled(false);
+                    el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
+                    requestPreviews(null, projektToGen, false, function () {
+                        if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
+                        updateHero(); // przywraca standardowy placeholder
+                        if (sugg && !el('inline-gate')) renderSuggestions(sugg.opts, sugg.multi);
+                        else if (gatePending() && !el('inline-gate')) renderInlineGate();
+                    });
+                };
+                // Kontakt (mail + telefon) PRZED generowaniem ekranów — jeśli brak,
+                // bramka teraz, a ekrany generują się dopiero po jej domknięciu.
+                if (!requireContactBeforeGen(runProjektGen)) runProjektGen();
             } else if (kierunki) {
                 // Rozwidlenie kierunku — karty wyboru zamiast chipsów (priorytet)
                 el('chat-msgs').appendChild(renderKierunkiEl(kierunki));
