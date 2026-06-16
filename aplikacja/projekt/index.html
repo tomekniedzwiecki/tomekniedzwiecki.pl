@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Projekt zaprojektowany z AI — Aplikacja | Tomek Niedźwiecki</title>
+<meta name="description" content="Pełny projekt narzędzia zaprojektowany na żywo w rozmowie z AI: ekrany, badanie rynku, opłacalność, plan sprzedaży, działająca strona i klikalny prototyp.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="https://tomekniedzwiecki.pl/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Zobacz, co naprawdę powstaje z jednej rozmowy z AI">
+<meta property="og:description" content="Ekrany, rynek, opłacalność, strona i klikalny prototyp — kompletny projekt narzędzia.">
+<meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#000;--surface:#0a0a0a;--surface2:#101012;--line:#242424;--line2:#1a1a1a;
+  --text:#ededed;--muted:#8f8f8f;--muted2:#6a6a6a;--blue:#0070f3;--blue-soft:rgba(0,112,243,.12);
+  --green:#19c37d;--amber:#e8a33d;
+  --r:14px;--maxw:980px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Geist',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.mono{font-family:'Geist Mono',monospace}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;text-decoration:none;min-width:0}
+.bar .brand .dot{width:26px;height:26px;border-radius:8px;background:var(--blue);display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.bar .brand .lbl{color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cta{font-size:13.5px;font-weight:600;color:#fff;background:var(--blue);border:1px solid var(--blue);border-radius:10px;padding:9px 15px;text-decoration:none;white-space:nowrap;transition:filter .15s,transform .15s}
+.cta:hover{filter:brightness(1.12)}
+.cta:active{transform:translateY(1px)}
+.cta--ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.cta--ghost:hover{border-color:#3a3a3a;filter:none}
+
+/* states */
+.state{min-height:70vh;display:grid;place-items:center;text-align:center;padding:40px 20px}
+.state h1{font-size:20px;margin-bottom:8px}
+.state p{color:var(--muted);max-width:420px}
+.spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;margin:0 auto 18px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+
+/* hero */
+.hero{padding:54px 0 34px;border-bottom:1px solid var(--line2)}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--blue);background:var(--blue-soft);border:1px solid rgba(0,112,243,.25);border-radius:999px;padding:5px 11px;margin-bottom:18px}
+.eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 0 rgba(0,112,243,.5);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,112,243,.45)}70%{box-shadow:0 0 0 7px rgba(0,112,243,0)}100%{box-shadow:0 0 0 0 rgba(0,112,243,0)}}
+.hero h1{font-size:clamp(30px,6vw,46px);font-weight:700;letter-spacing:-.02em;line-height:1.08;margin-bottom:14px}
+.hero .sub{font-size:clamp(15px,2.4vw,18px);color:var(--muted);max-width:680px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tag{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+.tag b{color:var(--text);font-weight:600}
+
+/* sections */
+section{padding:46px 0;border-bottom:1px solid var(--line2)}
+.shead{display:flex;align-items:baseline;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.shead .n{font-family:'Geist Mono',monospace;font-size:12px;color:var(--muted2);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+.shead h2{font-size:clamp(20px,3.4vw,26px);font-weight:600;letter-spacing:-.01em}
+.shead .hint{font-size:13.5px;color:var(--muted);margin-left:auto}
+
+/* screens gallery */
+.screens{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.shot{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface);cursor:zoom-in;transition:border-color .15s,transform .15s}
+.shot:hover{border-color:#3a3a3a;transform:translateY(-2px)}
+.shot img{display:block;width:100%;height:auto;background:#fff}
+.shot .cap{font-size:12.5px;color:var(--muted);padding:9px 12px;border-top:1px solid var(--line2)}
+
+/* live frames */
+.live{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.live .chrome{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line2);background:var(--surface2)}
+.live .dots{display:flex;gap:6px}
+.live .dots i{width:11px;height:11px;border-radius:50%;background:#333;display:block}
+.live .url{font-family:'Geist Mono',monospace;font-size:11.5px;color:var(--muted2);flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live .open{font-size:12px;color:var(--blue);text-decoration:none;font-weight:500;white-space:nowrap}
+.live iframe{display:block;width:100%;border:0;background:#fff}
+.live--site iframe{height:560px}
+.live--proto{max-width:420px;margin:0 auto}
+.live--proto iframe{height:600px}
+.live--proto .url{text-align:center}
+.frame-note{font-size:13px;color:var(--muted);margin-top:12px}
+
+/* cards / data */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:20px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card p{font-size:14px;color:var(--muted);margin-bottom:6px}
+.card .big{font-size:14.5px;color:var(--text)}
+.quote{font-size:clamp(16px,2.6vw,20px);line-height:1.5;color:var(--text);border-left:2px solid var(--blue);padding-left:18px;font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;border-radius:999px;padding:5px 12px;border:1px solid}
+.badge--green{color:var(--green);border-color:rgba(25,195,125,.3);background:rgba(25,195,125,.1)}
+.badge--amber{color:var(--amber);border-color:rgba(232,163,61,.3);background:rgba(232,163,61,.1)}
+ul.list{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.list li{font-size:14px;color:var(--muted);padding-left:22px;position:relative}
+ul.list li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+ul.list li b{color:var(--text);font-weight:600}
+
+/* pricing tiers */
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.tier{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:22px;position:relative}
+.tier.reco{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
+.tier .pill{position:absolute;top:-10px;left:22px;font-size:11px;font-weight:600;color:#fff;background:var(--blue);border-radius:999px;padding:3px 10px}
+.tier .tname{font-size:14px;color:var(--muted);font-weight:600}
+.tier .price{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:4px 0 2px}
+.tier .price small{font-size:14px;color:var(--muted);font-weight:500}
+.tier ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.tier ul li{font-size:13px;color:var(--muted);padding-left:20px;position:relative}
+.tier ul li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+
+/* milestones */
+.miles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.mile{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:20px;text-align:center}
+.mile .k{font-size:34px;font-weight:700;letter-spacing:-.02em}
+.mile .who{font-size:13px;color:var(--muted);margin-top:2px}
+.mile .rev{font-size:14px;color:var(--green);font-weight:600;margin-top:10px}
+
+/* posts */
+.post{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:18px 20px}
+.post .hook{font-weight:600;font-size:14.5px;margin-bottom:8px}
+.post .body{font-size:13.5px;color:var(--muted);white-space:pre-wrap}
+.post .where{font-size:11.5px;color:var(--muted2);margin-top:10px;font-family:'Geist Mono',monospace}
+
+/* final cta */
+.final{padding:60px 0;text-align:center;border-bottom:none}
+.final h2{font-size:clamp(24px,4vw,34px);font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+.final p{color:var(--muted);max-width:520px;margin:0 auto 24px;font-size:16px}
+.final .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.92);display:none;place-items:center;padding:24px;cursor:zoom-out}
+.lb.on{display:grid}
+.lb img{max-width:100%;max-height:92vh;border-radius:10px;border:1px solid var(--line)}
+.lb .x{position:absolute;top:18px;right:22px;font-size:30px;color:#fff;background:none;border:0;cursor:pointer;line-height:1}
+
+footer{padding:30px 0;text-align:center;color:var(--muted2);font-size:13px}
+footer a{color:var(--muted);text-decoration:none}
+
+@media(max-width:760px){
+  .grid2,.grid3{grid-template-columns:1fr}
+  .live--site iframe{height:460px}
+  .bar .brand .lbl{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a class="brand" href="https://tomekniedzwiecki.pl/aplikacja/">
+    <span class="dot">⚡</span>Aplikacja<span class="lbl" id="barlbl">&nbsp;· projekt zaprojektowany z AI</span>
+  </a>
+  <a class="cta" id="bartcta" href="https://tomekniedzwiecki.pl/aplikacja/sparing/">Stwórz swój za darmo →</a>
+</div>
+
+<div id="loading" class="state"><div><div class="spin"></div><p>Wczytuję projekt…</p></div></div>
+<div id="error" class="state hidden"><div>
+  <h1>Nie znaleźliśmy tego projektu</h1>
+  <p>Mógł jeszcze się nie domknąć albo nie jest publiczny. Wróć do <a href="https://tomekniedzwiecki.pl/aplikacja/inspiracje/" style="color:var(--blue)">galerii inspiracji</a> albo stwórz własny za darmo.</p>
+</div></div>
+
+<main id="app" class="hidden"></main>
+
+<div class="lb" id="lb"><button class="x" id="lbx">×</button><img id="lbimg" alt=""></div>
+
+<script>
+(function(){
+  var ENDPOINT = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-project';
+  var q = new URLSearchParams(location.search);
+  var sid = (q.get('sid') || q.get('id') || '').trim();
+  var loading = document.getElementById('loading'), errorEl = document.getElementById('error'), app = document.getElementById('app');
+
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function ctaQS(){ try { return (typeof window.getTrackingQS==='function' && window.getTrackingQS()) || ''; } catch(e){ return ''; } }
+  function fail(){ loading.classList.add('hidden'); errorEl.classList.remove('hidden'); }
+
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid)){ fail(); return; }
+
+  fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sessionId:sid,action:'public'})})
+    .then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(function(d){ if(!d || !d.projekt) throw new Error('brak'); render(d.projekt); })
+    .catch(fail);
+
+  // ── render helpers ──────────────────────────────────────────────
+  function sec(n, title, hint, inner){
+    if(!inner) return '';
+    return '<section><div class="wrap"><div class="shead"><span class="n">'+n+'</span><h2>'+esc(title)+'</h2>'+(hint?'<span class="hint">'+esc(hint)+'</span>':'')+'</div>'+inner+'</div></section>';
+  }
+  function arr(x){ return Array.isArray(x)?x:[]; }
+  function num(x){ return (typeof x==='number'&&isFinite(x))?x:null; }
+  function pln(v){ var n=num(v); return n==null?null:n.toLocaleString('pl-PL'); }
+
+  function render(p){
+    var html = '';
+
+    // HERO
+    var meta = [];
+    if(p.dla_kogo) meta.push('<span class="tag">Dla: <b>'+esc(p.dla_kogo)+'</b></span>');
+    if(arr(p.ekrany).length) meta.push('<span class="tag"><b>'+arr(p.ekrany).length+'</b> ekrany</span>');
+    meta.push('<span class="tag">Werdykt: <b style="color:var(--green)">zielone światło</b></span>');
+    html += '<div class="hero"><div class="wrap">'
+      + '<div class="eyebrow"><span class="pulse"></span>Zaprojektowane na żywo w rozmowie z AI</div>'
+      + '<h1>'+esc(p.nazwa||'Narzędzie')+'</h1>'
+      + (p.opis?'<p class="sub">'+esc(p.opis)+'</p>':'')
+      + '<div class="meta">'+meta.join('')+'</div>'
+      + '</div></div>';
+
+    // EKRANY
+    var imgs = p.preview_images || {};
+    var ORDER = [['glowna','Główna funkcja'],['dodatkowa','Dodatkowa funkcja'],['panel','Pulpit'],['podsumowanie','Projekt w pigułce']];
+    var shots = '';
+    ORDER.forEach(function(o){ var u=imgs[o[0]]; if(typeof u==='string'&&u){ shots += '<div class="shot" data-full="'+esc(u)+'"><img loading="lazy" src="'+esc(u)+'&width=520&format=webp" alt="'+esc(o[1])+'"><div class="cap">'+o[1]+'</div></div>'; }});
+    html += sec('01','Ekrany narzędzia','tak miałoby wyglądać', shots?'<div class="screens">'+shots+'</div>':'');
+
+    // STRONA (live)
+    if(p.landing_url){
+      var lu = p.landing_url + (p.landing_url.indexOf('?')>=0?'&':'?') + 'embed=1';
+      html += sec('02','Strona sprzedażowa','działa naprawdę — przewiń ją',
+        '<div class="live live--site"><div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">'+esc((p.nazwa||'narzędzie').toLowerCase().replace(/\s+/g,''))+'.pl</div><a class="open" href="'+esc(p.landing_url)+'" target="_blank" rel="noopener">otwórz ↗</a></div><iframe loading="lazy" src="'+esc(lu)+'"></iframe></div>'
+        +'<p class="frame-note">To prawdziwa strona w przeglądarce — nie obrazek. Wygenerowana z tego samego projektu.</p>');
+    }
+
+    // PROTOTYP (live)
+    if(p.prototyp_url){
+      var pu = p.prototyp_url + (p.prototyp_url.indexOf('?')>=0?'&':'?') + 'embed=1';
+      html += sec('03','Klikalny prototyp','dotknij — reaguje',
+        '<div class="live live--proto"><div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">prototyp</div><a class="open" href="'+esc(p.prototyp_url)+'" target="_blank" rel="noopener">pełny ekran ↗</a></div><iframe loading="lazy" src="'+esc(pu)+'"></iframe></div>'
+        +'<p class="frame-note">Działająca apka, nie makieta — kliknij w środku, wpisz coś, zobacz jak reaguje.</p>');
+    }
+
+    // KARTA
+    var k = p.karta || {};
+    if(k.problem || arr(k.ryzyka).length){
+      var inner = '<div class="grid2">';
+      inner += '<div class="card"><h3>Problem, który rozwiązuje</h3>'+(k.problem?'<p class="big">'+esc(k.problem)+'</p>':'')+(k.kto_placi?'<p style="margin-top:12px">Kto płaci: <b style="color:var(--text)">'+esc(k.kto_placi)+'</b></p>':'')+'</div>';
+      if(arr(k.ryzyka).length){ inner += '<div class="card"><h3>Uczciwie: ryzyka</h3><ul class="list">'+arr(k.ryzyka).map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul></div>'; }
+      inner += '</div>';
+      html += sec('04','Karta projektu','co i dla kogo', inner);
+    }
+
+    // RYNEK
+    var mr = p.market_report || {};
+    if(mr.teza || (mr.rynek&&mr.rynek.opis)){
+      var ri = '';
+      if(mr.teza) ri += '<p class="quote" style="margin-bottom:22px">'+esc(mr.teza)+'</p>';
+      var cells = '';
+      if(mr.ocena_potencjalu){ cells += '<div class="card"><h3>Ocena potencjału</h3><span class="badge badge--green">'+esc(mr.ocena_potencjalu)+'</span>'+(mr.ocena_uzasadnienie?'<p style="margin-top:12px">'+esc(mr.ocena_uzasadnienie)+'</p>':'')+'</div>'; }
+      if(mr.rynek&&(mr.rynek.liczba||mr.rynek.opis)){ cells += '<div class="card"><h3>Wielkość rynku</h3>'+(mr.rynek.liczba?'<p class="big" style="margin-bottom:8px"><b style="color:var(--text)">'+esc(mr.rynek.liczba)+'</b></p>':'')+(mr.rynek.opis?'<p>'+esc(mr.rynek.opis)+'</p>':'')+'</div>'; }
+      if(cells) ri += '<div class="grid2">'+cells+'</div>';
+      var trendy = arr(mr.trendy).slice(0,4).map(function(t){ return typeof t==='string'?t:(t&&t.opis); }).filter(Boolean);
+      if(trendy.length) ri += '<div class="card" style="margin-top:16px"><h3>Co się dzieje na rynku</h3><ul class="list">'+trendy.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul></div>';
+      html += sec('05','Badanie rynku','sprawdzone na żywo w sieci', ri);
+    }
+
+    // OPŁACALNOŚĆ
+    var ec = p.economics || {};
+    var tiery = ec.cennik && arr(ec.cennik.tiery);
+    if(tiery && tiery.length){
+      var ti = '<div class="tiers">'+tiery.slice(0,3).map(function(t){
+        var feats = arr(t.funkcje).slice(0,5).map(function(f){return '<li>'+esc(f)+'</li>';}).join('');
+        return '<div class="tier'+(t.polecany?' reco':'')+'">'+(t.polecany?'<span class="pill">polecany</span>':'')
+          +'<div class="tname">'+esc(t.nazwa||'')+'</div>'
+          +'<div class="price">'+(pln(t.cena)||'—')+' <small>'+esc(t.jednostka||'zł/mies.')+'</small></div>'
+          +(t.dla_kogo?'<p style="font-size:12.5px;color:var(--muted);margin-top:6px">'+esc(t.dla_kogo)+'</p>':'')
+          +(feats?'<ul>'+feats+'</ul>':'')+'</div>';
+      }).join('')+'</div>';
+      if(ec.komentarz) ti += '<p class="frame-note">'+esc(ec.komentarz)+'</p>';
+      html += sec('06','Czy to się spina','policzony model przychodu', ti);
+    }
+
+    // PLAN PRZYCHODU (kamienie)
+    var bp = p.business_plan || {};
+    var km = arr(bp.kamienie);
+    if(km.length){
+      var mi = '<div class="miles">'+km.map(function(m){
+        return '<div class="mile"><div class="k">'+(num(m.klienci)!=null?m.klienci:'—')+'</div><div class="who">'+esc(m.etap||'klientów')+'</div>'+(num(m.mies)!=null?'<div class="rev">~'+pln(m.mies)+' zł/mies.</div>':'')+'</div>';
+      }).join('')+'</div>';
+      html += sec('07','Droga do 50 klientów','plan przychodu krok po kroku', mi);
+    }
+
+    // PLAN SPRZEDAŻY (posty/kanały)
+    var g = p.gtm || {};
+    var posty = g.pakiet && arr(g.pakiet.posty);
+    var kanaly = g.playbook && arr(g.playbook.kanaly);
+    if((posty&&posty.length) || (kanaly&&kanaly.length)){
+      var gi = '';
+      if(kanaly&&kanaly.length){ var ks=kanaly.map(function(c){return typeof c==='string'?c:(c&&(c.nazwa||c.kanal));}).filter(Boolean); if(ks.length) gi += '<div class="card" style="margin-bottom:16px"><h3>Gdzie szukać klientów</h3><ul class="list">'+ks.slice(0,6).map(function(c){return '<li>'+esc(c)+'</li>';}).join('')+'</ul></div>'; }
+      if(posty&&posty.length){ gi += posty.slice(0,2).map(function(po){return '<div class="post" style="margin-bottom:12px">'+(po.haczyk?'<div class="hook">'+esc(po.haczyk)+'</div>':'')+'<div class="body">'+esc(po.tresc||'')+'</div>'+(po.gdzie?'<div class="where">'+esc(po.gdzie)+'</div>':'')+'</div>';}).join(''); }
+      html += sec('08','Plan zdobycia klientów','gotowe treści i kanały', gi);
+    }
+
+    // FINAL CTA
+    var qs = ctaQS(); var sp = 'https://tomekniedzwiecki.pl/aplikacja/sparing/'+(qs?('?'+qs):'');
+    html += '<section class="final"><div class="wrap">'
+      + '<h2>Twój pomysł zasługuje na to samo</h2>'
+      + '<p>To powstało z jednej rozmowy z AI — za darmo, w kilkanaście minut. Opisz swój pomysł i zobacz go w takiej formie.</p>'
+      + '<div class="row"><a class="cta" href="'+esc(sp)+'">Stwórz swój projekt za darmo →</a>'
+      + '<a class="cta cta--ghost" href="https://tomekniedzwiecki.pl/aplikacja/inspiracje/">Zobacz inne projekty</a></div>'
+      + '</div></section>';
+
+    html += '<footer><div class="wrap">Podgląd koncepcyjny · zaprojektowany w <a href="https://tomekniedzwiecki.pl/aplikacja/">tomekniedzwiecki.pl/aplikacja</a> · nic z tego nie jest jeszcze zbudowanym produktem</div></footer>';
+
+    app.innerHTML = html;
+    if(document.getElementById('barlbl')) document.getElementById('barlbl').innerHTML = '&nbsp;· '+esc(p.nazwa||'projekt');
+    loading.classList.add('hidden');
+    app.classList.remove('hidden');
+    bindLightbox();
+  }
+
+  // ── lightbox dla ekranów ──
+  function bindLightbox(){
+    var lb=document.getElementById('lb'), img=document.getElementById('lbimg');
+    document.querySelectorAll('.shot[data-full]').forEach(function(s){
+      s.addEventListener('click',function(){ img.src=s.getAttribute('data-full'); lb.classList.add('on'); });
+    });
+    function close(){ lb.classList.remove('on'); img.src=''; }
+    document.getElementById('lbx').addEventListener('click',close);
+    lb.addEventListener('click',function(e){ if(e.target===lb) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  }
+})();
+</script>
+</body>
+</html>
