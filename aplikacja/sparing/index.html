@@ -7466,9 +7466,25 @@
         // Generacje startują od razu (niezależnie od widoku)
         if (ctx.hasPlanSec) ensureKartaExtras(false);
 
+        if (pjView === 'strona') markSeenLanding(); // bramka prototypu: obejrzał stronę sprzedażową
         if (pjView === 'dash') renderProjektDash(body, ctx);
         else renderProjektDetail(body, ctx);
         startPjTicker();
+    }
+
+    // Bramka prototypu: lead obejrzał stronę sprzedażową. Serwer (spar-project)
+    // stempluje seen_landing_at tylko gdy landing realnie istnieje — gdy strona
+    // jeszcze w przygotowaniu, ponowimy przy kolejnym wyrenderowaniu widoku.
+    var seenLandingSentFor = {};
+    function markSeenLanding() {
+        var sid = state.sessionId;
+        if (!sid || seenLandingSentFor[sid]) return;
+        fetch(SPAR_PROJECT_ENDPOINT, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ sessionId: sid, action: 'seen_landing' })
+        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (d && d.seen) seenLandingSentFor[sid] = true;
+        }).catch(function () { });
     }
 
     function pjOpenDetail(view) {
