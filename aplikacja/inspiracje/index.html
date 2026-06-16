@@ -309,6 +309,42 @@ img { max-width: 100%; display: block; }
 .card__view:hover { background: #454545; }
 .card__view.is-on { background: var(--accent); transform: scale(1.2); }
 
+/* ── KARTA KOMPLETNA → wejście w pełny widok /projekt (hybryda) ── */
+.card--full .card__screen { cursor: pointer; }
+.card__badge {
+    position: absolute; top: 9px; left: 9px; z-index: 3;
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: -0.01em;
+    color: #fff; background: rgba(0, 112, 243, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px;
+    padding: 4px 8px; line-height: 1;
+}
+.card__badge svg { width: 11px; height: 11px; }
+.card__enter {
+    position: absolute; inset: 0; z-index: 1;
+    display: grid; place-items: center; opacity: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.5));
+    transition: opacity 0.2s var(--ease);
+}
+.card--full:hover .card__enter, .card--full:focus-within .card__enter { opacity: 1; }
+.card__enter span {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13.5px; font-weight: 600; color: #fff;
+    background: var(--accent); border-radius: 8px; padding: 10px 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+    transform: translateY(6px); transition: transform 0.2s var(--ease);
+}
+.card--full:hover .card__enter span { transform: none; }
+.card__enter svg { width: 15px; height: 15px; }
+.card__cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--accent);
+    white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+}
+.card__cta svg { width: 13px; height: 13px; flex-shrink: 0; transition: transform 0.2s var(--ease); }
+.card--full:hover .card__cta svg { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) { .card__enter span { transform: none; } }
+
 /* CTA między wierszami i na końcu */
 .midcta {
     grid-column: 1 / -1;
@@ -468,6 +504,13 @@ img { max-width: 100%; display: block; }
         return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
             '?format=webp&width=' + (w || 900) + '&quality=72&resize=contain';
     }
+    var ICO_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>';
+    var ICO_LAYERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>';
+    // link do pełnego widoku projektu (carry tracking params z reklam)
+    function projektUrl(id) {
+        var tq = ''; try { tq = (typeof window.getTrackingQS === 'function' && window.getTrackingQS()) || ''; } catch (e) { }
+        return '/aplikacja/projekt/?sid=' + encodeURIComponent(id) + (tq ? '&' + tq : '');
+    }
     var q = location.search;
     if (q) document.querySelectorAll('a[href="/aplikacja/sparing/"]').forEach(function (a) { a.href = '/aplikacja/sparing/' + q; });
     document.querySelectorAll('[data-cta]').forEach(function (a) {
@@ -505,7 +548,8 @@ img { max-width: 100%; display: block; }
                 return '<button type="button" class="card__view' + (i === 0 ? ' is-on' : '') + '" data-v="' + i + '" aria-label="' + esc(v.label) + '" title="' + esc(v.label) + '"></button>';
             }).join('')
             : '';
-        return '<article class="card' + (isNew ? ' is-new' : '') + '" data-name="' + esc(p.nazwa) + '">' +
+        var full = !!(p.complete && p.id);
+        return '<article class="card' + (isNew ? ' is-new' : '') + (full ? ' card--full' : '') + '" data-name="' + esc(p.nazwa) + '"' + (p.id ? ' data-id="' + esc(p.id) + '"' : '') + '>' +
             '<div class="card__bar">' +
             '<span class="card__lights" aria-hidden="true"><i></i><i></i><i></i></span>' +
             '<span class="card__name">' + esc(p.nazwa) + '</span>' +
@@ -513,7 +557,8 @@ img { max-width: 100%; display: block; }
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>' +
             esc(fmtTime(p.generated_at)) + '</span>' +
             '</div>' +
-            '<div class="card__screen" data-open>' +
+            '<div class="card__screen" data-open' + (full ? ' title="Zobacz cały projekt"' : '') + '>' +
+            (full ? '<span class="card__badge">' + ICO_LAYERS + 'Pełny projekt</span><span class="card__enter" aria-hidden="true"><span>' + ICO_ARROW + 'Zobacz cały projekt</span></span>' : '') +
             imgs.map(function (v, i) {
                 // tylko 1. widok dostaje src od razu (above-fold eager, dalsze lazy);
                 // ukryte widoki = data-src, ładowane dopiero przy hover/przełączeniu — inaczej
@@ -530,12 +575,15 @@ img { max-width: 100%; display: block; }
                 : '') +
             '</div>' +
             '<div class="card__foot">' +
-            '<span class="card__viewlabel" data-viewlabel>' + esc(imgs.length ? imgs[0].label : '') + '</span>' +
+            (full
+                ? '<a class="card__cta" href="' + esc(projektUrl(p.id)) + '">' + ICO_ARROW + 'Zobacz cały projekt</a>'
+                : '<span class="card__viewlabel" data-viewlabel>' + esc(imgs.length ? imgs[0].label : '') + '</span>') +
             '<span class="card__views">' + views + '</span>' +
             '</div></article>';
     }
 
     function bindCard(card, p) {
+        var full = !!(p.complete && p.id);
         var imgs = card.querySelectorAll('.card__screen img');
         var dots = card.querySelectorAll('.card__view');
         var label = card.querySelector('[data-viewlabel]');
@@ -548,7 +596,7 @@ img { max-width: 100%; display: block; }
             materialize(imgs[vi]);
             imgs.forEach(function (im, j) { im.classList.toggle('is-on', j === vi); });
             dots.forEach(function (d, j) { d.classList.toggle('is-on', j === vi); });
-            label.textContent = (p.imgs[vi] || {}).label || '';
+            if (label) label.textContent = (p.imgs[vi] || {}).label || '';
         }
         // hover = prefetch pozostałych widoków (desktop; na mobile ładuje klik kropki)
         card.addEventListener('pointerenter', function () { imgs.forEach(materialize); }, { once: true });
@@ -562,7 +610,11 @@ img { max-width: 100%; display: block; }
                 goV(vi + (b.getAttribute('data-nav') === 'next' ? 1 : -1));
             });
         });
-        card.querySelector('[data-open]').addEventListener('click', function () { openLb(p, vi); });
+        // kompletny projekt → wejście w pełny widok; reszta → lightbox ekranów
+        card.querySelector('[data-open]').addEventListener('click', function () {
+            if (full && p.id) { location.href = projektUrl(p.id); }
+            else { openLb(p, vi); }
+        });
     }
 
     var MID_CTA = '<div class="midcta" data-reveal><b>Wszystkie powstały <span class="ser">z czyjegoś pomysłu</span></b>' +
