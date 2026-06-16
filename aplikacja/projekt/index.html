@@ -5849,7 +5849,7 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
     // PIGUŁKA — infografika całego projektu (klik → lightbox)
     var pillUrl = state.previews[SUMMARY_META[0]];
     if (pillUrl){
-      tiles += bxMedia({ cls: 'bcard--contain', data: 'data-pjd-pill="' + esc(pillUrl) + '"', img: pillUrl, d: D(),
+      tiles += bxMedia({ cls: '', data: 'data-pjd-pill="' + esc(pillUrl) + '"', img: pillUrl, d: D(),
         peekI: I_EXPAND, peek: 'Powiększ', hoverI: I_EXPAND, hover: 'Zobacz w pełni',
         title: 'Projekt w pigułce', sub: 'jedna grafika — cały projekt' });
     }
