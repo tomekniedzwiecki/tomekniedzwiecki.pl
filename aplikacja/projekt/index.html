@@ -83,7 +83,7 @@ section{padding:46px 0;border-bottom:1px solid var(--line2)}
 .live iframe{display:block;width:100%;border:0;background:#fff}
 .live--site iframe{height:560px}
 .live--proto{max-width:420px;margin:0 auto}
-.live--proto iframe{height:600px}
+.live--proto iframe{height:600px;background:#0b0d12}
 .live--proto .url{text-align:center}
 .frame-note{font-size:13px;color:var(--muted);margin-top:12px}
 
@@ -177,6 +177,9 @@ footer a{color:var(--muted);text-decoration:none}
   var loading = document.getElementById('loading'), errorEl = document.getElementById('error'), app = document.getElementById('app');
 
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  // miniatura przez render API Supabase (lekka, webp, resize=contain — nie tnie boków).
+  // UWAGA: object/public NIE transformuje — trzeba render/image/public + ?width (nie &).
+  function thumb(u){ try{ return u.replace('/object/public/','/render/image/public/') + (u.indexOf('?')>=0?'&':'?') + 'width=640&resize=contain&quality=80'; }catch(e){ return u; } }
   function ctaQS(){ try { return (typeof window.getTrackingQS==='function' && window.getTrackingQS()) || ''; } catch(e){ return ''; } }
   function fail(){ loading.classList.add('hidden'); errorEl.classList.remove('hidden'); }
 
@@ -215,7 +218,7 @@ footer a{color:var(--muted);text-decoration:none}
     var imgs = p.preview_images || {};
     var ORDER = [['glowna','Główna funkcja'],['dodatkowa','Dodatkowa funkcja'],['panel','Pulpit'],['podsumowanie','Projekt w pigułce']];
     var shots = '';
-    ORDER.forEach(function(o){ var u=imgs[o[0]]; if(typeof u==='string'&&u){ shots += '<div class="shot" data-full="'+esc(u)+'"><img loading="lazy" src="'+esc(u)+'&width=520&format=webp" alt="'+esc(o[1])+'"><div class="cap">'+o[1]+'</div></div>'; }});
+    ORDER.forEach(function(o){ var u=imgs[o[0]]; if(typeof u==='string'&&u){ shots += '<div class="shot" data-full="'+esc(thumb(u))+'"><img loading="lazy" src="'+esc(thumb(u))+'" alt="'+esc(o[1])+'"><div class="cap">'+o[1]+'</div></div>'; }});
     html += sec('01','Ekrany narzędzia','tak miałoby wyglądać', shots?'<div class="screens">'+shots+'</div>':'');
 
     // STRONA (live)
