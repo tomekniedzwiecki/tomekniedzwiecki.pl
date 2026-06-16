@@ -16,6 +16,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b0d12;display:flex;fl
 .bar .brand span.lbl{color:#8b96a8;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar .cta{font-size:13px;font-weight:700;color:#0b0d12;background:#4d9fff;border-radius:9px;padding:8px 14px;text-decoration:none;white-space:nowrap;transition:filter .15s}
 .bar .cta:hover{filter:brightness(1.1)}
+.bar__left{display:flex;align-items:center;gap:10px;min-width:0}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fff;background:#15171d;border:1px solid #262a33;border-radius:9px;padding:7px 11px 7px 9px;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s;flex-shrink:0}
+.back:hover{background:#1c1f27;border-color:#333845}
+.back svg{width:15px;height:15px}
+.back.hidden{display:none}
 .stage{flex:1;position:relative;background:#fff}
 iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .msg{position:absolute;inset:0;display:grid;place-items:center;background:#fff;color:#0b0d12;text-align:center;padding:24px}
@@ -31,9 +36,15 @@ body.is-embed .bar{display:none}
 </head>
 <body>
 <div class="bar">
-  <a class="brand" href="https://tomekniedzwiecki.pl/aplikacja/">
-    <span class="dot">⚡</span>Aplikacja<span class="lbl" id="lbl">&nbsp;· podgląd koncepcyjny</span>
-  </a>
+  <div class="bar__left">
+    <a class="back hidden" id="back" href="#" aria-label="Wróć do podglądu projektu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>
+      <span>Podgląd projektu</span>
+    </a>
+    <a class="brand" href="https://tomekniedzwiecki.pl/aplikacja/">
+      <span class="dot">⚡</span>Aplikacja<span class="lbl" id="lbl">&nbsp;· podgląd koncepcyjny</span>
+    </a>
+  </div>
   <a class="cta" href="https://tomekniedzwiecki.pl/aplikacja/sparing/">Stwórz swój projekt →</a>
 </div>
 <div class="stage">
@@ -53,6 +64,11 @@ body.is-embed .bar{display:none}
   var isProto = k === 'prototyp';
   // embed=1 → osadzenie w panelu (panel ma już własną ramkę okna): chowamy pasek
   if (q.get('embed') === '1') { document.body.classList.add('is-embed'); }
+  // from=projekt → przyszliśmy z czytelnego pulpitu /aplikacja/projekt/: pokaż powrót
+  if (q.get('from') === 'projekt' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid)) {
+    var back = document.getElementById('back');
+    if (back) { back.href = 'https://tomekniedzwiecki.pl/aplikacja/projekt/?sid=' + encodeURIComponent(sid); back.classList.remove('hidden'); }
+  }
   var loading = document.getElementById('loading');
   var error = document.getElementById('error');
   var lbl = document.getElementById('lbl');
