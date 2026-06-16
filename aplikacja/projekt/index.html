@@ -4967,6 +4967,104 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
 .ro-foot a { color: var(--text-muted); }
 
 @media (max-width: 560px) { .ro-bar .brand .lbl { display: none; } }
+
+/* ============================================================
+   BENTO PULPITU — redesign showcase (TYLKO ta strona; panel
+   klienta nietknięty). Inspiracja: Vercel bento — wizual w
+   KAŻDEJ karcie + czytelny sygnał „kliknij, zobacz". Karty
+   wjeżdżają ze staggerem, wykresy rosną, hover unosi.
+   ============================================================ */
+.pj-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin:6px 0 20px; }
+.pj-head__txt .tabpane__eyebrow { font-family:var(--mono); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); }
+.pj-head__txt .tabpane__title { font-size:clamp(24px,4.5vw,34px); font-weight:700; letter-spacing:-.022em; line-height:1.05; margin:6px 0 0; }
+.pj-head__txt .tabpane__sub { font-size:14.5px; color:var(--text-muted); margin-top:8px; max-width:60ch; }
+.pj-share { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--text); background:var(--glass); border:1px solid var(--glass-border); border-radius:10px; padding:9px 13px; flex-shrink:0; transition:border-color .2s, background .2s; }
+.pj-share svg { width:15px; height:15px; }
+.pj-share:hover { border-color:#3a3a3a; background:var(--glass-strong); }
+
+.bento { display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); grid-auto-rows:198px; grid-auto-flow:dense; gap:14px; }
+.bcard {
+  position:relative; display:flex; flex-direction:column; overflow:hidden; isolation:isolate;
+  border:1px solid var(--border); border-radius:16px; background:var(--bg-elev); color:inherit;
+  text-align:left; text-decoration:none; cursor:pointer; font:inherit;
+  opacity:0; transform:translateY(18px) scale(.985);
+  animation:bxIn .55s var(--ease) forwards; animation-delay:var(--d,0ms);
+  transition:border-color .25s, box-shadow .25s, transform .25s;
+}
+@keyframes bxIn { to { opacity:1; transform:none; } }
+.bcard:hover { border-color:#3d3d3d; transform:translateY(-3px); box-shadow:0 14px 34px -16px rgba(0,0,0,.8); }
+.bcard:active { transform:translateY(-1px); }
+.bcard:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.bcard--hero { grid-column:span 2; grid-row:span 2; }
+.bcard--w2 { grid-column:span 2; }
+@media (max-width:540px){ .bento{ grid-template-columns:1fr; grid-auto-rows:auto; } .bcard,.bcard--hero,.bcard--w2{ grid-column:auto; grid-row:auto; min-height:184px; } .bcard--hero{ min-height:230px; } }
+
+/* PEEK — stały sygnał podglądu (prawy-góra), jaśnieje na hover; krótki puls na starcie */
+.bcard__peek { position:absolute; top:11px; right:11px; z-index:5; display:inline-flex; align-items:center; gap:5px;
+  font-size:11.5px; font-weight:600; color:var(--text); background:rgba(10,10,12,.74); backdrop-filter:blur(7px);
+  border:1px solid var(--glass-border); border-radius:999px; padding:5px 10px; line-height:1; white-space:nowrap;
+  transition:background .2s, border-color .2s, color .2s, transform .2s; animation:peekPulse 2.6s ease 1.1s 2; }
+.bcard__peek svg { width:13px; height:13px; }
+.bcard:hover .bcard__peek { background:var(--accent); border-color:var(--accent); color:#fff; transform:translateY(-1px); }
+@keyframes peekPulse { 0%,100%{ box-shadow:0 0 0 0 rgba(0,112,243,0);} 50%{ box-shadow:0 0 0 4px rgba(0,112,243,.16);} }
+
+/* ── KARTY Z OBRAZEM (zrzut / baner / infografika) ── */
+.bcard--media { justify-content:flex-end; }
+.bcard__img { position:absolute; inset:0; z-index:0; overflow:hidden; background:#0b0d12; }
+.bcard__img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .6s var(--ease); }
+.bcard__img .bcard__blur { filter:blur(26px) saturate(1.25); transform:scale(1.3); opacity:.5; }
+.bcard:hover .bcard__img img:not(.bcard__blur) { transform:scale(1.06); }
+.bcard--contain .bcard__img img:not(.bcard__blur) { object-fit:contain; }
+.bcard__scrim { position:absolute; inset:0; z-index:1; background:linear-gradient(180deg,rgba(0,0,0,0) 34%,rgba(0,0,0,.5) 68%,rgba(0,0,0,.88) 100%); }
+.bcard__foot { position:relative; z-index:3; padding:14px 15px; margin-top:auto; }
+.bcard__foot .t { display:block; font-size:15.5px; font-weight:650; color:#fff; letter-spacing:-.01em; }
+.bcard__foot .s { display:block; font-size:12.5px; color:rgba(255,255,255,.74); margin-top:3px; }
+.bcard--hero .bcard__foot .t { font-size:18px; }
+.bcard__live { display:inline-flex; align-items:center; gap:5px; vertical-align:middle; margin-left:8px; font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#19c37d; }
+.bcard__live i { width:6px; height:6px; border-radius:50%; background:#19c37d; box-shadow:0 0 0 0 rgba(25,195,125,.6); animation:liveDot 1.8s infinite; }
+@keyframes liveDot { 0%{box-shadow:0 0 0 0 rgba(25,195,125,.5);} 70%{box-shadow:0 0 0 6px rgba(25,195,125,0);} 100%{box-shadow:0 0 0 0 rgba(25,195,125,0);} }
+.bcard__hover { position:absolute; inset:0; z-index:4; display:grid; place-items:center; opacity:0; transition:opacity .26s; pointer-events:none; }
+.bcard:hover .bcard__hover { opacity:1; }
+.bcard__hover span { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#fff; background:rgba(10,10,12,.62); backdrop-filter:blur(9px); border:1px solid var(--glass-border); border-radius:999px; padding:10px 17px; transform:translateY(6px); transition:transform .26s; }
+.bcard:hover .bcard__hover span { transform:none; }
+.bcard__hover svg { width:16px; height:16px; }
+
+/* ── KARTY Z DANYMI (wykres = grafika) ── */
+.bcard--data { padding:16px 16px 14px; gap:7px; }
+.bcard__head { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--text-muted); }
+.bcard__head svg { width:16px; height:16px; color:var(--accent); }
+.bcard__big { font-size:27px; font-weight:760; letter-spacing:-.025em; color:#fff; line-height:1.02; }
+.bcard__big small { font-size:13px; font-weight:500; color:var(--text-muted); letter-spacing:0; }
+.bcard__sub { font-size:12.5px; color:var(--text-muted); line-height:1.42; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.bcard__viz { margin-top:auto; }
+.bcard__bars { display:flex; align-items:flex-end; gap:5px; height:52px; }
+.bcard__bars i { flex:1; min-width:6px; border-radius:3px 3px 0 0; background:linear-gradient(180deg,#303030,#161616);
+  transform:scaleY(0); transform-origin:bottom; animation:bxBar .75s var(--ease) forwards; animation-delay:calc(var(--d,0ms) + 160ms); }
+.bcard__bars i.g { background:linear-gradient(180deg,var(--accent),#0a4ea0); }
+@keyframes bxBar { to { transform:scaleY(1); } }
+.bcard__line { display:block; height:52px; width:100%; opacity:0; transform:translateY(8px); animation:bxFade .7s var(--ease) forwards; animation-delay:calc(var(--d,0ms) + 170ms); }
+.bcard__line svg { width:100%; height:100%; overflow:visible; }
+.bcard__line polyline { fill:none; stroke:var(--accent); stroke-width:2; vector-effect:non-scaling-stroke; stroke-linecap:round; stroke-linejoin:round; }
+@keyframes bxFade { to { opacity:1; transform:none; } }
+.bcard__pot { display:inline-flex; align-items:center; gap:7px; font-size:15px; font-weight:700; letter-spacing:-.01em; }
+.bcard__pot i { width:9px; height:9px; border-radius:50%; }
+.bcard__chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.bcard__chips span { font-size:11px; color:var(--text); background:#141416; border:1px solid var(--glass-border); border-radius:7px; padding:4px 8px; white-space:nowrap; }
+.bcard__chips span.more { color:var(--text-faint); }
+
+/* KARTA = mini-blueprint: cytat problemu na delikatnej siatce */
+.bcard--karta { padding:16px; }
+.bcard--karta::before { content:""; position:absolute; inset:0; z-index:0; opacity:.5;
+  background-image:linear-gradient(var(--glass-border-soft) 1px,transparent 1px),linear-gradient(90deg,var(--glass-border-soft) 1px,transparent 1px);
+  background-size:22px 22px; -webkit-mask-image:radial-gradient(120% 90% at 80% 10%,#000,transparent 75%); mask-image:radial-gradient(120% 90% at 80% 10%,#000,transparent 75%); }
+.bcard--karta > * { position:relative; z-index:1; }
+.bcard__quote { font-size:14.5px; line-height:1.42; color:var(--text); font-weight:500; margin-top:9px;
+  display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+.bcard__quote::before { content:"\201C"; color:var(--accent); font-weight:700; margin-right:2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bcard, .bcard__bars i, .bcard__line, .bcard__peek { animation:none !important; opacity:1 !important; transform:none !important; }
+}
 </style>
 </head>
 <body>
@@ -5673,104 +5771,161 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
     return { items: items, oldShots: [], versions: versions, k: k, brief: brief, nazwa: nazwa, hasShots: items.length > 0 };
   }
 
+  // ── ikony sygnałów podglądu ──
+  function svgI(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  var I_EXPAND = svgI('<path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path>');
+  var I_EXT = svgI('<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path>');
+  var I_ARROW = svgI('<path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path>');
+
+  // karta z obrazem: zrzut/baner/infografika wypełnia tło + scrim + stopka + hover
+  function bxMedia(o){
+    var tag = o.href ? 'a' : 'button';
+    var attr = o.href ? (' href="' + esc(o.href) + '" target="_blank" rel="noopener"') : ' type="button"';
+    return '<' + tag + ' class="bcard bcard--media ' + (o.cls || '') + '"' + attr + (o.data ? ' ' + o.data : '') + ' style="--d:' + o.d + 'ms">' +
+      '<span class="bcard__img"><img class="bcard__blur" src="' + esc(imgCdn(o.img, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
+      '<img src="' + esc(imgCdn(o.img, 'tile')) + '" alt="" loading="lazy"></span>' +
+      '<span class="bcard__scrim"></span>' +
+      '<span class="bcard__peek">' + o.peekI + esc(o.peek) + '</span>' +
+      '<span class="bcard__hover"><span>' + o.hoverI + esc(o.hover) + '</span></span>' +
+      '<span class="bcard__foot"><span class="t">' + o.title + '</span><span class="s">' + o.sub + '</span></span>' +
+      '</' + tag + '>';
+  }
+  // karta z danymi: nagłówek + duża liczba + opis + wykres (grafika)
+  function bxData(o){
+    return '<button type="button" class="bcard bcard--data ' + (o.cls || '') + '" data-pjd="' + o.view + '" style="--d:' + o.d + 'ms">' +
+      '<span class="bcard__peek">' + I_ARROW + 'Zobacz</span>' +
+      '<span class="bcard__head">' + pjIco(o.icon) + esc(o.head) + '</span>' +
+      (o.big ? '<span class="bcard__big">' + o.big + '</span>' : '') +
+      (o.sub ? '<span class="bcard__sub">' + esc(o.sub) + '</span>' : '') +
+      (o.viz ? '<span class="bcard__viz">' + o.viz + '</span>' : '') +
+      '</button>';
+  }
+  function bxBars(series){
+    var v = (series || []).filter(function(x){ return typeof x === 'number' && isFinite(x); });
+    if (v.length < 2) return '';
+    var mx = v.reduce(function(a,b){ return Math.max(a,b); }, 1);
+    return '<span class="bcard__bars" aria-hidden="true">' + v.map(function(n,i){
+      var h = Math.max(10, Math.round(n / mx * 100));
+      return '<i class="' + (i === v.length - 1 ? 'g' : '') + '" style="height:' + h + '%"></i>';
+    }).join('') + '</span>';
+  }
+  function bxLine(series){
+    var v = (series || []).filter(function(x){ return typeof x === 'number' && isFinite(x); });
+    if (v.length < 2) return '';
+    var mx = v.reduce(function(a,b){ return Math.max(a,b); }, 1) || 1, n = v.length;
+    var pts = v.map(function(val,i){ return ((i / (n - 1)) * 100).toFixed(1) + ',' + (48 - (val / mx) * 42).toFixed(1); }).join(' ');
+    return '<span class="bcard__line" aria-hidden="true"><svg viewBox="0 0 100 50" preserveAspectRatio="none">' +
+      '<defs><linearGradient id="bxg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0070f3" stop-opacity=".45"></stop><stop offset="1" stop-color="#0070f3" stop-opacity="0"></stop></linearGradient></defs>' +
+      '<polygon points="0,50 ' + pts + ' 100,50" fill="url(#bxg)"></polygon><polyline points="' + pts + '"></polyline></svg></span>';
+  }
+  function bxArea(){
+    var pts = '0,44 14,38 28,40 42,30 56,33 70,22 84,17 100,8';
+    return '<span class="bcard__line" aria-hidden="true"><svg viewBox="0 0 100 50" preserveAspectRatio="none">' +
+      '<defs><linearGradient id="bxa" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#0070f3" stop-opacity=".4"></stop><stop offset="1" stop-color="#0070f3" stop-opacity="0"></stop></linearGradient></defs>' +
+      '<polygon points="0,50 ' + pts + ' 100,50" fill="url(#bxa)"></polygon><polyline points="' + pts + '"></polyline></svg></span>';
+  }
+  function potInfo(oc){
+    if (oc === 'wysoki') return { t: 'Wysoki potencjał', c: '#19c37d' };
+    if (oc === 'umiarkowany') return { t: 'Umiarkowany', c: '#e8a33d' };
+    if (oc === 'niszowy') return { t: 'Solidna nisza', c: '#0070f3' };
+    return { t: 'W ocenie', c: '#8f8f8f' };
+  }
+
   function renderDash(ctx){
-    var html = '<div class="tabpane__head pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Pulpit projektu</div>' +
+    var html = '<div class="pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Pulpit projektu · zaprojektowany z AI</div>' +
       '<h2 class="tabpane__title">' + esc(ctx.nazwa) + '</h2>' +
       (ctx.brief.opis ? '<p class="tabpane__sub">' + esc(ctx.brief.opis) + '</p>' : '') + '</div>' +
       '<button type="button" class="pj-share" id="pj-share" title="Skopiuj link do tego podglądu">' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>Udostępnij</button></div>';
-    var tiles = '';
+    var tiles = '', di = 0;
+    function D(){ return (di++) * 45; }
 
-    // EKRANY
+    // EKRANY — hero z głównym ekranem (klik → galeria + lightbox)
     if (ctx.hasShots){
-      tiles += mediaTile({ cls: 'pjd-tile--hero', data: 'data-pjd="ekrany"', img: ctx.items[0].url,
-        title: 'Ekrany narzędzia', sub: ctx.items.length + ' ' + (ctx.items.length === 1 ? 'widok' : 'widoki') + ' — kliknij, żeby obejrzeć' });
+      tiles += bxMedia({ cls: 'bcard--hero', data: 'data-pjd="ekrany"', img: ctx.items[0].url, d: D(),
+        peekI: I_EXPAND, peek: 'Przeglądaj', hoverI: I_EXPAND, hover: 'Przeglądaj ekrany',
+        title: 'Ekrany narzędzia', sub: ctx.items.length + ' ' + (ctx.items.length === 1 ? 'gotowy widok' : (ctx.items.length < 5 ? 'gotowe widoki' : 'gotowych widoków')) });
     }
-    // KARTA
-    if (ctx.k){
-      var kartaInner = (ctx.k.problem ? '<span class="pjd-quote">' + esc(ctx.k.problem) + '</span>' : '') +
-        '<span class="pjd-tile__sub">problem, klienci i zakres pierwszej wersji</span>';
-      tiles += '<button type="button" class="pjd-tile" data-pjd="karta">' + pjGoIcon() +
-        '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.karta) + '</span>' +
-        '<span class="pjd-tile__t">Karta projektu</span>' + kartaInner + '</button>';
+    // PIGUŁKA — infografika całego projektu (klik → lightbox)
+    var pillUrl = state.previews[SUMMARY_META[0]];
+    if (pillUrl){
+      tiles += bxMedia({ cls: 'bcard--contain', data: 'data-pjd-pill="' + esc(pillUrl) + '"', img: pillUrl, d: D(),
+        peekI: I_EXPAND, peek: 'Powiększ', hoverI: I_EXPAND, hover: 'Zobacz w pełni',
+        title: 'Projekt w pigułce', sub: 'jedna grafika — cały projekt' });
     }
-    // PLAN
+    // PLAN PRZYCHODU — duża kwota + słupki (klik → pełne wyliczenia)
     var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
       ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
     if (goalK && typeof goalK.mies === 'number'){
       var planSeries = state.bizplan.kamienie.map(function(m){ return m && typeof m.mies === 'number' ? m.mies : null; }).filter(function(x){ return x !== null; });
-      tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="plan">' + pjGoIcon() +
-        '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
-        '<span class="pjd-tile__t">Plan przychodu</span>' +
-        '<span class="pjd-num">' + fmtZl(goalK.mies) + ' zł<small>/mies.</small></span>' +
-        '<span class="pjd-tile__sub">przy ' + esc(String(goalK.klienci)) + ' płacących klientach — zobacz pełne wyliczenia</span>' +
-        miniBars(planSeries, true) + '</button>';
+      tiles += bxData({ view: 'plan', icon: PJ_ICONS.plan, head: 'Plan przychodu', d: D(),
+        big: fmtZl(goalK.mies) + ' zł<small>/mies.</small>',
+        sub: 'cel przy ' + goalK.klienci + ' płacących klientach',
+        viz: bxBars(planSeries) });
     }
-    // RYNEK
-    if (state.raport){
-      var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
-      tiles += '<button type="button" class="pjd-tile pjd-tile--w3 pjd-tile--bg' + (oc === 'wysoki' ? ' pjd-tile--rynek-hi' : '') + '" data-pjd="rynek">' +
-        marketBg() + pjGoIcon() +
-        '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
-        '<span class="pjd-tile__t">Potencjał rynku</span>' +
-        (oc ? '<span class="pjd-badge pjd-badge--' + esc(oc) + '">' + esc(oc) + '</span>' : '') +
-        (state.raport.teza ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.teza) + '</span>' : '') + '</button>';
-    }
-    // ECONOMICS
+    // CZY TO ZARABIA — ltv/cac + krzywa wzrostu (klik → suwaki)
     if (state.economics){
       var ec = econCalc(state.economics, null);
       var ecSeries = (ec && Array.isArray(ec.sim)) ? ec.sim.map(function(s){ return s.aktywni; }) : [];
-      tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="economics">' + pjGoIcon() +
-        '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
-        '<span class="pjd-tile__t">Czy to zarabia</span>' +
-        (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;tyle wraca z 1 zł na klienta</small></span>' : '') +
-        '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
-        miniLine(ecSeries) + '</button>';
+      tiles += bxData({ view: 'economics', icon: PJ_ICONS.economics, head: 'Czy to zarabia', d: D(),
+        big: ec ? ((Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×') : '',
+        sub: 'tyle wraca z 1 zł na zdobycie klienta — przelicz na suwakach',
+        viz: bxLine(ecSeries) });
     }
-    // GTM + REKLAMY
+    // POTENCJAŁ RYNKU — ocena + wykres niszy (klik → raport)
+    if (state.raport){
+      var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
+      var pot = potInfo(oc);
+      tiles += bxData({ view: 'rynek', icon: PJ_ICONS.raport, head: 'Potencjał rynku', d: D(),
+        big: '<span class="bcard__pot"><i style="background:' + pot.c + '"></i>' + pot.t + '</span>',
+        sub: state.raport.teza || 'realny research: nisza, konkurenci, trendy',
+        viz: bxArea() });
+    }
+    // GDZIE SZUKAĆ KLIENTÓW — liczba + chipy kanałów (klik → plan)
     if (state.gtm){
-      var kanCount = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly.length : 0;
-      var adCount = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy.length : 0;
-      tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="gtm">' + pjGoIcon() +
-        '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.gtm) + '</span>' +
-        '<span class="pjd-tile__t">Gdzie szukać klientów</span>' +
-        '<span class="pjd-tile__sub">' + kanCount + ' miejsc, gdzie już są Twoi klienci — za darmo i przez reklamy</span></button>';
-      if (adCount){
-        tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="reklamy">' + pjGoIcon() +
-          '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.reklamy) + '</span>' +
-          '<span class="pjd-tile__t">Gotowe reklamy</span>' +
-          '<span class="pjd-tile__sub">' + adCount + ' ' + (adCount === 1 ? 'reklama gotowa' : (adCount < 5 ? 'reklamy gotowe' : 'reklam gotowych')) + ' — kreacja z ekranów + copy, od ręki do kampanii</span></button>';
-      }
+      var kanaly = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly : [];
+      var chipNames = kanaly.map(function(k){ return k && (k.miejsce || k.nazwa); }).filter(Boolean);
+      var chips = chipNames.slice(0, 3).map(function(c){ return '<span>' + esc(c) + '</span>'; }).join('');
+      if (chipNames.length > 3) chips += '<span class="more">+' + (chipNames.length - 3) + '</span>';
+      tiles += bxData({ view: 'gtm', icon: PJ_ICONS.gtm, head: 'Gdzie szukać klientów', d: D(),
+        big: kanaly.length + ' <small>miejsc</small>',
+        viz: chips ? '<span class="bcard__chips">' + chips + '</span>' : '' });
     }
-    // TWOJA STRONA — link w nowym oknie (iframe źle się przewijał)
+    // TWOJA STRONA — zrzut, link w nowym oknie
     if (state.landingUrl){
       var landThumb = state.previews.landing || (ctx.items.length ? ctx.items[0].url : '');
-      if (landThumb){
-        tiles += mediaTile({ cls: 'pjd-tile--w3', href: withFrom(state.landingUrl), img: landThumb,
-          title: 'Twoja strona <em class="pjd-live">działa</em>', sub: 'prawdziwa strona w przeglądarce — otwórz w nowym oknie ↗' });
-      } else {
-        tiles += '<a class="pjd-tile pjd-tile--w3" href="' + esc(withFrom(state.landingUrl)) + '" target="_blank" rel="noopener">' + pjGoIcon() +
-          '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.strona) + '</span>' +
-          '<span class="pjd-tile__t">Twoja strona <em class="pjd-live">działa</em></span>' +
-          '<span class="pjd-tile__sub">prawdziwa strona w przeglądarce — otwórz w nowym oknie ↗</span></a>';
-      }
+      tiles += bxMedia({ cls: 'bcard--w2', href: withFrom(state.landingUrl), img: landThumb || ctx.items[0] && ctx.items[0].url, d: D(),
+        peekI: I_EXT, peek: 'Otwórz ↗', hoverI: I_EXT, hover: 'Otwórz stronę',
+        title: 'Twoja strona <span class="bcard__live"><i></i>działa</span>',
+        sub: 'prawdziwa strona w przeglądarce, nie grafika' });
     }
-    // PROTOTYP — link w nowym oknie
+    // PROTOTYP — poster z ekranu apki, link w nowym oknie
     if (state.prototypeUrl){
-      tiles += '<a class="pjd-tile pjd-tile--proto" href="' + esc(withFrom(state.prototypeUrl)) + '" target="_blank" rel="noopener">' + pjGoIcon() +
-        '<span class="pjd-proto__glow" aria-hidden="true"></span>' +
-        '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-        '<span class="pjd-tile__t">Prototyp aplikacji <em class="pjd-live">działa</em></span>' +
-        '<span class="pjd-tile__sub">to nie zrzut ani makieta — klikalny prototyp. Otwórz w nowym oknie ↗</span></a>';
+      var protoThumb = state.previews.glowna || state.previews.panel || (ctx.items.length ? ctx.items[0].url : '');
+      tiles += bxMedia({ cls: 'bcard--w2', href: withFrom(state.prototypeUrl), img: protoThumb, d: D(),
+        peekI: I_EXT, peek: 'Otwórz ↗', hoverI: I_EXT, hover: 'Uruchom prototyp',
+        title: 'Klikalny prototyp <span class="bcard__live"><i></i>działa</span>',
+        sub: 'to nie zrzut ani makieta — wpisz, kliknij, sprawdź' });
     }
-    // PIGUŁKA
-    var pillUrl = state.previews[SUMMARY_META[0]];
-    if (pillUrl){
-      tiles += mediaTile({ cls: 'pjd-tile--w3', data: 'data-pjd-pill="' + esc(pillUrl) + '"', img: pillUrl,
-        title: 'Projekt w pigułce', sub: 'jedna grafika — cały projekt' });
+    // GOTOWE REKLAMY — baner kreacji jako grafika (klik → wszystkie + lightbox)
+    var rekArr = (state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : [];
+    var rekBanner = rekArr.filter(function(r){ return r && r.banner_url; })[0];
+    if (rekBanner){
+      var adCount = rekArr.length;
+      tiles += bxMedia({ cls: 'bcard--w2', data: 'data-pjd="reklamy"', img: rekBanner.banner_url, d: D(),
+        peekI: I_ARROW, peek: 'Zobacz', hoverI: I_ARROW, hover: 'Zobacz ' + adCount + ' reklam',
+        title: 'Gotowe reklamy', sub: adCount + ' ' + (adCount === 1 ? 'kreacja' : (adCount < 5 ? 'kreacje' : 'kreacji')) + ' z copy — od ręki do kampanii' });
+    }
+    // KARTA PROJEKTU — mini-blueprint z cytatem problemu (klik → pełna karta)
+    if (ctx.k){
+      tiles += '<button type="button" class="bcard bcard--karta" data-pjd="karta" style="--d:' + D() + 'ms">' +
+        '<span class="bcard__peek">' + I_ARROW + 'Zobacz</span>' +
+        '<span class="bcard__head">' + pjIco(PJ_ICONS.karta) + 'Karta projektu</span>' +
+        (ctx.k.problem ? '<span class="bcard__quote">' + esc(ctx.k.problem) + '</span>' : '<span class="bcard__sub">problem, klienci i zakres pierwszej wersji</span>') +
+        '</button>';
     }
 
-    html += '<div class="pjd-grid">' + tiles + '</div>';
+    html += '<div class="bento">' + tiles + '</div>';
     // finalne CTA + stopka podglądu — tylko na pulpicie
     var qs = ctaQS();
     var sp = 'https://tomekniedzwiecki.pl/aplikacja/sparing/' + (qs ? ('?' + qs) : '');
