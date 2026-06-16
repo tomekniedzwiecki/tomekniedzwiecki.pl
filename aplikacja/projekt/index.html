@@ -5062,8 +5062,66 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
   display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
 .bcard__quote::before { content:"\201C"; color:var(--accent); font-weight:700; margin-right:2px; }
 
+/* ============================================================
+   ONE-PAGE — „wszystko na jednej stronie": hero + sekcje pod
+   sobą, pełna treść inline (bez wchodzenia w kafle). Grafiki
+   przez .shot / .poster / .pill-shot; reszta treści to renderery
+   sparingu (kp2/rk/eco/gtm/pj-plan — CSS skopiowany wyżej).
+   ============================================================ */
+.hero { padding:46px 0 30px; }
+.hero__eye { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:500; color:var(--accent); background:var(--accent-soft); border:1px solid rgba(0,112,243,.25); border-radius:999px; padding:5px 11px; margin-bottom:16px; }
+.hero__eye i { width:7px; height:7px; border-radius:50%; background:var(--accent); animation:liveDot 2s infinite; }
+.hero h1 { font-size:clamp(30px,6vw,48px); font-weight:700; letter-spacing:-.025em; line-height:1.05; margin-bottom:14px; }
+.hero__sub { font-size:clamp(15px,2.4vw,18px); color:var(--text-muted); max-width:70ch; }
+.hero__tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+.hero__tags .tag { font-size:12.5px; color:var(--text-muted); background:var(--glass); border:1px solid var(--glass-border); border-radius:8px; padding:6px 11px; }
+.hero__tags .tag b { color:var(--text); font-weight:600; }
+.hero__share { margin-top:22px; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; color:var(--text); background:var(--glass); border:1px solid var(--glass-border); border-radius:10px; padding:9px 14px; cursor:pointer; transition:border-color .2s, background .2s; }
+.hero__share:hover { border-color:#3a3a3a; background:var(--glass-strong); }
+.hero__share svg { width:15px; height:15px; }
+
+.sec { padding:34px 0; border-top:1px solid var(--border); }
+.sec.reveal { opacity:0; transform:translateY(18px); transition:opacity .6s var(--ease), transform .6s var(--ease); }
+.sec.reveal.in { opacity:1; transform:none; }
+.sec__head { display:flex; align-items:baseline; gap:14px; margin-bottom:22px; }
+.sec__n { font-family:var(--mono); font-size:12px; color:var(--text-faint); border:1px solid var(--border); border-radius:7px; padding:4px 9px; flex-shrink:0; }
+.sec__tt { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.sec__tt h2 { font-size:clamp(20px,3.4vw,26px); font-weight:650; letter-spacing:-.015em; }
+.sec__hint { font-size:13.5px; color:var(--text-muted); }
+
+/* galeria ekranów */
+.shots-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; }
+.shot { position:relative; border:1px solid var(--border); border-radius:14px; overflow:hidden; background:#0b0d12; cursor:zoom-in; text-align:left; font:inherit; padding:0; transition:border-color .2s, transform .2s, box-shadow .2s; }
+.shot:hover { border-color:#3a3a3a; transform:translateY(-3px); box-shadow:0 12px 30px -14px rgba(0,0,0,.8); }
+.shot__img { display:block; aspect-ratio:16/10; overflow:hidden; background:#0b0d12; }
+.shot__img img { width:100%; height:100%; object-fit:cover; object-position:top center; transition:transform .5s var(--ease); }
+.shot:hover .shot__img img { transform:scale(1.05); }
+.shot__cap { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; color:var(--text-muted); padding:10px 13px; border-top:1px solid var(--border); }
+.shot__cap i { display:inline-flex; color:var(--text-faint); }
+.shot__cap svg { width:14px; height:14px; }
+
+/* poster strony / prototypu — link w nowym oknie */
+.poster { position:relative; display:block; border:1px solid var(--border); border-radius:18px; overflow:hidden; background:#0b0d12; text-decoration:none; transition:border-color .2s, transform .2s, box-shadow .2s; }
+.poster:hover { border-color:#3a3a3a; transform:translateY(-3px); box-shadow:0 18px 44px -20px rgba(0,0,0,.85); }
+.poster__img { display:block; max-height:430px; overflow:hidden; }
+.poster__img img { width:100%; height:auto; display:block; object-position:top; transition:transform .6s var(--ease); }
+.poster:hover .poster__img img { transform:scale(1.025); }
+.poster__bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; border-top:1px solid var(--border); background:var(--bg-elev); }
+.poster__live { display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:#19c37d; }
+.poster__live i { width:7px; height:7px; border-radius:50%; background:#19c37d; animation:liveDot 1.8s infinite; }
+.poster__open { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:650; color:#fff; background:var(--accent); border:1px solid var(--accent); border-radius:9px; padding:8px 14px; transition:filter .15s; }
+.poster:hover .poster__open { filter:brightness(1.12); }
+.poster--proto .poster__img { max-width:460px; margin:0 auto; }
+
+/* projekt w pigułce */
+.pill-shot { position:relative; display:block; width:100%; max-width:760px; margin:0 auto; border:1px solid var(--border); border-radius:16px; overflow:hidden; background:#0b0d12; cursor:zoom-in; padding:0; }
+.pill-shot img { width:100%; display:block; }
+.pill-shot__hint { position:absolute; top:12px; right:12px; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#fff; background:rgba(10,10,12,.72); backdrop-filter:blur(7px); border:1px solid var(--glass-border); border-radius:999px; padding:6px 11px; }
+.pill-shot__hint svg { width:14px; height:14px; }
+
 @media (prefers-reduced-motion: reduce) {
   .bcard, .bcard__bars i, .bcard__line, .bcard__peek { animation:none !important; opacity:1 !important; transform:none !important; }
+  .sec.reveal { opacity:1 !important; transform:none !important; transition:none !important; }
 }
 </style>
 </head>
@@ -5831,202 +5889,135 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
     return { t: 'W ocenie', c: '#8f8f8f' };
   }
 
-  function renderDash(ctx){
-    var html = '<div class="pj-head"><div class="pj-head__txt"><div class="tabpane__eyebrow">Pulpit projektu · zaprojektowany z AI</div>' +
-      '<h2 class="tabpane__title">' + esc(ctx.nazwa) + '</h2>' +
-      (ctx.brief.opis ? '<p class="tabpane__sub">' + esc(ctx.brief.opis) + '</p>' : '') + '</div>' +
-      '<button type="button" class="pj-share" id="pj-share" title="Skopiuj link do tego podglądu">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>Udostępnij</button></div>';
-    var tiles = '', di = 0;
-    function D(){ return (di++) * 45; }
+  // ── ONE-PAGE: wszystko na jednej przewijanej stronie (bez wchodzenia w kafle) ──
+  function secHTML(id, n, title, hint, inner){
+    if (!inner) return '';
+    return '<section class="sec" id="sec-' + id + '">' +
+      '<div class="sec__head"><span class="sec__n">' + n + '</span>' +
+      '<div class="sec__tt"><h2>' + esc(title) + '</h2>' + (hint ? '<span class="sec__hint">' + esc(hint) + '</span>' : '') + '</div></div>' +
+      inner + '</section>';
+  }
 
-    // EKRANY — hero z głównym ekranem (klik → galeria + lightbox)
-    if (ctx.hasShots){
-      tiles += bxMedia({ cls: 'bcard--hero', data: 'data-pjd="ekrany"', img: ctx.items[0].url, d: D(),
-        peekI: I_EXPAND, peek: 'Przeglądaj', hoverI: I_EXPAND, hover: 'Przeglądaj ekrany',
-        title: 'Ekrany narzędzia', sub: ctx.items.length + ' ' + (ctx.items.length === 1 ? 'gotowy widok' : (ctx.items.length < 5 ? 'gotowe widoki' : 'gotowych widoków')) });
+  function renderAll(){
+    var ctx = buildCtx();
+    var nn = 0;
+    function N(){ nn++; return nn < 10 ? '0' + nn : '' + nn; }
+    var H = '';
+
+    // HERO
+    var tags = [];
+    if (ctx.brief.dla_kogo) tags.push('<span class="tag">Dla: <b>' + esc(ctx.brief.dla_kogo) + '</b></span>');
+    if (ctx.items.length) tags.push('<span class="tag"><b>' + ctx.items.length + '</b> ' + (ctx.items.length === 1 ? 'ekran' : 'ekrany') + '</span>');
+    tags.push('<span class="tag">Werdykt: <b style="color:var(--green)">zielone światło</b></span>');
+    H += '<div class="hero">' +
+      '<div class="hero__eye"><i></i>Zaprojektowane na żywo w rozmowie z AI</div>' +
+      '<h1>' + esc(ctx.nazwa) + '</h1>' +
+      (ctx.brief.opis ? '<p class="hero__sub">' + esc(ctx.brief.opis) + '</p>' : '') +
+      '<div class="hero__tags">' + tags.join('') + '</div>' +
+      '<button type="button" class="hero__share" id="pj-share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>Skopiuj link do podglądu</button>' +
+      '</div>';
+
+    // 01 EKRANY — galeria → lightbox
+    if (ctx.items.length){
+      var shots = ctx.items.map(function(it){
+        return '<button type="button" class="shot" data-view="' + it.view + '">' +
+          '<span class="shot__img"><img src="' + esc(imgCdn(it.url, 'tile')) + '" alt="' + esc(it.label) + '" loading="lazy"></span>' +
+          '<span class="shot__cap">' + esc(it.label) + '<i>' + I_EXPAND + '</i></span></button>';
+      }).join('');
+      H += secHTML('ekrany', N(), 'Ekrany narzędzia', 'kliknij, by powiększyć', '<div class="shots-grid">' + shots + '</div>');
     }
-    // PIGUŁKA — infografika całego projektu (klik → lightbox)
-    var pillUrl = state.previews[SUMMARY_META[0]];
-    if (pillUrl){
-      tiles += bxMedia({ cls: '', data: 'data-pjd-pill="' + esc(pillUrl) + '"', img: pillUrl, d: D(),
-        peekI: I_EXPAND, peek: 'Powiększ', hoverI: I_EXPAND, hover: 'Zobacz w pełni',
-        title: 'Projekt w pigułce', sub: 'jedna grafika — cały projekt' });
-    }
-    // PLAN PRZYCHODU — duża kwota + słupki (klik → pełne wyliczenia)
-    var goalK = (state.bizplan && Array.isArray(state.bizplan.kamienie) && state.bizplan.kamienie.length)
-      ? state.bizplan.kamienie[state.bizplan.kamienie.length - 1] : null;
-    if (goalK && typeof goalK.mies === 'number'){
-      var planSeries = state.bizplan.kamienie.map(function(m){ return m && typeof m.mies === 'number' ? m.mies : null; }).filter(function(x){ return x !== null; });
-      tiles += bxData({ view: 'plan', icon: PJ_ICONS.plan, head: 'Plan przychodu', d: D(),
-        big: fmtZl(goalK.mies) + ' zł<small>/mies.</small>',
-        sub: 'cel przy ' + goalK.klienci + ' płacących klientach',
-        viz: bxBars(planSeries) });
-    }
-    // CZY TO ZARABIA — ltv/cac + krzywa wzrostu (klik → suwaki)
-    if (state.economics){
-      var ec = econCalc(state.economics, null);
-      var ecSeries = (ec && Array.isArray(ec.sim)) ? ec.sim.map(function(s){ return s.aktywni; }) : [];
-      tiles += bxData({ view: 'economics', icon: PJ_ICONS.economics, head: 'Czy to zarabia', d: D(),
-        big: ec ? ((Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×') : '',
-        sub: 'tyle wraca z 1 zł na zdobycie klienta — przelicz na suwakach',
-        viz: bxLine(ecSeries) });
-    }
-    // POTENCJAŁ RYNKU — ocena + wykres niszy (klik → raport)
-    if (state.raport){
-      var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
-      var pot = potInfo(oc);
-      tiles += bxData({ view: 'rynek', icon: PJ_ICONS.raport, head: 'Potencjał rynku', d: D(),
-        big: '<span class="bcard__pot"><i style="background:' + pot.c + '"></i>' + pot.t + '</span>',
-        sub: state.raport.teza || 'realny research: nisza, konkurenci, trendy',
-        viz: bxArea() });
-    }
-    // GDZIE SZUKAĆ KLIENTÓW — liczba + chipy kanałów (klik → plan)
-    if (state.gtm){
-      var kanaly = (state.gtm.playbook && Array.isArray(state.gtm.playbook.kanaly)) ? state.gtm.playbook.kanaly : [];
-      var chipNames = kanaly.map(function(k){ return k && (k.miejsce || k.nazwa); }).filter(Boolean);
-      var chips = chipNames.slice(0, 2).map(function(c){ var s = String(c); if (s.length > 22) s = s.slice(0, 21) + '…'; return '<span>' + esc(s) + '</span>'; }).join('');
-      if (chipNames.length > 2) chips += '<span class="more">+' + (chipNames.length - 2) + ' więcej</span>';
-      tiles += bxData({ view: 'gtm', icon: PJ_ICONS.gtm, head: 'Gdzie szukać klientów', d: D(),
-        big: kanaly.length + ' <small>miejsc</small>',
-        sub: 'gdzie już są Twoi klienci — za darmo i przez reklamy',
-        viz: chips ? '<span class="bcard__chips">' + chips + '</span>' : '' });
-    }
-    // TWOJA STRONA — zrzut, link w nowym oknie
+
+    // 02 STRONA — poster (link w nowym oknie)
     if (state.landingUrl){
       var landThumb = state.previews.landing || (ctx.items.length ? ctx.items[0].url : '');
-      tiles += bxMedia({ cls: 'bcard--w2', href: withFrom(state.landingUrl), img: landThumb || ctx.items[0] && ctx.items[0].url, d: D(),
-        peekI: I_EXT, peek: 'Otwórz ↗', hoverI: I_EXT, hover: 'Otwórz stronę',
-        title: 'Twoja strona <span class="bcard__live"><i></i>działa</span>',
-        sub: 'prawdziwa strona w przeglądarce, nie grafika' });
-    }
-    // PROTOTYP — poster z ekranu apki, link w nowym oknie
-    if (state.prototypeUrl){
-      var protoThumb = state.previews.glowna || state.previews.panel || (ctx.items.length ? ctx.items[0].url : '');
-      tiles += bxMedia({ cls: 'bcard--w2', href: withFrom(state.prototypeUrl), img: protoThumb, d: D(),
-        peekI: I_EXT, peek: 'Otwórz ↗', hoverI: I_EXT, hover: 'Uruchom prototyp',
-        title: 'Klikalny prototyp <span class="bcard__live"><i></i>działa</span>',
-        sub: 'to nie zrzut ani makieta — wpisz, kliknij, sprawdź' });
-    }
-    // GOTOWE REKLAMY — baner kreacji jako grafika (klik → wszystkie + lightbox)
-    var rekArr = (state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : [];
-    var rekBanner = rekArr.filter(function(r){ return r && r.banner_url; })[0];
-    if (rekBanner){
-      var adCount = rekArr.length;
-      tiles += bxMedia({ cls: 'bcard--w2', data: 'data-pjd="reklamy"', img: rekBanner.banner_url, d: D(),
-        peekI: I_ARROW, peek: 'Zobacz', hoverI: I_ARROW, hover: 'Zobacz ' + adCount + ' reklam',
-        title: 'Gotowe reklamy', sub: adCount + ' ' + (adCount === 1 ? 'kreacja' : (adCount < 5 ? 'kreacje' : 'kreacji')) + ' z copy — od ręki do kampanii' });
-    }
-    // KARTA PROJEKTU — mini-blueprint z cytatem problemu (klik → pełna karta)
-    if (ctx.k){
-      tiles += '<button type="button" class="bcard bcard--karta" data-pjd="karta" style="--d:' + D() + 'ms">' +
-        '<span class="bcard__peek">' + I_ARROW + 'Zobacz</span>' +
-        '<span class="bcard__head">' + pjIco(PJ_ICONS.karta) + 'Karta projektu</span>' +
-        (ctx.k.problem ? '<span class="bcard__quote">' + esc(ctx.k.problem) + '</span>' : '<span class="bcard__sub">problem, klienci i zakres pierwszej wersji</span>') +
-        '</button>';
+      if (landThumb){
+        H += secHTML('strona', N(), 'Strona sprzedażowa', 'działa naprawdę — otwórz w nowym oknie',
+          '<a class="poster" href="' + esc(withFrom(state.landingUrl)) + '" target="_blank" rel="noopener">' +
+          '<span class="poster__img"><img src="' + esc(imgCdn(landThumb, 'full')) + '" alt="Strona sprzedażowa" loading="lazy"></span>' +
+          '<span class="poster__bar"><span class="poster__live"><i></i>działająca strona w przeglądarce</span><span class="poster__open">Otwórz stronę ↗</span></span></a>');
+      }
     }
 
-    html += '<div class="bento">' + tiles + '</div>';
-    // finalne CTA + stopka podglądu — tylko na pulpicie
+    // 03 PROTOTYP — poster (link w nowym oknie)
+    if (state.prototypeUrl){
+      var protoThumb = state.previews.glowna || state.previews.panel || (ctx.items.length ? ctx.items[0].url : '');
+      if (protoThumb){
+        H += secHTML('prototyp', N(), 'Klikalny prototyp', 'to nie makieta — wpisz, kliknij, sprawdź',
+          '<a class="poster poster--proto" href="' + esc(withFrom(state.prototypeUrl)) + '" target="_blank" rel="noopener">' +
+          '<span class="poster__img"><img src="' + esc(imgCdn(protoThumb, 'full')) + '" alt="Prototyp aplikacji" loading="lazy"></span>' +
+          '<span class="poster__bar"><span class="poster__live"><i></i>działający prototyp</span><span class="poster__open">Uruchom prototyp ↗</span></span></a>');
+      }
+    }
+
+    // 04 KARTA PROJEKTU
+    if (ctx.k) H += secHTML('karta', N(), 'Karta projektu', 'co i dla kogo', kartaGridHTML(ctx.k, '', false));
+
+    // 05 BADANIE RYNKU (pełny raport)
+    if (state.raport) H += secHTML('rynek', N(), 'Badanie rynku', 'realny research z internetu', rynekHTML(state.raport));
+
+    // 06 OPŁACALNOŚĆ (suwaki)
+    if (state.economics) H += secHTML('economics', N(), 'Czy to się spina', 'policzony model — pokręć suwakami', economicsHTML(state.economics));
+
+    // 07 PLAN PRZYCHODU
+    if (state.bizplan) H += secHTML('plan', N(), 'Plan przychodu', 'droga do 50 klientów', bizplanHTML(state.bizplan));
+
+    // 08 GDZIE SZUKAĆ KLIENTÓW
+    if (state.gtm) H += secHTML('gtm', N(), 'Gdzie szukać klientów', 'gotowe kanały, skrypty i treści', gtmHTML(state.gtm));
+
+    // 09 GOTOWE REKLAMY (banery)
+    var rek = (state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : [];
+    if (rek.length) H += secHTML('reklamy', N(), 'Gotowe reklamy', 'kreacje z copy — od ręki do kampanii', '<div class="gtm-ads">' + adsHtml(rek) + '</div>');
+
+    // 10 PROJEKT W PIGUŁCE
+    var pill = state.previews[SUMMARY_META[0]];
+    if (pill) H += secHTML('pigulka', N(), 'Projekt w pigułce', 'jedna grafika — cały projekt',
+      '<button type="button" class="pill-shot" data-pill="' + esc(pill) + '"><img src="' + esc(imgCdn(pill, 'full')) + '" alt="Projekt w pigułce" loading="lazy"><span class="pill-shot__hint">' + I_EXPAND + 'Powiększ</span></button>');
+
+    // FINAL CTA + STOPKA
     var qs = ctaQS();
     var sp = 'https://tomekniedzwiecki.pl/aplikacja/sparing/' + (qs ? ('?' + qs) : '');
-    html += '<section class="ro-final"><h2>Twój pomysł zasługuje na to samo</h2>' +
+    H += '<section class="ro-final"><h2>Twój pomysł zasługuje na to samo</h2>' +
       '<p>To powstało z jednej rozmowy z AI — za darmo, w kilkanaście minut. Opisz swój pomysł i zobacz go w takiej formie.</p>' +
       '<div class="row"><a class="ro-cta" href="' + esc(sp) + '">Stwórz swój projekt za darmo →</a>' +
       '<a class="ro-cta ro-cta--ghost" href="https://tomekniedzwiecki.pl/aplikacja/inspiracje/">Zobacz inne projekty</a></div></section>' +
       '<div class="ro-foot">Podgląd koncepcyjny · zaprojektowany w <a href="https://tomekniedzwiecki.pl/aplikacja/">tomekniedzwiecki.pl/aplikacja</a> · nic z tego nie jest jeszcze zbudowanym produktem</div>';
-    app.innerHTML = html;
-    bindCommon();
-    app.querySelectorAll('[data-pjd]').forEach(function(t){ t.addEventListener('click', function(){ openDetail(t.getAttribute('data-pjd')); }); });
-    var pillTile = app.querySelector('[data-pjd-pill]');
-    if (pillTile) pillTile.addEventListener('click', function(){ openLightbox({ url: pillTile.getAttribute('data-pjd-pill'), label: 'Projekt w pigułce' }); });
-    var shareBtn = app.querySelector('#pj-share');
-    if (shareBtn) shareBtn.addEventListener('click', function(){
-      var url = location.origin + location.pathname + '?sid=' + encodeURIComponent(sid);
-      function done(){ showToast('Skopiowano link ✓'); }
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(function(){ window.prompt('Skopiuj link:', url); });
-      else window.prompt('Skopiuj link:', url);
-    });
+
+    app.innerHTML = H;
+    bindAll();
   }
 
-  function renderDetail(ctx){
-    var TITLES = {
-      ekrany: ['Ekrany narzędzia', 'kliknij ekran, żeby obejrzeć w powiększeniu'],
-      karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
-      plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy'],
-      economics: ['Czy to zarabia', 'model cenowy, koszt klienta i zwrot — przelicz na suwakach'],
-      gtm: ['Gdzie szukać klientów', 'darmowe miejsca, gdzie już są — i płatne kampanie'],
-      reklamy: ['Gotowe reklamy', 'koncepty z copy i baner z ekranów — od ręki do kampanii'],
-      rynek: ['Potencjał rynku', 'realny research z internetu: nisza, konkurenci, trendy']
-    };
-    var t = TITLES[pjView] || TITLES.karta;
-    var html = '<div class="pjd-detailhead"><button type="button" class="pjd-back" id="pjd-back">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg>Pulpit</button>' +
-      '<div class="pjd-detailhead__txt"><h2>' + t[0] + '</h2><span>' + t[1] + '</span></div></div>';
+  // „zobacz gotowe reklamy →" w sekcji GTM → płynne przewinięcie do sekcji reklam
+  function openDetail(view){ var s = document.getElementById('sec-' + view); if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
-    if (pjView === 'ekrany'){
-      if (ctx.items.length){
-        html += '<div class="pj2-shots n' + ctx.items.length + '">' + ctx.items.map(function(it){
-          return '<div class="pv-tile is-done" data-view="' + it.view + '">' +
-            '<span class="pv-tile__label">' + esc(it.label) + '</span>' +
-            '<div class="pv-tile__body"><img class="pv-tile__blur" src="' + esc(imgCdn(it.url, 'blur')) + '" alt="" aria-hidden="true" loading="lazy">' +
-            '<img src="' + esc(imgCdn(it.url, 'tile')) + '" alt="' + esc(it.label) + '" loading="lazy"></div></div>';
-        }).join('') + '</div>';
-      }
-    } else if (pjView === 'karta'){
-      html += ctx.k ? kartaGridHTML(ctx.k, '', true) : '<div class="tabpane__empty">Karta projektu niedostępna.</div>';
-    } else if (pjView === 'plan'){
-      html += state.bizplan ? bizplanHTML(state.bizplan) : '';
-    } else if (pjView === 'economics'){
-      html += state.economics ? economicsHTML(state.economics) : '';
-    } else if (pjView === 'gtm'){
-      html += state.gtm ? gtmHTML(state.gtm) : '';
-    } else if (pjView === 'rynek'){
-      html += state.raport ? rynekHTML(state.raport) : '';
-    } else if (pjView === 'reklamy'){
-      var rek = (state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : [];
-      html += rek.length ? '<div class="gtm-ads">' + adsHtml(rek) + '</div>' : '';
-    }
-
-    app.innerHTML = html;
-    bindCommon();
-    if (pjView === 'economics' && state.economics) bindEconomics(app, state.economics);
-    if ((pjView === 'gtm' || pjView === 'reklamy') && state.gtm) bindGtm(app);
-    if (pjView === 'rynek' && state.raport) bindRynek(app);
-    var back = el('pjd-back');
-    if (back) back.addEventListener('click', function(){ goView('dash'); });
+  function shareLink(){
+    var url = location.origin + location.pathname + '?sid=' + encodeURIComponent(sid);
+    function done(){ showToast('Skopiowano link ✓'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done).catch(function(){ window.prompt('Skopiuj link:', url); });
+    else window.prompt('Skopiuj link:', url);
   }
 
-  function bindCommon(){
+  function bindAll(){
+    // ekrany → lightbox (galeria widoków)
+    app.querySelectorAll('.shot[data-view]').forEach(function(s){ s.addEventListener('click', function(){ openLightbox(s.getAttribute('data-view')); }); });
+    // pigułka → lightbox pojedynczy
+    var ps = app.querySelector('.pill-shot[data-pill]');
+    if (ps) ps.addEventListener('click', function(){ openLightbox({ url: ps.getAttribute('data-pill'), label: 'Projekt w pigułce' }); });
+    // interaktywne treści
+    if (state.economics) bindEconomics(app, state.economics);
     bindPlanSim(app);
-    app.querySelectorAll('.pv-tile').forEach(function(tile){
-      tile.addEventListener('click', function(){
-        if (tile.dataset.view !== undefined) openLightbox(tile.dataset.view);
-      });
-    });
+    if (state.gtm) bindGtm(app);
+    if (state.raport) bindRynek(app);
+    var sb = app.querySelector('#pj-share');
+    if (sb) sb.addEventListener('click', shareLink);
+    // rozwijane bloki karty: desktop otwarte, mobile pierwszy
+    var desktop = window.matchMedia('(min-width: 1024px)').matches;
+    app.querySelectorAll('details.pj-sec').forEach(function(d, i){ d.open = desktop || i === 0; });
+    // reveal sekcji przy scrollu (delikatny fade-up)
+    if ('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      app.querySelectorAll('.sec').forEach(function(s){ s.classList.add('reveal'); io.observe(s); });
+    }
   }
-
-  // ── Router (hash = jedyne źródło prawdy; jeden render na nawigację) ──
-  function render(){
-    var ctx = buildCtx();
-    if (pjView === 'dash') renderDash(ctx);
-    else renderDetail(ctx);
-    if (el('barlbl')) el('barlbl').innerHTML = '&nbsp;· ' + esc(ctx.nazwa);
-    window.scrollTo(0, 0);
-  }
-  function goView(view){
-    var v = (view && DETAILS[view]) ? view : 'dash';
-    var hash = v === 'dash' ? '' : '#' + v;
-    if (location.hash === hash){ pjView = v; render(); return; }
-    if (hash){ location.hash = hash; }                       // → hashchange wyrenderuje
-    else { history.replaceState(null, '', location.pathname + location.search); pjView = v; render(); }
-  }
-  function openDetail(view){ gaEvent('app_tab_view', { tab: view }); goView(view); }
-  window.addEventListener('hashchange', function(){
-    var h = (location.hash || '').replace('#', '');
-    pjView = DETAILS[h] ? h : 'dash';
-    render();
-  });
 
   /* ── BOOT ──────────────────────────────────────────────────────── */
   function mapState(p){
@@ -6050,9 +6041,9 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
       mapState(d.projekt);
       loading.classList.add('ro-hidden');
       app.classList.remove('ro-hidden');
+      renderAll();
       var h = (location.hash || '').replace('#', '');
-      pjView = DETAILS[h] ? h : 'dash';
-      render();
+      if (h){ var sEl = document.getElementById('sec-' + h); if (sEl) setTimeout(function(){ sEl.scrollIntoView(); }, 80); }
     })
     .catch(fail);
 })();
