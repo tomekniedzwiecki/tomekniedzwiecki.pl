@@ -6034,7 +6034,23 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
   }
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sid)){ fail(); return; }
 
-  fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, action: 'public' }) })
+  // Podgląd ADMINA: panel TN Aplikacje otwiera tę stronę z #admin=<JWT> w hashu.
+  // Wtedy wołamy 'admin_get' (ungated, widzi niedomknięte projekty) zamiast 'public'.
+  // Token czytamy raz i USUWAMY z adresu (replaceState), zostawiając ew. kotwicę sekcji.
+  var adminTok = '';
+  (function(){
+    var h = location.hash || '';
+    var m = h.match(/[#&]admin=([^&]+)/);
+    if (m){
+      adminTok = decodeURIComponent(m[1]);
+      var rest = h.replace(/[#&]admin=[^&]+/, '').replace(/^#/, '');
+      try { history.replaceState(null, '', location.pathname + location.search + (rest ? '#' + rest : '')); } catch(e){}
+    }
+  })();
+
+  var fetchHeaders = { 'Content-Type': 'application/json' };
+  if (adminTok) fetchHeaders['Authorization'] = 'Bearer ' + adminTok;
+  fetch(ENDPOINT, { method: 'POST', headers: fetchHeaders, body: JSON.stringify({ sessionId: sid, action: adminTok ? 'admin_get' : 'public' }) })
     .then(function(r){ if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
     .then(function(d){
       if (!d || !d.projekt) throw new Error('brak');
@@ -6042,6 +6058,12 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
       loading.classList.add('ro-hidden');
       app.classList.remove('ro-hidden');
       renderAll();
+      if (adminTok){
+        var ab = document.createElement('div');
+        ab.textContent = 'Podgląd administratora';
+        ab.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:9999;font:600 11px/1 Geist,system-ui,sans-serif;letter-spacing:.02em;color:#ededed;background:rgba(10,10,10,.92);border:1px solid #2e2e2e;border-radius:8px;padding:7px 11px;backdrop-filter:blur(6px);pointer-events:none;';
+        document.body.appendChild(ab);
+      }
       var h = (location.hash || '').replace('#', '');
       if (h){ var sEl = document.getElementById('sec-' + h); if (sEl) setTimeout(function(){ sEl.scrollIntoView(); }, 80); }
     })
