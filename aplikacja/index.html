@@ -2408,11 +2408,19 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
         });
     }
 
-    // ===== Query string (?id= itd.) — przenieś na linki do sparingu + GA4 cta_click =====
-    var q = location.search;
-    document.querySelectorAll('a[href^="/aplikacja/sparing/"], a[href^="/aplikacja/inspiracje/"]').forEach(function (a) {
-        if (q) a.href = a.getAttribute('href') + q;
-    });
+    // ===== Query string (?id=, UTM, click-ID) — przenieś na linki do sparingu + GA4 cta_click =====
+    // Scalamy parametry przez URL API (nie sklejamy stringów — link „/sparing/?login=1"
+    // dostawał wcześniej drugie „?" i gubił fbclid/utm). Istniejące parametry linku zostają.
+    var cur = new URLSearchParams(location.search);
+    if (cur.toString()) {
+        document.querySelectorAll('a[href^="/aplikacja/sparing/"], a[href^="/aplikacja/inspiracje/"]').forEach(function (a) {
+            try {
+                var u = new URL(a.getAttribute('href'), location.origin);
+                cur.forEach(function (v, k) { if (!u.searchParams.has(k)) u.searchParams.set(k, v); });
+                a.href = u.pathname + u.search;
+            } catch (e) {}
+        });
+    }
     document.querySelectorAll('[data-cta]').forEach(function (a) {
         a.addEventListener('click', function () {
             var loc = a.dataset.ctaLoc || 'body';

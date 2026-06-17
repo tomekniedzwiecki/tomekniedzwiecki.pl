@@ -18,6 +18,34 @@
             } catch (e) {}
         })();
     </script>
+    <!-- Capture click-ID / UTM do sessionStorage — strona główna to częsty cel reklam
+         (routing po adresie docelowym). Bez tego first-touch ginie: landing_page zapisałby
+         się jako /aplikacja/ a referrer jako wewnętrzny zamiast prawdziwego wejścia z reklamy.
+         Ten sam blok co na /aplikacja, /sparing, /zbuduje itd. (ten sam origin → sessionStorage niesie dalej). -->
+    <script>
+    (function(){
+        var TRACKING_PARAMS = ['gclid','gbraid','wbraid','gad_source','fbclid','ttclid','msclkid','ref','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id','network','campaignid','adgroupid','creative','placement','device','keyword','matchtype'];
+        function getCookie(name){var v='; '+document.cookie;var parts=v.split('; '+name+'=');if(parts.length===2)return parts.pop().split(';').shift();return null;}
+        try {
+            var u = new URLSearchParams(window.location.search);
+            var stored = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+            TRACKING_PARAMS.forEach(function(p){var val=u.get(p); if(val) stored[p]=val;});
+            var fbp = getCookie('_fbp'); if(fbp) stored.fbp = fbp;
+            if(!stored.gclid && !stored.fbclid && !stored.ttclid){var gcl=getCookie('_gcl_aw'); if(gcl){var gp=gcl.split('.'); if(gp.length>=3) stored.gclid=gp.slice(2).join('.');}}
+            if(!stored.landing_page) stored.landing_page = window.location.href;
+            if(!stored.referrer && document.referrer) stored.referrer = document.referrer;
+            sessionStorage.setItem('tracking_params', JSON.stringify(stored));
+        } catch(e){}
+        window.getTrackingQS = function(){
+            try {
+                var s = JSON.parse(sessionStorage.getItem('tracking_params') || '{}');
+                var parts = [];
+                TRACKING_PARAMS.forEach(function(k){ if(s[k]) parts.push(encodeURIComponent(k)+'='+encodeURIComponent(s[k])); });
+                return parts.join('&');
+            } catch(e){ return ''; }
+        };
+    })();
+    </script>
     <title>Tomek Niedźwiecki — zbuduję Ci sklep online albo aplikację</title>
     <meta name="description" content="Zbuduję Ci sklep online od zera albo aplikację na Twoim pomyśle — i doprowadzę do pierwszych klientów. Prowadzisz już firmę? Zoptymalizuję ją automatyzacjami.">
     <meta name="robots" content="index, follow">
