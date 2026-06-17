@@ -545,6 +545,14 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     width: 100%;
     max-width: 1280px;
 }
+/* Desktop: rezerwa lewego marginesu na pionowy pasek „aktów" (.progress jest fixed
+   na left:28px, a aktywna etykieta sięga ~153px). Bez tego na węższych ekranach
+   (≤~1500px) ogromny hero i siatki kart wchodziły pod pasek i kleiły się do lewej
+   krawędzi. Treść zaczyna się teraz z zapasem od paska; galeria zostaje pełnej szerokości. */
+@media (min-width: 921px) {
+    .scene { padding-left: clamp(176px, 12vw, 232px); padding-right: clamp(72px, 7vw, 128px); }
+    .scene--gallery { padding-left: 0; padding-right: 0; }
+}
 .scene__aurora {
     position: absolute;
     top: 50%;
