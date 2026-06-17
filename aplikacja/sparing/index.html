@@ -5204,6 +5204,10 @@
     var LS_ACTIVE = 'spar_active';  // sid aktywnej rozmowy
     var LS_TRACKING = 'spar_tracking';
     var CONVOS_MAX = 3;
+    // Intencja logowania na starcie: force = link „?login=1" z bramy /aplikacja/;
+    // fresh = świeże wejście bez wznawianej rozmowy (powracający, niezalogowany).
+    var loginIntent = { force: false, fresh: false };
+    var autoLoginDone = false;
     function sessionKey(sid) { return 'spar_session:' + sid; }
     function messagesKey(sid) { return 'spar_messages:' + sid; }
     function previewKey(sid) { return 'spar_preview:' + sid; } // {images:{view:url}}
@@ -8531,6 +8535,20 @@
             var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
             banner.hidden = !(authState.ready && !authState.user && hasAccountFlag && userCount === 0 && !state.verdict);
         }
+        maybeAutoLogin();
+    }
+    // Powracający (był tu / ma konto) albo wprost „?login=1" z bramy → pokaż ekran
+    // logowania od razu, zamiast tylko banera. Zamykalny (X / tło), raz na kartę
+    // (sessionStorage), nigdy nad wznawianą rozmową ani gdy już zalogowany.
+    function maybeAutoLogin() {
+        if (autoLoginDone || !authState.ready || authState.user) return;
+        var hasAcc = false; try { hasAcc = localStorage.getItem(LS_HAS_ACCOUNT) === '1'; } catch (e) { }
+        var promptedTab = false; try { promptedTab = sessionStorage.getItem('spar_login_prompted') === '1'; } catch (e) { }
+        if (loginIntent.force || (loginIntent.fresh && hasAcc && !promptedTab)) {
+            autoLoginDone = true;
+            try { sessionStorage.setItem('spar_login_prompted', '1'); } catch (e) { }
+            openAuthModal(loginIntent.force ? null : 'Witaj z powrotem — zaloguj się, żeby wrócić do swoich projektów.');
+        }
     }
     function toggleAuthMenu() {
         var existing = el('auth-menu');
@@ -10886,6 +10904,9 @@
             return;
         }
 
+        // „?login=1" z bramy /aplikacja/ → otwórz ekran logowania, gdy auth gotowy
+        loginIntent.force = qs.get('login') === '1';
+
         captureTracking();
         bindChat();
         migrateConvos();
@@ -10935,6 +10956,9 @@
             return;
         }
 
+        // Świeże wejście (nie wznawiamy żadnej rozmowy) — dla powracających
+        // z kontem pokażemy ekran logowania (maybeAutoLogin po gotowości auth).
+        loginIntent.fresh = true;
         if (state.pSlug) state.profession = P_OPENERS[state.pSlug].apiName;
         startFresh(false);
 
