@@ -9102,7 +9102,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kierunki', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kierunki', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -9122,7 +9122,8 @@
             .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
             .replace(/<kierunki>[\s\S]*?<\/kierunki>/g, '')
             .replace(/<kamien>[\s\S]*?<\/kamien>/g, '')
-            .replace(/<bierny>[\s\S]*?<\/bierny>/g, '').replace(/<bierny\s*\/?>/g, '');
+            .replace(/<bierny>[\s\S]*?<\/bierny>/g, '').replace(/<bierny\s*\/?>/g, '')
+            .replace(/<rezygnacja>[\s\S]*?<\/rezygnacja>/g, '').replace(/<rezygnacja\s*\/?>/g, '');
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
             var i = t.indexOf(HIDDEN_MARKS[m]);
