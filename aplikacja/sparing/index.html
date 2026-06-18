@@ -5617,17 +5617,55 @@
         if (!authState.ready) { setTimeout(function () { onOwnerDenied(sid, hadToken); }, 250); return; }
         if (state.sessionId !== sid) return;
         var st = ownerGate[sid] || (ownerGate[sid] = {});
-        if (authState.user) {
-            // Mamy konto, ale dostaliśmy odpór. Jeśli pierwszy strzał poszedł BEZ tokena
-            // (wyścig auth), spróbuj raz jeszcze — teraz z JWT.
-            if (!hadToken && !st.retried) { st.retried = true; syncProjectFromServer(); return; }
-            if (!st.shown) { st.shown = true; sysMsg('Ta rozmowa należy do innego konta — nie masz do niej dostępu.', true); }
+        // Mamy konto, ale pierwszy strzał poszedł BEZ tokena (wyścig auth) — spróbuj
+        // raz jeszcze z JWT, zanim uznamy, że to nie nasza rozmowa.
+        if (authState.user && !hadToken && !st.retried) { st.retried = true; syncProjectFromServer(); return; }
+        if (st.shown) return;
+        st.shown = true;
+        lockSession();
+    }
+    // Twardy blok: komuś, kto nie jest zalogowanym właścicielem, NIE pokazujemy
+    // żadnej treści panelu. Kasujemy lokalny cache tej sesji (żeby odświeżenie ani
+    // podejrzenie DOM nic nie ujawniło) i zakrywamy całość niezamykalną nakładką
+    // z logowaniem. Po zalogowaniu właściciela panel odbuduje się z serwera.
+    function unlockSession() { var ov = el('owner-lock'); if (ov) ov.remove(); }
+    function lockSession() {
+        var sid = state.sessionId;
+        if (sid) {
+            try {
+                localStorage.removeItem(sessionKey(sid));
+                localStorage.removeItem(messagesKey(sid));
+                localStorage.removeItem(previewKey(sid));
+                saveJSON(LS_INDEX, convoIndex().filter(function (c) { return c.id !== sid; }));
+                if (loadJSON(LS_ACTIVE) === sid) localStorage.removeItem(LS_ACTIVE);
+            } catch (e) { }
+        }
+        if (el('owner-lock')) return; // już pokazana
+        var loggedWrong = !!authState.user; // zalogowany, ale nie właściciel
+        var ov = document.createElement('div');
+        ov.id = 'owner-lock';
+        ov.setAttribute('style', 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:rgba(8,8,11,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);');
+        ov.innerHTML =
+            '<div style="max-width:420px;width:100%;background:var(--surface,#16161a);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.5);">' +
+            '<div style="width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);margin-bottom:16px;">' +
+            '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>' +
+            '<h2 style="margin:0 0 6px;font-size:20px;font-weight:700;letter-spacing:-.02em;">Ta rozmowa jest prywatna</h2>' +
+            '<p style="margin:0 0 20px;font-size:14px;line-height:1.5;color:var(--text-muted,#9a9aa2);">' +
+            (loggedWrong
+                ? 'Jesteś zalogowany na koncie, które nie ma dostępu do tej rozmowy. Zaloguj się na właściwe konto.'
+                : 'Zaloguj się na konto, do którego należy ten projekt, aby zobaczyć jego zawartość.') +
+            '</p>' +
+            (loggedWrong
+                ? '<button type="button" class="btn" id="owner-lock-switch" style="width:100%;">Zaloguj się na inne konto</button>'
+                : authFormHTML('lock', 'Zaloguj się')) +
+            '<a href="/aplikacja/sparing/" style="display:inline-block;margin-top:16px;font-size:13px;color:var(--text-muted,#9a9aa2);">Zacznij własną rozmowę →</a>' +
+            '</div>';
+        document.body.appendChild(ov);
+        if (loggedWrong) {
+            var sw = el('owner-lock-switch');
+            if (sw) sw.addEventListener('click', function () { signOutAccount(); });
         } else {
-            if (!st.shown) {
-                st.shown = true;
-                sysMsg('Ta rozmowa jest przypięta do konta. Zaloguj się, aby ją zobaczyć.');
-                openAuthModal('Ta rozmowa jest prywatna — zaloguj się na konto, do którego należy.');
-            }
+            bindAuthForm('lock', null);
         }
     }
     function syncProjectFromServer() {
@@ -5643,6 +5681,8 @@
             return r.ok ? r.json() : null;
         }).then(function (d) {
             if (!d || !d.projekt || state.sessionId !== sid) return;
+            // Serwer wydał treść = jesteśmy uprawnieni → zdejmij ewentualny blok.
+            unlockSession(); if (ownerGate[sid]) ownerGate[sid] = {};
             if (Array.isArray(d.historia) && !historySynced[sid]) {
                 var localReal = messages.filter(function (m) { return !m.local; }).length;
                 if (d.historia.length > localReal) {
