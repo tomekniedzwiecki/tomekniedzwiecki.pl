@@ -301,7 +301,7 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 }
 
 /* ============================================================
-   INTRO OVERLAY — „Masz pomysł." / „To wystarczy."
+   INTRO OVERLAY — „Masz pomysł?" / „Resztę robię ja."
    ============================================================ */
 .intro {
     position: fixed;
@@ -811,13 +811,32 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
     color: var(--text-strong);
     font-size: 0.92em;
 }
+.proof__covers {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(17px, 2.1vw, 26px);
+    color: var(--text);
+    letter-spacing: -0.005em;
+    line-height: 1.45;
+    margin-top: clamp(20px, 3vh, 36px);
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.proof__covers strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text-strong);
+    font-size: 0.92em;
+}
 .proof__supporting {
     font-family: var(--serif);
     font-style: italic;
     font-size: clamp(16px, 1.8vw, 22px);
     color: var(--text-muted);
     letter-spacing: -0.005em;
-    margin-top: clamp(40px, 6vh, 80px);
+    margin-top: clamp(28px, 4vh, 56px);
     line-height: 1.45;
     max-width: 760px;
     margin-left: auto;
@@ -1953,8 +1972,8 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 ============================================================ -->
 <div class="intro" id="intro" role="button" tabindex="0" aria-label="Pomiń intro">
     <div class="intro__content">
-        <h2 class="intro__greeting">Masz pomysł<span class="intro__dot">.</span></h2>
-        <p class="intro__followup">To wystarczy.</p>
+        <h2 class="intro__greeting">Masz pomysł<span class="intro__dot">?</span></h2>
+        <p class="intro__followup">Resztę robię ja.</p>
     </div>
     <span class="intro__skip">pokaż &nbsp;↓</span>
 </div>
@@ -2077,7 +2096,11 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                 tyle biorę od przychodu — i tylko wtedy, gdy <strong>Ty zarabiasz.</strong>
             </p>
 
-            <p class="proof__supporting" data-reveal data-delay="1200">
+            <p class="proof__covers" data-reveal data-delay="1100">
+                Opłata obejmuje <strong>serwery, utrzymanie infrastruktury IT, naprawy błędów i bieżącą administrację</strong> — całość techniczną aplikacji.
+            </p>
+
+            <p class="proof__supporting" data-reveal data-delay="1400">
                 <strong>15 lat</strong> w e-biznesie <span class="proof__sep">·</span> <strong>70 mln zł</strong> obrotu zbudowanych firm <span class="proof__sep">·</span> tysiące wdrożonych osób
             </p>
         </div>
