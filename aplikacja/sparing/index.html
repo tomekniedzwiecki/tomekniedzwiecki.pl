@@ -9125,10 +9125,10 @@
                     if (typeof gtag === 'function') gtag('event', 'generate_lead', { persona: 'stworze', method: 'contact_gate' });
                     gaEvent('app_lead', { method: 'contact_gate' }); // osobna konwersja Stworze — generate_lead jest WSPOLNY mikro z /zapisy (nie oznaczac go jako key)
                     if (window.fbq) fbq('track', 'Lead', { content_name: 'sparing_contact' }, { eventID: leadEvtId });
-                    if (window.ttq) ttq.track('SubmitForm', { content_name: 'sparing_contact' }, { event_id: leadEvtId });
+                    if (window.ttq) ttq.track('CompleteRegistration', { content_name: 'sparing_contact' }, { event_id: leadEvtId });
                     // Server-side CAPI (iOS-resilient) — ten sam event_id = Meta/TikTok dedupują z pikselem
                     metaCapi('Lead', { event_id: leadEvtId, content_name: 'sparing_contact' });
-                    tiktokCapi('SubmitForm', { event_id: leadEvtId, content_name: 'sparing_contact' });
+                    tiktokCapi('CompleteRegistration', { event_id: leadEvtId, content_name: 'sparing_contact' });
                 }
             } catch (e) {}
             // imię wpisane ręcznie → dopisz do konta (OAuth ma je z profilu)
