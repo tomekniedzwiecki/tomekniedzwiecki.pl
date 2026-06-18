@@ -1975,6 +1975,30 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
 @keyframes ctaPulse { 0%, 100% { box-shadow: 0 14px 50px -18px rgba(77, 159, 255, 0.5); } 50% { box-shadow: 0 20px 66px -12px rgba(77, 159, 255, 0.95); } }
 @media (prefers-reduced-motion: reduce) { .btn--xl { animation: none; } }
 .cta__fine { margin-top: 16px; font-size: 12.5px; color: var(--text-faint); }
+.cta__trust {
+    margin-top: clamp(28px, 4vh, 44px);
+    padding-top: clamp(20px, 3vh, 28px);
+    border-top: 1px solid var(--border);
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(15px, 1.6vw, 19px);
+    line-height: 1.5;
+    color: var(--text-muted);
+    letter-spacing: -0.005em;
+}
+.cta__trust strong {
+    font-family: var(--sans);
+    font-style: normal;
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.cta__trust-sep { color: var(--text-faint); padding: 0 0.4em; }
 
 </style>
 </head>
@@ -2140,10 +2164,6 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
                     <li>Administracja</li>
                 </ul>
             </div>
-
-            <p class="proof__supporting" data-reveal data-delay="1400">
-                <strong>15 lat</strong> w e-biznesie <span class="proof__sep">·</span> <strong>70 mln zł</strong> obrotu zbudowanych firm <span class="proof__sep">·</span> tysiące wdrożonych osób
-            </p>
         </div>
     </section>
 
@@ -2312,6 +2332,10 @@ button { font-family: inherit; cursor: pointer; border: 0; background: none; col
             </div>
 
             <p class="cta__fine" data-reveal data-delay="440">Bez karty i bez zobowiązań</p>
+
+            <p class="cta__trust" data-reveal data-delay="540">
+                <strong>15 lat</strong> w e-biznesie <span class="cta__trust-sep">·</span> <strong>70 mln zł</strong> obrotu zbudowanych firm <span class="cta__trust-sep">·</span> tysiące wdrożonych osób
+            </p>
         </div>
     </section>
 
