@@ -5801,6 +5801,24 @@
             if (state.stage !== khWas) {
                 persistSession();
                 changed = true;
+                // Świeże urządzenie z ?id= dla sesji po pełnej płatności: init() dodał
+                // generyczny opener pre-payment („znajdźmy problem"), bo etap był jeszcze
+                // nieznany. Skoro serwer ujawnił know-how/build i nie ma jeszcze openera
+                // spowiednika ani realnej tury usera — podmień ten samotny opener.
+                if ((state.stage === 'knowhow' || state.stage === 'build') && !khHasOpener()) {
+                    var realUser = messages.some(function (m) { return m.role === 'user' && !m.local; });
+                    if (!realUser) {
+                        if (messages.length && messages[0].role === 'assistant' && messages[0].local && !messages[0].khOpener) messages.shift();
+                        ensureKnowhowOpener();
+                        // Lekki re-render samych wiadomości (bez enterChat — ono na końcu
+                        // znów woła sync). Panel etapu dorzuci refreshKnowhowUI niżej.
+                        var cm = el('chat-msgs');
+                        if (cm && activeTab === 'chat') {
+                            cm.innerHTML = '';
+                            messages.forEach(function (m) { appendMessage(m.role, m.content); });
+                        }
+                    }
+                }
                 refreshKnowhowUI();
                 if (state.stage === 'knowhow') playKnowhowIntro();
             }
@@ -9224,6 +9242,11 @@
         state.prototypeUrl = null;
         state.economics = null;
         state.gtm = null;
+        // KRYTYCZNE: wyzeruj pola etapu. Bez tego „Nowa rozmowa" po pełnej płatności
+        // dziedziczy stage='knowhow'/'build' (utrwalane przez persistSession pod nowym
+        // kluczem sesji) → świeża rozmowa utyka w UI etapu opłaconego, bez samonaprawy
+        // (sync świeżej sesji dostaje 'brak_projektu' i nie koryguje stage'a).
+        resetStageState();
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
@@ -9768,7 +9791,8 @@
         scrollToBottom(false);
     }
 
-    function streamReply(text, isFirst) {
+    function streamReply(text, isFirst, opts) {
+        var khResume = !!(opts && opts.knowhowResume); // zaczepka „wróć do rozmowy" (bez tury usera)
         genScreen = null; // user aktywnie pisze → nie jest „utknięty" na ekranie generowania
         streaming = true;
         setComposerEnabled(false);
@@ -9801,6 +9825,7 @@
             name: state.name,
             phone: state.phone || null,
             message: text,
+            knowhowResume: khResume ? true : undefined,
             tracking: isFirst ? getTracking() : null
         };
 
@@ -9998,7 +10023,7 @@
             if (raw) {
                 bubble.innerHTML = renderRich(visibleText(raw)) || '';
                 try { el('sr-status').textContent = visibleText(raw).slice(0, 400) || 'Odpowiedź gotowa.'; } catch (e) {} // #4 — jedno ogłoszenie dla czytnika
-                messages.push({ role: 'assistant', content: raw });
+                messages.push({ role: 'assistant', content: raw, local: khResume ? true : undefined, khNudge: khResume ? true : undefined });
                 saveMessages();
                 // Postęp kamieni z tej tury
                 var kam = parseKamien(raw);
@@ -10778,6 +10803,21 @@
         if (activeTab === 'wspolpraca') renderPaneWspolpraca();
     }
 
+    // Jedno miejsce zerujące stan etapu (stage/fullPaid/khClosed/paid/reveals/seen)
+    // — wołane przez startFresh, żeby „Nowa rozmowa" nie dziedziczyła etapu po
+    // opłaconej rozmowie. Te pola w innych miejscach ustawia tylko sync z serwera.
+    function resetStageState() {
+        state.stage = null;
+        state.fullPaid = false;
+        state.khClosed = false;
+        state.paid = false;
+        state.reveals = {};
+        state.seen = {};
+        // Zdejmij klasę widoku etapu — inaczej świeża rozmowa pre-payment dziedziczy
+        // .view--knowhow (chowa kafle podglądu), bo enterChat odświeża ją tylko w etapie.
+        var vc = el('view-chat'); if (vc) vc.classList.remove('view--knowhow');
+    }
+
     // Czy rozmowa-spowiednik już ruszyła? Źródłem prawdy jest sama historia
     // (opener oznaczony khOpener), więc stan przeżywa reload bez dodatkowego pola.
     function khHasOpener() {
@@ -10803,15 +10843,31 @@
         saveMessages();
         return true;
     }
-    // Wejście/powrót do rozmowy etapu dopracowania. Pierwszy raz dorzuca opener,
-    // potem tylko przełącza na czat. Zawsze odświeża etykiety przycisków.
+    // Proaktywna zaczepka AI po powrocie do rozmowy — treść zależna od luk w rozmowie
+    // (serwer generuje, my tylko strumieniujemy). Bez tury usera, ephemeral po stronie DB.
+    function requestKnowhowNudge() {
+        if (streaming) return;
+        streamReply('', false, { knowhowResume: true });
+    }
+    // Wejście/powrót do rozmowy etapu dopracowania.
+    //  • pierwszy raz: statyczny opener „spowiednika" (powitanie + otwarte pytanie),
+    //  • powrót do trwającej rozmowy: kontekstowa zaczepka „chcesz coś dopowiedzieć?"
+    //    z podpowiedziami, JEŚLI rozmowa stoi na turze AI (i nie jest to już zaczepka).
     function enterKnowhowChat() {
-        var added = (state.stage === 'knowhow' || state.stage === 'build') ? ensureKnowhowOpener() : false;
+        if (state.stage !== 'knowhow' && state.stage !== 'build') { switchTab('chat'); scrollToBottom(true); return; }
+        if (!khHasOpener()) {
+            ensureKnowhowOpener();
+            switchTab('chat');
+            if (el('chat-msgs')) appendMessage('assistant', messages[messages.length - 1].content);
+            unlockComposer(); refreshKnowhowUI(); scrollToBottom(true);
+            return;
+        }
         switchTab('chat');
-        if (added && el('chat-msgs')) appendMessage('assistant', messages[messages.length - 1].content);
-        unlockComposer();
-        refreshKnowhowUI();
-        scrollToBottom(true);
+        unlockComposer(); refreshKnowhowUI();
+        var last = messages.length ? messages[messages.length - 1] : null;
+        var idle = last && last.role === 'assistant' && !last.khNudge;
+        if (idle && !streaming) requestKnowhowNudge();
+        else scrollToBottom(true);
     }
 
     function closeKnowhow() {
@@ -10841,8 +10897,11 @@
         ov.querySelector('[data-ok="1"]').addEventListener('click', function () {
             var btn = this; btn.disabled = true; btn.textContent = 'Zamykam…';
             fetch(SPAR_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: state.sessionId, event: 'knowhow_close' }) })
-                .then(function (r) { return r.json(); })
-                .then(function () {
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+                .then(function (d) {
+                    // Dopiero realne ok=true flipuje etap. Inaczej 403/500/{ok:false}
+                    // dawały fałszywe „Tomek ma komplet" + miganie build↔knowhow po sync.
+                    if (!d || d.ok === false) return Promise.reject(d);
                     state.stage = 'build'; state.khClosed = true; persistSession(); refreshKnowhowUI();
                     showKnowhowOutroDone(ov, close);
                 })
