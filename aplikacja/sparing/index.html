@@ -1447,23 +1447,32 @@
     }
     .pj-land__addr svg { width: 12px; height: 12px; flex-shrink: 0; }
     .pj-land__open {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         font-size: 12.5px;
-        font-weight: 700;
-        color: var(--accent);
+        font-weight: 800;
+        color: #06122a; /* ciemny tekst na wypełnieniu — lepszy kontrast i widoczność */
         text-decoration: none;
         white-space: nowrap;
-        padding: 5px 10px;
+        padding: 6px 12px;
         border-radius: 8px;
-        border: 1px solid rgba(77, 159, 255, 0.35);
+        border: 0;
+        background: var(--accent);
+        box-shadow: 0 4px 14px -4px rgba(77, 159, 255, 0.6);
     }
-    .pj-land__open:hover { background: rgba(77, 159, 255, 0.12); }
+    .pj-land__open:hover { background: #6bb0ff; }
     .pj-land__frame {
         display: block;
         position: relative;
         aspect-ratio: 16 / 10;
         background: #fff;
+        overflow: hidden; /* przytnij — skalowany iframe rozpychał ramkę białym polem */
     }
     .pj-land__frame iframe {
+        position: absolute; /* wyjmij z flow, inaczej 200% wysokości rozciąga ramkę */
+        top: 0;
+        left: 0;
         width: 200%;
         height: 200%;
         border: 0;
@@ -5598,14 +5607,41 @@
     // Z JWT właściciela serwer zwraca też pełną historię rozmowy (d.historia) —
     // odtwarzamy ją, gdy lokalnie mamy mniej (zalogowany wrócił na innym urządzeniu).
     var historySynced = {}; // sid -> true (odtworzenie historii tylko raz na wejście)
+    // Bramka właściciela: serwer zwraca 403, gdy rozmowa jest przypięta do konta,
+    // a my nie jesteśmy zalogowanym właścicielem (link ?id= przestał działać jak hasło).
+    var ownerGate = {}; // sid -> { retried: bool, shown: bool }
+    function onOwnerDenied(sid, hadToken) {
+        // Wejście z linku: getSession() rozwiązuje się asynchronicznie — nie wyciągaj
+        // wniosków zanim auth będzie gotowy (zalogowany właściciel nie może dostać
+        // bramki przez wyścig, gdy token jeszcze się nie wczytał).
+        if (!authState.ready) { setTimeout(function () { onOwnerDenied(sid, hadToken); }, 250); return; }
+        if (state.sessionId !== sid) return;
+        var st = ownerGate[sid] || (ownerGate[sid] = {});
+        if (authState.user) {
+            // Mamy konto, ale dostaliśmy odpór. Jeśli pierwszy strzał poszedł BEZ tokena
+            // (wyścig auth), spróbuj raz jeszcze — teraz z JWT.
+            if (!hadToken && !st.retried) { st.retried = true; syncProjectFromServer(); return; }
+            if (!st.shown) { st.shown = true; sysMsg('Ta rozmowa należy do innego konta — nie masz do niej dostępu.', true); }
+        } else {
+            if (!st.shown) {
+                st.shown = true;
+                sysMsg('Ta rozmowa jest przypięta do konta. Zaloguj się, aby ją zobaczyć.');
+                openAuthModal('Ta rozmowa jest prywatna — zaloguj się na konto, do którego należy.');
+            }
+        }
+    }
     function syncProjectFromServer() {
         if (!state.sessionId) return;
         var sid = state.sessionId;
+        var hadToken = !!(authState.user && authState.token);
         fetch(SPAR_PROJECT_ENDPOINT, {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, action: 'get' })
-        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        }).then(function (r) {
+            if (r.status === 403 || r.status === 401) { onOwnerDenied(sid, hadToken); return null; }
+            return r.ok ? r.json() : null;
+        }).then(function (d) {
             if (!d || !d.projekt || state.sessionId !== sid) return;
             if (Array.isArray(d.historia) && !historySynced[sid]) {
                 var localReal = messages.filter(function (m) { return !m.local; }).length;
@@ -5933,8 +5969,12 @@
        SIDEBAR + ZAKŁADKI PROJEKTU (Rozmowa / Karta / Ekrany / Współpraca)
        ============================================================ */
     function checkoutURL() {
+        // lead_id (nie „lead" — checkout/v2 czyta lead_id) + spar_email + sid wiążą wpłatę
+        // dokładnie z tą sesją, dzięki czemu CRM oznacza Rezerwację automatycznie.
         var u = CHECKOUT_BASE + '?offer=' + encodeURIComponent(OFFER_ID);
-        if (state.leadId) u += '&lead=' + encodeURIComponent(state.leadId);
+        if (state.leadId) u += '&lead_id=' + encodeURIComponent(state.leadId);
+        if (state.email) u += '&spar_email=' + encodeURIComponent(state.email);
+        if (state.sessionId) u += '&sid=' + encodeURIComponent(state.sessionId);
         return u;
     }
 
@@ -8465,6 +8505,9 @@
         syncContactToServer();
         syncAccountConvos();
         refreshConvoEntitlement();
+        // Powrót z bramki właściciela: po zalogowaniu spróbuj ponownie dociągnąć
+        // zawartość (teraz z JWT) — jeśli to konto właściciela, panel się wypełni.
+        if (state.sessionId) { ownerGate[state.sessionId] = {}; syncProjectFromServer(); }
     }
     // Lekki zapis kontaktu (event:'contact') — przypina konto/mail/telefon do
     // sesji bez pełnej tury. JWT (gdy zalogowany) decyduje o tożsamości na serwerze.
