@@ -5469,6 +5469,9 @@
             gtm: state.gtm || null,
             reveals: state.reveals || {},
             paid: !!state.paid,
+            stage: state.stage || null,
+            fullPaid: !!state.fullPaid,
+            khClosed: !!state.khClosed,
             seen: state.seen || {}
         });
         saveJSON(LS_ACTIVE, state.sessionId);
@@ -5578,6 +5581,9 @@
         state.reveals = (saved.reveals && typeof saved.reveals === 'object') ? saved.reveals : {};
         state.seen = (saved.seen && typeof saved.seen === 'object') ? saved.seen : {};
         state.paid = !!saved.paid;
+        state.stage = saved.stage || null;
+        state.fullPaid = !!saved.fullPaid;
+        state.khClosed = !!saved.khClosed;
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
@@ -6131,10 +6137,14 @@
             b.hidden = !subShow[b.dataset.pjview];
         });
         updateSideStatus();
-        // W etapie know-how/budowa „Współpraca" jest zbędna (rezerwacja już za nami)
-        document.querySelectorAll('.side__item[data-tab="wspolpraca"]').forEach(function (b) {
-            b.hidden = (state.stage === 'knowhow' || state.stage === 'build');
+        var khMode = (state.stage === 'knowhow' || state.stage === 'build');
+        // W etapie know-how/budowa „Współpraca" i „Potencjał rynku" zbędne na wierzchu
+        // (rynek nadal dostępny z pulpitu Etap 1); „Pulpit projektu" → „Etap 1".
+        document.querySelectorAll('.side__item[data-tab="wspolpraca"], .side__item[data-tab="rynek"]').forEach(function (b) {
+            b.hidden = khMode;
         });
+        var pulpitLabel = document.querySelector('.side__item[data-tab="projekt"]:not([data-pjview]) .side__label');
+        if (pulpitLabel) pulpitLabel.textContent = khMode ? 'Etap 1 — ustalenia' : 'Pulpit projektu';
         var cta = el('side-cta');
         var show = state.verdict === 'zielony';
         if (show && cta.hidden) cta.classList.add('is-in'); // animacja momentu odblokowania
@@ -10739,6 +10749,7 @@
 .khov-cta{opacity:0;transform:translateY(10px);transition:.5s ease .18s}
 .khov.s3 .khov-h,.khov.s3 .khov-p,.khov.s3 .khov-cta{opacity:1;transform:none}
 .khov-go{background:var(--accent,#0070f3);color:#fff;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:600;border:0;cursor:pointer}
+.view--knowhow .msg--preview{display:none}
 @media(max-width:560px){.khn{width:62px}.khn-link{width:16px}.khov-h{white-space:normal;font-size:20px}}`;
         var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
     })();
@@ -10753,6 +10764,8 @@
             var w = document.createElement('div'); w.className = 'verdict'; w.innerHTML = cardBoxHTML();
             var node = w.firstChild; var cm = el('chat-msgs'); if (node && cm) cm.insertBefore(node, cm.firstChild);
         }
+        var vc = el('view-chat');
+        if (vc) vc.classList.toggle('view--knowhow', state.stage === 'knowhow' || state.stage === 'build');
         if (typeof updateHero === 'function') updateHero();
         updateSideBadges();
         if (activeTab === 'wspolpraca') renderPaneWspolpraca();
@@ -11053,9 +11066,9 @@
         // Kafel CTA = brama do zakładki Współpraca (nie wprost do płatności —
         // tam jest pełny plan wspólnego biznesu i dopiero stamtąd rezerwacja).
         var sideCta = el('side-cta');
-        sideCta.addEventListener('click', function () { switchTab('wspolpraca'); });
+        sideCta.addEventListener('click', function () { switchTab((state.stage === 'knowhow' || state.stage === 'build') ? 'chat' : 'wspolpraca'); });
         sideCta.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchTab('wspolpraca'); }
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchTab((state.stage === 'knowhow' || state.stage === 'build') ? 'chat' : 'wspolpraca'); }
         });
         el('btn-side').addEventListener('click', openSide);
         el('side-backdrop').addEventListener('click', closeSide);
