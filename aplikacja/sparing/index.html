@@ -5313,6 +5313,9 @@
         authProvider: null,     // 'google' | 'facebook' | null
         reveals: {},            // sekwencja odkrywania: {key:status} ze spar-project (drip); pusty = brak planu = pokazuj wszystko
         paid: false,            // wpłacona rezerwacja 500 zł — odblokowuje wszystkie odsłony
+        stage: null,            // null|'rezerwacja'|'knowhow'|'build' — etap po werdykcie
+        fullPaid: false,        // pełna płatność (full_paid_at) — odpala etap know-how (dopracowanie wizji)
+        khClosed: false,        // etap know-how zamknięty (knowhow_closed_at)
         seen: {}                // {view:true} — co user już otwierał (status nowe vs gotowe)
     };
     // Dane z powrotu OAuth (implicit flow) — czekają na bramkę z telefonem
@@ -5782,6 +5785,19 @@
                 persistSession();
                 changed = true;
             }
+            // ── Etap KNOW-HOW (dopracowanie wizji): pełna płatność + niezamknięte ──
+            var khWas = state.stage;
+            state.fullPaid = !!p.full_paid_at;
+            state.khClosed = !!p.knowhow_closed_at;
+            state.stage = state.khClosed ? 'build'
+                : (state.fullPaid ? 'knowhow'
+                : ((state.verdict === 'zielony' || p.verdict === 'zielony') ? 'rezerwacja' : null));
+            if (state.stage !== khWas) {
+                persistSession();
+                changed = true;
+                refreshKnowhowUI();
+                if (state.stage === 'knowhow') playKnowhowIntro();
+            }
             if (p.preview_history && typeof p.preview_history === 'object') {
                 Object.keys(p.preview_history).forEach(function (v) {
                     (Array.isArray(p.preview_history[v]) ? p.preview_history[v] : []).forEach(function (u) { archive(v, u); });
@@ -6106,14 +6122,32 @@
             gtm: state.verdict === 'zielony',
             reklamy: state.verdict === 'zielony'
         };
+        // W etapie know-how zwijamy stare podzakładki projektu (ekrany/karta/plan/…)
+        // pod „Pulpit projektu" — robimy miejsce na dopracowanie wizji.
+        if (state.stage === 'knowhow') {
+            Object.keys(subShow).forEach(function (k) { subShow[k] = false; });
+        }
         document.querySelectorAll('.side__item[data-pjview]').forEach(function (b) {
             b.hidden = !subShow[b.dataset.pjview];
         });
         updateSideStatus();
+        // W etapie know-how/budowa „Współpraca" jest zbędna (rezerwacja już za nami)
+        document.querySelectorAll('.side__item[data-tab="wspolpraca"]').forEach(function (b) {
+            b.hidden = (state.stage === 'knowhow' || state.stage === 'build');
+        });
         var cta = el('side-cta');
         var show = state.verdict === 'zielony';
         if (show && cta.hidden) cta.classList.add('is-in'); // animacja momentu odblokowania
         cta.hidden = !show;
+        if (show && state.stage === 'knowhow') {
+            cta.classList.add('side-cta--kh');
+            cta.innerHTML =
+                '<div class="side-cta__eyebrow">Etap · Dopracowanie wizji</div>' +
+                '<div class="side-cta__t">Zbieramy szczegóły pod budowę</div>' +
+                '<div class="side-cta__d">Opowiadasz, ja dopytuję i notuję. Z tego powstanie pierwsza wersja Twojej aplikacji.</div>' +
+                '<span class="side-cta__btn" onclick="event.stopPropagation();switchTab(\'chat\')">Wróć do rozmowy →</span>' +
+                '<span class="side-cta__close" onclick="event.stopPropagation();closeKnowhow()">To już wszystko — przejdź do budowy</span>';
+        }
     }
 
     /* ── Zakładka PROJEKT: ekrany + karta w blokach + wersje + poprawki ── */
@@ -8289,7 +8323,7 @@
     // jest wycentrowane na środku ekranu; potem pasek dokuje na dół.
     function updateHero() {
         var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
-        var hero = userCount === 0 && !state.verdict;
+        var hero = userCount === 0 && !state.verdict && state.stage !== 'knowhow' && state.stage !== 'build';
         el('view-chat').classList.toggle('is-hero', hero);
         el('chat-input').placeholder = hero ? 'Opowiedz o swoim pomyśle…' : 'Napisz odpowiedź…';
     }
@@ -10639,6 +10673,26 @@
     }
 
     function cardBoxHTML() {
+        if (state.stage === 'knowhow') {
+            return '<div class="paybox paybox--kh" id="panel-box">' +
+                '<div class="paybox__eyebrow">Etap · Dopracowanie wizji</div>' +
+                '<h3 class="paybox__title">Pakiet opłacony — dopracujmy wizję przed budową</h3>' +
+                '<ul class="paybox__list">' +
+                '<li><strong>Karta projektu i ekrany</strong> są gotowe — masz je w „Pulpicie projektu" obok.</li>' +
+                '<li>Teraz zbieram od Ciebie <strong>szczegóły, które realnie zmienią pierwszą wersję</strong> — realne sytuacje, przykłady, liczby, materiały.</li>' +
+                '<li>Bez pośpiechu — <strong>możesz wracać przez kilka dni.</strong> Gdy uznasz, że to wszystko, klikasz „przejdź do budowy".</li>' +
+                '</ul>' +
+                '<button type="button" class="paybox__btn" onclick="switchTab(\'chat\')">Zaczynamy rozmowę ↓</button>' +
+                '<button type="button" class="paybox__btn paybox__btn--ghost" onclick="closeKnowhow()">To już wszystko — przejdź do budowy</button>' +
+                '</div>';
+        }
+        if (state.stage === 'build') {
+            return '<div class="paybox" id="panel-box">' +
+                '<div class="paybox__eyebrow">Etap · Budowa</div>' +
+                '<h3 class="paybox__title">Dopracowanie domknięte — ruszamy z budową</h3>' +
+                '<p class="paybox__note">Tomek ma już wszystko, czego potrzebuje, żeby zbudować pierwszą wersję. Jak coś Ci jeszcze przyjdzie do głowy — napisz, dopiszemy.</p>' +
+                '</div>';
+        }
         return '<div class="paybox" id="panel-box">' +
             '<div class="paybox__eyebrow">Projekt zdefiniowany</div>' +
             '<h3 class="paybox__title">Karta projektu <em>gotowa</em></h3>' +
@@ -10649,6 +10703,95 @@
             '<button type="button" class="paybox__btn" id="btn-collab-tab">Zobacz, jak budujemy to razem <span class="btn__arrow">→</span></button>' +
             '<p class="paybox__note">Masz pytania? Pisz śmiało — a projekt możesz dalej dopracowywać, każda zmiana zaktualizuje kartę.</p>' +
             '</div>';
+    }
+
+    // ── ETAP KNOW-HOW (dopracowanie wizji): helpery UI + animacja wejścia ──────
+    (function injectKhStyles() {
+        var css = `
+.paybox--kh{border-color:rgba(0,112,243,.3)}
+.paybox__btn--ghost{background:transparent;border:1px solid var(--line-2,rgba(255,255,255,.14));color:var(--text-muted,#a1a1a1);margin-top:8px}
+.paybox__btn--ghost:hover{color:var(--text-strong,#fff);border-color:rgba(255,255,255,.28)}
+.side-cta--kh .side-cta__close{display:block;text-align:center;margin-top:8px;color:var(--text-faint,#6e6e6e);font-size:12px;cursor:pointer}
+.side-cta--kh .side-cta__close:hover{color:var(--text-muted,#a1a1a1)}
+.khov{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:24px;background:#050507;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);opacity:0;transition:opacity .45s ease}
+.khov::before{content:"";position:absolute;inset:0;background:radial-gradient(760px 520px at 50% 30%,rgba(0,112,243,.16),transparent 62%);pointer-events:none}
+.khov.in{opacity:1}.khov.out{opacity:0}
+.khov-in{position:relative;width:100%;max-width:560px;text-align:center;border:1px solid rgba(255,255,255,.07);border-radius:22px;padding:38px 30px 32px;background:rgba(12,12,15,.55)}
+.khov-eye{font:500 11px/1 var(--mono,ui-monospace,monospace);letter-spacing:.22em;color:var(--accent,#0070f3);text-transform:uppercase;opacity:0;transform:translateY(8px);transition:.6s ease}
+.khov.s1 .khov-eye{opacity:1;transform:none}
+.khov-step{display:flex;align-items:center;justify-content:center;margin:34px 0 8px}
+.khn{display:flex;flex-direction:column;align-items:center;gap:9px;width:84px}
+.khn-dot{position:relative;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(255,255,255,.14);background:#0c0c0c;display:flex;align-items:center;justify-content:center;transform:scale(.7);opacity:.45;transition:transform .45s cubic-bezier(.2,1.4,.4,1),opacity .4s,border-color .4s,background .4s}
+.khn-dot svg{width:15px;height:15px;opacity:0;transition:opacity .3s ease .1s}
+.khn.done .khn-dot{transform:scale(1);opacity:1;border-color:var(--green,#45a557);background:rgba(69,165,87,.14)}
+.khn.done .khn-dot svg{opacity:1;color:var(--green,#45a557)}
+.khn-lab{font:500 11px/1.2 sans-serif;color:#6e6e6e;max-width:84px;transition:color .4s}.khn.done .khn-lab{color:#a1a1a1}
+.khn-link{width:28px;height:1.5px;background:rgba(255,255,255,.08);position:relative;overflow:hidden;margin-top:-20px}
+.khn-link::after{content:"";position:absolute;inset:0;width:0;background:linear-gradient(90deg,var(--green,#45a557),rgba(69,165,87,.4));transition:width .5s}.khn-link.fill::after{width:100%}.khn-link.fill-blue::after{background:linear-gradient(90deg,var(--green,#45a557),var(--accent,#0070f3));width:100%}
+.khn--new .khn-dot{width:38px;height:38px;border-color:var(--accent,#0070f3);background:rgba(0,112,243,.13)}
+.khn--new.lit .khn-dot{transform:scale(1);opacity:1;animation:khpulse 1.8s ease-out .1s 2}.khn--new.lit .khn-dot svg{opacity:1;color:var(--accent,#0070f3)}.khn--new.lit .khn-lab{color:#fff;font-weight:600}
+@keyframes khpulse{0%{box-shadow:0 0 0 0 rgba(0,112,243,.45)}100%{box-shadow:0 0 0 16px rgba(0,112,243,0)}}
+.khn-ring{position:absolute;left:50%;top:50%;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent,#0070f3);transform:translate(-50%,-50%) scale(.6);opacity:0}
+.khn--new.lit .khn-ring{animation:khring 1s ease-out .05s forwards}
+@keyframes khring{0%{opacity:.8;transform:translate(-50%,-50%) scale(.6)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.6)}}
+.khov-h{font-size:clamp(18px,4.4vw,30px);line-height:1.1;letter-spacing:-.02em;color:#fff;font-weight:700;margin:30px 0 12px;white-space:nowrap;opacity:0;transform:translateY(14px);transition:.6s cubic-bezier(.2,.7,.2,1)}
+.khov-p{font-size:16px;color:#a1a1a1;max-width:48ch;margin:0 auto 26px;opacity:0;transform:translateY(12px);transition:.6s ease .1s}
+.khov-cta{opacity:0;transform:translateY(10px);transition:.5s ease .18s}
+.khov.s3 .khov-h,.khov.s3 .khov-p,.khov.s3 .khov-cta{opacity:1;transform:none}
+.khov-go{background:var(--accent,#0070f3);color:#fff;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:600;border:0;cursor:pointer}
+@media(max-width:560px){.khn{width:62px}.khn-link{width:16px}.khov-h{white-space:normal;font-size:20px}}`;
+        var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+    })();
+
+    function refreshKnowhowUI() {
+        var pb = el('panel-box');
+        if (pb) {
+            var tmp = document.createElement('div'); tmp.innerHTML = cardBoxHTML(); var nu = tmp.firstChild; if (nu) pb.replaceWith(nu);
+        } else if ((state.stage === 'knowhow' || state.stage === 'build') && el('chat-msgs')) {
+            // Brak panelu (np. świeże urządzenie bez lokalnej historii werdyktu) —
+            // wstrzykujemy panel etapu na górę czatu, żeby od razu było widać sytuację.
+            var w = document.createElement('div'); w.className = 'verdict'; w.innerHTML = cardBoxHTML();
+            var node = w.firstChild; var cm = el('chat-msgs'); if (node && cm) cm.insertBefore(node, cm.firstChild);
+        }
+        if (typeof updateHero === 'function') updateHero();
+        updateSideBadges();
+        if (activeTab === 'wspolpraca') renderPaneWspolpraca();
+    }
+
+    function closeKnowhow() {
+        if (!confirm('Zamknąć etap dopracowania i przejść do budowy? Zawsze możesz tu wrócić i dopisać.')) return;
+        fetch(SPAR_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: state.sessionId, event: 'knowhow_close' }) })
+            .then(function (r) { return r.json(); })
+            .then(function () { state.stage = 'build'; state.khClosed = true; persistSession(); refreshKnowhowUI(); })
+            .catch(function () { alert('Nie udało się zamknąć etapu — spróbuj ponownie.'); });
+    }
+
+    // Animacja „odblokowano etap" — RAZ na sesję (localStorage), nieinwazyjna
+    function playKnowhowIntro() {
+        try { var k = 'kh_intro_' + state.sessionId; if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) { /* ignore */ }
+        if (document.querySelector('.khov')) return;
+        var steps = [['Rozmowa', 0], ['Zielone światło', 0], ['Rezerwacja', 0], ['Pełna płatność', 0], ['Dopracowanie wizji', 1]];
+        var CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+        var SPK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></svg>';
+        var nodes = '';
+        steps.forEach(function (s, i) {
+            if (i) nodes += '<div class="khn-link" data-l="' + i + '"></div>';
+            nodes += '<div class="khn ' + (s[1] ? 'khn--new' : '') + '" data-n="' + i + '"><div class="khn-dot">' + (s[1] ? '<span class="khn-ring"></span>' + SPK : CHK) + '</div><div class="khn-lab">' + s[0] + '</div></div>';
+        });
+        var ov = document.createElement('div'); ov.className = 'khov';
+        ov.innerHTML = '<div class="khov-in"><div class="khov-eye">Odblokowano kolejny etap</div><div class="khov-step">' + nodes + '</div>' +
+            '<h2 class="khov-h">Przechodzimy do dopracowania wizji</h2>' +
+            '<p class="khov-p">Pakiet opłacony. Zanim ruszy budowa, dopniemy szczegóły Twojej aplikacji — żeby pierwsza wersja była dokładnie taka, jak chcesz.</p>' +
+            '<div class="khov-cta"><button type="button" class="khov-go">Zaczynamy →</button></div></div>';
+        document.body.appendChild(ov);
+        var nn = ov.querySelectorAll('[data-n]'), lk = ov.querySelectorAll('[data-l]');
+        ov.querySelector('.khov-go').addEventListener('click', function () { ov.classList.add('out'); setTimeout(function () { if (ov.parentNode) ov.parentNode.removeChild(ov); }, 560); });
+        requestAnimationFrame(function () { ov.classList.add('in'); });
+        setTimeout(function () { ov.classList.add('s1'); }, 220);
+        var t = 620; for (var i = 0; i < 4; i++) { (function (x) { setTimeout(function () { nn[x].classList.add('done'); if (x > 0 && lk[x - 1]) lk[x - 1].classList.add('fill'); }, t); })(i); t += 360; }
+        setTimeout(function () { if (lk[3]) lk[3].classList.add('fill-blue'); }, t);
+        setTimeout(function () { nn[4].classList.add('lit'); }, t + 260);
+        setTimeout(function () { ov.classList.add('s3'); }, t + 760);
     }
 
     function renderVerdict(color, karta) {
