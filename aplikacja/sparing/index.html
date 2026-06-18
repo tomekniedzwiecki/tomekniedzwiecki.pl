@@ -6155,8 +6155,12 @@
                 '<div class="side-cta__eyebrow">Etap · Dopracowanie wizji</div>' +
                 '<div class="side-cta__t">Zbieramy szczegóły pod budowę</div>' +
                 '<div class="side-cta__d">Opowiadasz, ja dopytuję i notuję. Z tego powstanie pierwsza wersja Twojej aplikacji.</div>' +
-                '<span class="side-cta__btn" onclick="event.stopPropagation();switchTab(\'chat\')">Wróć do rozmowy →</span>' +
-                '<span class="side-cta__close" onclick="event.stopPropagation();closeKnowhow()">To już wszystko — przejdź do budowy</span>';
+                '<span class="side-cta__btn" data-kh-act="chat">' + (khHasOpener() ? 'Wróć do rozmowy →' : 'Zaczynamy rozmowę →') + '</span>' +
+                '<span class="side-cta__close" data-kh-act="close">To już wszystko — przejdź do budowy</span>';
+        } else if (state.stage === 'build') {
+            // Etap domknięty — kafel w sidebarze zbędny (panel budowy żyje w czacie).
+            cta.classList.remove('side-cta--kh');
+            cta.hidden = true;
         }
     }
 
@@ -6249,10 +6253,7 @@
 
         fetch(SPAR_PROJECT_ENDPOINT, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': SB_PUBLISHABLE
-            },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, action: 'get' })
         }).then(function (r) {
             return r.json().then(function (d) { return { ok: r.ok, d: d }; });
@@ -6587,7 +6588,7 @@
         var sid = state.sessionId;
         fetch(SPAR_IMAGE_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             // force w body: bez niego serwer zwraca istniejącą pigułkę z cache
             // (ochrona przed wyścigiem ensure↔sync na czystym urządzeniu)
             body: JSON.stringify({ sessionId: sid, view: SUMMARY_META[0], force: !!force })
@@ -6623,7 +6624,7 @@
         var sid = state.sessionId;
         fetch(SPAR_PLAN_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, force: !!force })
         }).then(function (r) {
             return r.json().then(function (d) { return { ok: r.ok, d: d }; });
@@ -6668,7 +6669,7 @@
         if (activeTab === 'rynek') renderPaneRynek();
         fetch(SPAR_RAPORT_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, force: !!force })
         }).then(function (r) {
             return r.json().then(function (d) { return { ok: r.ok, d: d }; });
@@ -6728,7 +6729,7 @@
                 if (state.sessionId !== sid) return;
                 fetch(SPAR_PROJECT_ENDPOINT, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    headers: authHeaders(),
                     body: JSON.stringify({ sessionId: sid, action: 'get' })
                 }).then(function (r) { return r.json(); }).then(function (d) {
                     if (state.sessionId !== sid) return;
@@ -6746,7 +6747,7 @@
         }
         fetch(SPAR_LANDING_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid })
         }).then(function (r) {
             return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; });
@@ -6794,7 +6795,7 @@
                 if (state.sessionId !== sid) return;
                 fetch(SPAR_PROTOTYPE_ENDPOINT, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    headers: authHeaders(),
                     body: JSON.stringify({ sessionId: sid, action: 'status' })
                 }).then(function (r) { return r.json(); }).then(function (d) {
                     if (state.sessionId !== sid) return;
@@ -6811,7 +6812,7 @@
         }
         fetch(SPAR_PROTOTYPE_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid })
         }).then(function (r) {
             return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; });
@@ -6850,7 +6851,7 @@
         var sid = state.sessionId;
         fetch(SPAR_ECONOMICS_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, force: !!force })
         }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
             if (state.sessionId !== sid) return;
@@ -6882,7 +6883,7 @@
         var sid = state.sessionId;
         fetch(SPAR_GTM_ENDPOINT, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, force: !!force })
         }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
             if (state.sessionId !== sid) return;
@@ -6909,7 +6910,7 @@
         extras.gtm = 'gen'; extrasStart.gtm = Date.now();
         var sid = state.sessionId;
         fetch(SPAR_GTM_ENDPOINT, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, action: 'regen_channels' })
         }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
             if (state.sessionId !== sid) return;
@@ -6925,7 +6926,7 @@
         extras.reklamy = 'gen'; extrasStart.reklamy = Date.now();
         var sid = state.sessionId;
         fetch(SPAR_GTM_ENDPOINT, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, action: 'regen_ads' })
         }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); }).then(function (res) {
             if (state.sessionId !== sid) return;
@@ -6954,7 +6955,7 @@
             setTimeout(function () {
                 if (state.sessionId !== sid) return;
                 fetch(SPAR_PROJECT_ENDPOINT, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    method: 'POST', headers: authHeaders(),
                     body: JSON.stringify({ sessionId: sid, action: 'get' })
                 }).then(function (r) { return r.json(); }).then(function (d) {
                     if (state.sessionId !== sid) return;
@@ -6971,7 +6972,7 @@
             }, 15000);
         }
         fetch(SPAR_GTM_ENDPOINT, {
-            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+            method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, action: 'banners' })
         }).then(function () { poll(16); }).catch(function () { extras.gtmBanners = 'idle'; });
     }
@@ -10569,7 +10570,7 @@
                 attempt = attempt || 0;
                 return fetch(SPAR_IMAGE_ENDPOINT, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                    headers: authHeaders(),
                     body: JSON.stringify({ sessionId: state.sessionId, view: view })
                 }).then(function (res) {
                     if (!res.ok) {
@@ -10692,15 +10693,15 @@
                 '<li>Teraz zbieram od Ciebie <strong>szczegóły, które realnie zmienią pierwszą wersję</strong> — realne sytuacje, przykłady, liczby, materiały.</li>' +
                 '<li>Bez pośpiechu — <strong>możesz wracać przez kilka dni.</strong> Gdy uznasz, że to wszystko, klikasz „przejdź do budowy".</li>' +
                 '</ul>' +
-                '<button type="button" class="paybox__btn" onclick="switchTab(\'chat\')">Zaczynamy rozmowę ↓</button>' +
-                '<button type="button" class="paybox__btn paybox__btn--ghost" onclick="closeKnowhow()">To już wszystko — przejdź do budowy</button>' +
+                '<button type="button" class="paybox__btn" data-kh-act="chat">' + (khHasOpener() ? 'Wróć do rozmowy ↓' : 'Zaczynamy rozmowę ↓') + '</button>' +
+                '<button type="button" class="paybox__btn paybox__btn--ghost" data-kh-act="close">To już wszystko — przejdź do budowy</button>' +
                 '</div>';
         }
         if (state.stage === 'build') {
             return '<div class="paybox" id="panel-box">' +
                 '<div class="paybox__eyebrow">Etap · Budowa</div>' +
-                '<h3 class="paybox__title">Dopracowanie domknięte — ruszamy z budową</h3>' +
-                '<p class="paybox__note">Tomek ma już wszystko, czego potrzebuje, żeby zbudować pierwszą wersję. Jak coś Ci jeszcze przyjdzie do głowy — napisz, dopiszemy.</p>' +
+                '<h3 class="paybox__title">Dopracowanie domknięte — Tomek ma komplet</h3>' +
+                '<p class="paybox__note">Teraz Tomek składa pierwszą wersję Twojej aplikacji i <strong>odezwie się do Ciebie z kolejnym krokiem.</strong> Jak coś Ci jeszcze przyjdzie do głowy — po prostu tu napisz, dopiszę to do projektu.</p>' +
                 '</div>';
         }
         return '<div class="paybox" id="panel-box">' +
@@ -10749,6 +10750,12 @@
 .khov-cta{opacity:0;transform:translateY(10px);transition:.5s ease .18s}
 .khov.s3 .khov-h,.khov.s3 .khov-p,.khov.s3 .khov-cta{opacity:1;transform:none}
 .khov-go{background:var(--accent,#0070f3);color:#fff;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:600;border:0;cursor:pointer}
+.khov-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.khov-cancel{background:transparent;color:var(--text-muted,#a1a1a1);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:12px 20px;font-size:15px;font-weight:500;cursor:pointer}
+.khov-cancel:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.khov-done{display:flex;align-items:center;justify-content:center;width:62px;height:62px;margin:26px auto 4px;border-radius:50%;border:1.5px solid var(--green,#45a557);background:rgba(69,165,87,.14);animation:khpop .5s cubic-bezier(.2,1.4,.4,1)}
+.khov-done svg{width:30px;height:30px;color:var(--green,#45a557)}
+@keyframes khpop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
 .view--knowhow .msg--preview{display:none}
 @media(max-width:560px){.khn{width:62px}.khn-link{width:16px}.khov-h{white-space:normal;font-size:20px}}`;
         var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
@@ -10771,12 +10778,87 @@
         if (activeTab === 'wspolpraca') renderPaneWspolpraca();
     }
 
+    // Czy rozmowa-spowiednik już ruszyła? Źródłem prawdy jest sama historia
+    // (opener oznaczony khOpener), więc stan przeżywa reload bez dodatkowego pola.
+    function khHasOpener() {
+        return messages.some(function (m) { return m && m.khOpener; });
+    }
+    // Pierwsza wiadomość AI w etapie dopracowania — spersonalizowana pod projekt,
+    // ton „spowiednika": słucham, dopytuję, NIE odpytuję z wiedzy branżowej ani
+    // kontaktów (to bierze na siebie Tomek — patrz model operatora).
+    function buildKnowhowOpener() {
+        var nazwa = (state.lastBrief && state.lastBrief.nazwa) ? String(state.lastBrief.nazwa).trim() : '';
+        var tyt = nazwa ? '**' + nazwa + '**' : 'Twojego narzędzia';
+        return 'Pakiet opłacony — od teraz robimy to razem. 🤝\n\n' +
+            'Zanim usiądę do budowy, chcę dopracować z Tobą wizję ' + tyt + ', żeby pierwsza wersja była dokładnie taka, jak ją widzisz. ' +
+            'Bez formularzy i odpytywania — po prostu opowiedz mi, jak to ma działać w praktyce: konkretne sytuacje, przykłady, liczby, materiały, na których Ci zależy.\n\n' +
+            'Nie martw się, jeśli czegoś nie wiesz — **research i wiedzę branżową biorę na siebie.** Ty znasz swój pomysł, ja go ułożę w działające narzędzie.\n\n' +
+            'Od czego chcesz zacząć?';
+    }
+    // Dodaje opener do historii (raz). Sam NIE renderuje — robi to wołający albo
+    // replay w enterChat — żeby uniknąć podwójnego dymka.
+    function ensureKnowhowOpener() {
+        if (khHasOpener()) return false;
+        messages.push({ role: 'assistant', content: buildKnowhowOpener(), local: true, khOpener: true });
+        saveMessages();
+        return true;
+    }
+    // Wejście/powrót do rozmowy etapu dopracowania. Pierwszy raz dorzuca opener,
+    // potem tylko przełącza na czat. Zawsze odświeża etykiety przycisków.
+    function enterKnowhowChat() {
+        var added = (state.stage === 'knowhow' || state.stage === 'build') ? ensureKnowhowOpener() : false;
+        switchTab('chat');
+        if (added && el('chat-msgs')) appendMessage('assistant', messages[messages.length - 1].content);
+        unlockComposer();
+        refreshKnowhowUI();
+        scrollToBottom(true);
+    }
+
     function closeKnowhow() {
-        if (!confirm('Zamknąć etap dopracowania i przejść do budowy? Zawsze możesz tu wrócić i dopisać.')) return;
-        fetch(SPAR_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: state.sessionId, event: 'knowhow_close' }) })
-            .then(function (r) { return r.json(); })
-            .then(function () { state.stage = 'build'; state.khClosed = true; persistSession(); refreshKnowhowUI(); })
-            .catch(function () { alert('Nie udało się zamknąć etapu — spróbuj ponownie.'); });
+        // Etap już domknięty → przycisk „przejdź do budowy" sprowadza po prostu do czatu.
+        if (state.stage === 'build') { switchTab('chat'); scrollToBottom(true); return; }
+        playKnowhowOutro();
+    }
+
+    // Domknięcie etapu = świadomy, finałowy gest. Zamiast natywnego confirm()
+    // pełnoekranowa scena: potwierdzenie → po sukcesie ekran „domknięte + co dalej".
+    function playKnowhowOutro() {
+        if (document.querySelector('.khov')) return;
+        var ov = document.createElement('div'); ov.className = 'khov';
+        ov.innerHTML = '<div class="khov-in">' +
+            '<div class="khov-eye">Zamknięcie etapu</div>' +
+            '<h2 class="khov-h" style="white-space:normal">Domykamy dopracowanie?</h2>' +
+            '<p class="khov-p">Przekażę Tomkowi komplet ustaleń i ruszy z budową pierwszej wersji. ' +
+            'Zawsze możesz tu wrócić i coś dopisać — ale to dla mnie sygnał „z mojej strony to już wszystko".</p>' +
+            '<div class="khov-cta khov-actions">' +
+            '<button type="button" class="khov-go" data-ok="1">Tak, przekaż do budowy →</button>' +
+            '<button type="button" class="khov-cancel" data-ok="0">Jeszcze nie</button>' +
+            '</div></div>';
+        document.body.appendChild(ov);
+        requestAnimationFrame(function () { ov.classList.add('in', 's1', 's3'); });
+        var close = function () { ov.classList.add('out'); setTimeout(function () { if (ov.parentNode) ov.parentNode.removeChild(ov); }, 480); };
+        ov.querySelector('[data-ok="0"]').addEventListener('click', close);
+        ov.querySelector('[data-ok="1"]').addEventListener('click', function () {
+            var btn = this; btn.disabled = true; btn.textContent = 'Zamykam…';
+            fetch(SPAR_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: state.sessionId, event: 'knowhow_close' }) })
+                .then(function (r) { return r.json(); })
+                .then(function () {
+                    state.stage = 'build'; state.khClosed = true; persistSession(); refreshKnowhowUI();
+                    showKnowhowOutroDone(ov, close);
+                })
+                .catch(function () { btn.disabled = false; btn.textContent = 'Tak, przekaż do budowy →'; alert('Nie udało się zamknąć etapu — spróbuj ponownie.'); });
+        });
+    }
+    function showKnowhowOutroDone(ov, close) {
+        var inner = ov.querySelector('.khov-in');
+        inner.innerHTML =
+            '<div class="khov-eye" style="opacity:1;transform:none">Dopracowanie domknięte</div>' +
+            '<div class="khov-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>' +
+            '<h2 class="khov-h" style="opacity:1;transform:none;white-space:normal">Tomek ma komplet</h2>' +
+            '<p class="khov-p" style="opacity:1;transform:none">Zabieram wszystko, co ustaliliśmy, i przekazuję Tomkowi. ' +
+            'Teraz on składa pierwszą wersję Twojej aplikacji — i <strong>odezwie się do Ciebie z kolejnym krokiem.</strong></p>' +
+            '<div class="khov-cta" style="opacity:1;transform:none"><button type="button" class="khov-go" data-done="1">Wróć do panelu</button></div>';
+        inner.querySelector('[data-done="1"]').addEventListener('click', close);
     }
 
     // Animacja „odblokowano etap" — RAZ na sesję (localStorage), nieinwazyjna
@@ -10872,16 +10954,23 @@
         unlockComposer();
 
         if (isResume && messages.length === 0) {
-            addOpener();
+            // Świeże urządzenie w etapie dopracowania (brak lokalnej historii) —
+            // od razu opener spowiednika zamiast pre-paymentowego „znajdźmy problem".
+            if (state.stage === 'knowhow' || state.stage === 'build') ensureKnowhowOpener();
+            else addOpener();
             saveMessages();
         }
         messages.forEach(function (m) { appendMessage(m.role, m.content); });
 
         // Resume podglądu: jeśli w historii był marker <projekt>, odtwórz obrazek
-        // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem
+        // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem.
+        // W etapie know-how/budowa ekrany żyją w „Etap 1 — ustalenia" — w samej
+        // rozmowie kafli podglądu NIE pokazujemy (czysty kanał spowiednika).
         var projektContent = null;
-        for (var pi = messages.length - 1; pi >= 0; pi--) {
-            if (messages[pi].role === 'assistant' && messages[pi].content.indexOf('<projekt>') >= 0) { projektContent = messages[pi].content; break; }
+        if (state.stage !== 'knowhow' && state.stage !== 'build') {
+            for (var pi = messages.length - 1; pi >= 0; pi--) {
+                if (messages[pi].role === 'assistant' && messages[pi].content.indexOf('<projekt>') >= 0) { projektContent = messages[pi].content; break; }
+            }
         }
         var regenerating = false;
         if (projektContent) {
@@ -10963,6 +11052,11 @@
                 }
             }
         }
+
+        // Etap dopracowania/budowy: zsynchronizuj klasę widoku (chowa kafle podglądu)
+        // i etykiety przycisków. syncProjectFromServer odświeża to tylko przy ZMIANIE
+        // etapu — przy zwykłym wejściu (stage bez zmian) musimy zrobić to tutaj.
+        if (state.stage === 'knowhow' || state.stage === 'build') refreshKnowhowUI();
 
         updateStages();
         updateHero();
@@ -11066,9 +11160,23 @@
         // Kafel CTA = brama do zakładki Współpraca (nie wprost do płatności —
         // tam jest pełny plan wspólnego biznesu i dopiero stamtąd rezerwacja).
         var sideCta = el('side-cta');
-        sideCta.addEventListener('click', function () { switchTab((state.stage === 'knowhow' || state.stage === 'build') ? 'chat' : 'wspolpraca'); });
+        // W etapie know-how/budowa kafel ma własne przyciski [data-kh-act] (obsługa
+        // przez delegację niżej) — outer handler działa tylko dla fazy współpracy.
+        sideCta.addEventListener('click', function () { if (state.stage === 'knowhow' || state.stage === 'build') return; switchTab('wspolpraca'); });
         sideCta.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchTab((state.stage === 'knowhow' || state.stage === 'build') ? 'chat' : 'wspolpraca'); }
+            if ((e.key === 'Enter' || e.key === ' ') && state.stage !== 'knowhow' && state.stage !== 'build') { e.preventDefault(); switchTab('wspolpraca'); }
+        });
+        // Delegacja akcji etapu know-how. Przyciski („Zaczynamy/Wróć do rozmowy",
+        // „przejdź do budowy") renderują się dynamicznie w kaflu sidebara i w panelu
+        // czatu, a switchTab/closeKnowhow żyją w tym IIFE — inline onclick by nie
+        // zadziałał (global scope). Jeden listener na document obsługuje wszystkie.
+        document.addEventListener('click', function (e) {
+            var t = e.target && e.target.closest ? e.target.closest('[data-kh-act]') : null;
+            if (!t) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (t.getAttribute('data-kh-act') === 'close') closeKnowhow();
+            else enterKnowhowChat();
         });
         el('btn-side').addEventListener('click', openSide);
         el('side-backdrop').addEventListener('click', closeSide);
