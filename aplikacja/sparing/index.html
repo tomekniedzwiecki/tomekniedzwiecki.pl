@@ -10849,6 +10849,19 @@
         if (streaming) return;
         streamReply('', false, { knowhowResume: true });
     }
+    // Usuwa ostatnią zaczepkę (khNudge) z historii i DOM — żeby ponowny „wróć do
+    // rozmowy" dał ŚWIEŻĄ zaczepkę zamiast stackować kolejne (albo być no-opem).
+    function removeLastNudge() {
+        if (!messages.length || !messages[messages.length - 1].khNudge) return;
+        messages.pop();
+        saveMessages();
+        var cm = el('chat-msgs');
+        if (cm) {
+            var bubbles = cm.querySelectorAll('.msg--ai');
+            if (bubbles.length) bubbles[bubbles.length - 1].remove();
+        }
+        removeChips();
+    }
     // Wejście/powrót do rozmowy etapu dopracowania.
     //  • pierwszy raz: statyczny opener „spowiednika" (powitanie + otwarte pytanie),
     //  • powrót do trwającej rozmowy: kontekstowa zaczepka „chcesz coś dopowiedzieć?"
@@ -10864,10 +10877,18 @@
         }
         switchTab('chat');
         unlockComposer(); refreshKnowhowUI();
+        if (streaming) { scrollToBottom(true); return; }
         var last = messages.length ? messages[messages.length - 1] : null;
-        var idle = last && last.role === 'assistant' && !last.khNudge;
-        if (idle && !streaming) requestKnowhowNudge();
-        else scrollToBottom(true);
+        // Rozmowa „stoi" na turze AI (opener / poprzednia zaczepka / odpowiedź) →
+        // ZAWSZE świeża zaczepka. Poprzednią zaczepkę podmieniamy (bez stackowania),
+        // żeby każdy klik dał nowy, kontekstowy prompt powrotu. Gdy ostatnia jest
+        // wiadomość usera (czeka na odpowiedź AI) — tylko przewijamy.
+        if (last && last.role === 'assistant') {
+            if (last.khNudge) removeLastNudge();
+            requestKnowhowNudge();
+        } else {
+            scrollToBottom(true);
+        }
     }
 
     function closeKnowhow() {
