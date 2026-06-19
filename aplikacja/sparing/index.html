@@ -1514,10 +1514,12 @@
         border-top: 1px solid var(--glass-border);
     }
 
-    /* ── Kafel-bohater „Dotknij aplikacji" na pulpicie ── */
+    /* ── Kafel „Dotknij aplikacji" na pulpicie — half-width (span 3) jak reszta,
+       żeby trzymał rytm 2-w-rzędzie i parował się z „Projekt w pigułce" w jednej
+       linii (wcześniej span 6 rozbijał siatkę i zostawiał pigułkę samą). ── */
     .pjd-tile--proto {
-        grid-column: span 6;
-        min-height: 168px;
+        grid-column: span 3;
+        min-height: 235px;
         border-color: rgba(77, 159, 255, 0.4);
         background:
             radial-gradient(130% 160% at 100% 0%, rgba(77, 159, 255, 0.16), transparent 55%),
