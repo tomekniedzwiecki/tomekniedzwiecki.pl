@@ -1212,25 +1212,42 @@
         justify-content: flex-end;
         gap: 7px;
         text-align: left;
-        padding: 20px;
+        padding: 22px;
         border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.02);
+        border-radius: 18px;
+        /* głębia: delikatny top-light gradient + rozjaśniona górna krawędź */
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012) 42%, rgba(255, 255, 255, 0.008));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
         color: inherit;
         font: inherit;
         cursor: pointer;
         overflow: hidden;
         text-decoration: none;
-        transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+    /* subtelny radialny poblask w rogu ikony — „życie" karty */
+    .pjd-tile::before {
+        content: '';
+        position: absolute;
+        top: -40%;
+        left: -10%;
+        width: 320px;
+        height: 220px;
+        background: radial-gradient(closest-side, rgba(77, 159, 255, 0.12), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
     }
     .pjd-tile:hover {
-        border-color: rgba(77, 159, 255, 0.55);
-        transform: translateY(-3px);
-        background: rgba(255, 255, 255, 0.035);
-        box-shadow: 0 22px 48px -24px rgba(77, 159, 255, 0.4);
+        border-color: rgba(77, 159, 255, 0.5);
+        transform: translateY(-4px);
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.06), rgba(255, 255, 255, 0.012) 45%, rgba(255, 255, 255, 0.008));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 26px 52px -26px rgba(77, 159, 255, 0.5);
     }
+    .pjd-tile:hover::before { opacity: 1; }
     .pjd-tile--static { cursor: default; justify-content: flex-start; }
-    .pjd-tile--static:hover { border-color: var(--glass-border); transform: none; background: rgba(255, 255, 255, 0.02); box-shadow: none; }
+    .pjd-tile--static:hover { border-color: var(--glass-border); transform: none; background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.008)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+    .pjd-tile--static:hover::before { opacity: 0; }
     .pjd-tile--dim { opacity: 0.55; cursor: default; }
     .pjd-tile--dim:hover { border-color: var(--glass-border); transform: none; box-shadow: none; }
     .pjd-tile--hero { grid-column: span 4; min-height: 300px; }
@@ -1259,8 +1276,8 @@
     }
     .pjd-tile__media .pjd-tile__blur {
         object-fit: cover;
-        transform: scale(1.14);
-        filter: blur(26px) saturate(1.2) brightness(0.55);
+        transform: scale(1.18);
+        filter: blur(30px) saturate(1.05) brightness(0.32);
         transition: none;
     }
     .pjd-tile:hover .pjd-tile__media img:not(.pjd-tile__blur) { transform: scale(1.035); }
@@ -1268,27 +1285,33 @@
         content: '';
         position: absolute;
         inset: auto 0 0 0;
-        height: 46px;
-        background: linear-gradient(180deg, transparent, rgba(5, 6, 10, 0.55));
+        height: 64px;
+        background: linear-gradient(180deg, transparent, rgba(8, 9, 14, 0.7));
         pointer-events: none;
     }
     .pjd-tile__pad {
         display: flex;
         flex-direction: column;
         gap: 6px;
-        padding: 15px 20px 17px;
+        padding: 16px 22px 18px;
     }
+    .pjd-tile--hero .pjd-tile__t { font-size: 19px; }
+    .pjd-tile--hero .pjd-tile__media::after { height: 90px; background: linear-gradient(180deg, transparent, rgba(8, 9, 14, 0.82)); }
     .pjd-tile__ico {
-        width: 36px;
-        height: 36px;
-        border-radius: 11px;
-        background: rgba(77, 159, 255, 0.14);
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(160deg, rgba(77, 159, 255, 0.22), rgba(77, 159, 255, 0.07));
+        border: 1px solid rgba(77, 159, 255, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 6px 16px -8px rgba(77, 159, 255, 0.5);
         display: grid;
         place-items: center;
         margin-bottom: auto;
         flex-shrink: 0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .pjd-tile__ico svg { width: 18px; height: 18px; color: var(--accent); }
+    .pjd-tile:hover .pjd-tile__ico { transform: translateY(-1px) scale(1.04); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 10px 22px -8px rgba(77, 159, 255, 0.7); }
+    .pjd-tile__ico svg { width: 19px; height: 19px; color: var(--accent); }
     .pjd-tile__t {
         font-family: inherit;
         font-weight: 800;
@@ -1300,21 +1323,23 @@
         gap: 8px;
     }
     .pjd-tile__sub { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
-    .pjd-tile__go {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid var(--glass-border);
-        display: grid;
-        place-items: center;
-        transition: background 0.16s ease, transform 0.16s ease;
+    /* „Otwiera się" = strzałka inline PO TYTULE — tylko na klikalnych kaflach
+       (button/a), ujawniana na hover. Tytuł jest w tym samym miejscu na każdym
+       boxie, więc afordancja jest spójna wszędzie (koniec pływającego chipu, który
+       lądował raz w prawym-dolnym, raz w prawym-górnym rogu). Statyczne kafle (div)
+       jej nie dostają — bo nie są klikalne. */
+    button.pjd-tile .pjd-tile__t::after, a.pjd-tile .pjd-tile__t::after {
+        content: '→';
+        color: var(--accent);
+        font-weight: 600;
+        opacity: 0;
+        transform: translateX(-5px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
     }
-    .pjd-tile__go svg { width: 14px; height: 14px; color: var(--text-strong); }
-    .pjd-tile:hover .pjd-tile__go { background: var(--accent); transform: translateX(2px); }
+    button.pjd-tile:hover .pjd-tile__t::after, a.pjd-tile:hover .pjd-tile__t::after,
+    button.pjd-tile:focus-visible .pjd-tile__t::after, a.pjd-tile:focus-visible .pjd-tile__t::after {
+        opacity: 1; transform: translateX(0);
+    }
     .pjd-quote {
         font-family: Georgia, 'Times New Roman', serif;
         font-style: italic;
@@ -1332,8 +1357,9 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-    .pjd-num { font-weight: 800; font-size: clamp(24px, 3vw, 32px); color: var(--text-strong); line-height: 1.1; }
-    .pjd-num small { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    /* Liczby = sygnatura Geist: monospace, ciasny tracking, mocny kontrast */
+    .pjd-num { font-family: var(--mono, ui-monospace, monospace); font-weight: 600; font-size: clamp(27px, 3.2vw, 36px); color: var(--text-strong); line-height: 1.05; letter-spacing: -0.02em; }
+    .pjd-num small { font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--text-muted); letter-spacing: 0; }
     .pjd-live {
         font-style: normal;
         font-size: 10px;
@@ -1347,16 +1373,17 @@
     }
     .pjd-badge {
         align-self: flex-start;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.07em;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--accent);
-        border: 1px solid rgba(77, 159, 255, 0.4);
+        background: rgba(77, 159, 255, 0.12);
+        border: 1px solid rgba(77, 159, 255, 0.3);
         border-radius: 99px;
-        padding: 3px 11px;
+        padding: 3.5px 11px;
     }
-    .pjd-badge--wysoki { color: #5dd39e; border-color: rgba(93, 211, 158, 0.45); }
+    .pjd-badge--wysoki { color: #5dd39e; background: rgba(93, 211, 158, 0.12); border-color: rgba(93, 211, 158, 0.35); }
     /* Pasek postępu generacji (ETA) */
     .pjd-gen { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
     .pjd-gen__top { display: flex; align-items: center; gap: 9px; }
@@ -4997,25 +5024,47 @@
     .side-cta__btn:hover { filter: brightness(1.06); box-shadow: 0 8px 22px -10px rgba(0,112,243,.65), 0 1px 0 rgba(255,255,255,.14) inset !important; }
 
     /* Mini-wizualizacje w kaflach pulpitu (plan / economics / rynek) */
-    .pjd-tile__ico, .pjd-tile__t, .pjd-tile__sub, .pjd-tile__go, .pjd-num,
-    .pjd-badge, .pjd-quote, .pjd-spark { position: relative; z-index: 1; }
-    .pjd-spark { display: block; margin-top: 10px; }
-    .pjd-spark--bars { display: flex; align-items: flex-end; gap: 5px; height: 42px; }
-    .pjd-spark--bars i { flex: 1 1 0; background: #1f1f1f; border: 1px solid var(--border-strong); border-bottom: none; border-radius: 4px 4px 0 0; min-height: 8px; }
-    .pjd-spark--bars i.is-goal { background: var(--accent); border-color: var(--accent); }
-    .pjd-spark--line { height: 44px; }
+    .pjd-tile__ico, .pjd-tile__t, .pjd-tile__sub, .pjd-num,
+    .pjd-badge, .pjd-quote, .pjd-spark, .pjd-gen { position: relative; z-index: 1; }
+    .pjd-spark { display: block; margin-top: 12px; }
+    /* Słupki: gradient w marce zamiast płaskiej szarości; słupek-cel jaśniejszy + poblask */
+    .pjd-spark--bars { display: flex; align-items: flex-end; gap: 6px; height: 44px; }
+    .pjd-spark--bars i {
+        flex: 1 1 0; min-height: 9px; border-radius: 5px 5px 2px 2px;
+        background: linear-gradient(180deg, rgba(77, 159, 255, 0.55), rgba(77, 159, 255, 0.1));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .pjd-spark--bars i.is-goal {
+        background: linear-gradient(180deg, var(--accent), rgba(77, 159, 255, 0.45));
+        box-shadow: 0 0 16px -2px rgba(77, 159, 255, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .pjd-spark--line { height: 46px; }
     .pjd-spark--line svg { width: 100%; height: 100%; display: block; }
-    .pjd-spark--line polyline { fill: none; stroke: var(--accent); stroke-width: 2.5px; stroke-linecap: round; stroke-linejoin: round; }
-    .pjd-spark--line polygon { fill: var(--accent); opacity: .13; }
+    .pjd-spark--line polyline { fill: none; stroke: var(--accent); stroke-width: 2.5px; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(77, 159, 255, 0.5)); }
+    .pjd-spark--line polygon { fill: var(--accent); opacity: .16; }
     /* tło kafla „Potencjał rynku" — dekoracyjny wykres wzrostu */
     .pjd-tile--bg > * { position: relative; z-index: 1; }
     .pjd-bg { position: absolute; inset: 0; z-index: 0 !important; pointer-events: none; }
     .pjd-bg svg { width: 100%; height: 100%; display: block; }
-    .pjd-bg__area { fill: var(--accent); opacity: .08; }
-    .pjd-bg__line { fill: none; stroke: var(--accent); stroke-width: 1.5px; opacity: .32; }
+    .pjd-bg__area { fill: var(--accent); opacity: .11; }
+    .pjd-bg__line { fill: none; stroke: var(--accent); stroke-width: 1.5px; opacity: .42; }
     .pjd-tile--rynek-hi .pjd-bg__area { fill: var(--green); }
     .pjd-tile--rynek-hi .pjd-bg__line { stroke: var(--green); }
-    @media (prefers-reduced-motion: reduce) { .pjd-spark--bars i { transition: none; } }
+    /* ── Tematyczne tła kafli (każdy box „mówi" czym jest, jak wykres w Potencjale) ──
+       Motyw waży w prawym-górnym rogu i zanika ku lewemu-dołowi (gdzie jest tekst),
+       dzięki masce. Lekko wyraźniejszy przy hoverze. */
+    .pjd-bg2 { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+        -webkit-mask-image: linear-gradient(218deg, #000 4%, rgba(0,0,0,.55) 38%, transparent 72%);
+        mask-image: linear-gradient(218deg, #000 4%, rgba(0,0,0,.55) 38%, transparent 72%);
+        transition: opacity 0.25s ease, transform 0.4s var(--ease, ease); opacity: 0.9; }
+    .pjd-bg2 svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .pjd-tile:hover .pjd-bg2 { opacity: 1; transform: scale(1.03); }
+    .pjbg-stroke { fill: none; stroke: var(--accent); stroke-width: 1.6px; stroke-opacity: .34; stroke-linecap: round; stroke-linejoin: round; }
+    .pjbg-dot { fill: var(--accent); fill-opacity: .5; }
+    .pjbg-fill { fill: var(--accent); fill-opacity: .14; }
+    .pjbg-area { fill: var(--accent); opacity: .10; }
+    .pjbg-line { fill: none; stroke: var(--accent); stroke-width: 1.8px; stroke-opacity: .42; stroke-linecap: round; stroke-linejoin: round; }
+    @media (prefers-reduced-motion: reduce) { .pjd-spark--bars i { transition: none; } .pjd-tile:hover .pjd-bg2 { transform: none; } }
     </style>
 </head>
 <body>
@@ -6456,9 +6505,9 @@
         return false;
     }
     function lockedTile(icon, title, sub) {
-        return '<div class="pjd-tile pjd-tile--w3 pjd-tile--static" style="position:relative;opacity:.82">' +
-            '<span aria-hidden="true" style="position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#9fb0c8;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:3px 9px;line-height:1">' +
-            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>wkrótce</span>' +
+        return '<div class="pjd-tile pjd-tile--w3 pjd-tile--static" style="position:relative;opacity:.9">' +
+            '<span aria-hidden="true" style="position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.03em;color:#cfe1ff;background:rgba(77,159,255,.18);border:1px solid rgba(77,159,255,.45);border-radius:999px;padding:4px 10px;line-height:1;box-shadow:0 4px 14px -6px rgba(77,159,255,.6)">' +
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>wkrótce</span>' +
             '<span class="pjd-tile__ico">' + pjIco(icon) + '</span>' +
             '<span class="pjd-tile__t">' + title + '</span>' +
             '<span class="pjd-tile__sub">' + sub + '</span>' +
@@ -7525,8 +7574,48 @@
         }, 25000);
     }
 
-    function pjGoIcon() {
-        return '<span class="pjd-tile__go" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg></span>';
+    // Afordancja „otwiera się" przeniesiona na tytuł (jedyny element w tym samym
+    // miejscu na każdym kaflu) → patrz reguła .pjd-tile__t::after w CSS. Pływający
+    // chip w rogu lądował w różnych miejscach (media vs zwykłe) — usunięty.
+    function pjGoIcon() { return ''; }
+
+    // Tematyczne tło kafla — lekka grafika liniowa „mówiąca" czym jest box (jak wykres
+    // w Potencjale rynku). Waży w prawym-górnym rogu; maska wygasza je pod tekstem.
+    var PJ_BG = {
+        karta: '<svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice"><g class="pjbg-stroke"><rect x="252" y="44" width="120" height="150" rx="10"/></g><g class="pjbg-fill"><rect x="270" y="64" width="84" height="11" rx="4"/><rect x="270" y="84" width="58" height="9" rx="4"/></g><g class="pjbg-stroke"><line x1="270" y1="112" x2="354" y2="112"/><line x1="270" y1="130" x2="330" y2="130"/></g><g class="pjbg-fill"><rect x="270" y="150" width="64" height="22" rx="6"/></g></svg>',
+        plan: '<svg viewBox="0 0 400 240" preserveAspectRatio="none"><path class="pjbg-area" d="M0,210 C70,196 130,168 210,134 C290,100 350,66 400,44 L400,240 L0,240 Z"/><path class="pjbg-line" d="M0,210 C70,196 130,168 210,134 C290,100 350,66 400,44"/></svg>',
+        economics: '<svg viewBox="0 0 400 240" preserveAspectRatio="none"><g class="pjbg-fill"><rect x="244" y="150" width="26" height="74" rx="4"/><rect x="284" y="116" width="26" height="108" rx="4"/><rect x="324" y="84" width="26" height="140" rx="4"/><rect x="364" y="48" width="26" height="176" rx="4"/></g><path class="pjbg-line" d="M257,150 L297,116 L337,84 L377,48"/></svg>',
+        gtm: '<svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice"><g class="pjbg-stroke"><line x1="300" y1="56" x2="350" y2="120"/><line x1="300" y1="56" x2="246" y2="104"/><line x1="350" y1="120" x2="318" y2="188"/><line x1="246" y1="104" x2="318" y2="188"/><line x1="300" y1="56" x2="318" y2="188"/></g><g class="pjbg-dot"><circle cx="300" cy="56" r="7"/><circle cx="350" cy="120" r="5.5"/><circle cx="246" cy="104" r="5.5"/><circle cx="318" cy="188" r="5.5"/></g></svg>',
+        reklamy: '<svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice"><g class="pjbg-stroke"><rect x="268" y="44" width="116" height="84" rx="10"/><rect x="236" y="96" width="116" height="84" rx="10"/></g><path class="pjbg-fill" d="M282,124 l26,14 l-26,14 Z"/></svg>',
+        strona: '<svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice"><g class="pjbg-stroke"><rect x="240" y="40" width="148" height="170" rx="12"/><line x1="240" y1="66" x2="388" y2="66"/></g><g class="pjbg-dot"><circle cx="254" cy="53" r="3.4"/><circle cx="266" cy="53" r="3.4"/><circle cx="278" cy="53" r="3.4"/></g><g class="pjbg-fill"><rect x="258" y="84" width="112" height="46" rx="6"/><rect x="258" y="142" width="74" height="11" rx="4"/><rect x="258" y="162" width="96" height="11" rx="4"/></g></svg>',
+        prototyp: '<svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice"><g class="pjbg-stroke"><rect x="286" y="28" width="84" height="184" rx="16"/><line x1="312" y1="44" x2="344" y2="44"/></g><g class="pjbg-fill"><rect x="300" y="62" width="56" height="40" rx="6"/><rect x="300" y="112" width="40" height="9" rx="4"/></g><path class="pjbg-fill" d="M246,150 l0,46 l11,-11 l9,18 l9,-4 l-9,-18 l16,0 Z"/></svg>',
+        pigulka: '<svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice"><g class="pjbg-stroke"><rect x="256" y="36" width="116" height="168" rx="12"/></g><g class="pjbg-fill"><rect x="274" y="60" width="80" height="10" rx="4"/><rect x="274" y="80" width="60" height="10" rx="4"/><rect x="274" y="106" width="80" height="10" rx="4"/><rect x="274" y="126" width="48" height="10" rx="4"/><rect x="274" y="152" width="70" height="10" rx="4"/></g></svg>',
+        rynek: '<svg viewBox="0 0 400 240" preserveAspectRatio="none"><path class="pjbg-area" d="M0,206 C70,196 120,176 190,150 C270,120 330,150 400,70 L400,240 L0,240 Z"/><path class="pjbg-line" d="M0,206 C70,196 120,176 190,150 C270,120 330,150 400,70"/></svg>'
+    };
+    // Fallback dla kafli bez data-pjd (generujące się / „wkrótce") — po tytule.
+    var PJ_BG_BY_TITLE = [['plan przychodu', 'plan'], ['potencjał rynku', 'rynek'], ['czy to zarabia', 'economics'],
+        ['gdzie szukać', 'gtm'], ['gotowe reklamy', 'reklamy'], ['twoja strona', 'strona'],
+        ['prototyp', 'prototyp'], ['pigułce', 'pigulka'], ['pigułka', 'pigulka'], ['karta projektu', 'karta']];
+    function pjDecorateBackgrounds(root) {
+        if (!root) return;
+        root.querySelectorAll('.pjd-tile').forEach(function (t) {
+            // media (ma obraz) i rynek-gotowy (ma już wykres marketBg) zostawiamy
+            if (t.classList.contains('pjd-tile--media') || t.querySelector('.pjd-bg, .pjd-bg2')) return;
+            if (t.hasAttribute('data-pjd-rynek')) return;
+            // Kafle z własną wizualizacją w treści (Plan = słupki, Czy to zarabia = linia)
+            // NIE dostają tła — inaczej dwie grafiki nakładają się na siebie.
+            if (t.querySelector('.pjd-spark')) return;
+            var key = t.getAttribute('data-pjd') || t.getAttribute('data-bg') || '';
+            if (!key) {
+                var tt = ((t.querySelector('.pjd-tile__t') || {}).textContent || '').toLowerCase();
+                for (var i = 0; i < PJ_BG_BY_TITLE.length; i++) { if (tt.indexOf(PJ_BG_BY_TITLE[i][0]) >= 0) { key = PJ_BG_BY_TITLE[i][1]; break; } }
+            }
+            var svg = PJ_BG[key];
+            if (!svg) return;
+            var span = document.createElement('span');
+            span.className = 'pjd-bg2'; span.setAttribute('aria-hidden', 'true'); span.innerHTML = svg;
+            t.insertBefore(span, t.firstChild);
+        });
     }
 
     /* ── Mini-wizualizacje w kaflach pulpitu (lekkie, dekoracyjne) ── */
@@ -7891,6 +7980,7 @@
 
         html += '<div class="pjd-grid">' + tiles + '</div>';
         body.innerHTML = html;
+        pjDecorateBackgrounds(body);
         bindProjektCommon(body, ctx);
         body.querySelectorAll('[data-pjd]').forEach(function (t) {
             t.addEventListener('click', function () { pjOpenDetail(t.getAttribute('data-pjd')); });
