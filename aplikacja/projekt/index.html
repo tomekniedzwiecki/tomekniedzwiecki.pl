@@ -5390,7 +5390,7 @@ body { overflow: auto !important; height: auto !important; min-height: 100dvh; d
     var churn = (ov && ov.churn != null ? ov.churn : (+w.churn_mies_proc || 4)) / 100;
     var cac = ov && ov.cac != null ? ov.cac : (+w.cac || 0);
     var budzet = ov && ov.budzet != null ? ov.budzet : (+w.budzet_reklam_mies || 0);
-    var kosztBud = +w.koszt_budowy || 12500;
+    var kosztBud = +w.koszt_budowy || 12500; // fallback ceny budowy netto — kanon: settings.aplikacja_model_biznesowy (to samo w aplikacja/sparing/index.html)
     var gross = cena * marza;
     var revShare = cena * 0.10;
     var ltv = churn > 0 ? gross / churn : gross * 36;
