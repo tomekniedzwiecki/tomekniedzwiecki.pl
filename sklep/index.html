@@ -2958,109 +2958,90 @@
     .pc-brak-tytul { font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
     .pc-brak-opis { opacity: .82; font-size: .95em; line-height: 1.5; margin-bottom: 14px; }
     .pc-brak .pc-actions { margin-top: 0; }
-    /* SIATKA KAFELKÓW (galeria) — zamiast karuzeli; minimalny kafelek: zdjęcie + nazwa + cena + zysk + CTA */
+    /* SIATKA PRODUKTÓW (galeria) — premium glass: zdjęcie cover + lightbox, czytelny zysk, CTA */
     .pc-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
+        gap: 12px;
     }
-    @media (min-width: 720px) { .pc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 760px) { .pc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     .pc-card {
         position: relative;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
         border: 1px solid var(--glass-border-soft);
-        border-radius: 14px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
-        -webkit-backdrop-filter: blur(10px);
-        backdrop-filter: blur(10px);
-        padding: 10px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
     }
-    .pc-img {
+    @media (hover: hover) { .pc-card:hover { transform: translateY(-3px); border-color: var(--glass-border); box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.6); } }
+    .pc-card.is-top { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(0, 217, 126, 0.3), 0 16px 40px -18px rgba(0, 217, 126, 0.4); }
+    .pc-imgwrap {
+        position: relative;
         width: 100%;
-        height: 150px;
-        object-fit: contain;
-        padding: 4px;
-        box-sizing: border-box;
-        border-radius: 10px;
-        margin-bottom: 9px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid var(--glass-border-soft);
-    }
-    .pc-card.is-top {
-        border-color: var(--accent);
-        background: linear-gradient(180deg, var(--accent-soft) 0%, rgba(255, 255, 255, 0.02) 70%);
-        box-shadow: 0 0 0 1px rgba(0, 217, 126, 0.35), 0 14px 38px -16px rgba(0, 217, 126, 0.45);
-    }
-    .pc-badge {
-        position: absolute;
-        top: 14px;
-        left: 14px;
-        font-size: 9.5px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        color: var(--accent-ink);
-        background: var(--accent);
-        border-radius: 999px;
-        padding: 3px 8px;
-        z-index: 2;
-    }
-    .pc-name {
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        line-height: 1.3;
-        color: var(--text-strong);
-        margin-bottom: 8px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        aspect-ratio: 4 / 3;
+        background: rgba(255, 255, 255, 0.06);
+        cursor: zoom-in;
         overflow: hidden;
     }
-    .pc-kat { font-size: 11px; color: var(--text-faint); margin-bottom: 8px; }
-    .pc-why { font-size: 14px; line-height: 1.55; color: var(--text); margin-bottom: 12px; }
-    .pc-proof { font-size: 11px; line-height: 1.35; color: var(--text-faint); margin-bottom: 9px; }
-    .pc-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 9px;
+    .pc-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s var(--ease); }
+    @media (hover: hover) { .pc-imgwrap:hover .pc-img { transform: scale(1.05); } }
+    .pc-zoom {
+        position: absolute; top: 8px; right: 8px; width: 30px; height: 30px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; background: rgba(0, 0, 0, 0.5); color: #fff;
+        -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); pointer-events: none;
     }
-    .pc-pill {
-        font-size: 11.5px;
-        color: var(--text);
-        background: var(--glass-strong);
-        border: 1px solid var(--glass-border);
-        border-radius: 8px;
-        padding: 3px 8px;
+    .pc-zoom svg { width: 15px; height: 15px; }
+    .pc-badge {
+        position: absolute; top: 8px; left: 8px;
+        display: inline-flex; align-items: center; gap: 3px;
+        font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em;
+        color: var(--accent-ink); background: var(--accent);
+        border-radius: 999px; padding: 3px 8px 3px 6px; z-index: 2;
     }
-    .pc-pill strong { color: var(--text-strong); font-weight: 700; }
-    .pc-pill.pc-pill--margin { color: var(--accent); border-color: var(--accent); }
-    .pc-pill.pc-pill--margin strong { color: var(--accent); }
-    .pc-signal {
-        font-size: 12.5px;
-        line-height: 1.5;
-        color: var(--text-muted);
-        margin-bottom: 12px;
+    .pc-badge svg { width: 11px; height: 11px; }
+    .pc-body { display: flex; flex-direction: column; flex: 1; padding: 12px; }
+    .pc-name {
+        font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--text-strong);
+        margin-bottom: 11px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        overflow: hidden; min-height: 2.6em;
     }
-    .pc-signal a { color: var(--accent); text-decoration: none; white-space: nowrap; }
-    .pc-signal a:hover { text-decoration: underline; }
+    .pc-prices { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .pc-price { font-size: 11px; color: var(--text-muted); line-height: 1.2; }
+    .pc-price strong { display: block; font-size: 15px; font-weight: 700; color: var(--text-strong); margin-top: 2px; }
+    .pc-profit { text-align: right; line-height: 1.2; }
+    .pc-profit-lbl { font-size: 11px; color: var(--accent); }
+    .pc-profit strong { display: block; font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: -.01em; margin-top: 2px; }
+    .pc-proof { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-faint); margin-bottom: 12px; }
+    .pc-proof svg { width: 12px; height: 12px; flex: none; color: var(--accent); opacity: .85; }
     .pc-pick {
-        margin-top: auto;
-        width: 100%;
-        padding: 11px 12px;
-        border-radius: 11px;
-        background: var(--accent);
-        color: var(--accent-ink);
-        font-weight: 700;
-        font-size: 14px;
-        cursor: pointer;
-        border: none;
+        margin-top: auto; width: 100%; min-height: 44px; padding: 11px 12px;
+        border-radius: 11px; background: var(--accent); color: var(--accent-ink);
+        font-weight: 700; font-size: 14px; cursor: pointer; border: none;
         transition: filter .15s var(--ease);
     }
-    .pc-pick:hover { filter: brightness(1.06); }
-    .pc-pick:active { transform: translateY(0) scale(0.99); }
+    .pc-pick:hover { filter: brightness(1.07); }
+    .pc-pick:active { filter: brightness(.95); }
+    /* LIGHTBOX — powiększenie zdjęcia produktu */
+    .pc-lightbox {
+        position: fixed; inset: 0; z-index: 1000;
+        display: flex; align-items: center; justify-content: center; padding: 20px;
+        background: rgba(0, 0, 0, 0.85); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        cursor: zoom-out; animation: pcLbIn .18s var(--ease);
+    }
+    .pc-lightbox img { max-width: 92vw; max-height: 88vh; object-fit: contain; border-radius: 12px; box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8); }
+    .pc-lightbox-x {
+        position: absolute; top: 16px; right: 16px; width: 42px; height: 42px;
+        display: flex; align-items: center; justify-content: center; border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12); color: #fff; border: none; cursor: pointer;
+    }
+    .pc-lightbox-x svg { width: 20px; height: 20px; }
+    @keyframes pcLbIn { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .pc-card, .pc-img, .pc-lightbox { transition: none; animation: none; } }
     /* Rząd akcji pod karuzelą — ghost chipy w palecie */
     .pc-actions {
         display: flex;
@@ -10734,19 +10715,36 @@
         return (Math.round(n) === n ? String(n) : n.toFixed(2).replace(/\.?0+$/, '')) + ' zł';
     }
 
-    // Mini-dowód popytu (1 linijka): wyciąga liczbę zamówień + % opinii z długiego sygnału.
+    // Mini-dowód popytu (1 linijka): TYLKO liczba zamówień (bez % opinii — decyzja Tomka).
     function miniProof(sygnal) {
         var s = String(sygnal || '');
-        var parts = [];
         var vol = s.match(/(\d[\d\s.]*)\s*zamówie/i);
-        if (vol) parts.push(vol[1].replace(/\s/g, '') + '+ zamówień');
-        var rate = s.match(/([\d.]+)\s*%/);
-        if (rate) parts.push(Math.round(parseFloat(rate[1])) + '% opinii');
-        return parts.length ? '🔥 ' + parts.join(' · ') : '';
+        if (vol) { var n = vol[1].replace(/\s/g, ''); if (n && n !== '0') return n + '+ zamówień'; }
+        return '';
+    }
+    // Ikony SVG (bez emoji — wytyczne UI/UX).
+    var SVG_STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>';
+    var SVG_ZOOM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>';
+    var SVG_TREND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 8h6v6"/></svg>';
+    var SVG_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+
+    // Powiększenie zdjęcia (lightbox) — klik kafelka/zdjęcia.
+    function openLightbox(src) {
+        if (!src) return;
+        var ex = document.getElementById('pc-lb'); if (ex) ex.remove();
+        var lb = document.createElement('div');
+        lb.className = 'pc-lightbox'; lb.id = 'pc-lb';
+        lb.innerHTML = '<button type="button" class="pc-lightbox-x" aria-label="Zamknij">' + SVG_X + '</button>' +
+            '<img src="' + esc(src) + '" alt="Powiększenie produktu" referrerpolicy="no-referrer">';
+        function close() { lb.remove(); document.removeEventListener('keydown', onKey); }
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        lb.addEventListener('click', close);
+        document.addEventListener('keydown', onKey);
+        document.body.appendChild(lb);
     }
 
-    // arr = ProductCandidate[]; SIATKA kafelków (galeria). Minimalny kafelek: zdjęcie, nazwa,
-    // cena, zysk, CTA + dyskretny dowód. nazwa/ref_url z modelu → ZAWSZE przez esc().
+    // arr = ProductCandidate[]; SIATKA kafelków (galeria). Kafelek: zdjęcie (klik=zoom) + nazwa
+    // + cena/zysk + dyskretny dowód + CTA. nazwa/img z modelu → ZAWSZE przez esc().
     function renderPropozycjeEl(arr, runda) {
         var wrap = document.createElement('div');
         wrap.className = 'pc-grid-wrap';
@@ -10758,25 +10756,34 @@
 
         arr.forEach(function (p) {
             var top = !!p.najmocniejszy;
+            var nazwa = String(p.nazwa || '').trim();
+            var imgU = String(p.image || '').trim();
+            var hasImg = /^https?:\/\//i.test(imgU);
             var c = document.createElement('div');
             c.className = 'pc-card' + (top ? ' is-top' : '');
             var html = '';
-            if (top) html += '<span class="pc-badge">⭐ TOP</span>';
-            var imgU = String(p.image || '').trim();
-            if (/^https?:\/\//i.test(imgU)) html += '<img class="pc-img" src="' + esc(imgU) + '" alt="" loading="lazy" referrerpolicy="no-referrer">';
-            html += '<div class="pc-name">' + esc(String(p.nazwa || '').trim().slice(0, 80)) + '</div>';
-            // cena sprzedaży + ile zarabiam (2 pigułki)
-            var pills = '';
+            // zdjęcie (cover) — klikalne, powiększa się w lightboxie
+            html += '<div class="pc-imgwrap"' + (hasImg ? ' data-zoom="' + esc(imgU) + '"' : '') + '>';
+            if (top) html += '<span class="pc-badge">' + SVG_STAR + 'TOP</span>';
+            if (hasImg) {
+                html += '<img class="pc-img" src="' + esc(imgU) + '" alt="' + esc(nazwa.slice(0, 80)) + '" loading="lazy" referrerpolicy="no-referrer">';
+                html += '<span class="pc-zoom">' + SVG_ZOOM + '</span>';
+            }
+            html += '</div>';
+            // treść
+            html += '<div class="pc-body">';
+            html += '<div class="pc-name">' + esc(nazwa.slice(0, 80)) + '</div>';
             var cena = zl(p.est_cena_detaliczna_pl);
-            if (cena) pills += '<span class="pc-pill">cena <strong>' + esc(cena) + '</strong></span>';
             var marza = zl(p.est_marza_zl);
-            if (marza) pills += '<span class="pc-pill pc-pill--margin">zysk <strong>' + esc(marza) + '</strong></span>';
-            if (pills) html += '<div class="pc-meta">' + pills + '</div>';
-            // dyskretny dowód popytu (1 linijka)
+            html += '<div class="pc-prices">' +
+                '<div class="pc-price">cena<strong>' + esc(cena || '—') + '</strong></div>' +
+                '<div class="pc-profit"><span class="pc-profit-lbl">zarabiasz</span><strong>' + esc(marza || '—') + '</strong></div>' +
+                '</div>';
             var proof = miniProof(p.sygnal_popytu);
-            if (proof) html += '<div class="pc-proof">' + esc(proof) + '</div>';
+            if (proof) html += '<div class="pc-proof">' + SVG_TREND + '<span>' + esc(proof) + '</span></div>';
             html += '<button type="button" class="pc-pick" data-action="pick" data-nazwa="' +
-                esc(String(p.nazwa || '').trim().slice(0, 90)) + '">Biorę ten</button>';
+                esc(nazwa.slice(0, 90)) + '">Biorę ten</button>';
+            html += '</div>';
             c.innerHTML = html;
             grid.appendChild(c);
         });
@@ -10855,6 +10862,10 @@
     // [Biorę ten] / [Pokaż inne] / [Zmień kategorię] → zwykła wiadomość usera.
     // [Mam własny produkt] / [Mam własny pomysł] → switch_track (k2/k3).
     document.addEventListener('click', function (e) {
+        // Klik zdjęcia → powiększenie (lightbox). Dozwolone ZAWSZE (też w czasie streamu i na
+        // zamrożonych kartach) — to tylko podgląd, nie akcja.
+        var zoomEl = e.target.closest && e.target.closest('.pc-imgwrap');
+        if (zoomEl && zoomEl.getAttribute('data-zoom')) { e.preventDefault(); openLightbox(zoomEl.getAttribute('data-zoom')); return; }
         var btn = e.target.closest && e.target.closest('.pc-card .pc-pick, .pc-actions .pc-act');
         if (!btn || streaming || el('inline-gate')) return;
         var act = btn.getAttribute('data-action');
