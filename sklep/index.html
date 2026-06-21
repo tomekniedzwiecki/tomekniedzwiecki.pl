@@ -10667,6 +10667,19 @@
         w.style.opacity = '0';
         setTimeout(removePropUI, 180);
     }
+    // ZAMROŻENIE karuzeli po kliknięciu — zostaje widoczna w historii czatu (jako podjęta
+    // decyzja), ale przyciski nieaktywne; zwalnia aktywne ID, więc kolejna runda propozycji
+    // renderuje się jako NOWA karuzela pod spodem (cała historia doboru widoczna).
+    function freezeProp() {
+        if (propLoaderTimer) { clearInterval(propLoaderTimer); propLoaderTimer = null; }
+        var l = document.getElementById(PROP_LOADER_ID); if (l) l.remove();
+        var w = document.getElementById(PROP_WRAP_ID);
+        if (!w) return;
+        w.id = PROP_WRAP_ID + '-done-' + Date.now();
+        w.classList.add('pc-frozen');
+        var btns = w.querySelectorAll('.pc-pick, .pc-act');
+        for (var i = 0; i < btns.length; i++) { btns[i].disabled = true; btns[i].style.pointerEvents = 'none'; btns[i].style.opacity = '.4'; }
+    }
 
     function showPropLoader() {
         // loader pojawia się W TRAKCIE streamu (event SSE), więc NIE guardujemy `streaming`
@@ -10877,7 +10890,7 @@
         var act = btn.getAttribute('data-action');
         if (!act) return;
         e.preventDefault();
-        fadeRemoveProp();
+        freezeProp(); // karuzela ZOSTAJE w historii czatu (zamrożona), kolejna runda renderuje się pod spodem
         if (act === 'pick') {
             var nazwa = btn.getAttribute('data-nazwa') || '';
             sendOpening('Wybieram: ' + nazwa);
