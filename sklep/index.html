@@ -2958,27 +2958,33 @@
     .pc-brak-tytul { font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
     .pc-brak-opis { opacity: .82; font-size: .95em; line-height: 1.5; margin-bottom: 14px; }
     .pc-brak .pc-actions { margin-top: 0; }
+    /* SIATKA KAFELKÓW (galeria) — zamiast karuzeli; minimalny kafelek: zdjęcie + nazwa + cena + zysk + CTA */
+    .pc-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+    @media (min-width: 720px) { .pc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     .pc-card {
         position: relative;
         display: flex;
         flex-direction: column;
-        scroll-snap-align: center;
         border: 1px solid var(--glass-border-soft);
-        border-radius: 16px;
+        border-radius: 14px;
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
-        padding: 16px;
+        padding: 10px;
     }
     .pc-img {
         width: 100%;
-        height: 240px;
+        height: 150px;
         object-fit: contain;
-        padding: 6px;
+        padding: 4px;
         box-sizing: border-box;
         border-radius: 10px;
-        margin-bottom: 10px;
-        background: rgba(255, 255, 255, 0.04);
+        margin-bottom: 9px;
+        background: rgba(255, 255, 255, 0.05);
         border: 1px solid var(--glass-border-soft);
     }
     .pc-card.is-top {
@@ -2987,41 +2993,47 @@
         box-shadow: 0 0 0 1px rgba(0, 217, 126, 0.35), 0 14px 38px -16px rgba(0, 217, 126, 0.45);
     }
     .pc-badge {
-        align-self: flex-start;
-        font-size: 10px;
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        font-size: 9.5px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: .05em;
-        color: var(--accent);
-        background: var(--bg-elev);
-        border: 1px solid var(--accent);
+        letter-spacing: .04em;
+        color: var(--accent-ink);
+        background: var(--accent);
         border-radius: 999px;
-        padding: 2px 9px;
-        margin-bottom: 8px;
+        padding: 3px 8px;
+        z-index: 2;
     }
     .pc-name {
-        font-size: 17px;
-        font-weight: 800;
+        font-size: 14px;
+        font-weight: 700;
         letter-spacing: -0.01em;
-        line-height: 1.25;
+        line-height: 1.3;
         color: var(--text-strong);
-        margin-bottom: 7px;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
     .pc-kat { font-size: 11px; color: var(--text-faint); margin-bottom: 8px; }
     .pc-why { font-size: 14px; line-height: 1.55; color: var(--text); margin-bottom: 12px; }
+    .pc-proof { font-size: 11px; line-height: 1.35; color: var(--text-faint); margin-bottom: 9px; }
     .pc-meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 7px;
-        margin-bottom: 10px;
+        gap: 6px;
+        margin-bottom: 9px;
     }
     .pc-pill {
-        font-size: 12px;
+        font-size: 11.5px;
         color: var(--text);
         background: var(--glass-strong);
         border: 1px solid var(--glass-border);
-        border-radius: 9px;
-        padding: 4px 9px;
+        border-radius: 8px;
+        padding: 3px 8px;
     }
     .pc-pill strong { color: var(--text-strong); font-weight: 700; }
     .pc-pill.pc-pill--margin { color: var(--accent); border-color: var(--accent); }
@@ -10722,98 +10734,55 @@
         return (Math.round(n) === n ? String(n) : n.toFixed(2).replace(/\.?0+$/, '')) + ' zł';
     }
 
-    // arr = ProductCandidate[]; każda karta + wyróżnienie `najmocniejszy`.
-    // nazwa/ref_url itp. z modelu → ZAWSZE przez esc() (atrybuty i treść).
+    // Mini-dowód popytu (1 linijka): wyciąga liczbę zamówień + % opinii z długiego sygnału.
+    function miniProof(sygnal) {
+        var s = String(sygnal || '');
+        var parts = [];
+        var vol = s.match(/(\d[\d\s.]*)\s*zamówie/i);
+        if (vol) parts.push(vol[1].replace(/\s/g, '') + '+ zamówień');
+        var rate = s.match(/([\d.]+)\s*%/);
+        if (rate) parts.push(Math.round(parseFloat(rate[1])) + '% opinii');
+        return parts.length ? '🔥 ' + parts.join(' · ') : '';
+    }
+
+    // arr = ProductCandidate[]; SIATKA kafelków (galeria). Minimalny kafelek: zdjęcie, nazwa,
+    // cena, zysk, CTA + dyskretny dowód. nazwa/ref_url z modelu → ZAWSZE przez esc().
     function renderPropozycjeEl(arr, runda) {
         var wrap = document.createElement('div');
-        wrap.className = 'car';
+        wrap.className = 'pc-grid-wrap';
         wrap.id = PROP_WRAP_ID;
         runda = Number(runda) || 0;
-        var lastRound = runda >= 3; // 3. (ostatnia) runda — pod karuzelą menu trzech dróg
-        var track = document.createElement('div');
-        track.className = 'car__track';
+        var lastRound = runda >= 3;
+        var grid = document.createElement('div');
+        grid.className = 'pc-grid';
 
         arr.forEach(function (p) {
             var top = !!p.najmocniejszy;
             var c = document.createElement('div');
             c.className = 'pc-card' + (top ? ' is-top' : '');
-
             var html = '';
-            if (top) html += '<span class="pc-badge">⭐ najmocniejszy strzał</span>';
+            if (top) html += '<span class="pc-badge">⭐ TOP</span>';
             var imgU = String(p.image || '').trim();
             if (/^https?:\/\//i.test(imgU)) html += '<img class="pc-img" src="' + esc(imgU) + '" alt="" loading="lazy" referrerpolicy="no-referrer">';
-            html += '<div class="pc-name">' + esc(String(p.nazwa || '').trim().slice(0, 90)) + '</div>';
-            if (p.kategoria) html += '<div class="pc-kat">' + esc(String(p.kategoria).trim().slice(0, 60)) + '</div>';
-
-            var why = String(p.czemu_sie_sprzedaje || p.opis_1zd || '').trim();
-            if (why) html += '<div class="pc-why">' + esc(why.slice(0, 220)) + '</div>';
-
-            // ceny + marża w pigułkach
+            html += '<div class="pc-name">' + esc(String(p.nazwa || '').trim().slice(0, 80)) + '</div>';
+            // cena sprzedaży + ile zarabiam (2 pigułki)
             var pills = '';
             var cena = zl(p.est_cena_detaliczna_pl);
             if (cena) pills += '<span class="pc-pill">cena <strong>' + esc(cena) + '</strong></span>';
             var marza = zl(p.est_marza_zl);
-            if (marza) pills += '<span class="pc-pill pc-pill--margin">zarabiasz ok. <strong>' + esc(marza) + '</strong> na sztuce</span>';
+            if (marza) pills += '<span class="pc-pill pc-pill--margin">zysk <strong>' + esc(marza) + '</strong></span>';
             if (pills) html += '<div class="pc-meta">' + pills + '</div>';
-
-            // sygnał popytu + dyskretne źródło
-            var sygnal = String(p.sygnal_popytu || '').trim();
-            if (sygnal) {
-                var src = '';
-                var ref = String(p.ref_url || '').trim();
-                if (/^https?:\/\//i.test(ref)) src = ' <a href="' + esc(ref) + '" target="_blank" rel="noopener noreferrer">Źródło</a>';
-                html += '<div class="pc-signal">' + esc(sygnal.slice(0, 240)) + src + '</div>';
-            }
-
-            // „Biorę ten" per karta — nazwa w data-atrybucie (escapowana)
+            // dyskretny dowód popytu (1 linijka)
+            var proof = miniProof(p.sygnal_popytu);
+            if (proof) html += '<div class="pc-proof">' + esc(proof) + '</div>';
             html += '<button type="button" class="pc-pick" data-action="pick" data-nazwa="' +
                 esc(String(p.nazwa || '').trim().slice(0, 90)) + '">Biorę ten</button>';
-
             c.innerHTML = html;
-            track.appendChild(c);
+            grid.appendChild(c);
         });
-        wrap.appendChild(track);
+        wrap.appendChild(grid);
 
-        // kropki + strzałki — mechanika 1:1 z renderKaruzelaEl
-        if (arr.length > 1) {
-            var dots = document.createElement('div');
-            dots.className = 'car__dots';
-            arr.forEach(function (_, i) {
-                var dt = document.createElement('button');
-                dt.type = 'button';
-                if (i === 0) dt.className = 'is-on';
-                dt.setAttribute('aria-label', 'Produkt ' + (i + 1) + ' z ' + arr.length);
-                dt.addEventListener('click', function () {
-                    track.scrollTo({ left: track.children[i].offsetLeft - 8, behavior: 'smooth' });
-                });
-                dots.appendChild(dt);
-            });
-            wrap.appendChild(dots);
-
-            var mkArrow = function (dir) {
-                var b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'car__arr car__arr--' + (dir < 0 ? 'l' : 'r');
-                b.setAttribute('aria-label', dir < 0 ? 'Poprzedni produkt' : 'Następny produkt');
-                b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="' + (dir < 0 ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6') + '"></path></svg>';
-                b.addEventListener('click', function () {
-                    track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: 'smooth' });
-                });
-                return b;
-            };
-            wrap.appendChild(mkArrow(-1));
-            wrap.appendChild(mkArrow(1));
-
-            track.addEventListener('scroll', function () {
-                var w = track.children[0].offsetWidth + 10;
-                var i = Math.max(0, Math.min(arr.length - 1, Math.round(track.scrollLeft / w)));
-                dots.querySelectorAll('button').forEach(function (dd, di) {
-                    dd.classList.toggle('is-on', di === i);
-                });
-            }, { passive: true });
-        }
-
-        // Rząd akcji pod karuzelą (delegacja data-action — patrz niżej).
+        // Rząd akcji pod siatką (delegacja data-action — patrz niżej).
         // Rundy 1–2: [Pokaż inne]. Runda 3 (ostatnia): menu trzech dróg (decyzja Tomka —
         // limit 3×5; po wyczerpaniu nie puszczamy taśmy w nieskończoność).
         var actions = document.createElement('div');
