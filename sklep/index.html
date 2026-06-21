@@ -2959,6 +2959,15 @@
         backdrop-filter: blur(10px);
         padding: 16px;
     }
+    .pc-img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--glass-border-soft);
+    }
     .pc-card.is-top {
         border-color: var(--accent);
         background: linear-gradient(180deg, var(--accent-soft) 0%, rgba(255, 255, 255, 0.02) 70%);
@@ -10689,6 +10698,8 @@
 
             var html = '';
             if (top) html += '<span class="pc-badge">⭐ najmocniejszy strzał</span>';
+            var imgU = String(p.image || '').trim();
+            if (/^https?:\/\//i.test(imgU)) html += '<img class="pc-img" src="' + esc(imgU) + '" alt="" loading="lazy" referrerpolicy="no-referrer">';
             html += '<div class="pc-name">' + esc(String(p.nazwa || '').trim().slice(0, 90)) + '</div>';
             if (p.kategoria) html += '<div class="pc-kat">' + esc(String(p.kategoria).trim().slice(0, 60)) + '</div>';
 
