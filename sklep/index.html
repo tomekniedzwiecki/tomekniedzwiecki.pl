@@ -10252,13 +10252,17 @@
                     return;
                 }
                 if (ev === 'bud_propozycje') {
-                    // K1 — kandydaci produktowi: szukam → loader, gotowe → karuzela
+                    // K1 — kandydaci produktowi: szukam → loader, gotowe → karuzela,
+                    // limit → wyczerpane 3 rundy (serwer odmówił 4.) → tylko sprzątamy loader,
+                    // menu trzech dróg poprowadzi mózg w treści tury (<opcje>).
                     if (obj && obj.status === 'szukam') {
                         showPropLoader();
                         scrollToBottom(false);
                     } else if (obj && obj.status === 'gotowe') {
                         var items = Array.isArray(obj.items) ? obj.items.slice(0, 5) : [];
-                        showPropozycje(items);
+                        showPropozycje(items, obj.runda || 0);
+                    } else if (obj && obj.status === 'limit') {
+                        removePropUI();
                     }
                     return;
                 }
@@ -10684,10 +10688,12 @@
 
     // arr = ProductCandidate[]; każda karta + wyróżnienie `najmocniejszy`.
     // nazwa/ref_url itp. z modelu → ZAWSZE przez esc() (atrybuty i treść).
-    function renderPropozycjeEl(arr) {
+    function renderPropozycjeEl(arr, runda) {
         var wrap = document.createElement('div');
         wrap.className = 'car';
         wrap.id = PROP_WRAP_ID;
+        runda = Number(runda) || 0;
+        var lastRound = runda >= 3; // 3. (ostatnia) runda — pod karuzelą menu trzech dróg
         var track = document.createElement('div');
         track.className = 'car__track';
 
@@ -10771,14 +10777,25 @@
             }, { passive: true });
         }
 
-        // Rząd akcji pod karuzelą (delegacja data-action — patrz niżej)
+        // Rząd akcji pod karuzelą (delegacja data-action — patrz niżej).
+        // Rundy 1–2: [Pokaż inne]. Runda 3 (ostatnia): menu trzech dróg (decyzja Tomka —
+        // limit 3×5; po wyczerpaniu nie puszczamy taśmy w nieskończoność).
         var actions = document.createElement('div');
         actions.className = 'pc-actions';
-        actions.innerHTML =
-            '<button type="button" class="pc-act" data-action="more">Pokaż inne propozycje</button>' +
-            '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
-            '<button type="button" class="pc-act" data-action="own_brand">Mam jednak własny produkt</button>' +
-            '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>';
+        if (lastRound) {
+            actions.innerHTML =
+                '<button type="button" class="pc-act" data-action="best">Wróćmy do najlepszego z pokazanych</button>' +
+                '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
+                '<button type="button" class="pc-act" data-action="own_link">Mam produkt z AliExpress — wkleję link</button>' +
+                '<button type="button" class="pc-act" data-action="own_brand">Mam jednak własny produkt</button>' +
+                '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>';
+        } else {
+            actions.innerHTML =
+                '<button type="button" class="pc-act" data-action="more">Pokaż inne propozycje</button>' +
+                '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
+                '<button type="button" class="pc-act" data-action="own_brand">Mam jednak własny produkt</button>' +
+                '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>';
+        }
         wrap.appendChild(actions);
 
         return wrap;
@@ -10799,10 +10816,10 @@
         } catch (e) { return null; }
     }
 
-    function showPropozycje(arr) {
+    function showPropozycje(arr, runda) {
         removePropUI();
         if (!arr || !arr.length) return;
-        el('chat-msgs').appendChild(renderPropozycjeEl(arr));
+        el('chat-msgs').appendChild(renderPropozycjeEl(arr, runda));
         scrollToBottom(false);
     }
 
@@ -10823,6 +10840,10 @@
             sendOpening('Pokaż inne propozycje');
         } else if (act === 'kategoria') {
             sendOpening('Zmień kategorię produktu');
+        } else if (act === 'best') {
+            sendOpening('Wróćmy do najlepszego z pokazanych — dopracujmy go');
+        } else if (act === 'own_link') {
+            sendOpening('Mam konkretny produkt z AliExpress — chcę podać link');
         } else if (act === 'own_brand') {
             switchTrack('k2', 'Mam jednak własny produkt — chcę zbudować markę i sprzedaż');
         } else if (act === 'own_idea') {
