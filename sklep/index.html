@@ -10615,8 +10615,17 @@
        ============================================================ */
     var PROP_LOADER_ID = 'prop-loader';
     var PROP_WRAP_ID = 'prop-cards';
+    var propLoaderTimer = null;
+    var PROP_LOADER_LABELS = [
+        'Sprawdzam, co teraz realnie się sprzedaje…',
+        'Patrzę na trendy z TikToka i Allegro…',
+        'Liczę marże i ceny w polskich sklepach…',
+        'Odsiewam produkty słabe i nasycone…',
+        'Składam Ci kilka konkretnych propozycji…'
+    ];
 
     function removePropUI() {
+        if (propLoaderTimer) { clearInterval(propLoaderTimer); propLoaderTimer = null; }
         var l = document.getElementById(PROP_LOADER_ID); if (l) l.remove();
         var w = document.getElementById(PROP_WRAP_ID); if (w) w.remove();
     }
@@ -10638,9 +10647,19 @@
         d.className = 'msg msg--ai reveal-in';
         d.id = PROP_LOADER_ID;
         d.innerHTML = '<span class="pc-loader"><span class="typing"><i></i><i></i><i></i></span>' +
-            'Szukam produktów, które ludzie realnie kupują…</span>';
+            '<span id="prop-loader-label" style="transition:opacity .2s var(--ease)">' + PROP_LOADER_LABELS[0] + '</span></span>';
         el('chat-msgs').appendChild(d);
         scrollToBottom(false);
+        // rotacja sensownych etykiet co ~2,8 s — research trwa ~30 s, czekanie ma ŻYĆ, nie wyglądać na zawieszenie
+        var li = 0;
+        if (propLoaderTimer) clearInterval(propLoaderTimer);
+        propLoaderTimer = setInterval(function () {
+            li = (li + 1) % PROP_LOADER_LABELS.length;
+            var lbl = document.getElementById('prop-loader-label');
+            if (!lbl) { clearInterval(propLoaderTimer); propLoaderTimer = null; return; }
+            lbl.style.opacity = '0';
+            setTimeout(function () { var x = document.getElementById('prop-loader-label'); if (x) { x.textContent = PROP_LOADER_LABELS[li]; x.style.opacity = '1'; } }, 200);
+        }, 2800);
     }
 
     function num(v) {
