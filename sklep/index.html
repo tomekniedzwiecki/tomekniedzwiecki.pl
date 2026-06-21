@@ -10828,6 +10828,7 @@
         } else {
             actions.innerHTML =
                 '<button type="button" class="pc-act" data-action="more">Pokaż inne propozycje</button>' +
+                '<button type="button" class="pc-act" data-action="wider">Te mnie nie przekonują — szukaj szerzej</button>' +
                 '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
                 '<button type="button" class="pc-act" data-action="own_brand">Mam jednak własny produkt</button>' +
                 '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>';
@@ -10896,6 +10897,8 @@
             sendOpening('Wybieram: ' + nazwa);
         } else if (act === 'more') {
             sendOpening('Pokaż inne propozycje');
+        } else if (act === 'wider') {
+            sendOpening('Te produkty mnie nie przekonują — wyjdźmy szerzej do nadrzędnej kategorii, żeby zwiększyć szanse na dobrą sprzedaż');
         } else if (act === 'kategoria') {
             sendOpening('Zmień kategorię produktu');
         } else if (act === 'best') {
