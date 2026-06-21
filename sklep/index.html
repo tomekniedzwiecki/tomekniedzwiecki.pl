@@ -10674,9 +10674,16 @@
         d.className = 'msg msg--ai reveal-in';
         d.id = PROP_LOADER_ID;
         d.innerHTML = '<span class="pc-loader"><span class="typing"><i></i><i></i><i></i></span>' +
-            '<span id="prop-loader-label" style="transition:opacity .2s var(--ease)">' + PROP_LOADER_LABELS[0] + '</span></span>';
+            '<span id="prop-loader-label" style="transition:opacity .2s var(--ease)">' + PROP_LOADER_LABELS[0] + '</span></span>' +
+            '<div style="margin-top:10px;height:5px;border-radius:99px;background:rgba(255,255,255,.10);overflow:hidden">' +
+            '<div id="prop-bar" style="height:100%;width:5%;border-radius:99px;background:var(--accent)"></div></div>';
         el('chat-msgs').appendChild(d);
         scrollToBottom(false);
+        // Poglądowy pasek postępu: dobór trwa ~40–80 s (research fraz → AliExpress → ocena).
+        // Płynnie pełznie do ~93% przez ~62 s (krzywa: szybko na starcie, wolniej u końca), a
+        // gdy przyjdą produkty/brak — removePropUI usuwa loader razem z paskiem. To podgląd
+        // postępu, nie realny % (mamy jeden POST bez strumienia etapów).
+        setTimeout(function () { var b = document.getElementById('prop-bar'); if (b) { b.style.transition = 'width 62s cubic-bezier(.06,.7,.25,1)'; b.style.width = '93%'; } }, 60);
         // rotacja sensownych etykiet co ~2,8 s — research trwa ~30 s, czekanie ma ŻYĆ, nie wyglądać na zawieszenie
         var li = 0;
         if (propLoaderTimer) clearInterval(propLoaderTimer);
