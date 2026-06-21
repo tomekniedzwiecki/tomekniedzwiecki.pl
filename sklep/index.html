@@ -10272,7 +10272,7 @@
                         showPropLoader();
                         scrollToBottom(false);
                     } else if (obj && obj.status === 'gotowe') {
-                        var items = Array.isArray(obj.items) ? obj.items.slice(0, 5) : [];
+                        var items = Array.isArray(obj.items) ? obj.items.slice(0, 10) : [];
                         showPropozycje(items, obj.runda || 0);
                     } else if (obj && obj.status === 'brak') {
                         // „Jakość albo nic": brak produktów spełniających kryteria → komunikat + menu.
@@ -10848,7 +10848,7 @@
         try {
             var arr = JSON.parse(inner);
             if (!Array.isArray(arr)) return null;
-            arr = arr.filter(function (x) { return x && typeof x.nazwa === 'string' && x.nazwa.trim(); }).slice(0, 5);
+            arr = arr.filter(function (x) { return x && typeof x.nazwa === 'string' && x.nazwa.trim(); }).slice(0, 10);
             return arr.length ? arr : null;
         } catch (e) { return null; }
     }
