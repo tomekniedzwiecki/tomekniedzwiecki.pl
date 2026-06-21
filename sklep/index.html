@@ -2947,6 +2947,17 @@
        PROPOZYCJE PRODUKTÓW (K1) — karuzela 5 kandydatów + akcje
        Reużywa mechanikę .car* (track/dots/arr); .pc-* = treść produktu.
        ============================================================ */
+    .pc-brak {
+        border: 1px solid var(--glass-border-soft);
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        padding: 18px;
+    }
+    .pc-brak-tytul { font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
+    .pc-brak-opis { opacity: .82; font-size: .95em; line-height: 1.5; margin-bottom: 14px; }
+    .pc-brak .pc-actions { margin-top: 0; }
     .pc-card {
         position: relative;
         display: flex;
@@ -10261,6 +10272,9 @@
                     } else if (obj && obj.status === 'gotowe') {
                         var items = Array.isArray(obj.items) ? obj.items.slice(0, 5) : [];
                         showPropozycje(items, obj.runda || 0);
+                    } else if (obj && obj.status === 'brak') {
+                        // „Jakość albo nic": brak produktów spełniających kryteria → komunikat + menu.
+                        showPropBrak();
                     } else if (obj && obj.status === 'limit') {
                         removePropUI();
                     }
@@ -10818,8 +10832,30 @@
 
     function showPropozycje(arr, runda) {
         removePropUI();
-        if (!arr || !arr.length) return;
+        if (!arr || !arr.length) { showPropBrak(); return; }
         el('chat-msgs').appendChild(renderPropozycjeEl(arr, runda));
+        scrollToBottom(false);
+    }
+
+    // „Jakość albo nic": gdy żaden produkt nie spełnia kryteriów (min. sprzedaż + ocena),
+    // NIE pokazujemy słabych — komunikat + menu (zmień kategorię / wklej link AliExpress).
+    function showPropBrak() {
+        removePropUI();
+        var wrap = document.createElement('div');
+        wrap.className = 'car';
+        wrap.id = PROP_WRAP_ID;
+        var box = document.createElement('div');
+        box.className = 'pc-brak';
+        box.innerHTML =
+            '<div class="pc-brak-tytul">W tej kategorii nie znalazłem produktu, który spełnia nasze kryteria — sprawdzona, wysoka sprzedaż i bardzo dobre oceny.</div>' +
+            '<div class="pc-brak-opis">Pokazuję tylko produkty z realnym dowodem, że się sprzedają. Wybierz, co dalej:</div>' +
+            '<div class="pc-actions">' +
+            '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
+            '<button type="button" class="pc-act" data-action="own_link">Mam produkt z AliExpress — wkleję link</button>' +
+            '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>' +
+            '</div>';
+        wrap.appendChild(box);
+        el('chat-msgs').appendChild(wrap);
         scrollToBottom(false);
     }
 
