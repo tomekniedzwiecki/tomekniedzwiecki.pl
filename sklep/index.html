@@ -6061,6 +6061,7 @@
                         if (cm && activeTab === 'chat') {
                             cm.innerHTML = '';
                             messages.forEach(function (m) { appendMessage(m.role, m.content); });
+                            settleProposalsHistory();
                         }
                     }
                 }
@@ -9610,7 +9611,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kierunki', '<propozycje_zadaj', '<propozycje', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -9631,6 +9632,7 @@
             .replace(/<kierunki>[\s\S]*?<\/kierunki>/g, '')
             .replace(/<propozycje_zadaj>[\s\S]*?<\/propozycje_zadaj>/g, '').replace(/<propozycje_zadaj\s*\/?>/g, '')
             .replace(/<propozycje>[\s\S]*?<\/propozycje>/g, '')
+            .replace(/<propbrak>[\s\S]*?<\/propbrak>/g, '').replace(/<propbrak\s*\/?>/g, '')
             .replace(/<kamien>[\s\S]*?<\/kamien>/g, '')
             .replace(/<bierny>[\s\S]*?<\/bierny>/g, '').replace(/<bierny\s*\/?>/g, '')
             .replace(/<rezygnacja>[\s\S]*?<\/rezygnacja>/g, '').replace(/<rezygnacja\s*\/?>/g, '');
@@ -9742,7 +9744,8 @@
             var kr = parseKaruzela(content);
             if (kr) el('chat-msgs').appendChild(renderKaruzelaEl(kr));
             var pp = parsePropozycje(content);
-            if (pp) el('chat-msgs').appendChild(renderPropozycjeEl(pp));
+            if (pp) el('chat-msgs').appendChild(renderPropozycjeEl(pp.items, pp.runda));
+            else if (hasPropBrak(content)) el('chat-msgs').appendChild(buildPropBrakEl());
             if (hasMakieta(content)) el('chat-msgs').appendChild(mkCardEl());
         }
         scrollToBottom(false);
@@ -10160,6 +10163,8 @@
         var meta = { verdict: null, leadId: null, projekt: null };
         var gotText = false;
         var failedBeforeText = false;
+        var lastProp = null;  // {items, runda} z SSE bud_propozycje 'gotowe' — utrwalane w treści tury
+        var brakFlag = false; // SSE 'brak' / 'gotowe' z pustą listą — komunikat „brak" do utrwalenia
 
         var switchTrk = (opts && opts.switchTrack) || null; // 'k2'|'k3' — zmiana kierunku
         var body = {
@@ -10285,9 +10290,13 @@
                         scrollToBottom(false);
                     } else if (obj && obj.status === 'gotowe') {
                         var items = Array.isArray(obj.items) ? obj.items.slice(0, 10) : [];
+                        // utrwalamy payload, żeby kafelki przeżyły F5 (embed w treści tury niżej)
+                        if (items.length) { lastProp = { items: items, runda: obj.runda || 0 }; brakFlag = false; }
+                        else { brakFlag = true; }
                         showPropozycje(items, obj.runda || 0);
                     } else if (obj && obj.status === 'brak') {
                         // „Jakość albo nic": brak produktów spełniających kryteria → komunikat + menu.
+                        brakFlag = true; lastProp = null;
                         showPropBrak();
                     } else if (obj && obj.status === 'limit') {
                         removePropUI();
@@ -10384,6 +10393,14 @@
                 updateStages();
                 return;
             }
+            // Utrwalenie propozycji/„braku" w treści tury — kafelki przychodzą przez SSE
+            // (nie w `raw`), więc bez tego znikały po odświeżeniu (F5). visibleText() strippuje
+            // marker, więc nie pojawia się w dymku; messages idzie tylko do localStorage.
+            if (lastProp && lastProp.items.length && raw.indexOf('<propozycje>') < 0) {
+                raw += (raw ? '\n\n' : '') + '<propozycje>' + JSON.stringify({ r: lastProp.runda, items: lastProp.items }) + '</propozycje>';
+            } else if (brakFlag && !hasPropBrak(raw)) {
+                raw += (raw ? '\n\n' : '') + '<propbrak></propbrak>';
+            }
             if (raw) {
                 bubble.innerHTML = renderRich(visibleText(raw)) || '';
                 try { el('sr-status').textContent = visibleText(raw).slice(0, 400) || 'Odpowiedź gotowa.'; } catch (e) {} // #4 — jedno ogłoszenie dla czytnika
@@ -10418,7 +10435,7 @@
                 var propy = parsePropozycje(raw);
                 if (propy && !document.getElementById(PROP_WRAP_ID)) {
                     removePropUI();
-                    var prEl = renderPropozycjeEl(propy);
+                    var prEl = renderPropozycjeEl(propy.items, propy.runda);
                     anchor.insertAdjacentElement('afterend', prEl);
                     anchor = prEl;
                 }
@@ -10682,15 +10699,36 @@
     // ZAMROŻENIE karuzeli po kliknięciu — zostaje widoczna w historii czatu (jako podjęta
     // decyzja), ale przyciski nieaktywne; zwalnia aktywne ID, więc kolejna runda propozycji
     // renderuje się jako NOWA karuzela pod spodem (cała historia doboru widoczna).
-    function freezeProp() {
-        if (propLoaderTimer) { clearInterval(propLoaderTimer); propLoaderTimer = null; }
-        var l = document.getElementById(PROP_LOADER_ID); if (l) l.remove();
-        var w = document.getElementById(PROP_WRAP_ID);
-        if (!w) return;
-        w.id = PROP_WRAP_ID + '-done-' + Date.now();
+    var freezeSeq = 0; // unikalny sufiks id (Date.now() może się powtórzyć w tej samej ms)
+    // Zamrożenie konkretnego bloku propozycji (siatka lub „brak"): zdejmuje singletonowy id
+    // prop-cards, dezaktywuje przyciski. Galeria (klik w zdjęcie) działa nadal — to podgląd.
+    function freezeWrap(w) {
+        if (!w || w.classList.contains('pc-frozen')) return;
+        if (w.id === PROP_WRAP_ID) w.id = PROP_WRAP_ID + '-done-' + Date.now() + '-' + (++freezeSeq);
         w.classList.add('pc-frozen');
         var btns = w.querySelectorAll('.pc-pick, .pc-act');
         for (var i = 0; i < btns.length; i++) { btns[i].disabled = true; btns[i].style.pointerEvents = 'none'; btns[i].style.opacity = '.4'; }
+    }
+    function freezeProp() {
+        if (propLoaderTimer) { clearInterval(propLoaderTimer); propLoaderTimer = null; }
+        var l = document.getElementById(PROP_LOADER_ID); if (l) l.remove();
+        freezeWrap(document.getElementById(PROP_WRAP_ID));
+    }
+    // Po odtworzeniu historii (F5): aktywny zostaje tylko OSTATNI blok propozycji i tylko,
+    // gdy nie ma po nim tury użytkownika. Resztę zamrażamy (inaczej duplikat id prop-cards
+    // + możliwość klikania przestarzałych rund). Bloki to bezpośrednie dzieci #chat-msgs.
+    function settleProposalsHistory() {
+        var msgs = el('chat-msgs'); if (!msgs) return;
+        var kids = msgs.children, lastUserIdx = -1, blocks = [], i;
+        for (i = 0; i < kids.length; i++) {
+            if (!kids[i].classList) continue;
+            if (kids[i].classList.contains('msg--user')) lastUserIdx = i;
+            if (kids[i].classList.contains('pc-prop-block')) blocks.push({ el: kids[i], idx: i });
+        }
+        for (i = 0; i < blocks.length; i++) {
+            var isLast = i === blocks.length - 1;
+            if (!isLast || blocks[i].idx < lastUserIdx) freezeWrap(blocks[i].el);
+        }
     }
 
     function showPropLoader() {
@@ -10811,7 +10849,7 @@
     // + cena/zysk + dyskretny dowód + CTA. nazwa/img z modelu → ZAWSZE przez esc().
     function renderPropozycjeEl(arr, runda) {
         var wrap = document.createElement('div');
-        wrap.className = 'pc-grid-wrap';
+        wrap.className = 'pc-grid-wrap pc-prop-block';
         wrap.id = PROP_WRAP_ID;
         wrap._items = arr; // referencja dla galerii pełnoekranowej (openGallery)
         runda = Number(runda) || 0;
@@ -10879,19 +10917,30 @@
         return wrap;
     }
 
-    // Parser fallback z markera <propozycje>…</propozycje> (gdy backend wstawi
-    // listę w treści tury, nie tylko SSE) — JSON: ProductCandidate[].
+    // Parser markera <propozycje>…</propozycje>. Dwa formaty:
+    //  • tablica ProductCandidate[] (backend wstawia listę w treści tury — fallback),
+    //  • obiekt {r:<runda>, items:[…]} (utrwalenie po SSE bud_propozycje — przeżywa F5).
+    // Zwraca {items, runda} albo null.
     function parsePropozycje(raw) {
         if (!raw) return null;
         var ms = raw.match(/<propozycje>([\s\S]*?)<\/propozycje>/g);
         if (!ms || !ms.length) return null;
         var inner = ms[ms.length - 1].replace(/^<propozycje>/, '').replace(/<\/propozycje>$/, '');
         try {
-            var arr = JSON.parse(inner);
-            if (!Array.isArray(arr)) return null;
+            var parsed = JSON.parse(inner);
+            var arr, runda = 0;
+            if (Array.isArray(parsed)) arr = parsed;
+            else if (parsed && Array.isArray(parsed.items)) { arr = parsed.items; runda = Number(parsed.r || parsed.runda) || 0; }
+            else return null;
             arr = arr.filter(function (x) { return x && typeof x.nazwa === 'string' && x.nazwa.trim(); }).slice(0, 10);
-            return arr.length ? arr : null;
+            return arr.length ? { items: arr, runda: runda } : null;
         } catch (e) { return null; }
+    }
+
+    // Marker stanu „brak produktów spełniających kryteria" — żeby komunikat + menu
+    // (zmień kategorię / wklej link / własny pomysł) też przeżyły odświeżenie.
+    function hasPropBrak(raw) {
+        return /<propbrak\s*(\/\s*)?>/.test(raw || '');
     }
 
     function showPropozycje(arr, runda) {
@@ -10903,10 +10952,10 @@
 
     // „Jakość albo nic": gdy żaden produkt nie spełnia kryteriów (min. sprzedaż + ocena),
     // NIE pokazujemy słabych — komunikat + menu (zmień kategorię / wklej link AliExpress).
-    function showPropBrak() {
-        removePropUI();
+    // Budowa wydzielona, bo rehydracja po F5 też musi odtworzyć ten blok (hasPropBrak).
+    function buildPropBrakEl() {
         var wrap = document.createElement('div');
-        wrap.className = 'car';
+        wrap.className = 'car pc-prop-block';
         wrap.id = PROP_WRAP_ID;
         var box = document.createElement('div');
         box.className = 'pc-brak';
@@ -10919,7 +10968,11 @@
             '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>' +
             '</div>';
         wrap.appendChild(box);
-        el('chat-msgs').appendChild(wrap);
+        return wrap;
+    }
+    function showPropBrak() {
+        removePropUI();
+        el('chat-msgs').appendChild(buildPropBrakEl());
         scrollToBottom(false);
     }
 
@@ -11747,6 +11800,7 @@
             saveMessages();
         }
         messages.forEach(function (m) { appendMessage(m.role, m.content); });
+        settleProposalsHistory();
 
         // Resume podglądu: jeśli w historii był marker <projekt>, odtwórz obrazek
         // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem.

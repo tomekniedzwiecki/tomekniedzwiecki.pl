@@ -7157,7 +7157,7 @@
         var churn = (ov && ov.churn != null ? ov.churn : (+w.churn_mies_proc || 4)) / 100;
         var cac = ov && ov.cac != null ? ov.cac : (+w.cac || 0);
         var budzet = ov && ov.budzet != null ? ov.budzet : (+w.budzet_reklam_mies || 0);
-        var kosztBud = +w.koszt_budowy || 12500;
+        var kosztBud = +w.koszt_budowy || 12500; // fallback ceny budowy netto — kanon: settings.aplikacja_model_biznesowy (to samo w aplikacja/projekt/index.html)
         var gross = cena * marza;                       // miesięczny zysk brutto z klienta
         var revShare = cena * 0.10;                     // 10% od przychodu — prowizja Tomka (rev-share)
         var ltv = churn > 0 ? gross / churn : gross * 36;
@@ -9278,7 +9278,15 @@
                     sessionStorage.setItem(leadEvtKey, '1');
                     var leadEvtId = 'lead_' + state.sessionId; // dedup piksel<->CAPI
                     if (typeof gtag === 'function') gtag('event', 'generate_lead', { persona: 'stworze', method: 'contact_gate' });
-                    gaEvent('app_lead', { method: 'contact_gate' }); // osobna konwersja Stworze — generate_lead jest WSPOLNY mikro z /zapisy (nie oznaczac go jako key)
+                    // form_complete = TA SAMA konwersja Google Ads „Rejestracje" co /zapisy
+                    // (import GA4->Ads juz dziala — ZERO konfiguracji po stronie konta).
+                    // persona:'stworze' rozdziela Stworze od AWE w GA4; w Ads kazda kampania liczy
+                    // konwersje z wlasnych klikniec, wiec persony nie mieszaja sie na poziomie kampanii.
+                    gaEvent('form_complete', { method: 'contact_gate' });
+                    // app_lead zostaje OBOK: czysty kubelek lejka Stworze (tylko sparing go wysyla);
+                    // zaleza od niego audytoria remarketingu „porzucil rozmowe" / „lead bez rezerwacji".
+                    // UWAGA w Google Ads: NIE importuj app_lead jako 2. konwersji obok form_complete = double-count.
+                    gaEvent('app_lead', { method: 'contact_gate' });
                     if (window.fbq) fbq('track', 'Lead', { content_name: 'sparing_contact' }, { eventID: leadEvtId });
                     if (window.ttq) ttq.track('CompleteRegistration', { content_name: 'sparing_contact' }, { event_id: leadEvtId });
                     // Server-side CAPI (iOS-resilient) — ten sam event_id = Meta/TikTok dedupują z pikselem
