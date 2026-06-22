@@ -5942,8 +5942,24 @@
                 if (d.historia.length > localReal) {
                     historySynced[sid] = true;
                     var opener = (messages.length && messages[0].local && messages[0].role === 'assistant') ? [messages[0]] : [];
+                    // Markery propozycji/braku żyją TYLKO w localStorage (serwer ich nie zna) — przenieś je
+                    // na odpowiadające tury asystenta z serwera (po kolejności), inaczej zniknęłyby po wejściu.
+                    var localMarks = [];
+                    messages.forEach(function (m) {
+                        if (m.local || m.role === 'user') return;
+                        var c = String(m.content || '');
+                        var pm = c.match(/<propozycje>[\s\S]*?<\/propozycje>/);
+                        localMarks.push(pm ? pm[0] : (hasPropBrak(c) ? '<propbrak></propbrak>' : null));
+                    });
+                    var aiIdx = 0;
                     messages = opener.concat(d.historia.map(function (m) {
-                        return { role: m.role === 'user' ? 'user' : 'assistant', content: String(m.content || '') };
+                        var role = m.role === 'user' ? 'user' : 'assistant';
+                        var content = String(m.content || '');
+                        if (role === 'assistant') {
+                            var mk = localMarks[aiIdx++];
+                            if (mk && content.indexOf('<propozycje>') < 0 && !hasPropBrak(content)) content += (content ? '\n\n' : '') + mk;
+                        }
+                        return { role: role, content: content };
                     }));
                     saveMessages();
                     enterChat(true);
@@ -9734,7 +9750,7 @@
         var div = document.createElement('div');
         div.className = 'msg msg--' + (role === 'user' ? 'user' : 'ai');
         if (role === 'user') div.textContent = content;
-        else div.innerHTML = renderRich(visibleText(content));
+        else { div.innerHTML = renderRich(visibleText(content)); if (!div.innerHTML) div.style.display = 'none'; } // brak widocznego tekstu (same propozycje/brak) — bez pustego dymka
         el('chat-msgs').appendChild(div);
         if (role !== 'user') {
             var bl = parseBlysk(content);
@@ -9843,6 +9859,7 @@
         var text = ta.value.trim();
         if (!text || streaming) return;
         if (el('inline-gate')) return; // bramka czeka na imię i mail
+        freezeProp(); // aktywna karuzela propozycji → zamroź (spójnie: zostaje w historii, kolejna runda pod spodem)
         removeChips();
         if (text.length > MAX_MSG_LEN) {
             sysMsg('Maksymalnie ' + MAX_MSG_LEN + ' znaków na wiadomość. Skróć i wyślij ponownie.', true);
@@ -9865,6 +9882,7 @@
     // Wysyłka programowa (chip profesji / dymek odpowiedzi) — jak sendMessage, bez composera
     function sendOpening(text) {
         if (streaming) return;
+        freezeProp(); // jw. — zamroź aktywną karuzelę przed nową turą (no-op gdy brak/już zamrożona)
         var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
         messages.push({ role: 'user', content: text });
         saveMessages();
@@ -10388,7 +10406,9 @@
             if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
             updateSendState();
 
-            if (failedBeforeText && !raw) {
+            // Nie porzucaj tury, jeśli przyszły propozycje/brak (przez SSE) — trzeba je utrwalić
+            // niżej, inaczej po abort/błędzie streamu kafelki znikają po F5.
+            if (failedBeforeText && !raw && !(lastProp && lastProp.items.length) && !brakFlag) {
                 bubble.remove();
                 updateStages();
                 return;
@@ -10397,13 +10417,19 @@
             // (nie w `raw`), więc bez tego znikały po odświeżeniu (F5). visibleText() strippuje
             // marker, więc nie pojawia się w dymku; messages idzie tylko do localStorage.
             if (lastProp && lastProp.items.length && raw.indexOf('<propozycje>') < 0) {
-                raw += (raw ? '\n\n' : '') + '<propozycje>' + JSON.stringify({ r: lastProp.runda, items: lastProp.items }) + '</propozycje>';
+                // <\/ chroni przed nazwą produktu zawierającą literał </propozycje>, który
+                // urwałby leniwy regex parsera/visibleText (parsePropozycje odwraca przed JSON.parse).
+                raw += (raw ? '\n\n' : '') + '<propozycje>' + JSON.stringify({ r: lastProp.runda, items: lastProp.items }).replace(/<\//g, '<\\/') + '</propozycje>';
             } else if (brakFlag && !hasPropBrak(raw)) {
                 raw += (raw ? '\n\n' : '') + '<propbrak></propbrak>';
             }
             if (raw) {
-                bubble.innerHTML = renderRich(visibleText(raw)) || '';
-                try { el('sr-status').textContent = visibleText(raw).slice(0, 400) || 'Odpowiedź gotowa.'; } catch (e) {} // #4 — jedno ogłoszenie dla czytnika
+                var vis = visibleText(raw);
+                bubble.innerHTML = renderRich(vis) || '';
+                // tura bez widocznego tekstu (same propozycje/brak z SSE) — nie pokazuj pustego dymka;
+                // zostaje w DOM jako kotwica afterend, ale ukryta (kafelki to osobny sibling poniżej)
+                if (!vis) bubble.style.display = 'none';
+                try { el('sr-status').textContent = vis.slice(0, 400) || 'Odpowiedź gotowa.'; } catch (e) {} // #4 — jedno ogłoszenie dla czytnika
                 messages.push({ role: 'assistant', content: raw, local: khResume ? true : undefined, khNudge: khResume ? true : undefined });
                 saveMessages();
                 // Postęp kamieni z tej tury
@@ -10789,8 +10815,9 @@
 
     // GALERIA PEŁNOEKRANOWA — klik zdjęcia: duży podgląd + nawigacja (strzałki/swipe/klawiatura)
     // + nazwa/cena/zysk + CTA „Biorę ten" na dole. items = produkty bieżącej siatki, idx = start.
-    function openGallery(items, idx) {
+    function openGallery(items, idx, sourceWrap) {
         if (!items || !items.length) return;
+        var frozen = !!(sourceWrap && sourceWrap.classList.contains('pc-frozen')); // historyczna runda → tylko podgląd
         idx = Math.max(0, Math.min(items.length - 1, idx | 0));
         var ex = document.getElementById('pc-lb'); if (ex) ex.remove();
         var lb = document.createElement('div');
@@ -10808,6 +10835,7 @@
             pricesEl = lb.querySelector('.pc-gal-prices'), countEl = lb.querySelector('.pc-gal-count'),
             ctaEl = lb.querySelector('.pc-gal-cta'),
             arrL = lb.querySelector('.pc-gal-arr--l'), arrR = lb.querySelector('.pc-gal-arr--r');
+        if (frozen) ctaEl.style.display = 'none'; // zamrożona/historyczna runda → bez „Biorę ten", sam podgląd
         function render() {
             var p = items[idx] || {};
             var src = String(p.image || '').trim();
@@ -10828,9 +10856,11 @@
             if (e.target.closest('.pc-gal-arr--l')) { go(-1); return; }
             if (e.target.closest('.pc-gal-arr--r')) { go(1); return; }
             if (e.target.closest('.pc-gal-cta')) {
-                if (streaming || el('inline-gate')) return;
+                if (streaming || el('inline-gate') || frozen) return; // nie pozwalaj wybrać z historycznej rundy
                 var nm = ctaEl.getAttribute('data-nazwa') || '';
-                close(); freezeProp(); sendOpening('Wybieram: ' + nm); return;
+                close();
+                if (sourceWrap) freezeWrap(sourceWrap); else freezeProp(); // zamroź właściwy blok, nie singleton
+                sendOpening('Wybieram: ' + nm); return;
             }
             // klik na zdjęcie lub dolny panel — NIE zamykaj; klik na tło — zamknij
             if (e.target.closest('.pc-gal-img') || e.target.closest('.pc-gal-bottom')) return;
@@ -10926,6 +10956,7 @@
         var ms = raw.match(/<propozycje>([\s\S]*?)<\/propozycje>/g);
         if (!ms || !ms.length) return null;
         var inner = ms[ms.length - 1].replace(/^<propozycje>/, '').replace(/<\/propozycje>$/, '');
+        inner = inner.replace(/<\\\//g, '</'); // odwróć ucieczkę z embedu (legacy-tablica nie zawiera <\/, więc no-op)
         try {
             var parsed = JSON.parse(inner);
             var arr, runda = 0;
@@ -10987,7 +11018,7 @@
             e.preventDefault();
             var wrapEl = zoomEl.closest('.pc-grid-wrap');
             var items = wrapEl && wrapEl._items;
-            if (items && items.length) openGallery(items, parseInt(zoomEl.getAttribute('data-idx'), 10) || 0);
+            if (items && items.length) openGallery(items, parseInt(zoomEl.getAttribute('data-idx'), 10) || 0, wrapEl);
             return;
         }
         var btn = e.target.closest && e.target.closest('.pc-card .pc-pick, .pc-actions .pc-act');
