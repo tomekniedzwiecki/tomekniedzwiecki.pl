@@ -1823,6 +1823,28 @@
     .rkg-mockup { text-align: center; }
     .rkg-mockup__lab { font-size: 13px; font-weight: 700; color: var(--text-strong); margin-bottom: 12px; }
     .rkg-mockup img { max-width: 340px; width: 100%; border-radius: 14px; border: 1px solid var(--glass-border); box-shadow: 0 16px 44px -14px rgba(0, 0, 0, 0.65); }
+    .rkg-gen { font-size: 13px; color: var(--text-muted); padding: 8px 0; }
+    .rkg-landing-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 11px; padding: 13px 20px; font-size: 14px; font-weight: 700; cursor: pointer; transition: filter .15s; }
+    .rkg-landing-btn:hover { filter: brightness(1.08); }
+    .fbposts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 640px) { .fbposts { grid-template-columns: 1fr; } }
+    .fbpost { background: #fff; color: #1c1e21; border: 1px solid #dadde1; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+    .fbpost__top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
+    .fbpost__av { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #0070f3, #00d97e); flex-shrink: 0; }
+    .fbpost__name { font-size: 13px; font-weight: 700; color: #050505; }
+    .fbpost__meta { font-size: 11px; color: #65676b; }
+    .fbpost__txt { padding: 0 12px 10px; font-size: 13px; line-height: 1.45; color: #050505; }
+    .fbpost__img { background: #f0f2f5; aspect-ratio: 4 / 5; }
+    .fbpost__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fbpost__cta { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #f0f2f5; padding: 10px 12px; }
+    .fbpost__hl { font-size: 13px; font-weight: 700; color: #050505; line-height: 1.25; }
+    .fbpost__btn { flex-shrink: 0; background: #e4e6eb; color: #050505; font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 6px; }
+    .fbpost__bar { display: flex; justify-content: space-around; border-top: 1px solid #dadde1; padding: 7px 0; font-size: 12px; color: #65676b; }
+    .lpm { position: fixed; inset: 0; z-index: 100000; background: #0a0a0a; display: flex; flex-direction: column; }
+    .lpm-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; color: #fff; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+    .lpm-x { width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; font-size: 20px; cursor: pointer; }
+    .lpm-body { flex: 1; overflow: auto; background: #fff; }
+    .lpm-body iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
     /* Werdykt: teza serifem + zegar potencjału */
     .rk-hero {
         position: relative;
@@ -5588,6 +5610,8 @@
         lastBrief: null,        // ostatni brief <projekt> (nazwa/opis do nagłówka zakładki Projekt)
         chosenProduct: null,    // wybrany viralowy produkt z karuzeli (ETAP 1) — karta w sidebarze
         mockupUrl: null,        // pionowy mockup strony sprzedażowej (bud-mockup; cache per-produkt)
+        suiteAds: null,         // 4 reklamy (copy+grafika) jako posty FB (bud-ads; cache per-produkt)
+        landingHtml: null,      // gotowy landing HTML (bud-landing-gen; cache per-produkt)
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
         editPending: false,     // runda poprawki w toku (kliknięto „Poprawiam projekt", czekamy na nowy werdykt)
         bizplan: null,          // wstępny plan przychodu z bud-plan (JSON; liczony po zielonym werdykcie)
@@ -5749,6 +5773,8 @@
             lastBrief: state.lastBrief || null,
             chosenProduct: state.chosenProduct || null,
             mockupUrl: state.mockupUrl || null,
+            suiteAds: state.suiteAds || null,
+            landingHtml: state.landingHtml || null,
             editsUsed: state.editsUsed || 0,
             editPending: !!state.editPending,
             bizplan: state.bizplan || null,
@@ -5886,7 +5912,8 @@
         persistSession();
         renderChosenProduct();
         kickReport(false);   // raport strategiczny startuje od razu po wyborze (w tle)
-        kickMockup(false);   // pionowy mockup strony — równolegle (w tle)
+        kickMockup(false);   // pionowy mockup strony — równolegle (w tle); po jego gotowości rusza landing
+        kickAds(false);      // 4 reklamy (posty FB) — równolegle (w tle)
     }
     function renderChosenProduct() {
         var box = el('side-chosen'); if (!box) return;
@@ -5929,6 +5956,8 @@
         state.lastBrief = saved.lastBrief || null;
         state.chosenProduct = saved.chosenProduct || null;
         state.mockupUrl = saved.mockupUrl || null;
+        state.suiteAds = saved.suiteAds || null;
+        state.landingHtml = saved.landingHtml || null;
         renderChosenProduct();
         state.editsUsed = saved.editsUsed || 0;
         state.editPending = !!saved.editPending;
@@ -7170,24 +7199,69 @@
                 if (res.ok && res.d && res.d.mockup_url) {
                     state.mockupUrl = res.d.mockup_url; persistSession(); mockupGen = false;
                     if (activeTab === 'rynek') renderPaneRynek();
+                    kickLanding(false);   // landing korzysta z gotowego mockupu jako referencji
                     return;
                 }
                 if (res.ok && res.d && res.d.pending) {
                     if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, false, attempt + 1); }, 12000);
-                    else mockupGen = false;
+                    else { mockupGen = false; kickLanding(false); }   // mockup nie wyszedł — landing i tak (tekstowo)
                     return;
                 }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) {
                     setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, force, attempt + 1); }, 3500);
                     return;
                 }
-                mockupGen = false;
+                mockupGen = false; kickLanding(false);   // fallback: landing bez mockupu
             }).catch(function () {
                 if (state.sessionId !== sid) return;
                 if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, force, attempt + 1); }, 3500); return; }
-                mockupGen = false;
+                mockupGen = false; kickLanding(false);
             });
     }
+    // #3 REKLAMY (bud-ads) — 4 posty FB, cache per-produkt, w tle.
+    var SPAR_ADS_ENDPOINT = SB_URL + '/functions/v1/bud-ads';
+    var adsGen = false;
+    function kickAds(force) {
+        if (!state.chosenProduct || !state.sessionId) return;
+        if (!force && state.suiteAds) return;
+        if (adsGen) return;
+        adsGen = true;
+        _doAds(state.sessionId, !!force, 0);
+    }
+    function _doAds(sid, force, attempt) {
+        fetch(SPAR_ADS_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct }) })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+            .then(function (res) {
+                if (state.sessionId !== sid) return;
+                if (res.ok && res.d && Array.isArray(res.d.ads) && res.d.ads.length) { state.suiteAds = res.d.ads; persistSession(); adsGen = false; if (activeTab === 'rynek') renderPaneRynek(); return; }
+                if (res.ok && res.d && res.d.pending) { if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else adsGen = false; return; }
+                if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; }
+                adsGen = false;
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; });
+    }
+
+    // #4 LANDING HTML (bud-landing-gen, gpt-5.5 z mockupu) — cache per-produkt, w tle.
+    var SPAR_LANDING_ENDPOINT = SB_URL + '/functions/v1/bud-landing-gen';
+    var landingGen = false;
+    function kickLanding(force) {
+        if (!state.chosenProduct || !state.sessionId) return;
+        if (!force && state.landingHtml) return;
+        if (landingGen) return;
+        landingGen = true;
+        _doLanding(state.sessionId, !!force, 0);
+    }
+    function _doLanding(sid, force, attempt) {
+        fetch(SPAR_LANDING_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, mockup_url: state.mockupUrl || '' }) })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+            .then(function (res) {
+                if (state.sessionId !== sid) return;
+                if (res.ok && res.d && res.d.landing_html) { state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; if (activeTab === 'rynek') renderPaneRynek(); return; }
+                if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else landingGen = false; return; }
+                if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; }
+                landingGen = false;
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; });
+    }
+
     function showRaportReadyModal() {
         if (el('raport-ready')) return;
         var ov = document.createElement('div');
@@ -8708,6 +8782,20 @@
 
     var rkIO = null; // obserwator poprzedniego renderu — sprzątany przy każdym wejściu
 
+    function openLandingPreview() {
+        if (!state.landingHtml) return;
+        var old = el('landing-modal'); if (old) old.remove();
+        var ov = document.createElement('div');
+        ov.id = 'landing-modal'; ov.className = 'lpm';
+        ov.innerHTML = '<div class="lpm-bar"><span>Podgląd Twojej strony sprzedażowej</span><button type="button" class="lpm-x" id="lpm-x" aria-label="Zamknij">✕</button></div>' +
+            '<div class="lpm-body"><iframe id="lpm-frame" sandbox="" title="Podgląd strony"></iframe></div>';
+        document.body.appendChild(ov);
+        try { el('lpm-frame').srcdoc = state.landingHtml; } catch (e) { }
+        function close() { var m = el('landing-modal'); if (m) m.remove(); document.removeEventListener('keydown', onKey); }
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        el('lpm-x').addEventListener('click', close);
+        document.addEventListener('keydown', onKey);
+    }
     function renderPaneRynek() {
         var body = el('pane-rynek-body');
         var pane = el('pane-rynek');
@@ -8780,6 +8868,31 @@
                 '<h3>' + esc(sx.tytul) + '</h3></div>' + inner + '</section>';
         });
 
+        // #3 REKLAMY — posty FB (pokaż gdy gotowe; inaczej dociągnij w tle)
+        if (Array.isArray(state.suiteAds) && state.suiteAds.length) {
+            var posts = state.suiteAds.map(function (a) {
+                return '<div class="fbpost">' +
+                    '<div class="fbpost__top"><div class="fbpost__av"></div><div><div class="fbpost__name">Twoja marka</div><div class="fbpost__meta">Sponsorowane · ✔</div></div></div>' +
+                    (a.primary_text ? '<div class="fbpost__txt">' + esc(a.primary_text) + '</div>' : '') +
+                    (a.image_url ? '<div class="fbpost__img"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(a.image_url) + '" onerror="this.style.display=\'none\'"></div>' : '') +
+                    (a.headline ? '<div class="fbpost__cta"><div class="fbpost__hl">' + esc(a.headline) + '</div><span class="fbpost__btn">Kup teraz</span></div>' : '') +
+                    '<div class="fbpost__bar"><span>👍 Lubię to</span><span>💬 Komentarz</span><span>↗ Udostępnij</span></div>' +
+                    '</div>';
+            }).join('');
+            html += '<section class="rk-sec rk-reveal"><div class="rk-sec__head"><span class="rk-sec__no" aria-hidden="true">' + (++rkNo < 10 ? '0' + rkNo : rkNo) + '</span><h3>Reklamy<span>tak będą wyglądać Twoje reklamy na Facebooku/Instagramie</span></h3></div><div class="fbposts">' + posts + '</div></section>';
+        } else if (state.chosenProduct) {
+            kickAds(false);
+            html += '<section class="rk-sec rk-reveal"><div class="rkg-gen">🎨 Przygotowuję 4 reklamy (grafika + copy)…</div></section>';
+        }
+
+        // #4 LANDING — przycisk do pełnoekranowego podglądu (pokaż gdy gotowy)
+        if (state.landingHtml) {
+            html += '<section class="rk-sec rk-reveal"><div class="rk-sec__head"><span class="rk-sec__no" aria-hidden="true">' + (++rkNo < 10 ? '0' + rkNo : rkNo) + '</span><h3>Twoja strona sprzedażowa<span>gotowy landing — kliknij, by zobaczyć na pełnym ekranie</span></h3></div>' +
+                '<button type="button" class="rkg-landing-btn" id="rk-landing-open">🖥️ Otwórz podgląd strony</button></section>';
+        } else if (state.chosenProduct) {
+            html += '<section class="rk-sec rk-reveal"><div class="rkg-gen">🛠️ Buduję Twoją stronę sprzedażową…</div></section>';
+        }
+
         if (srcs.length) {
             html += '<section class="rk-sec" id="rk-sec-zrodla"><details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
                 srcs.map(function (s) {
@@ -8790,6 +8903,7 @@
         html += '<div class="pj-plan__note">Raport przygotowany automatycznie na podstawie publicznych źródeł. Pełną strategię i plan wdrożenia dopracujesz z Tomkiem po rezerwacji.</div>';
 
         body.innerHTML = html;
+        var lbtn = el('rk-landing-open'); if (lbtn) lbtn.addEventListener('click', openLandingPreview);
 
         if ('IntersectionObserver' in window) {
             // Wjazd sekcji + start animacji zegara i kropek
@@ -9962,7 +10076,7 @@
         state.previewHistory = {};
         state.emailKnown = false; // nowa sesja = nowy wiersz w bazie, serwer maila jeszcze nie ma
         state.lastBrief = null;
-        state.chosenProduct = null; state.mockupUrl = null; renderChosenProduct();
+        state.chosenProduct = null; state.mockupUrl = null; state.suiteAds = null; state.landingHtml = null; renderChosenProduct();
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
