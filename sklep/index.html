@@ -5873,7 +5873,7 @@
     function setChosenProduct(p) {
         if (!p) return;
         state.chosenProduct = {
-            name: p.name || '', cover: p.cover || '', image: p.image || '',
+            id: p.id || '', name: p.name || '', cover: p.cover || '', image: p.image || '',
             price: p.price || '', product_link: p.product_link || '', category: p.category || '',
             saves: p.saves || 0, plays: p.plays || 0, comments: p.comments || 0, eng_rate: p.eng_rate || 0,
             newest_days: (p.newest_days != null ? p.newest_days : null), tiktok_url: p.tiktok_url || ''
