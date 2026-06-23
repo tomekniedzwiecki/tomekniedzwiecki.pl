@@ -5909,6 +5909,8 @@
             saves: p.saves || 0, plays: p.plays || 0, comments: p.comments || 0, eng_rate: p.eng_rate || 0,
             newest_days: (p.newest_days != null ? p.newest_days : null), tiktok_url: p.tiktok_url || ''
         };
+        gaEvent('pick', { name: state.chosenProduct.name || '' });
+        slReset();           // finalny wybór — czyść shortlistę/seen i chowaj pasek
         persistSession();
         renderChosenProduct();
         kickReport(false);   // raport strategiczny startuje od razu po wyborze (w tle)
@@ -9017,6 +9019,60 @@
         .vpm-prev{left:14px}.vpm-next{right:14px}
         .vpm-x{position:fixed;top:16px;right:18px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4}
         .vpm-x:hover{background:rgba(255,255,255,.22)}
+        /* ── SHORTLISTA „Rozważam" (hybryda C) — tokeny Geist 1:1 ── */
+        .vp-add{position:absolute;top:9px;right:47px;width:32px;height:32px;border:1px solid var(--glass-border);border-radius:8px;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;line-height:1;transition:background .15s,border-color .15s,color .15s}
+        .vp-add:hover{background:rgba(0,0,0,.82);border-color:var(--accent)}
+        .vp-add.is-in{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+        .vp-card--rec{border-color:var(--accent)!important;box-shadow:0 0 0 2px var(--accent)}
+        .vp-card.sl-pop{animation:slPop .32s ease}
+        @keyframes slPop{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}
+        .vpm-add{background:rgba(255,255,255,.05);border:1px solid var(--glass-border);color:var(--text-strong);border-radius:11px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+        .vpm-add:hover{border-color:var(--accent);color:var(--accent)}
+        .vpm-add.is-in{background:rgba(0,217,126,.12);border-color:var(--accent);color:var(--accent)}
+        .sl-bar{position:sticky;bottom:0;z-index:40;display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;max-width:740px;margin:0 auto;padding:9px 12px;background:rgba(11,11,11,.92);backdrop-filter:blur(8px);border:1px solid var(--glass-border);border-radius:13px}
+        .sl-bar.sl-shake{animation:slShake .4s ease}
+        @keyframes slShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+        .sl-lead{font-size:12.5px;font-weight:700;color:var(--text-strong);white-space:nowrap}
+        .sl-thumbs{display:flex;gap:6px}
+        .sl-thumb{position:relative;width:44px;height:44px;border-radius:9px;overflow:hidden;border:1px solid var(--glass-border);background:#000;cursor:pointer;padding:0;flex:0 0 auto}
+        .sl-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+        .sl-thumb .sl-noimg{display:block;width:100%;height:100%;background:linear-gradient(145deg,#1c1c1f,#0a0a0a)}
+        .sl-thumb .sl-x{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-size:13px;opacity:0;transition:opacity .15s}
+        .sl-thumb:hover .sl-x{opacity:1}
+        .sl-msg{font-size:11.5px;color:var(--text-muted);flex:1 1 auto;min-width:0}
+        .sl-compare{background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:filter .15s}
+        .sl-compare:hover{filter:brightness(1.08)}
+        .sl-compare:disabled{opacity:.4;cursor:not-allowed;filter:none}
+        .sl-meter{font-size:11px;color:var(--text-muted);white-space:nowrap;margin-left:auto}
+        /* overlay porównania reużywa .vpm (rgba .94, Esc/klik tła zamyka) */
+        .sl-cmp-card{position:relative;width:100%;max-width:880px;max-height:92vh;overflow-y:auto;background:#0b0b0b;border:1px solid var(--glass-border);border-radius:18px;padding:22px}
+        .sl-cmp-head{font-size:16px;font-weight:700;color:var(--text-strong);text-align:center;margin-bottom:16px}
+        .sl-cols{display:grid;gap:12px}
+        .sl-cols-2{grid-template-columns:1fr 1fr}
+        .sl-cols-3{grid-template-columns:1fr 1fr 1fr}
+        .sl-col{display:flex;flex-direction:column;gap:8px;border:1px solid var(--glass-border);border-radius:13px;padding:12px;background:rgba(255,255,255,.02)}
+        .sl-prev{position:relative;width:100%;aspect-ratio:9/16;max-height:34vh;border:0;border-radius:10px;overflow:hidden;background:#000;cursor:pointer;padding:0}
+        .sl-prev img{width:100%;height:100%;object-fit:cover;display:block}
+        .sl-prev .sl-noimg{display:block;width:100%;height:100%;background:linear-gradient(145deg,#1c1c1f,#0a0a0a)}
+        .sl-playov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);color:#fff;font-size:24px}
+        .sl-prev:hover .sl-playov{background:rgba(0,0,0,.5)}
+        .sl-cname{font-size:13.5px;font-weight:700;color:var(--text-strong);line-height:1.3}
+        .sl-cmeta{font-size:11.5px;color:var(--text-muted)}
+        .sl-badge{background:rgba(255,255,255,.08);border-radius:5px;padding:1px 6px;font-size:10.5px}
+        .sl-rows{display:flex;flex-direction:column;gap:5px;margin:4px 0}
+        .sl-row{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--text-muted);border-bottom:1px solid var(--glass-border);padding-bottom:4px}
+        .sl-row b{font-size:13px;color:var(--text-strong);font-weight:600}
+        .sl-row b.is-lead{color:var(--accent);font-weight:700}
+        .sl-pick{margin-top:auto;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s}
+        .sl-pick:hover{filter:brightness(1.08)}
+        .sl-verdict{display:block;width:100%;margin-top:16px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);color:var(--text-strong);border-radius:11px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:border-color .15s,color .15s}
+        .sl-verdict:hover{border-color:var(--accent);color:var(--accent)}
+        @media(max-width:560px){
+          .sl-cols-3{grid-template-columns:1fr;}
+          .sl-cols-2{grid-template-columns:1fr;}
+          .sl-prev{max-height:42vh}
+          .sl-meter{margin-left:0}
+        }
         @media(max-width:720px){
           .vpm{padding:0;align-items:stretch}
           .vpm-card{flex-direction:column;gap:0;max-width:none;max-height:100vh;height:100vh;overflow-y:auto}
@@ -9036,6 +9092,7 @@
             if (e.target.closest('.vpm-prev')) { lbStep(-1); return; }
             if (e.target.closest('.vpm-next')) { lbStep(1); return; }
             var pk = e.target.closest('.vpm-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct((VP_STATE.items || [])[VP_STATE.lbIndex || 0]); closeVP(); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+            var ad = e.target.closest('.vpm-add'); if (ad) { var cur = (VP_STATE.items || [])[VP_STATE.lbIndex || 0]; if (!cur) return; if (slHas(cur)) removeFromShortlist(slKey(cur)); else addToShortlist(cur); renderLightbox(); return; }
             var pt = e.target.closest('.vpm-pot'); if (pt) { if (streaming || el('inline-gate')) return; closeVP(); sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
         });
         document.body.appendChild(m);
@@ -9054,6 +9111,7 @@
         if (!items.length) return;
         if (idx == null || idx < 0) idx = 0; if (idx >= items.length) idx = items.length - 1;
         VP_STATE.lbIndex = idx;
+        vpMarkSeen(items[idx]);   // licznik eksploracji (tani smaczek z A)
         renderLightbox();
         el('vpm').classList.add('show');
     }
@@ -9090,6 +9148,7 @@
                 '</div>' +
                 '<div class="vpm-actions">' +
                   '<button type="button" class="vpm-pick" data-pick="' + esc(p.name) + '">Wybieram ten produkt</button>' +
+                  '<button type="button" class="vpm-add' + (slHas(p) ? ' is-in' : '') + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '">' + (slHas(p) ? '✓ W rozważam' : '+ Rozważam') + '</button>' +
                   '<button type="button" class="vpm-pot" data-pot="' + esc(p.name) + '">Jaki ma potencjał?</button>' +
                 '</div>' +
               '</div>' +
@@ -9107,13 +9166,42 @@
             if ((VP_STATE.page || 0) > 0 && wrap) { VP_STATE.page -= 1; vpFetch(wrap).then(function () { VP_STATE.lbIndex = Math.max(0, (VP_STATE.items.length || 1) - 1); renderLightbox(); }); return; }
             i = items.length - 1;
         }
-        VP_STATE.lbIndex = i; renderLightbox();
+        VP_STATE.lbIndex = i; vpMarkSeen((VP_STATE.items || [])[i]); renderLightbox();
     }
     function closeVP() { var m = el('vpm'); if (m) { m.classList.remove('show'); el('vpm-body').innerHTML = ''; } }
     function fmtVP(n) { n = +n || 0; return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(n >= 1e4 ? 0 : 1) + 'k' : String(n); }
 
     // Stan karuzeli ETAP 1: aktywna kategoria, strona, lista kategorii z liczbami.
-    var VP_STATE = { cat: '', page: 0, n: 6, cats: null, hasMore: false, total: 0 };
+    // shortlist: PEŁNE obiekty produktu (NIE indeksy — vpFetch nadpisuje items przy każdej
+    // stronie/kategorii; indeks gubi tożsamość). Dedup po kluczu name+video_id.
+    // seen: mapa obejrzanych (klucz → 1) do dyskretnego licznika „Obejrzane N".
+    var VP_STATE = { cat: '', page: 0, n: 6, cats: null, hasMore: false, total: 0, shortlist: [], seen: {} };
+    var SL_MAX = 3;                       // limit shortlisty (rdzeń hybrydy C)
+    function slKey(p) { return (p && (p.name || '') + '|' + (p.video_id || p.id || '')) || ''; }
+    function slHas(p) { var k = slKey(p); return VP_STATE.shortlist.some(function (x) { return slKey(x) === k; }); }
+    function slCount() { return VP_STATE.shortlist.length; }
+    function seenCount() { return Object.keys(VP_STATE.seen || {}).length; }
+    function slStoreKey() { return state.sessionId ? 'sl_' + state.sessionId : null; }
+    function slPersist() {
+        var k = slStoreKey(); if (!k) return;
+        saveJSON(k, { shortlist: VP_STATE.shortlist, seen: VP_STATE.seen });
+    }
+    function slRestore() {
+        var k = slStoreKey(); if (!k) return;
+        var d = loadJSON(k);
+        if (d && Array.isArray(d.shortlist)) { VP_STATE.shortlist = d.shortlist.slice(0, SL_MAX); VP_STATE.seen = d.seen || {}; }
+    }
+    function slReset() {
+        VP_STATE.shortlist = []; VP_STATE.seen = {};
+        var k = slStoreKey(); if (k) { try { localStorage.removeItem(k); } catch (e) {} }
+        var b = el('sl-bar'); if (b) b.remove();
+    }
+    // Oznacz produkt jako obejrzany (lightbox / double-tap) → licznik eksploracji.
+    // (vp* prefiks: globalny markSeen(view) jest już zajęty przez zakładki projektu)
+    function vpMarkSeen(p) {
+        var k = slKey(p); if (!k) return;
+        if (!VP_STATE.seen[k]) { VP_STATE.seen[k] = 1; slPersist(); renderShortlistBar(); }
+    }
 
     function vpCatsBar() {
         if (!VP_STATE.cats || !VP_STATE.cats.length) return '';
@@ -9140,6 +9228,7 @@
                         (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
                         (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
                         '<button type="button" class="vp-fs" data-idx="' + i + '" aria-label="Pełny ekran">⛶</button>' +
+                        '<button type="button" class="vp-add' + (slHas(p) ? ' is-in' : '') + '" data-idx="' + i + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '" title="' + (slHas(p) ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania') + '" aria-label="Rozważam">' + (slHas(p) ? '✓' : '+') + '</button>' +
                         '<div class="vp-play"><span>▶</span></div>' +
                     '</div>' +
                     '<div class="vp-b">' +
@@ -9158,10 +9247,202 @@
             '<button type="button" class="vp-more">Pokaż inne ↻</button>' +
             '<span class="vp-count">' + VP_STATE.total + ' hitów' + (VP_STATE.cat ? ' w „' + esc(VP_STATE.cat) + '”' : '') + '</span>' +
         '</div>';
-        var cap = '<div class="vp-cap">Przesuń w bok, kliknij ▶ żeby obejrzeć film. Wybierz jeden, który Cię ciekawi — to dopiero pierwszy z wielu produktów.</div>';
+        var cap = '<div class="vp-cap">Przesuń w bok, kliknij ▶ żeby obejrzeć film. Te które Cię ciekawią dorzuć do „Rozważam” — zestawię je obok siebie. To dopiero pierwszy z wielu produktów.</div>';
         wrap.innerHTML = catsHtml + '<div class="vp-track">' + cards + '</div>' + foot + cap;
+        renderShortlistBar();
     }
 
+    /* ============================================================
+       SHORTLISTA „Rozważam" (rdzeń hybrydy C) — pasek + porównanie + werdykt
+       Wszystkie akcje przez delegację (front to IIFE; inline onclick NIE działa).
+       ============================================================ */
+    function addToShortlist(p) {
+        if (!p) return false;
+        if (slHas(p)) return true;
+        if (slCount() >= SL_MAX) { slShake(); return false; }
+        // przechowuj PEŁNY obiekt (kopia) — vpFetch nadpisze VP_STATE.items
+        VP_STATE.shortlist.push(JSON.parse(JSON.stringify(p)));
+        gaEvent('shortlist_add', { name: p.name || '', n: slCount() });
+        slPersist();
+        renderShortlistBar();
+        refreshVpAddButtons();
+        // po 1. dodaniu — lekka zachęta jako TOAST (nie fałszywy dymek usera w czacie)
+        if (slCount() === 1) {
+            showToast('Dodane do „Rozważam" — dorzuć jeszcze 1–2 i kliknij „Porównaj", zestawię je na liczbach.');
+        }
+        return true;
+    }
+    function removeFromShortlist(key) {
+        var before = slCount();
+        VP_STATE.shortlist = VP_STATE.shortlist.filter(function (x) { return slKey(x) !== key; });
+        if (slCount() !== before) { slPersist(); renderShortlistBar(); refreshVpAddButtons(); }
+    }
+    function slShake() {
+        var b = el('sl-bar'); if (!b) return;
+        b.classList.remove('sl-shake'); void b.offsetWidth; b.classList.add('sl-shake');
+        var mc = b.querySelector('.sl-msg'); if (mc) { mc.textContent = 'Komplet 3/3 — wyrzuć któryś, żeby dobrać nowy.'; }
+    }
+    // Odśwież stan przycisków „+ Rozważam" na widocznych kartach (bez pełnego re-renderu).
+    function refreshVpAddButtons() {
+        var w = el('vp-picker'); if (!w) return;
+        var items = VP_STATE.items || [];
+        Array.prototype.forEach.call(w.querySelectorAll('.vp-add'), function (btn) {
+            var p = items[+btn.getAttribute('data-idx')];
+            var inIt = p && slHas(p);
+            btn.classList.toggle('is-in', !!inIt);
+            btn.setAttribute('aria-pressed', inIt ? 'true' : 'false');
+            btn.setAttribute('title', inIt ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania');
+            btn.innerHTML = inIt ? '✓' : '+';
+        });
+        // lightbox (jeśli otwarty) — przerysuj przycisk Rozważam
+        var m = el('vpm'); if (m && m.classList.contains('show')) renderLightbox();
+    }
+    // Sticky pasek nad composerem: „Rozważasz: N/3 · [miniaturki] · Porównaj →"
+    function renderShortlistBar() {
+        var host = el('chat-msgs'); if (!host) return;
+        var n = slCount();
+        var bar = el('sl-bar');
+        if (!n && !seenCount()) { if (bar) bar.remove(); return; }
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'sl-bar'; bar.className = 'sl-bar';
+            var composer = el('composer');
+            if (composer && composer.parentNode) composer.parentNode.insertBefore(bar, composer);
+            else host.appendChild(bar);
+            // delegacja raz na pasku (przeżywa innerHTML re-render)
+            bar.addEventListener('click', function (e) {
+                var th = e.target.closest('.sl-thumb');
+                if (th) { removeFromShortlist(th.getAttribute('data-key')); return; }
+                var cmp = e.target.closest('.sl-compare');
+                if (cmp && !cmp.disabled) { openCompare(); return; }
+            });
+        }
+        var thumbs = VP_STATE.shortlist.map(function (p) {
+            var img = p.cover || p.image || '';
+            return '<button type="button" class="sl-thumb" data-key="' + esc(slKey(p)) + '" title="' + esc(p.name) + ' — kliknij, żeby wyjąć">' +
+                (img ? '<img referrerpolicy="no-referrer" src="' + esc(img) + '" alt="">' : '<span class="sl-noimg"></span>') +
+                '<span class="sl-x" aria-hidden="true">✕</span>' +
+            '</button>';
+        }).join('');
+        var label = n === 0 ? 'Klikaj „+ Rozważam" przy tym, co Cię ciekawi'
+            : 'Rozważasz: ' + n + '/' + SL_MAX;
+        var hint = n === 1 ? '<span class="sl-msg">Dorzuć jeszcze jeden do porównania</span>'
+            : n >= SL_MAX ? '<span class="sl-msg">Masz komplet — podmień, jeśli coś lepszego wpadnie Ci w oko</span>'
+            : '<span class="sl-msg"></span>';
+        var cmp = n >= 2 ? '<button type="button" class="sl-compare">Porównaj →</button>'
+            : '<button type="button" class="sl-compare" disabled>Porównaj →</button>';
+        var seen = seenCount();
+        var meter = '<span class="sl-meter">Obejrzane: ' + seen + (n ? ' · Odłożone: ' + n : '') + '</span>';
+        bar.innerHTML =
+            '<div class="sl-lead">' + esc(label) + '</div>' +
+            '<div class="sl-thumbs">' + thumbs + '</div>' +
+            hint + cmp + meter;
+    }
+    // Overlay porównania (reuse stylu .vpm): 2-3 kolumny + lider wiersza --accent.
+    function openCompare() {
+        if (slCount() < 2) return;
+        injectVpStyle();
+        gaEvent('compare_open', { n: slCount() });
+        var ov = el('sl-cmp');
+        if (!ov) {
+            ov = document.createElement('div');
+            ov.id = 'sl-cmp'; ov.className = 'vpm sl-cmp';
+            ov.innerHTML = '<div id="sl-cmp-body"></div>';
+            ov.addEventListener('click', function (e) {
+                if (e.target.id === 'sl-cmp') { closeCompare(); return; }
+                if (e.target.closest('.vpm-x')) { closeCompare(); return; }
+                var pv = e.target.closest('.sl-prev');
+                if (pv) { var i = +pv.getAttribute('data-idx'); closeCompare(); openLightboxForShortlist(i); return; }
+                var vd = e.target.closest('.sl-verdict');
+                if (vd) { if (streaming || el('inline-gate')) return; closeCompare(); shortlistVerdict(); return; }
+                var pk = e.target.closest('.sl-pick');
+                if (pk) { if (streaming || el('inline-gate')) return; var p = VP_STATE.shortlist[+pk.getAttribute('data-idx')]; if (!p) return; closeCompare(); setChosenProduct(p); removePicker(); sendOpening('Wybieram produkt: ' + (p.name || '')); return; }
+            });
+            document.body.appendChild(ov);
+            document.addEventListener('keydown', function (e) {
+                var o = el('sl-cmp'); if (!o || !o.classList.contains('show')) return;
+                if (e.key === 'Escape') closeCompare();
+            });
+        }
+        renderCompare();
+        ov.classList.add('show');
+    }
+    function closeCompare() { var o = el('sl-cmp'); if (o) { o.classList.remove('show'); var b = el('sl-cmp-body'); if (b) b.innerHTML = ''; } }
+    // Otwórz istniejący lightbox dla i-tego produktu shortlisty (wgraj go do items, jeśli brak).
+    function openLightboxForShortlist(i) {
+        var p = VP_STATE.shortlist[i]; if (!p) return;
+        var items = VP_STATE.items || [];
+        var idx = -1;
+        for (var j = 0; j < items.length; j++) { if (slKey(items[j]) === slKey(p)) { idx = j; break; } }
+        if (idx < 0) { VP_STATE.items = items.concat([p]); idx = VP_STATE.items.length - 1; }
+        vpMarkSeen(p);
+        openProductLightbox(idx);
+    }
+    function renderCompare() {
+        var body = el('sl-cmp-body'); if (!body) return;
+        var list = VP_STATE.shortlist;
+        // wyznacz lidera per wiersz statystyk (wyższy = lepszy; newest_days niższy = lepszy)
+        var rows = [
+            { k: 'saves', l: 'zapisów', fmt: fmtVP, better: 'max' },
+            { k: 'plays', l: 'wyświetleń', fmt: fmtVP, better: 'max' },
+            { k: 'comments', l: 'komentarzy', fmt: fmtVP, better: 'max' },
+            { k: 'eng_rate', l: 'zaangażowania', fmt: function (v) { return ((v || 0) * 100).toFixed(1) + '%'; }, better: 'max' },
+            { k: 'newest_days', l: 'świeżość (dni)', fmt: function (v) { return v == null ? '—' : v; }, better: 'min' }
+        ];
+        var leaders = {};
+        rows.forEach(function (r) {
+            var best = null, bestIdx = -1;
+            list.forEach(function (p, i) {
+                var v = p[r.k];
+                if (v == null) return;
+                if (best == null || (r.better === 'max' ? v > best : v < best)) { best = v; bestIdx = i; }
+            });
+            leaders[r.k] = bestIdx;
+        });
+        var cols = list.map(function (p, i) {
+            var img = p.cover || p.image || '';
+            var meta = [];
+            if (p.category) meta.push(esc(p.category));
+            var badge = p.newest_days != null ? '<span class="sl-badge">' + p.newest_days + ' dni</span>' : '';
+            var stats = rows.map(function (r) {
+                var v = p[r.k];
+                var lead = leaders[r.k] === i ? ' is-lead' : '';
+                return '<div class="sl-row"><span>' + esc(r.l) + '</span><b class="' + lead.trim() + '">' + r.fmt(v) + '</b></div>';
+            }).join('');
+            return '<div class="sl-col">' +
+                '<button type="button" class="sl-prev" data-idx="' + i + '">' +
+                    (img ? '<img referrerpolicy="no-referrer" src="' + esc(img) + '" alt="">' : '<span class="sl-noimg"></span>') +
+                    '<span class="sl-playov">▶</span>' +
+                '</button>' +
+                '<div class="sl-cname">' + esc(p.name) + '</div>' +
+                (meta.length || badge ? '<div class="sl-cmeta">' + meta.join(' · ') + (badge ? ' ' + badge : '') + '</div>' : '') +
+                '<div class="sl-rows">' + stats + '</div>' +
+                '<button type="button" class="sl-pick" data-idx="' + i + '">Wybieram ten</button>' +
+            '</div>';
+        }).join('');
+        body.innerHTML =
+            '<button type="button" class="vpm-x" aria-label="Zamknij">✕</button>' +
+            '<div class="sl-cmp-card">' +
+                '<div class="sl-cmp-head">Twoja krótka lista — który ma najlepszy układ?</div>' +
+                '<div class="sl-cols sl-cols-' + list.length + '">' + cols + '</div>' +
+                '<button type="button" class="sl-verdict">A który Ty byś wybrał?</button>' +
+            '</div>';
+    }
+    // Werdykt kuratora — buduje prompt z REALNYCH danych shortlisty i woła sendOpening.
+    function shortlistVerdict() {
+        if (slCount() < 2 || streaming) return;
+        gaEvent('verdict', { n: slCount() });
+        var lines = VP_STATE.shortlist.map(function (p, i) {
+            return (i + 1) + '. ' + (p.name || '') +
+                ' — zapisy: ' + (p.saves || 0) +
+                ', wyświetlenia: ' + (p.plays || 0) +
+                ', komentarze: ' + (p.comments || 0) +
+                ', zaangażowanie: ' + (((p.eng_rate || 0) * 100).toFixed(1)) + '%' +
+                ', świeżość: ' + (p.newest_days != null ? p.newest_days + ' dni' : 'b.d.') +
+                (p.category ? ', kategoria: ' + p.category : '');
+        }).join('\n');
+        sendOpening('Pomóż mi wybrać — który z tych produktów ma największy potencjał i dlaczego?\n' + lines);
+    }
     function vpFetch(wrap) {
         var u = VP_ENDPOINT + '?n=' + VP_STATE.n + '&page=' + VP_STATE.page + (VP_STATE.cat ? '&cat=' + encodeURIComponent(VP_STATE.cat) : '');
         return fetch(u).then(function (r) { return r.json(); }).then(function (j) {
@@ -9183,6 +9464,8 @@
         if (el('vp-picker')) return;
         injectVpStyle();
         VP_STATE.cat = ''; VP_STATE.page = 0;
+        VP_STATE.shortlist = []; VP_STATE.seen = {};   // świeży start; potem ewentualne wskrzeszenie z LS tej sesji
+        slRestore();                                    // przeżyj F5 / „Pokaż inne" w obrębie tej samej rozmowy
         var wrap = document.createElement('div'); wrap.className = 'vp'; wrap.id = 'vp-picker';
         wrap.innerHTML = '<div class="vp-load">Ładuję viralowe produkty z TikToka…</div>';
         el('chat-msgs').appendChild(wrap); scrollToBottom(false);
@@ -9193,9 +9476,24 @@
             var mr = e.target.closest('.vp-more');
             if (mr) { VP_STATE.page = VP_STATE.hasMore ? VP_STATE.page + 1 : 0; vpFetch(wrap); return; }
             var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openProductLightbox(+fs.getAttribute('data-idx')); return; }
+            var ad = e.target.closest('.vp-add'); if (ad) { e.stopPropagation(); var pa = VP_STATE.items[+ad.getAttribute('data-idx')]; if (!pa) return; if (slHas(pa)) removeFromShortlist(slKey(pa)); else addToShortlist(pa); return; }
             var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct(VP_STATE.items[+pk.getAttribute('data-idx')]); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
             var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
-            var v = e.target.closest('.vp-vid'); if (v) { openProductLightbox(+v.getAttribute('data-idx')); return; }
+            var v = e.target.closest('.vp-vid'); if (v) {
+                var vi = +v.getAttribute('data-idx');
+                // double-tap (<300ms) na kadrze = dodaj do Rozważam (gest social, smaczek z A)
+                var now = Date.now();
+                if (wrap.__lastTapIdx === vi && (now - (wrap.__lastTapAt || 0)) < 300) {
+                    wrap.__lastTapAt = 0; wrap.__lastTapIdx = -1;
+                    var pv = VP_STATE.items[vi];
+                    if (pv && !slHas(pv)) { addToShortlist(pv); var card = v.closest('.vp-card'); if (card) { card.classList.remove('sl-pop'); void card.offsetWidth; card.classList.add('sl-pop'); } }
+                    return;
+                }
+                wrap.__lastTapAt = now; wrap.__lastTapIdx = vi;
+                // pojedynczy tap → lightbox po oknie double-tap (żeby double nie otwierał lightboxa)
+                setTimeout(function () { if (wrap.__lastTapIdx === vi && Date.now() - wrap.__lastTapAt >= 280) { openProductLightbox(vi); } }, 300);
+                return;
+            }
         });
         vpFetch(wrap);
     }
@@ -10090,6 +10388,7 @@
         // kluczem sesji) → świeża rozmowa utyka w UI etapu opłaconego, bez samonaprawy
         // (sync świeżej sesji dostaje 'brak_projektu' i nie koryguje stage'a).
         resetStageState();
+        slReset();           // czyść shortlistę/seen + zdejmij wiszący pasek przy nowej rozmowie
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
@@ -10114,7 +10413,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -10132,6 +10431,8 @@
             .replace(/<blysk>[\s\S]*?<\/blysk>/g, '')
             .replace(/<sekcje>[\s\S]*?<\/sekcje>/g, '')
             .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
+            .replace(/<karuzela\b[^>]*\/?>/g, '')                 // <karuzela cat="X"> — przełączenie kategorii
+            .replace(/<wskaz\b[^>]*>[\s\S]*?<\/wskaz>/g, '').replace(/<wskaz\b[^>]*\/?>/g, '') // <wskaz idx=N> — rekomendacja karty
             .replace(/<kierunki>[\s\S]*?<\/kierunki>/g, '')
             .replace(/<propozycje_zadaj>[\s\S]*?<\/propozycje_zadaj>/g, '').replace(/<propozycje_zadaj\s*\/?>/g, '')
             .replace(/<propozycje>[\s\S]*?<\/propozycje>/g, '')
@@ -10944,6 +11245,17 @@
                     anchor.insertAdjacentElement('afterend', krEl);
                     anchor = krEl;
                 }
+                // ETAP 1 — tryb PRZEWODNIK: AI przełącza kategorię (<karuzela cat="X">)
+                // i/lub wskazuje 1 hit (<wskaz idx="N">). Front-only: cat → vpFetch jak klik chipa,
+                // potem podświetl wskazaną kartę zielonym pierścieniem + scroll.
+                var katCat = parseKaruzelaCat(raw);
+                var wskaz = parseWskaz(raw);
+                if (katCat != null && el('vp-picker')) {
+                    VP_STATE.cat = katCat; VP_STATE.page = 0;
+                    vpFetch(el('vp-picker')).then(function () { if (wskaz) setTimeout(function () { applyWskaz(wskaz); }, 60); });
+                } else if (wskaz) {
+                    setTimeout(function () { applyWskaz(wskaz); }, 60);
+                }
                 // Propozycje produktów (K1) — fallback z markera <propozycje>, gdy
                 // backend wstawi listę w treści tury zamiast SSE bud_propozycje.
                 // Pomijamy, jeśli karuzela już zrenderowana przez SSE (brak duplikatu).
@@ -11109,6 +11421,42 @@
     /* ============================================================
        KARUZELA — porównanie wariantów (marker <karuzela>)
        ============================================================ */
+    // <wskaz idx="N"> lub <wskaz nazwa="..."> — AI wskazuje 1 hit (tryb PRZEWODNIK).
+    function parseWskaz(raw) {
+        if (!raw) return null;
+        var m = raw.match(/<wskaz\b([^>]*?)\/?>/i);
+        if (!m) return null;
+        var attrs = m[1] || '';
+        var idxM = attrs.match(/idx\s*=\s*["']?(\d+)/i);
+        var nameM = attrs.match(/nazwa\s*=\s*["']([^"']+)["']/i);
+        var out = {};
+        if (idxM) out.idx = +idxM[1];
+        if (nameM) out.nazwa = nameM[1];
+        return (out.idx != null || out.nazwa) ? out : null;
+    }
+    // <karuzela cat="X"> — AI przełącza kategorię (analogicznie do kliknięcia chipa).
+    function parseKaruzelaCat(raw) {
+        if (!raw) return null;
+        var m = raw.match(/<karuzela\b[^>]*?cat\s*=\s*["']([^"']+)["'][^>]*\/?>/i);
+        return m ? m[1] : null;
+    }
+    // Podświetl rekomendowaną kartę (zielony pierścień + scroll). Front-only, bez backendu.
+    function applyWskaz(w) {
+        if (!w) return;
+        var wrap = el('vp-picker'); if (!wrap) return;
+        var items = VP_STATE.items || [];
+        var idx = (w.idx != null) ? w.idx : -1;
+        if (idx < 0 && w.nazwa) {
+            var nm = w.nazwa.trim().toLowerCase();
+            for (var j = 0; j < items.length; j++) { if ((items[j].name || '').trim().toLowerCase() === nm) { idx = j; break; } }
+        }
+        if (idx < 0 || idx >= items.length) return;
+        Array.prototype.forEach.call(wrap.querySelectorAll('.vp-card--rec'), function (c) { c.classList.remove('vp-card--rec'); });
+        var cards = wrap.querySelectorAll('.vp-card');
+        var card = cards[idx]; if (!card) return;
+        card.classList.add('vp-card--rec');
+        try { card.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch (e) { card.scrollIntoView(); }
+    }
     function parseKaruzela(raw) {
         if (!raw) return null;
         var ms = raw.match(/<karuzela>([\s\S]*?)<\/karuzela>/g);
