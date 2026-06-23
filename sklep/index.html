@@ -1820,6 +1820,9 @@
     .rkg-body strong, .rkg-body b { color: var(--text-strong); }
     .rkg-names { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
     .rkg-name { font-size: 13px; font-weight: 700; color: var(--accent); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 999px; padding: 6px 14px; }
+    .rkg-mockup { text-align: center; }
+    .rkg-mockup__lab { font-size: 13px; font-weight: 700; color: var(--text-strong); margin-bottom: 12px; }
+    .rkg-mockup img { max-width: 340px; width: 100%; border-radius: 14px; border: 1px solid var(--glass-border); box-shadow: 0 16px 44px -14px rgba(0, 0, 0, 0.65); }
     /* Werdykt: teza serifem + zegar potencjału */
     .rk-hero {
         position: relative;
@@ -5584,6 +5587,7 @@
         emailKnown: false,      // serwer zna maila tej sesji (powrót z linku ?id= — nie pytaj drugi raz)
         lastBrief: null,        // ostatni brief <projekt> (nazwa/opis do nagłówka zakładki Projekt)
         chosenProduct: null,    // wybrany viralowy produkt z karuzeli (ETAP 1) — karta w sidebarze
+        mockupUrl: null,        // pionowy mockup strony sprzedażowej (bud-mockup; cache per-produkt)
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
         editPending: false,     // runda poprawki w toku (kliknięto „Poprawiam projekt", czekamy na nowy werdykt)
         bizplan: null,          // wstępny plan przychodu z bud-plan (JSON; liczony po zielonym werdykcie)
@@ -5744,6 +5748,7 @@
             emailKnown: !!state.emailKnown,
             lastBrief: state.lastBrief || null,
             chosenProduct: state.chosenProduct || null,
+            mockupUrl: state.mockupUrl || null,
             editsUsed: state.editsUsed || 0,
             editPending: !!state.editPending,
             bizplan: state.bizplan || null,
@@ -5881,6 +5886,7 @@
         persistSession();
         renderChosenProduct();
         kickReport(false);   // raport strategiczny startuje od razu po wyborze (w tle)
+        kickMockup(false);   // pionowy mockup strony — równolegle (w tle)
     }
     function renderChosenProduct() {
         var box = el('side-chosen'); if (!box) return;
@@ -5922,6 +5928,7 @@
         state.emailKnown = !!saved.emailKnown;
         state.lastBrief = saved.lastBrief || null;
         state.chosenProduct = saved.chosenProduct || null;
+        state.mockupUrl = saved.mockupUrl || null;
         renderChosenProduct();
         state.editsUsed = saved.editsUsed || 0;
         state.editPending = !!saved.editPending;
@@ -7140,6 +7147,45 @@
                 if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, force, attempt + 1); }, 3500); return; }
                 extras.raport = 'fail';
                 if (activeTab === 'rynek') renderPaneRynek();
+            });
+    }
+    // #2 MOCKUP strony — pionowy obraz (bud-mockup), generowany w tle równolegle z raportem,
+    // cache per-produkt. Pokazywany na górze zakładki raportu.
+    var SPAR_MOCKUP_ENDPOINT = SB_URL + '/functions/v1/bud-mockup';
+    var mockupGen = false;
+    function kickMockup(force) {
+        if (!state.chosenProduct || !state.sessionId) return;
+        if (!force && state.mockupUrl) return;
+        if (mockupGen) return;
+        mockupGen = true;
+        _doMockup(state.sessionId, !!force, 0);
+    }
+    function _doMockup(sid, force, attempt) {
+        fetch(SPAR_MOCKUP_ENDPOINT, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+            .then(function (res) {
+                if (state.sessionId !== sid) return;
+                if (res.ok && res.d && res.d.mockup_url) {
+                    state.mockupUrl = res.d.mockup_url; persistSession(); mockupGen = false;
+                    if (activeTab === 'rynek') renderPaneRynek();
+                    return;
+                }
+                if (res.ok && res.d && res.d.pending) {
+                    if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, false, attempt + 1); }, 12000);
+                    else mockupGen = false;
+                    return;
+                }
+                if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) {
+                    setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, force, attempt + 1); }, 3500);
+                    return;
+                }
+                mockupGen = false;
+            }).catch(function () {
+                if (state.sessionId !== sid) return;
+                if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, force, attempt + 1); }, 3500); return; }
+                mockupGen = false;
             });
     }
     function showRaportReadyModal() {
@@ -8709,6 +8755,16 @@
             (dla ? '<div class="rkg-for">Raport przygotowany dla: <b>' + esc(dla) + '</b></div>' : '') +
             (r.lead ? '<p class="rkg-lead">' + escMd(r.lead) + '</p>' : '') + '</section>';
 
+        // #2 Mockup strony — pionowy podgląd (jeśli gotowy)
+        if (state.mockupUrl) {
+            html += '<section class="rk-sec rk-reveal"><div class="rkg-mockup">' +
+                '<div class="rkg-mockup__lab">🖥️ Tak może wyglądać Twoja strona sprzedażowa</div>' +
+                '<img loading="lazy" src="' + esc(state.mockupUrl) + '" alt="Podgląd strony sprzedażowej">' +
+                '</div></section>';
+        } else if (state.chosenProduct) {
+            kickMockup(false);
+        }
+
         var rkNo = 0;
         sekcje.forEach(function (sx) {
             if (!sx || !sx.tytul) return;
@@ -9906,7 +9962,7 @@
         state.previewHistory = {};
         state.emailKnown = false; // nowa sesja = nowy wiersz w bazie, serwer maila jeszcze nie ma
         state.lastBrief = null;
-        state.chosenProduct = null; renderChosenProduct();
+        state.chosenProduct = null; state.mockupUrl = null; renderChosenProduct();
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
