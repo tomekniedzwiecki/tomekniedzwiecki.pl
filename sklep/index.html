@@ -5474,7 +5474,7 @@
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
     var OPENER_PROMISE = 'Który bierzemy?';
 
-    var OPENER_GENERIC = OPENER_HI + '\n\nTomek od 15 lat buduje sklepy internetowe **razem z ludźmi** — uczy ich prowadzić biznes i zostaje wspólnikiem, gdy zaczyna zarabiać. Wszystko zaczyna się od jednej rzeczy: **dobrego produktu**.\n\nDlatego przejrzałem **setki tysięcy filmów na TikToku** i wyłowiłem te, które sprzedają się właśnie teraz — z nimi start jest po prostu łatwiejszy. Poniżej masz kilka z nich.\n\n**Wybierz jeden, który Cię ciekawi** — spokojnie, bez ślęczenia: to dopiero **pierwszy z wielu produktów**, które razem wprowadzimy. Na nim po prostu pokażę Ci, jak to działa: zrobimy **badanie rynku**, **branding** i **stronę sprzedażową**, żebyś zobaczył jego pełny potencjał na własne oczy.\n\n' + OPENER_PROMISE;
+    var OPENER_GENERIC = OPENER_HI + '\n\nTomek od 15 lat buduje sklepy internetowe **razem z ludźmi** i zostaje wspólnikiem, kiedy zaczynają zarabiać. Wszystko rusza od jednego: **dobrego produktu** — dlatego przejrzałem **setki tysięcy filmów na TikToku** i wyłowiłem te, które sprzedają się właśnie teraz.\n\n**Wybierz jeden, który Cię ciekawi** — bez ślęczenia, to dopiero **pierwszy z wielu**. Na nim pokażę Ci, jak to działa: zrobimy **badanie rynku**, **branding** i **stronę sprzedażową**.\n\n' + OPENER_PROMISE;
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
     var START_CHIPS = [
@@ -8807,7 +8807,8 @@
             VP_STATE.hasMore = !!(j && j.has_more);
             VP_STATE.total = (j && j.total) || 0;
             renderViralProducts(wrap, (j && j.products) || []);
-            scrollToBottom(false);
+            // pokaż GÓRĘ karuzeli (chipy kategorii + kadr), nie stopkę
+            var w = el('qr-chips'); if (w) w.scrollIntoView({ block: 'start', behavior: 'auto' });
         }).catch(function () {
             if (el('qr-chips')) wrap.innerHTML = '<div class="vp-load">Nie udało się załadować — napisz, a poszukamy razem.</div>';
         });
