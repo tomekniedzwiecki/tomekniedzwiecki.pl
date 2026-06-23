@@ -369,6 +369,16 @@
     }
     .side__convo-row:hover .side__convo-del { opacity: 0.7; }
     .side__convo-del:hover { opacity: 1; color: #ff6b6b; background: rgba(255, 107, 107, 0.12); }
+    .side__chosen { margin: 2px 0 8px; }
+    .chosen { display: flex; gap: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 12px; padding: 9px; align-items: flex-start; }
+    .chosen__media { flex: 0 0 54px; width: 54px; height: 54px; border-radius: 9px; overflow: hidden; background: #161616; display: grid; place-items: center; }
+    .chosen__media img { width: 100%; height: 100%; object-fit: cover; }
+    .chosen__body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+    .chosen__name { font-size: 12.5px; font-weight: 700; color: var(--text-strong); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .chosen__cat { font-size: 10.5px; color: var(--text-muted); }
+    .chosen__stats { display: flex; gap: 9px; flex-wrap: wrap; font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .chosen__stats b { color: var(--accent); font-weight: 700; }
+    .chosen__price { font-size: 11px; color: var(--text-strong); font-weight: 600; margin-top: 2px; }
     .side__convo-dot {
         width: 7px;
         height: 7px;
@@ -5286,6 +5296,7 @@
             <div class="side__sect">Twoje projekty</div>
             <nav class="side__convolist" id="side-convolist"></nav>
         </div>
+        <div class="side__chosen" id="side-chosen" hidden></div>
         <div class="side__sect">Projekt</div>
         <nav class="side__nav">
             <button type="button" class="side__item is-active" data-tab="chat">
@@ -5561,6 +5572,7 @@
         previewHistory: {},     // {view:[starsze urls]} — poprzednie wersje ekranów (nic nie przepada)
         emailKnown: false,      // serwer zna maila tej sesji (powrót z linku ?id= — nie pytaj drugi raz)
         lastBrief: null,        // ostatni brief <projekt> (nazwa/opis do nagłówka zakładki Projekt)
+        chosenProduct: null,    // wybrany viralowy produkt z karuzeli (ETAP 1) — karta w sidebarze
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
         editPending: false,     // runda poprawki w toku (kliknięto „Poprawiam projekt", czekamy na nowy werdykt)
         bizplan: null,          // wstępny plan przychodu z bud-plan (JSON; liczony po zielonym werdykcie)
@@ -5720,6 +5732,7 @@
             kamien: state.kamien || 0,
             emailKnown: !!state.emailKnown,
             lastBrief: state.lastBrief || null,
+            chosenProduct: state.chosenProduct || null,
             editsUsed: state.editsUsed || 0,
             editPending: !!state.editPending,
             bizplan: state.bizplan || null,
@@ -5845,6 +5858,41 @@
             renderConvoList();
         }
     }
+    // Karta WYBRANEGO produktu w sidebarze — widać, co wybrano (miniatura z AliExpress + dowód viralu).
+    function setChosenProduct(p) {
+        if (!p) return;
+        state.chosenProduct = {
+            name: p.name || '', cover: p.cover || '', image: p.image || '',
+            price: p.price || '', product_link: p.product_link || '', category: p.category || '',
+            saves: p.saves || 0, plays: p.plays || 0, comments: p.comments || 0, eng_rate: p.eng_rate || 0,
+            newest_days: (p.newest_days != null ? p.newest_days : null), tiktok_url: p.tiktok_url || ''
+        };
+        persistSession();
+        renderChosenProduct();
+    }
+    function renderChosenProduct() {
+        var box = el('side-chosen'); if (!box) return;
+        var c = state.chosenProduct;
+        if (!c || !c.name) { box.hidden = true; box.innerHTML = ''; return; }
+        box.hidden = false;
+        var img = c.image || c.cover || '';   // czysty kadr produktu (AliExpress) > okładka filmu
+        box.innerHTML =
+            '<div class="side__sect">Wybrany produkt</div>' +
+            '<div class="chosen">' +
+              '<div class="chosen__media">' +
+                (img ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(img) + '" onerror="this.style.display=\'none\'">' : '') +
+              '</div>' +
+              '<div class="chosen__body">' +
+                '<div class="chosen__name">' + esc(c.name) + '</div>' +
+                (c.category ? '<div class="chosen__cat">' + esc(c.category) + '</div>' : '') +
+                '<div class="chosen__stats">' +
+                  '<span><b>' + fmtVP(c.saves) + '</b> zapisów</span>' +
+                  '<span><b>' + fmtVP(c.plays) + '</b> wyświetleń</span>' +
+                '</div>' +
+                (c.price ? '<div class="chosen__price">Cena det.: ' + esc(c.price) + '</div>' : '') +
+              '</div>' +
+            '</div>';
+    }
     function applySavedState(saved) {
         state.pSlug = saved.pSlug || state.pSlug;
         state.profession = saved.profession || (state.pSlug && P_OPENERS[state.pSlug] ? P_OPENERS[state.pSlug].apiName : null);
@@ -5861,6 +5909,8 @@
         state.kamien = saved.kamien || 0;
         state.emailKnown = !!saved.emailKnown;
         state.lastBrief = saved.lastBrief || null;
+        state.chosenProduct = saved.chosenProduct || null;
+        renderChosenProduct();
         state.editsUsed = saved.editsUsed || 0;
         state.editPending = !!saved.editPending;
         state.bizplan = saved.bizplan || null;
@@ -8756,6 +8806,7 @@
         @media(max-width:560px){.vp-card{flex:0 0 81vw;max-width:310px}}
         .vp-card:hover{border-color:var(--accent)}
         .vp-vid{position:relative;width:100%;aspect-ratio:9/16;max-height:46vh;background:#000;cursor:pointer}
+        .vp-vid.vp-noimg{background:linear-gradient(145deg,#1c1c1f,#0a0a0a)}
         .vp-vid img{width:100%;height:100%;object-fit:cover;display:block}
         .vp-vid .vp-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.46))}
         .vp-vid .vp-play span{width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.5);border:1.5px solid rgba(255,255,255,.66);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;padding-left:3px;backdrop-filter:blur(3px);transition:background .15s,transform .15s}
@@ -8777,24 +8828,121 @@
         .vp-more{background:rgba(255,255,255,.05);border:1px solid var(--glass-border);color:var(--text-strong);border-radius:9px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:color .15s,border-color .15s}
         .vp-more:hover{border-color:var(--accent);color:var(--accent)}
         .vp-count{font-size:11.5px;color:var(--text-muted)}
-        .vpm{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
+        .vpm{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:99999;display:none;align-items:center;justify-content:center;padding:16px}
         .vpm.show{display:flex}
-        .vpm iframe{width:min(380px,94vw);height:min(88vh,660px);border:0;border-radius:16px;background:#000}
-        .vpm-x{position:absolute;top:16px;right:20px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-        .vpm-x:hover{background:rgba(255,255,255,.18)}
+        .vpm-card{position:relative;display:flex;gap:16px;align-items:stretch;width:100%;max-width:840px;max-height:92vh}
+        .vpm-video{flex:0 0 auto}
+        .vpm-video iframe{width:min(330px,78vw);height:min(86vh,586px);border:0;border-radius:16px;background:#000;display:block}
+        .vpm-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;background:#0b0b0b;border:1px solid var(--glass-border);border-radius:16px;padding:20px;overflow-y:auto}
+        .vpm-count{font-size:11.5px;color:var(--text-muted);letter-spacing:.03em}
+        .vpm-name{font-size:18px;font-weight:700;color:var(--text-strong);line-height:1.3}
+        .vpm-meta{font-size:12.5px;color:var(--text-muted);margin-top:-4px}
+        .vpm-meta .ad{color:var(--accent)}
+        .vpm-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .vpm-stat{background:rgba(255,255,255,.04);border:1px solid var(--glass-border);border-radius:10px;padding:9px 11px}
+        .vpm-stat b{display:block;font-size:16px;color:var(--accent);font-weight:700;line-height:1.2}
+        .vpm-stat span{font-size:10.5px;color:var(--text-muted)}
+        .vpm-actions{margin-top:auto;display:flex;flex-direction:column;gap:9px;padding-top:8px}
+        .vpm-pick{background:var(--accent);color:var(--accent-ink);border:0;border-radius:11px;padding:13px;font-size:14.5px;font-weight:700;cursor:pointer;transition:filter .15s}
+        .vpm-pick:hover{filter:brightness(1.08)}
+        .vpm-pot{background:rgba(255,255,255,.05);border:1px solid var(--glass-border);color:var(--text-strong);border-radius:11px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s}
+        .vpm-pot:hover{border-color:var(--accent);color:var(--accent)}
+        .vpm-nav{position:fixed;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:25px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;backdrop-filter:blur(4px);transition:background .15s}
+        .vpm-nav:hover{background:rgba(255,255,255,.24)}
+        .vpm-prev{left:14px}.vpm-next{right:14px}
+        .vpm-x{position:fixed;top:16px;right:18px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4}
+        .vpm-x:hover{background:rgba(255,255,255,.22)}
+        @media(max-width:720px){
+          .vpm{padding:0;align-items:stretch}
+          .vpm-card{flex-direction:column;gap:0;max-width:none;max-height:100vh;height:100vh;overflow-y:auto}
+          .vpm-video{padding:52px 0 4px;display:flex;justify-content:center;background:#000}
+          .vpm-video iframe{width:min(92vw,360px);height:min(56vh,500px);border-radius:12px}
+          .vpm-side{border:0;border-radius:0;flex:0 0 auto;padding:14px 18px 30px}
+          .vpm-nav{top:28vh;width:40px;height:40px;font-size:22px}
+          .vpm-prev{left:6px}.vpm-next{right:6px}
+        }
         `;
         document.head.appendChild(s);
         var m = document.createElement('div'); m.className = 'vpm'; m.id = 'vpm';
-        m.innerHTML = '<div class="vpm-x" id="vpm-x">✕</div><div id="vpm-body"></div>';
-        m.addEventListener('click', function (e) { if (e.target.id === 'vpm' || e.target.id === 'vpm-x') closeVP(); });
+        m.innerHTML = '<div id="vpm-body"></div>';
+        m.addEventListener('click', function (e) {
+            if (e.target.id === 'vpm') { closeVP(); return; }
+            if (e.target.closest('.vpm-x')) { closeVP(); return; }
+            if (e.target.closest('.vpm-prev')) { lbStep(-1); return; }
+            if (e.target.closest('.vpm-next')) { lbStep(1); return; }
+            var pk = e.target.closest('.vpm-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct((VP_STATE.items || [])[VP_STATE.lbIndex || 0]); closeVP(); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+            var pt = e.target.closest('.vpm-pot'); if (pt) { if (streaming || el('inline-gate')) return; closeVP(); sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
+        });
         document.body.appendChild(m);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeVP(); });
+        document.addEventListener('keydown', function (e) {
+            if (!el('vpm') || !el('vpm').classList.contains('show')) return;
+            if (e.key === 'Escape') closeVP();
+            else if (e.key === 'ArrowRight') lbStep(1);
+            else if (e.key === 'ArrowLeft') lbStep(-1);
+        });
     }
-    function playVP(vid) {
-        if (!vid) return; injectVpStyle();
-        var src = 'https://www.tiktok.com/player/v1/' + vid + '?music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0&timestamp=0&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1';
-        el('vpm-body').innerHTML = '<iframe src="' + src + '" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>';
+    // Pełnoekranowy podgląd = mini-przeglądarka produktu: wideo + statystyki + akcje
+    // (Wybieram / Potencjał) + nawigacja ‹ › po kolejnych produktach (z przeskokiem stron).
+    function openLightbox(idx) {
+        injectVpStyle();
+        var items = VP_STATE.items || [];
+        if (!items.length) return;
+        if (idx == null || idx < 0) idx = 0; if (idx >= items.length) idx = items.length - 1;
+        VP_STATE.lbIndex = idx;
+        renderLightbox();
         el('vpm').classList.add('show');
+    }
+    function renderLightbox() {
+        var items = VP_STATE.items || [];
+        var p = items[VP_STATE.lbIndex || 0];
+        if (!p) return;
+        var src = 'https://www.tiktok.com/player/v1/' + p.video_id + '?music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0&timestamp=0&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1';
+        var eng = ((p.eng_rate || 0) * 100).toFixed(1) + '%';
+        var total = VP_STATE.total || items.length;
+        var globalIdx = (VP_STATE.page || 0) * (VP_STATE.n || 6) + (VP_STATE.lbIndex || 0) + 1;
+        var meta = [];
+        if (p.category) meta.push(esc(p.category));
+        if (p.newest_days != null) meta.push(p.newest_days + ' dni temu');
+        if (p.is_ad) meta.push('<span class="ad">reklamowany</span>');
+        var stat = function (v, l) { return '<div class="vpm-stat"><b>' + v + '</b><span>' + l + '</span></div>'; };
+        el('vpm-body').innerHTML =
+            '<button type="button" class="vpm-x" aria-label="Zamknij">✕</button>' +
+            '<button type="button" class="vpm-nav vpm-prev" aria-label="Poprzedni">‹</button>' +
+            '<button type="button" class="vpm-nav vpm-next" aria-label="Następny">›</button>' +
+            '<div class="vpm-card">' +
+              '<div class="vpm-video"><iframe src="' + src + '" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe></div>' +
+              '<div class="vpm-side">' +
+                '<div class="vpm-count">' + globalIdx + ' / ' + total + ' &middot; hit z TikToka</div>' +
+                '<div class="vpm-name">' + esc(p.name) + '</div>' +
+                (meta.length ? '<div class="vpm-meta">' + meta.join(' · ') + '</div>' : '') +
+                '<div class="vpm-stats">' +
+                  stat(fmtVP(p.saves), 'zapisów') +
+                  stat(fmtVP(p.plays), 'wyświetleń') +
+                  stat(fmtVP(p.comments), 'komentarzy') +
+                  stat(eng, 'zaangażowania') +
+                  (p.followers ? stat(fmtVP(p.followers), 'obserwujących autora') : '') +
+                  (p.videos ? stat(p.videos, 'filmów z tym produktem') : '') +
+                '</div>' +
+                '<div class="vpm-actions">' +
+                  '<button type="button" class="vpm-pick" data-pick="' + esc(p.name) + '">Wybieram ten produkt</button>' +
+                  '<button type="button" class="vpm-pot" data-pot="' + esc(p.name) + '">Jaki ma potencjał?</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+    }
+    function lbStep(dir) {
+        var items = VP_STATE.items || [];
+        if (!items.length) return;
+        var i = (VP_STATE.lbIndex || 0) + dir;
+        var wrap = el('vp-picker');
+        if (i >= items.length) {
+            if (VP_STATE.hasMore && wrap) { VP_STATE.page = (VP_STATE.page || 0) + 1; vpFetch(wrap).then(function () { VP_STATE.lbIndex = 0; renderLightbox(); }); return; }
+            i = 0; // zawijaj w obrębie załadowanych
+        } else if (i < 0) {
+            if ((VP_STATE.page || 0) > 0 && wrap) { VP_STATE.page -= 1; vpFetch(wrap).then(function () { VP_STATE.lbIndex = Math.max(0, (VP_STATE.items.length || 1) - 1); renderLightbox(); }); return; }
+            i = items.length - 1;
+        }
+        VP_STATE.lbIndex = i; renderLightbox();
     }
     function closeVP() { var m = el('vpm'); if (m) { m.classList.remove('show'); el('vpm-body').innerHTML = ''; } }
     function fmtVP(n) { n = +n || 0; return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(n >= 1e4 ? 0 : 1) + 'k' : String(n); }
@@ -8819,14 +8967,14 @@
             return;
         }
         var cards = '';
-        products.forEach(function (p) {
+        products.forEach(function (p, i) {
             var hot = p.newest_days != null && p.newest_days <= 14;
             cards +=
                 '<div class="vp-card">' +
-                    '<div class="vp-vid" data-vid="' + esc(p.video_id) + '">' +
-                        (p.cover ? '<img loading="lazy" src="' + esc(p.cover) + '">' : '') +
+                    '<div class="vp-vid' + (p.cover ? '' : ' vp-noimg') + '" data-idx="' + i + '">' +
+                        (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
                         (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
-                        '<button type="button" class="vp-fs" data-vid="' + esc(p.video_id) + '" aria-label="Pełny ekran">⛶</button>' +
+                        '<button type="button" class="vp-fs" data-idx="' + i + '" aria-label="Pełny ekran">⛶</button>' +
                         '<div class="vp-play"><span>▶</span></div>' +
                     '</div>' +
                     '<div class="vp-b">' +
@@ -8836,7 +8984,7 @@
                             '<span class="vp-stat"><b>' + fmtVP(p.plays) + '</b> wyświetleń</span>' +
                             '<span class="vp-stat"><b>' + fmtVP(p.comments) + '</b> komentarzy</span>' +
                         '</div>' +
-                        '<button type="button" class="vp-pick" data-pick="' + esc(p.name) + '">Wybieram ten</button>' +
+                        '<button type="button" class="vp-pick" data-idx="' + i + '" data-pick="' + esc(p.name) + '">Wybieram ten</button>' +
                         '<button type="button" class="vp-pot" data-pot="' + esc(p.name) + '">Jaki ma potencjał?</button>' +
                     '</div>' +
                 '</div>';
@@ -8856,7 +9004,8 @@
             if (j && j.categories) VP_STATE.cats = j.categories;
             VP_STATE.hasMore = !!(j && j.has_more);
             VP_STATE.total = (j && j.total) || 0;
-            renderViralProducts(wrap, (j && j.products) || []);
+            VP_STATE.items = (j && j.products) || [];   // lista bieżącej strony — używa jej lightbox (nawigacja ‹ ›)
+            renderViralProducts(wrap, VP_STATE.items);
             // pokaż GÓRĘ karuzeli (chipy kategorii + kadr), nie stopkę
             var w = el('vp-picker'); if (w) w.scrollIntoView({ block: 'start', behavior: 'auto' });
         }).catch(function () {
@@ -8878,10 +9027,10 @@
             if (ct) { VP_STATE.cat = ct.getAttribute('data-cat') || ''; VP_STATE.page = 0; vpFetch(wrap); return; }
             var mr = e.target.closest('.vp-more');
             if (mr) { VP_STATE.page = VP_STATE.hasMore ? VP_STATE.page + 1 : 0; vpFetch(wrap); return; }
-            var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); playVP(fs.getAttribute('data-vid')); return; }
-            var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+            var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openLightbox(+fs.getAttribute('data-idx')); return; }
+            var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct(VP_STATE.items[+pk.getAttribute('data-idx')]); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
             var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
-            var v = e.target.closest('.vp-vid'); if (v) { playVP(v.getAttribute('data-vid')); return; }
+            var v = e.target.closest('.vp-vid'); if (v) { openLightbox(+v.getAttribute('data-idx')); return; }
         });
         vpFetch(wrap);
     }
@@ -9762,6 +9911,7 @@
         state.previewHistory = {};
         state.emailKnown = false; // nowa sesja = nowy wiersz w bazie, serwer maila jeszcze nie ma
         state.lastBrief = null;
+        state.chosenProduct = null; renderChosenProduct();
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
