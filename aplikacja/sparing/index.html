@@ -9148,6 +9148,13 @@
         return !(state.email || state.emailKnown);
     }
     function gatePending() {
+        // Etap know-how/budowa = PO pełnej płatności. Kontakt mamy dawno (lead +
+        // checkout), telefon jest w bazie, a Tomek prowadzi klienta osobiście. Bramka
+        // kontaktu nie ma tu racji bytu — a że state.phone bywa pusty lokalnie (numer
+        // przyszedł z checkoutu, nie z bramki czatu), gatePending() wracało true i
+        // finalizer doklejał bramkę po KAŻDEJ odpowiedzi, blokując composer (klient
+        // musiał odświeżać). Twardo gasimy bramkę w tych etapach.
+        if (state.stage === 'knowhow' || state.stage === 'build') return false;
         // Generowanie ma ruszyć bez kontaktu → bramka PRZED generowaniem (Tomek):
         // niezależnie od liczby wiadomości i tego, czy jest już brief.
         if (forceContactGate) return gateContactMissing();
@@ -9906,6 +9913,25 @@
         sendBtn.classList.add('is-stop');
         sendBtn.setAttribute('aria-label', 'Zatrzymaj generowanie');
 
+        // Watchdog zawieszonego streamu: gdyby serwer/sieć urwały połączenie BEZ
+        // domknięcia (reader.read() nigdy nie zwraca done), streaming zostawał true,
+        // a composer zablokowany do ręcznego odświeżenia. Po dłuższej ciszy sieci na
+        // czystym czacie abortujemy — catch(AbortError) odblokuje pole jak przy „Stop”.
+        // Długie operacje z własnym rytmem eventów (badanie rynku / generowanie ekranów)
+        // wyłączają cięcie (genScreen ustawione) — tam tylko przezbrajamy zegar.
+        var stalled = false;
+        var watchdog = null;
+        function armWatchdog() {
+            if (watchdog) clearTimeout(watchdog);
+            watchdog = setTimeout(function () {
+                if (!streaming) return;
+                if (genScreen) { armWatchdog(); return; }
+                stalled = true;
+                if (streamAbort) { try { streamAbort.abort(); } catch (e) {} }
+            }, 40000);
+        }
+        armWatchdog();
+
         var bubble = document.createElement('div');
         bubble.className = 'msg msg--ai';
         bubble.setAttribute('aria-live', 'off'); // #4 — nie ogłaszamy każdego tokenu czytnikowi
@@ -10056,6 +10082,7 @@
                         return;
                     }
                     buf += decoder.decode(r.value, { stream: true }).replace(/\r\n/g, '\n');
+                    armWatchdog(); // napłynęły dane — stream żyje, przezbrój zegar
                     var idx;
                     while ((idx = buf.indexOf('\n\n')) >= 0) {
                         var rawEvent = buf.slice(0, idx);
@@ -10070,6 +10097,12 @@
             if (err && err.name === 'AbortError') {
                 // #3 — użytkownik zatrzymał generowanie; zostaje to, co już padło (bez błędu)
                 failedBeforeText = !gotText;
+                // Abort z watchdoga (zawis połączenia), a nie ręczny „Stop” → powiedz
+                // wprost i przywróć niewysłaną wiadomość, żeby dało się ją ponowić.
+                if (stalled) {
+                    if (!gotText) restoreFailedMessage(text);
+                    sysMsg('Połączenie się zacięło — odblokowałem pole. Jeśli odpowiedź się urwała, wyślij ponownie.', true);
+                }
                 return;
             }
             if (err && (err.code === 'wymagany_email' || err.code === 'wymagane_konto')) {
@@ -10105,6 +10138,7 @@
             }
         }).then(function () {
             streaming = false;
+            if (watchdog) { clearTimeout(watchdog); watchdog = null; } // stream domknięty/abort — zegar zbędny
             // #3 — przywróć przycisk wysyłki z trybu „Zatrzymaj"
             var sbDone = el('btn-send');
             sbDone.classList.remove('is-stop');
