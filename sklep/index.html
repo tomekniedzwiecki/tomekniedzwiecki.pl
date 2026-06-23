@@ -6113,7 +6113,13 @@
     // ── Płatna kolejna rozmowa (49 zł) ───────────────────────────────────────
     // 1. projekt darmowy; każdy następny wymaga zakupu oferty „Aplikacja —
     // kolejna rozmowa" (lub grantu admina). Stan = 1 + paidConvos (z serwera).
-    function allowedConvos() { return FREE_CONVOS + (paidConvos || 0); }
+    function allowedConvos() {
+        // ⏸ TYMCZASOWO ODBLOKOWANE (2026-06-23, testy): dowolna liczba rozmów za darmo.
+        //    Przywrócenie paywallu 49 zł za kolejną rozmowę → usuń `return 9999;`
+        //    i odkomentuj oryginalną linię poniżej.
+        return 9999;
+        // return FREE_CONVOS + (paidConvos || 0);
+    }
     function refreshConvoEntitlement() {
         if (!authState.user || !authState.token) { paidConvos = 0; return Promise.resolve(0); }
         return fetch(SPAR_PROJECT_ENDPOINT, {
