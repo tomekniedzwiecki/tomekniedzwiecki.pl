@@ -4450,13 +4450,15 @@
        HERO STATE — start rozmowy: wszystko wycentrowane, pasek
        na środku; po pierwszej wiadomości dokuje na dół
        ============================================================ */
+    /* Start = wysoki picker viralowych produktów → normalny scroll + input zadokowany na dole
+       (centrowanie hero psuło czytelność: wypychało górę i input poza ekran). */
     .view--chat.is-hero .chat-scroll {
-        flex: 0 0 auto;
-        margin-top: auto;
-        overflow: visible;
+        flex: 1;
+        margin-top: 0;
+        overflow-y: auto;
     }
     .view--chat.is-hero .chat-composer {
-        margin-bottom: auto;
+        margin-bottom: 0;
         background: none;
         padding-top: 4px;
     }
