@@ -337,7 +337,8 @@
         display: flex;
         align-items: center;
         gap: 9px;
-        width: 100%;
+        flex: 1;
+        min-width: 0;
         min-height: 38px;
         padding: 8px 12px;
         border-radius: 10px;
@@ -355,6 +356,19 @@
     }
     .side__convo:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-strong); }
     .side__convo.is-active { background: rgba(255, 255, 255, 0.06); color: var(--text-strong); }
+    .side__convo-row { display: flex; align-items: center; gap: 2px; }
+    .side__convo-del {
+        flex-shrink: 0;
+        width: 30px; height: 30px;
+        display: grid; place-items: center;
+        border-radius: 8px;
+        color: var(--text-muted);
+        opacity: 0.4;
+        cursor: pointer;
+        transition: opacity 0.15s, color 0.15s, background 0.15s;
+    }
+    .side__convo-row:hover .side__convo-del { opacity: 0.7; }
+    .side__convo-del:hover { opacity: 1; color: #ff6b6b; background: rgba(255, 107, 107, 0.12); }
     .side__convo-dot {
         width: 7px;
         height: 7px;
@@ -5784,6 +5798,8 @@
         var nav = el('side-convolist');
         nav.innerHTML = '';
         idx.slice().reverse().forEach(function (c) {
+            var row = document.createElement('div');
+            row.className = 'side__convo-row';
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'side__convo' + (c.id === state.sessionId ? ' is-active' : '');
@@ -5798,8 +5814,36 @@
                 if (c.id !== state.sessionId) loadConvo(c.id);
                 else { switchTab('chat'); closeSide(); }
             });
-            nav.appendChild(b);
+            var del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'side__convo-del';
+            del.title = 'Usuń rozmowę';
+            del.setAttribute('aria-label', 'Usuń rozmowę');
+            del.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+            del.addEventListener('click', function (e) { e.stopPropagation(); deleteConvo(c.id, c.title); });
+            row.appendChild(b);
+            row.appendChild(del);
+            nav.appendChild(row);
         });
+    }
+    // Usuń rozmowę lokalnie (indeks + klucze per-sesja). Indeks jest czysto lokalny,
+    // więc usunięcie się nie cofa. Jeśli kasujemy aktywną — przeskocz na inną albo zacznij świeżą.
+    function deleteConvo(sid, title) {
+        if (!confirm('Usunąć rozmowę „' + (title || 'Rozmowa') + '"? Tej operacji nie cofniesz.')) return;
+        try {
+            localStorage.removeItem(sessionKey(sid));
+            localStorage.removeItem(messagesKey(sid));
+            localStorage.removeItem(previewKey(sid));
+            saveJSON(LS_INDEX, convoIndex().filter(function (c) { return c.id !== sid; }));
+            if (loadJSON(LS_ACTIVE) === sid) localStorage.removeItem(LS_ACTIVE);
+        } catch (e) { }
+        if (sid === state.sessionId) {
+            var rest = convoIndex();
+            if (rest.length) loadConvo(rest[rest.length - 1].id);
+            else startFresh(true);
+        } else {
+            renderConvoList();
+        }
     }
     function applySavedState(saved) {
         state.pSlug = saved.pSlug || state.pSlug;
@@ -8808,24 +8852,24 @@
     function vpFetch(wrap) {
         var u = VP_ENDPOINT + '?n=' + VP_STATE.n + '&page=' + VP_STATE.page + (VP_STATE.cat ? '&cat=' + encodeURIComponent(VP_STATE.cat) : '');
         return fetch(u).then(function (r) { return r.json(); }).then(function (j) {
-            if (!el('qr-chips')) return;
+            if (!el('vp-picker')) return;
             if (j && j.categories) VP_STATE.cats = j.categories;
             VP_STATE.hasMore = !!(j && j.has_more);
             VP_STATE.total = (j && j.total) || 0;
             renderViralProducts(wrap, (j && j.products) || []);
             // pokaż GÓRĘ karuzeli (chipy kategorii + kadr), nie stopkę
-            var w = el('qr-chips'); if (w) w.scrollIntoView({ block: 'start', behavior: 'auto' });
+            var w = el('vp-picker'); if (w) w.scrollIntoView({ block: 'start', behavior: 'auto' });
         }).catch(function () {
-            if (el('qr-chips')) wrap.innerHTML = '<div class="vp-load">Nie udało się załadować — napisz, a poszukamy razem.</div>';
+            if (el('vp-picker')) wrap.innerHTML = '<div class="vp-load">Nie udało się załadować — napisz, a poszukamy razem.</div>';
         });
     }
 
     // Start świeżej rozmowy (ETAP 1): karuzela viralowych produktów z bud-tt-featured.
     function renderChips() {
-        if (el('qr-chips')) return;
+        if (el('vp-picker')) return;
         injectVpStyle();
         VP_STATE.cat = ''; VP_STATE.page = 0;
-        var wrap = document.createElement('div'); wrap.className = 'vp'; wrap.id = 'qr-chips';
+        var wrap = document.createElement('div'); wrap.className = 'vp'; wrap.id = 'vp-picker';
         wrap.innerHTML = '<div class="vp-load">Ładuję viralowe produkty z TikToka…</div>';
         el('chat-msgs').appendChild(wrap); scrollToBottom(false);
         // Delegacja zdarzeń raz, na trwałym kontenerze (innerHTML przy re-renderze nie gubi listenera).
@@ -8835,7 +8879,7 @@
             var mr = e.target.closest('.vp-more');
             if (mr) { VP_STATE.page = VP_STATE.hasMore ? VP_STATE.page + 1 : 0; vpFetch(wrap); return; }
             var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); playVP(fs.getAttribute('data-vid')); return; }
-            var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; fadeRemoveChips(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+            var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
             var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
             var v = e.target.closest('.vp-vid'); if (v) { playVP(v.getAttribute('data-vid')); return; }
         });
@@ -8853,6 +8897,21 @@
         if (!c) { removeChips(); return; }
         c.classList.add('is-leaving');
         setTimeout(removeChips, 180);
+    }
+    // ── KARUZELA PRODUKTÓW (ETAP 1) = trwała powierzchnia wyboru, osobna od dymków <opcje> AI ──
+    // Żyje przez cały ETAP 1 (pytania o potencjał jej NIE niszczą) i jest przypięta do DOŁU
+    // czatu, żeby zawsze była pod ręką nad polem wpisywania. Usuwana dopiero przy wyborze produktu.
+    function removePicker() {
+        var c = el('vp-picker');
+        if (!c) return;
+        c.style.transition = 'opacity .18s ease, transform .18s ease';
+        c.style.opacity = '0'; c.style.transform = 'translateY(6px)';
+        setTimeout(function () { var x = el('vp-picker'); if (x) x.remove(); }, 190);
+    }
+    // Po każdej nowej wiadomości/podpowiedzi przesuń karuzelę na sam dół (jeśli wciąż w ETAP 1).
+    function pinPickerBottom() {
+        var p = el('vp-picker'), msgs = el('chat-msgs');
+        if (p && msgs && msgs.lastElementChild !== p) msgs.appendChild(p);
     }
 
     // Lightbox v2 — podpis widoku, strzałki między ekranami, wyraźny X
@@ -9877,6 +9936,7 @@
             else if (hasPropBrak(content)) el('chat-msgs').appendChild(buildPropBrakEl());
             if (hasMakieta(content)) el('chat-msgs').appendChild(mkCardEl());
         }
+        pinPickerBottom();   // karuzela ETAP 1 zawsze na dole, pod najnowszą wiadomością
         scrollToBottom(false);
         return div;
     }
@@ -10130,6 +10190,7 @@
         div.appendChild(own);
         if (multi) div.appendChild(goBtn);
         el('chat-msgs').appendChild(div);
+        pinPickerBottom();   // karuzela ETAP 1 zostaje pod dymkami AI
         scrollToBottom(false);
     }
 
