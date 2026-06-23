@@ -7103,12 +7103,14 @@
         if (extras.raport === 'gen') return;
         if (!force && state.raport) return;
         extras.raport = 'gen'; extrasStart.raport = Date.now();
-        var sid = state.sessionId;
+        _doReport(state.sessionId, !!force, 0);
+    }
+    function _doReport(sid, force, attempt) {
         if (activeTab === 'rynek') renderPaneRynek();
         fetch(SPAR_RAPORT_ENDPOINT, {
             method: 'POST', headers: authHeaders(),
-            body: JSON.stringify({ sessionId: sid, force: !!force, product: state.chosenProduct, recipient: state.name || '' })
-        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+            body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, recipient: state.name || '' })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && res.d.raport) {
@@ -7117,16 +7119,22 @@
                     if (activeTab === 'rynek') renderPaneRynek();
                     if (activeTab === 'projekt') renderPaneProjekt();
                     showRaportReadyModal();
-                } else if (res.ok && res.d && res.d.pending) {
-                    setTimeout(function () {
-                        if (state.sessionId === sid && !state.raport && extras.raport === 'gen') { extras.raport = 'idle'; kickReport(false); }
-                    }, 120000);
-                } else {
-                    extras.raport = 'fail'; updateSideBadges();
-                    if (activeTab === 'rynek') renderPaneRynek();
+                    return;
                 }
+                if (res.ok && res.d && res.d.pending) {
+                    setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, false, 0); }, 120000);
+                    return;
+                }
+                // Sesja jeszcze nie istnieje na serwerze (404) — bud-chat tworzy ją po 1. wiadomości. Ponów.
+                if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) {
+                    setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, force, attempt + 1); }, 3500);
+                    return;
+                }
+                extras.raport = 'fail'; updateSideBadges();
+                if (activeTab === 'rynek') renderPaneRynek();
             }).catch(function () {
                 if (state.sessionId !== sid) return;
+                if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, force, attempt + 1); }, 3500); return; }
                 extras.raport = 'fail';
                 if (activeTab === 'rynek') renderPaneRynek();
             });
