@@ -8666,10 +8666,10 @@
         var body = el('pane-rynek-body');
         var pane = el('pane-rynek');
         if (rkIO) { rkIO.disconnect(); rkIO = null; }
-        var nazwa = (state.lastBrief && state.lastBrief.nazwa) || 'Twoje narzędzie';
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Potencjał rynku</div>' +
-            '<h2 class="tabpane__title">' + esc(nazwa) + ' na tle rynku</h2>' +
-            '<p class="tabpane__sub">Realny research z internetu: wielkość niszy, konkurenci z cenami, trendy. Każda liczba ma podlinkowane źródło.</p></div>';
+        var prodName = (state.chosenProduct && state.chosenProduct.name) || (state.raport && state.raport.naglowek) || (state.lastBrief && state.lastBrief.nazwa) || 'Twój produkt';
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Raport strategiczny</div>' +
+            '<h2 class="tabpane__title">' + esc((state.raport && state.raport.naglowek) || ('Raport strategiczny — ' + prodName)) + '</h2>' +
+            '<p class="tabpane__sub">Dedykowany przewodnik: jak wprowadzić ten produkt na rynek, zbudować markę i skalować sprzedaż — na realnym researchu.</p></div>';
 
         var r = state.raport;
         if (!r) {
@@ -8695,7 +8695,12 @@
             return;
         }
 
-        var dla = (typeof r.dla === 'string' && r.dla.trim()) ? r.dla.trim() : (state.name || '');
+        // Imię z konta/bramki ma pierwszeństwo nad „dla" zapisanym w raporcie (model
+        // przy braku imienia wpisuje placeholder „klient" — wtedy linię chowamy).
+        var rdla = (typeof r.dla === 'string') ? r.dla.trim() : '';
+        var rdlaLow = rdla.toLowerCase();
+        var dla = (state.name && state.name.trim()) ? state.name.trim()
+            : ((rdla && rdlaLow !== 'klient' && rdlaLow !== '(klient)' && rdlaLow !== 'kliencie') ? rdla : '');
         var sekcje = Array.isArray(r.sekcje) ? r.sekcje : [];
         var srcs = Array.isArray(r.zrodla) ? r.zrodla.filter(function (s) { return s && s.url; }) : [];
 
