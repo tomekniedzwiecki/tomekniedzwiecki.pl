@@ -8576,8 +8576,8 @@
                 dots += '<i' + (di < youCount ? ' class="is-you"' : '') + ' style="transition-delay:' + (di * 9) + 'ms"></i>';
             }
             var cap = youCount === 1
-                ? '<b>Zielona kropka</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby przejąć stery.'
-                : '<b>Zielone kropki</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby przejąć stery.';
+                ? '<b>Zielona kropka</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby ten sklep zaczął zarabiać.'
+                : '<b>Zielone kropki</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby ten sklep zaczął zarabiać.';
             html += rkSec('nisza', 'Wielkość niszy', 'ilu potencjalnych klientów działa w Polsce — i jak mało z nich potrzebujesz',
                 '<div class="rk-niche"><div>' +
                 '<div class="rk-niche__num">' + esc(r.rynek.liczba || '—') + '</div>' +
@@ -8598,7 +8598,7 @@
                     (c.luka ? '<p class="rk-comp__gap"><span>Czego brakuje — Twoje wejście</span>' + escMd(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
                     '</div>';
             }).join('');
-            html += rkSec('konkurencja', 'Konkurencja', konk.length + ' ' + (konk.length === 1 ? 'narzędzie' : konk.length < 5 ? 'narzędzia' : 'narzędzi') + ' na rynku — i czego każdemu brakuje',
+            html += rkSec('konkurencja', 'Konkurencja', 'kto już to sprzedaje — i gdzie każdy zostawia Ci otwarte wejście',
                 '<div class="rk-comps">' + cards + '</div>');
         }
 
