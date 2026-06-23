@@ -1809,6 +1809,17 @@
     }
     .rk-sec__head h3 { font-size: 17.5px; font-weight: 800; color: var(--text-strong); margin: 0; }
     .rk-sec__head h3 span { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
+    .rkg-for { font-size: 12.5px; color: var(--text-muted); margin-bottom: 10px; }
+    .rkg-for b { color: var(--accent); }
+    .rkg-lead { font-size: 16px; line-height: 1.6; color: var(--text-strong); font-weight: 500; margin: 0; }
+    .rkg-body { font-size: 14.5px; line-height: 1.7; color: #cfcfd6; }
+    .rkg-body h3 { font-size: 15px; font-weight: 700; color: var(--text-strong); margin: 16px 0 6px; }
+    .rkg-body ul, .rkg-body ol { margin: 6px 0 6px 2px; padding-left: 18px; }
+    .rkg-body li { margin: 4px 0; }
+    .rkg-body p { margin: 9px 0; }
+    .rkg-body strong, .rkg-body b { color: var(--text-strong); }
+    .rkg-names { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .rkg-name { font-size: 13px; font-weight: 700; color: var(--accent); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); border-radius: 999px; padding: 6px 14px; }
     /* Werdykt: teza serifem + zegar potencjału */
     .rk-hero {
         position: relative;
@@ -5869,6 +5880,7 @@
         };
         persistSession();
         renderChosenProduct();
+        kickReport(false);   // raport strategiczny startuje od razu po wyborze (w tle)
     }
     function renderChosenProduct() {
         var box = el('side-chosen'); if (!box) return;
@@ -6853,8 +6865,8 @@
         ekrany: function () { return lightboxItems().length > 0 || Object.keys(state.previewHistory || {}).length > 0; },
         karta: function () { return kartaVersions().length > 0; },
         plan: function () { return !!state.bizplan; },
-        // rynek pokazuje raport dopiero po zielonym werdykcie + karcie (patrz renderPaneRynek)
-        rynek: function () { return state.verdict === 'zielony' && !!state.karta && !!state.raport; },
+        // rynek: raport strategiczny generowany po wyborze produktu (picker-first)
+        rynek: function () { return !!state.raport; },
         economics: function () { return !!state.economics; },
         gtm: function () { return !!state.gtm; },
         reklamy: function () { return !!(state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy) && state.gtm.pakiet.reklamy.length); },
@@ -7082,6 +7094,58 @@
             if (activeTab === 'rynek') renderPaneRynek();
             if (activeTab === 'projekt') renderPaneProjekt();
         });
+    }
+
+    // PICKER-FIRST: raport strategiczny generujemy ZARAZ po wyborze produktu (w tle),
+    // bez czekania na werdykt. Bazuje na wybranym produkcie + imieniu (jeśli znane).
+    function kickReport(force) {
+        if (!state.chosenProduct || !state.sessionId) return;
+        if (extras.raport === 'gen') return;
+        if (!force && state.raport) return;
+        extras.raport = 'gen'; extrasStart.raport = Date.now();
+        var sid = state.sessionId;
+        if (activeTab === 'rynek') renderPaneRynek();
+        fetch(SPAR_RAPORT_ENDPOINT, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ sessionId: sid, force: !!force, product: state.chosenProduct, recipient: state.name || '' })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+            .then(function (res) {
+                if (state.sessionId !== sid) return;
+                if (res.ok && res.d && res.d.raport) {
+                    state.raport = res.d.raport; persistSession(); extras.raport = 'idle';
+                    updateSideBadges();
+                    if (activeTab === 'rynek') renderPaneRynek();
+                    if (activeTab === 'projekt') renderPaneProjekt();
+                    showRaportReadyModal();
+                } else if (res.ok && res.d && res.d.pending) {
+                    setTimeout(function () {
+                        if (state.sessionId === sid && !state.raport && extras.raport === 'gen') { extras.raport = 'idle'; kickReport(false); }
+                    }, 120000);
+                } else {
+                    extras.raport = 'fail'; updateSideBadges();
+                    if (activeTab === 'rynek') renderPaneRynek();
+                }
+            }).catch(function () {
+                if (state.sessionId !== sid) return;
+                extras.raport = 'fail';
+                if (activeTab === 'rynek') renderPaneRynek();
+            });
+    }
+    function showRaportReadyModal() {
+        if (el('raport-ready')) return;
+        var ov = document.createElement('div');
+        ov.className = 'auth-modal'; ov.id = 'raport-ready'; ov.hidden = false;
+        ov.innerHTML =
+            '<div class="auth-modal__card">' +
+            '<div class="auth-modal__title">Twój raport strategiczny jest gotowy</div>' +
+            '<p class="auth-modal__sub">Przygotowałem dedykowaną analizę Twojego produktu — rynek i potencjał, grupa docelowa, marka, plan marketingowy i skalowanie. Możesz się z nim teraz zapoznać.</p>' +
+            '<button type="button" class="btn" id="rr-open" style="width:100%;margin-top:8px">Zobacz raport</button>' +
+            '<button type="button" id="rr-close" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:var(--text-muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline">Później</button>' +
+            '</div>';
+        document.body.appendChild(ov);
+        el('rr-open').addEventListener('click', function () { ov.remove(); switchTab('rynek'); });
+        el('rr-close').addEventListener('click', function () { ov.remove(); });
+        ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });
     }
 
     // (Grafiki „marka istnieje" — sklep/telefon — wycofane decyzją Tomka
@@ -8135,27 +8199,26 @@
                     '</div>';
             }
 
-            // RAPORT — ocena potencjału (klik → zakładka Potencjał rynku)
-            if (!revUnlocked('rynek')) {
-                tiles += lockedTile(PJ_ICONS.raport, REV_TEASER.rynek[0], REV_TEASER.rynek[1]);
-            } else if (state.raport) {
-                var oc = typeof state.raport.ocena_potencjalu === 'string' ? state.raport.ocena_potencjalu : '';
-                tiles += '<button type="button" class="pjd-tile pjd-tile--w3 pjd-tile--bg' + (oc === 'wysoki' ? ' pjd-tile--rynek-hi' : '') + '" data-pjd-rynek>' +
+            // RAPORT STRATEGICZNY (klik → zakładka Raport)
+            if (state.raport) {
+                tiles += '<button type="button" class="pjd-tile pjd-tile--w3 pjd-tile--bg pjd-tile--rynek-hi" data-pjd-rynek>' +
                     marketBg() +
                     pjGoIcon() +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
-                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
-                    (oc ? '<span class="pjd-badge pjd-badge--' + esc(oc) + '">' + esc(oc) + '</span>' : '') +
-                    (state.raport.teza ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.teza) + '</span>' : '') +
+                    '<span class="pjd-tile__t">Raport strategiczny</span>' +
+                    '<span class="pjd-badge pjd-badge--wysoki">gotowy</span>' +
+                    (state.raport.lead ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.lead) + '</span>' : '') +
                     '</button>';
-            } else {
+            } else if (state.chosenProduct) {
                 tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
-                    '<span class="pjd-tile__t">Potencjał rynku</span>' +
+                    '<span class="pjd-tile__t">Raport strategiczny</span>' +
                     (extras.raport === 'fail'
                         ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się przygotować raportu.</b><button type="button" class="preview-retry" data-retry="raport">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('raport', 'Sprawdzam Twój rynek w internecie…', 'konkurenci, ceny, wielkość niszy — realny research')) +
+                        : genProgressHTML('raport', 'Przygotowuję Twój raport strategiczny…', 'rynek, grupa, marka, plan, skalowanie — realny research')) +
                     '</div>';
+            } else {
+                tiles += lockedTile(PJ_ICONS.raport, 'Raport strategiczny', 'Wybierz produkt, a przygotuję pełną analizę i strategię.');
             }
 
             // CZY TO SIĘ SPINA — unit economics (klik → detal z suwakami)
@@ -8488,7 +8551,7 @@
                 else if (kind === 'economics') { extras.economics = 'idle'; ensureEconomics(false); }
                 else if (kind === 'gtm') { extras.gtm = 'idle'; if (state.gtm) regenChannels(); else ensureGtm(true); }
                 else if (kind === 'ads') { extras.reklamy = 'idle'; regenAds(); }
-                else if (kind === 'raport') { extras.raport = 'idle'; ensureRaport(false); }
+                else if (kind === 'raport') { extras.raport = 'idle'; kickReport(true); }
                 else { extras.summary = 'idle'; ensureSummaryImage(false); }
                 renderPaneProjekt();
             });
@@ -8597,138 +8660,54 @@
             '<h2 class="tabpane__title">' + esc(nazwa) + ' na tle rynku</h2>' +
             '<p class="tabpane__sub">Realny research z internetu: wielkość niszy, konkurenci z cenami, trendy. Każda liczba ma podlinkowane źródło.</p></div>';
 
-        if (state.verdict !== 'zielony' || !state.karta) {
-            body.innerHTML = head +
-                '<div class="tabpane__empty">Raport przygotuje się automatycznie, gdy domkniemy projekt w rozmowie.<br>' +
-                '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
-            body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
-            return;
-        }
-        if (!revUnlocked('rynek') && !state.raport) {
-            body.innerHTML = head + lockedView('rynek');
-            return;
-        }
         var r = state.raport;
         if (!r) {
+            if (!state.chosenProduct) {
+                body.innerHTML = head +
+                    '<div class="tabpane__empty">Najpierw wybierz produkt w rozmowie — wtedy przygotuję dla Ciebie pełny raport strategiczny.<br>' +
+                    '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
+                body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
+                return;
+            }
             if (extras.raport === 'fail') {
                 body.innerHTML = head +
                     '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować raportu.</b>' +
                     '<span>Spróbuj jeszcze raz — research trwa około 2 minut.</span></div>' +
                     '<button type="button" class="preview-retry" id="rk-retry">Spróbuj ponownie</button></div>';
-                el('rk-retry').addEventListener('click', function () { extras.raport = 'idle'; ensureRaport(false); });
+                el('rk-retry').addEventListener('click', function () { extras.raport = 'idle'; kickReport(true); });
             } else {
-                ensureRaport(false);
+                if (extras.raport !== 'gen') kickReport(false);
                 body.innerHTML = head +
-                    genProgressHTML('raport', 'Sprawdzam Twój rynek w internecie…', 'konkurenci i ich ceny, wielkość niszy, trendy — to realne wyszukiwanie');
+                    genProgressHTML('raport', 'Przygotowuję Twój raport strategiczny…', 'analiza produktu, rynku PL, konkurencji, marki i skalowania — realny research w internecie');
                 startPjTicker();
             }
             return;
         }
 
-        var srcMap = {};
-        (Array.isArray(r.zrodla) ? r.zrodla : []).forEach(function (s) {
-            if (s && s.nr != null) srcMap[s.nr] = s;
-        });
-        var oc = (typeof r.ocena_potencjalu === 'string' && /^(wysoki|umiarkowany|niszowy)$/.test(r.ocena_potencjalu))
-            ? r.ocena_potencjalu : '';
-        var hasRynek = r.rynek && typeof r.rynek === 'object';
-        var konk = Array.isArray(r.konkurenci) ? r.konkurenci.filter(function (c) { return c && typeof c === 'object'; }).slice(0, 6) : [];
-        var trendy = Array.isArray(r.trendy) ? r.trendy.filter(function (t) { return t && typeof t === 'object'; }).slice(0, 4) : [];
-        var wnioski = Array.isArray(r.co_to_oznacza) ? r.co_to_oznacza.slice(0, 6) : [];
+        var dla = (typeof r.dla === 'string' && r.dla.trim()) ? r.dla.trim() : (state.name || '');
+        var sekcje = Array.isArray(r.sekcje) ? r.sekcje : [];
         var srcs = Array.isArray(r.zrodla) ? r.zrodla.filter(function (s) { return s && s.url; }) : [];
 
         var html = head;
+        html += '<section class="rk-sec rk-reveal">' +
+            (dla ? '<div class="rkg-for">Raport przygotowany dla: <b>' + esc(dla) + '</b></div>' : '') +
+            (r.lead ? '<p class="rkg-lead">' + escMd(r.lead) + '</p>' : '') + '</section>';
 
         var rkNo = 0;
-        function rkSec(id, title, sub, inner) {
+        sekcje.forEach(function (sx) {
+            if (!sx || !sx.tytul) return;
             rkNo++;
-            return '<section class="rk-sec rk-reveal" id="rk-sec-' + id + '">' +
-                '<div class="rk-sec__head"><span class="rk-sec__no" aria-hidden="true">' + (rkNo < 10 ? '0' + rkNo : rkNo) + '</span>' +
-                '<h3>' + title + '<span>' + sub + '</span></h3></div>' + inner + '</section>';
-        }
-
-        // 1. WERDYKT — teza serifem + zegar potencjału (łuk SVG, długość 264)
-        html += '<section class="rk-sec rk-reveal" id="rk-sec-werdykt"><div class="rk-hero">' +
-            '<div><p class="rk-hero__teza">' + escMd(r.teza || '') + '</p>' +
-            (r.ocena_uzasadnienie ? '<p class="rk-hero__why">' + escMd(r.ocena_uzasadnienie) + '</p>' : '') +
-            '</div>' +
-            '<div class="rk-gauge rk-gauge--' + (oc || 'brak') + '" role="img" aria-label="Potencjał projektu: ' + esc(oc || 'w ocenie') + '">' +
-            '<svg viewBox="0 0 200 116" aria-hidden="true">' +
-            '<path class="rk-gauge__track" d="M16 108 A 84 84 0 0 1 184 108"></path>' +
-            '<path class="rk-gauge__fill" d="M16 108 A 84 84 0 0 1 184 108"></path>' +
-            '</svg>' +
-            '<div class="rk-gauge__val">' + esc(oc || 'w ocenie') + '</div>' +
-            '<div class="rk-gauge__cap">potencjał projektu</div>' +
-            '</div></div></section>';
-
-        // 2. NISZA — liczba + siatka 100 kropek przeliczona na cel 50 klientów
-        if (hasRynek) {
-            var low = rkParseLow(r.rynek.liczba);
-            var youCount = 1, pctTxt = '';
-            if (low) {
-                var pct = 50 / low * 100;
-                pctTxt = pct < 0.1 ? 'mniej niż 0,1%'
-                    : 'ok. ' + (pct < 1 ? pct.toFixed(1).replace('.', ',') : String(Math.round(pct))) + '%';
-                youCount = Math.min(100, Math.max(1, Math.round(pct)));
+            var inner = '<div class="rkg-body">' + renderRich(String(sx.tresc || '')) + '</div>';
+            if (Array.isArray(sx.nazwy) && sx.nazwy.length) {
+                inner += '<div class="rkg-names">' + sx.nazwy.slice(0, 8).map(function (nm) {
+                    return '<span class="rkg-name">' + esc(String(nm)) + '</span>';
+                }).join('') + '</div>';
             }
-            var dots = '';
-            for (var di = 0; di < 100; di++) {
-                dots += '<i' + (di < youCount ? ' class="is-you"' : '') + ' style="transition-delay:' + (di * 9) + 'ms"></i>';
-            }
-            var cap = youCount === 1
-                ? '<b>Zielona kropka</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby ten sklep zaczął zarabiać.'
-                : '<b>Zielone kropki</b> = Twoje pierwsze 50 płacących klientów' + (pctTxt ? ' — ' + pctTxt + ' tej niszy' : '') + '. Tyle wystarczy, żeby ten sklep zaczął zarabiać.';
-            html += rkSec('nisza', 'Wielkość niszy', 'ilu potencjalnych klientów działa w Polsce — i jak mało z nich potrzebujesz',
-                '<div class="rk-niche"><div>' +
-                '<div class="rk-niche__num">' + esc(r.rynek.liczba || '—') + '</div>' +
-                '<div class="rk-niche__kogo">' + esc(r.rynek.kogo || '') + '</div>' +
-                (r.rynek.opis ? '<p class="rk-niche__desc">' + escMd(r.rynek.opis) + rkRefs(r.rynek.zrodla, srcMap) + '</p>' : '') +
-                '</div><div class="rk-dots"><div class="rk-dots__grid" aria-hidden="true">' + dots + '</div>' +
-                '<p class="rk-dots__cap">' + cap + '</p></div></div>');
-        }
+            html += '<section class="rk-sec rk-reveal"><div class="rk-sec__head">' +
+                '<span class="rk-sec__no" aria-hidden="true">' + (rkNo < 10 ? '0' + rkNo : rkNo) + '</span>' +
+                '<h3>' + esc(sx.tytul) + '</h3></div>' + inner + '</section>';
+        });
 
-        // 3. KONKURENCJA — karty: cena chipem, luka jako „Twoje wejście"
-        if (konk.length) {
-            var cards = konk.map(function (c) {
-                return '<div class="rk-comp">' +
-                    '<div class="rk-comp__top"><b>' + esc(c.nazwa || '') + '</b>' +
-                    (c.kraj ? '<span class="rk-comp__kraj">' + esc(c.kraj) + '</span>' : '') + '</div>' +
-                    (c.cena ? '<span class="rk-comp__price">' + esc(c.cena) + '</span>' : '') +
-                    (c.czym_jest ? '<p class="rk-comp__what">' + escMd(c.czym_jest) + '</p>' : '') +
-                    (c.luka ? '<p class="rk-comp__gap"><span>Czego brakuje — Twoje wejście</span>' + escMd(c.luka) + rkRefs(c.zrodla, srcMap) + '</p>' : '') +
-                    '</div>';
-            }).join('');
-            html += rkSec('konkurencja', 'Konkurencja', 'kto już to sprzedaje — i gdzie każdy zostawia Ci otwarte wejście',
-                '<div class="rk-comps">' + cards + '</div>');
-        }
-
-        // 4. OKNO RYNKOWE — spotlight z radarem (bez numerowanego nagłówka)
-        if (r.luka_rynkowa) {
-            html += '<section class="rk-sec rk-reveal" id="rk-sec-okno"><div class="rk-window">' +
-                '<i class="rk-ring" aria-hidden="true"></i><i class="rk-ring" aria-hidden="true"></i>' +
-                '<span class="rk-window__label">' +
-                pjIco('<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>') +
-                'Okno rynkowe</span>' +
-                '<p>' + escMd(r.luka_rynkowa) + '</p></div></section>';
-        }
-
-        // 5. TRENDY — karty z numerem-duchem
-        if (trendy.length) {
-            var tcards = trendy.map(function (t, ti) {
-                return '<div class="rk-trend"><span class="rk-trend__no" aria-hidden="true">0' + (ti + 1) + '</span>' +
-                    '<b>' + esc(t.tytul || '') + '</b>' +
-                    (t.opis ? '<p>' + escMd(t.opis) + rkRefs(t.zrodla, srcMap) + '</p>' : '') + '</div>';
-            }).join('');
-            html += rkSec('trendy', 'Trendy wokół projektu', 'co się dzieje na rynku — z liczbami', '<div class="rk-trends">' + tcards + '</div>');
-        }
-
-        // 6. WNIOSKI — ponumerowana lista
-        if (wnioski.length) {
-            html += rkSec('wnioski', 'Co to oznacza dla projektu', 'wnioski z researchu — dla pierwszej wersji i sprzedaży',
-                '<ul class="rk-means">' + wnioski.map(function (x) { return '<li>' + escMd(x) + '</li>'; }).join('') + '</ul>');
-        }
-
-        // 7. ŹRÓDŁA
         if (srcs.length) {
             html += '<section class="rk-sec" id="rk-sec-zrodla"><details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
                 srcs.map(function (s) {
@@ -8736,7 +8715,7 @@
                 }).join('') + '</ol></details></section>';
         }
 
-        html += '<div class="pj-plan__note">Wstępny research przygotowany automatycznie na podstawie publicznych źródeł. Pełną analizę rynku i plan przedsięwzięcia przygotowuje Tomek po rezerwacji rozmowy.</div>';
+        html += '<div class="pj-plan__note">Raport przygotowany automatycznie na podstawie publicznych źródeł. Pełną strategię i plan wdrożenia dopracujesz z Tomkiem po rezerwacji.</div>';
 
         body.innerHTML = html;
 
