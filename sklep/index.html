@@ -8883,7 +8883,7 @@
     }
     // Pełnoekranowy podgląd = mini-przeglądarka produktu: wideo + statystyki + akcje
     // (Wybieram / Potencjał) + nawigacja ‹ › po kolejnych produktach (z przeskokiem stron).
-    function openLightbox(idx) {
+    function openProductLightbox(idx) {
         injectVpStyle();
         var items = VP_STATE.items || [];
         if (!items.length) return;
@@ -9027,10 +9027,10 @@
             if (ct) { VP_STATE.cat = ct.getAttribute('data-cat') || ''; VP_STATE.page = 0; vpFetch(wrap); return; }
             var mr = e.target.closest('.vp-more');
             if (mr) { VP_STATE.page = VP_STATE.hasMore ? VP_STATE.page + 1 : 0; vpFetch(wrap); return; }
-            var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openLightbox(+fs.getAttribute('data-idx')); return; }
+            var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openProductLightbox(+fs.getAttribute('data-idx')); return; }
             var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct(VP_STATE.items[+pk.getAttribute('data-idx')]); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
             var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
-            var v = e.target.closest('.vp-vid'); if (v) { openLightbox(+v.getAttribute('data-idx')); return; }
+            var v = e.target.closest('.vp-vid'); if (v) { openProductLightbox(+v.getAttribute('data-idx')); return; }
         });
         vpFetch(wrap);
     }
