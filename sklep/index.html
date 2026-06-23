@@ -9195,6 +9195,8 @@
         VP_STATE.shortlist = []; VP_STATE.seen = {};
         var k = slStoreKey(); if (k) { try { localStorage.removeItem(k); } catch (e) {} }
         var b = el('sl-bar'); if (b) b.remove();
+        // zdejmij zielony pierścień rekomendacji (<wskaz>) z poprzedniej tury
+        try { Array.prototype.forEach.call(document.querySelectorAll('.vp-card--rec'), function (c) { c.classList.remove('vp-card--rec'); }); } catch (e) {}
     }
     // Oznacz produkt jako obejrzany (lightbox / double-tap) → licznik eksploracji.
     // (vp* prefiks: globalny markSeen(view) jest już zajęty przez zakładki projektu)
