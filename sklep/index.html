@@ -7122,7 +7122,10 @@
                     return;
                 }
                 if (res.ok && res.d && res.d.pending) {
-                    setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, false, 0); }, 120000);
+                    // generowanie w tle (serwer) — dociągaj co 15s aż raport się zapisze (cap ~6 min)
+                    if (attempt < 26) {
+                        setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, false, attempt + 1); }, 15000);
+                    } else { extras.raport = 'fail'; updateSideBadges(); if (activeTab === 'rynek') renderPaneRynek(); }
                     return;
                 }
                 // Sesja jeszcze nie istnieje na serwerze (404) — bud-chat tworzy ją po 1. wiadomości. Ponów.
