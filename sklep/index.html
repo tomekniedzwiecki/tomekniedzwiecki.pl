@@ -5889,7 +5889,7 @@
                   '<span><b>' + fmtVP(c.saves) + '</b> zapisów</span>' +
                   '<span><b>' + fmtVP(c.plays) + '</b> wyświetleń</span>' +
                 '</div>' +
-                (c.price ? '<div class="chosen__price">Cena det.: ' + esc(c.price) + '</div>' : '') +
+                (c.newest_days != null ? '<div class="chosen__price">🔥 viral z ostatnich ' + c.newest_days + ' dni</div>' : '') +
               '</div>' +
             '</div>';
     }
