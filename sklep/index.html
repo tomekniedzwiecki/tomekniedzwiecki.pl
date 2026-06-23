@@ -5470,9 +5470,9 @@
 
     // Otwarcie: lekkie, z obietnicą (podgląd sklepu za parę minut), zero progów
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
-    var OPENER_PROMISE = 'Krótka, konkretna rozmowa — a po kilku minutach zobaczysz **pierwszy szkic swojego sklepu**.\n\nOd czego zaczynamy?';
+    var OPENER_PROMISE = 'Który bierzemy?';
 
-    var OPENER_GENERIC = OPENER_HI + '\n\nZbudujemy razem Twój biznes online — od produktu i niszy po sklep, który realnie sprzedaje.\n\n' + OPENER_PROMISE;
+    var OPENER_GENERIC = OPENER_HI + '\n\nTomek od 15 lat buduje sklepy internetowe **razem z ludźmi** — uczy ich prowadzić biznes i zostaje wspólnikiem, gdy zaczyna zarabiać. Wszystko zaczyna się od jednej rzeczy: **dobrego produktu**.\n\nDlatego przejrzałem **setki tysięcy filmów na TikToku** i wyłowiłem te, które sprzedają się właśnie teraz — z nimi start jest po prostu łatwiejszy. Poniżej masz kilka z nich.\n\n**Wybierz jeden, który Cię ciekawi** — spokojnie, bez ślęczenia: to dopiero **pierwszy z wielu produktów**, które razem wprowadzimy. Na nim po prostu pokażę Ci, jak to działa: zrobimy **badanie rynku**, **branding** i **stronę sprzedażową**, żebyś zobaczył jego pełny potencjał na własne oczy.\n\n' + OPENER_PROMISE;
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
     var START_CHIPS = [
@@ -8674,59 +8674,115 @@
 
     // Otwarcie rozmowy — lokalne (zero API), dopasowane do ?p= z reklamy
     function addOpener() {
-        var o = state.pSlug && P_OPENERS[state.pSlug] ? P_OPENERS[state.pSlug] : null;
-        messages.push({ role: 'assistant', content: o ? o.opener : OPENER_GENERIC, local: true });
+        // Nowe flow: zawsze ten sam wstęp prowadzący do wyboru viralowego produktu
+        // (koniec routingu po zainteresowaniach z reklamy ?p=).
+        messages.push({ role: 'assistant', content: OPENER_GENERIC, local: true });
     }
 
     // EKRAN WYBORU 3 KIERUNKÓW (start świeżej rozmowy). Karty reużywają stylu
     // kierunków (.kr/.kr-card) → łapią paletę AWE. Wrapper ma id 'qr-chips',
     // więc istniejące sprzątanie (removeChips/fadeRemoveChips, guardy
     // `if (el('qr-chips'))` oraz auto-send ze strony głównej) działa bez zmian.
-    function renderStartKierunkiEl() {
-        var wrap = document.createElement('div');
-        wrap.className = 'kr kr--start';
-        wrap.id = 'qr-chips';
+    // ── NOWE FLOW: wybór 1 z viralowych produktów (video TikTok + dane) zamiast kierunków ──
+    var VP_ENDPOINT = SB_URL + '/functions/v1/bud-tt-featured';
+    var VP_STYLE_DONE = false;
+    function injectVpStyle() {
+        if (VP_STYLE_DONE) return; VP_STYLE_DONE = true;
+        var s = document.createElement('style');
+        s.textContent = `
+        .vp{width:100%;max-width:660px;margin:8px auto 0}
+        .vp-load{color:var(--text-muted);font-size:14px;padding:16px 0;text-align:center}
+        .vp-cap{font-size:12.5px;color:var(--text-muted);margin:2px 0 13px;text-align:center;line-height:1.45}
+        .vp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+        @media(max-width:560px){.vp-grid{grid-template-columns:repeat(2,1fr)}}
+        .vp-card{border:1px solid var(--glass-border);border-radius:14px;background:#0b0b0b;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+        .vp-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+        .vp-vid{position:relative;width:100%;aspect-ratio:9/16;background:#000;cursor:pointer}
+        .vp-vid img{width:100%;height:100%;object-fit:cover;display:block}
+        .vp-vid .vp-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.42))}
+        .vp-vid .vp-play span{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.5);border:1.5px solid rgba(255,255,255,.62);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;padding-left:3px;backdrop-filter:blur(3px);transition:background .15s,transform .15s}
+        .vp-vid:hover .vp-play span{background:rgba(0,0,0,.74);transform:scale(1.06)}
+        .vp-vid .vp-badge{position:absolute;top:8px;left:8px;font-size:10.5px;font-weight:600;background:rgba(0,0,0,.62);padding:3px 8px;border-radius:6px;color:#fff}
+        .vp-vid .vp-badge.hot{background:var(--accent);color:var(--accent-ink)}
+        .vp-fs{position:absolute;top:8px;right:8px;width:30px;height:30px;border:0;border-radius:7px;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
+        .vp-fs:hover{background:rgba(0,0,0,.82)}
+        .vp-b{padding:11px 12px 12px;display:flex;flex-direction:column;gap:9px;flex:1}
+        .vp-name{font-size:13.5px;font-weight:600;color:var(--text-strong);line-height:1.25}
+        .vp-stats{display:flex;gap:6px;flex-wrap:wrap}
+        .vp-stat{font-size:10.5px;color:var(--text-muted);background:rgba(255,255,255,.04);border:1px solid var(--glass-border);border-radius:6px;padding:2px 7px;white-space:nowrap}
+        .vp-stat b{color:var(--accent);font-weight:700}
+        .vp-pick{margin-top:auto;background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;transition:filter .15s}
+        .vp-pick:hover{filter:brightness(1.08)}
+        .vpm{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
+        .vpm.show{display:flex}
+        .vpm iframe{width:min(380px,94vw);height:min(88vh,660px);border:0;border-radius:16px;background:#000}
+        .vpm-x{position:absolute;top:16px;right:20px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+        .vpm-x:hover{background:rgba(255,255,255,.18)}
+        `;
+        document.head.appendChild(s);
+        var m = document.createElement('div'); m.className = 'vpm'; m.id = 'vpm';
+        m.innerHTML = '<div class="vpm-x" id="vpm-x">✕</div><div id="vpm-body"></div>';
+        m.addEventListener('click', function (e) { if (e.target.id === 'vpm' || e.target.id === 'vpm-x') closeVP(); });
+        document.body.appendChild(m);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeVP(); });
+    }
+    function playVP(vid) {
+        if (!vid) return; injectVpStyle();
+        var src = 'https://www.tiktok.com/player/v1/' + vid + '?music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0&timestamp=0&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=1';
+        el('vpm-body').innerHTML = '<iframe src="' + src + '" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe>';
+        el('vpm').classList.add('show');
+    }
+    function closeVP() { var m = el('vpm'); if (m) { m.classList.remove('show'); el('vpm-body').innerHTML = ''; } }
+    function fmtVP(n) { n = +n || 0; return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1000 ? (n / 1000).toFixed(n >= 1e4 ? 0 : 1) + 'k' : String(n); }
 
-        // Opener (powitanie AI) zadaje już „Od czego zaczynamy?" — karty są
-        // odpowiedzią na to pytanie, więc nie dublujemy nagłówka.
-
-        function pick(send) {
-            return function () {
-                if (streaming || el('inline-gate')) return;
-                fadeRemoveChips();
-                sendOpening(send);
-            };
-        }
-
-        START_KIERUNKI.forEach(function (k, i) {
-            var card = document.createElement('button');
-            card.type = 'button';
-            card.className = 'kr-card kr-start__card';
+    function renderViralProducts(wrap, products) {
+        injectVpStyle();
+        if (!products.length) { wrap.innerHTML = '<div class="vp-load">Chwilowo brak produktów — napisz, a poszukamy razem.</div>'; return; }
+        var grid = document.createElement('div'); grid.className = 'vp-grid';
+        products.forEach(function (p) {
+            var eng = ((p.eng_rate || 0) * 100).toFixed(1) + '%';
+            var hot = p.newest_days != null && p.newest_days <= 14;
+            var card = document.createElement('div'); card.className = 'vp-card';
             card.innerHTML =
-                '<div class="kr-start__k">K' + (i + 1) + '</div>' +
-                '<div class="kr-start__body">' +
-                '<div class="kr-title">' + esc(k.nazwa) + '</div>' +
-                '<div class="kr-opis">' + esc(k.opis) + '</div>' +
+                '<div class="vp-vid" data-vid="' + esc(p.video_id) + '">' +
+                    (p.cover ? '<img loading="lazy" src="' + esc(p.cover) + '">' : '') +
+                    (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
+                    '<button type="button" class="vp-fs" data-vid="' + esc(p.video_id) + '" aria-label="Pełny ekran">⛶</button>' +
+                    '<div class="vp-play"><span>▶</span></div>' +
                 '</div>' +
-                '<svg class="kr-start__arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>';
-            card.addEventListener('click', pick(k.send));
-            wrap.appendChild(card);
+                '<div class="vp-b">' +
+                    '<div class="vp-name">' + esc(p.name) + '</div>' +
+                    '<div class="vp-stats">' +
+                        '<span class="vp-stat"><b>' + fmtVP(p.saves) + '</b> zapisów</span>' +
+                        '<span class="vp-stat"><b>' + fmtVP(p.plays) + '</b> wyświetleń</span>' +
+                        '<span class="vp-stat"><b>' + fmtVP(p.comments) + '</b> komentarzy</span>' +
+                    '</div>' +
+                    '<button type="button" class="vp-pick" data-pick="' + esc(p.name) + '">Wybieram ten</button>' +
+                '</div>';
+            grid.appendChild(card);
         });
-
-        var own = document.createElement('button');
-        own.type = 'button';
-        own.className = 'qr-own kr-own';
-        own.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>albo napisz po swojemu';
-        own.addEventListener('click', function () { if (el('inline-gate')) return; el('chat-input').focus(); });
-        wrap.appendChild(own);
-        return wrap;
+        var cap = document.createElement('div'); cap.className = 'vp-cap';
+        cap.textContent = 'Kliknij ▶, żeby obejrzeć film. Wybierz ten, który Cię ciekawi — kolejne dorzucimy po drodze.';
+        wrap.innerHTML = ''; wrap.appendChild(cap); wrap.appendChild(grid);
+        wrap.addEventListener('click', function (e) {
+            var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); playVP(fs.getAttribute('data-vid')); return; }
+            var v = e.target.closest('.vp-vid'); if (v) { playVP(v.getAttribute('data-vid')); return; }
+            var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; fadeRemoveChips(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+        });
     }
 
-    // Start świeżej rozmowy: zamiast chipów Aplikacji pokazujemy 3 karty kierunków.
+    // Start świeżej rozmowy: pokazujemy viralowe produkty do wyboru (pobierane z bud-tt-featured).
     function renderChips() {
         if (el('qr-chips')) return;
-        el('chat-msgs').appendChild(renderStartKierunkiEl());
-        scrollToBottom(false);
+        injectVpStyle();
+        var wrap = document.createElement('div'); wrap.className = 'vp'; wrap.id = 'qr-chips';
+        wrap.innerHTML = '<div class="vp-load">Ładuję viralowe produkty z TikToka…</div>';
+        el('chat-msgs').appendChild(wrap); scrollToBottom(false);
+        fetch(VP_ENDPOINT + '?n=5').then(function (r) { return r.json(); }).then(function (j) {
+            if (!el('qr-chips')) return;
+            renderViralProducts(wrap, (j && j.products) || []);
+            scrollToBottom(false);
+        }).catch(function () { if (el('qr-chips')) wrap.innerHTML = '<div class="vp-load">Nie udało się załadować — napisz, a poszukamy razem.</div>'; });
     }
     function removeChips() {
         var c = el('qr-chips');
