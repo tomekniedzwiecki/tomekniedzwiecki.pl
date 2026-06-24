@@ -1845,6 +1845,44 @@
     .lpm-x { width: 38px; height: 38px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; font-size: 20px; cursor: pointer; }
     .lpm-body { flex: 1; overflow: auto; background: #fff; }
     .lpm-body iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+    .lpm-body--img { background: #0a0a0a; display: flex; align-items: flex-start; justify-content: center; padding: 24px; }
+    .lpm-body--img img { max-width: 420px; width: 100%; height: auto; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); }
+
+    /* ── PIPELINE ETAP 2 — picker makiet (4 style), ustalenia, sklep ── */
+    .mk-set { display: flex; flex-direction: column; gap: 6px; }
+    .mk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 620px) { .mk-grid { grid-template-columns: 1fr; } }
+    .mk-card {
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        background: #0b0b0b;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease), transform 0.18s var(--ease);
+    }
+    .mk-card:hover { border-color: var(--text-muted); }
+    .mk-card.is-chosen { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 18px 40px -18px rgba(0, 217, 126, 0.5); }
+    .mk-card__img { position: relative; aspect-ratio: 3 / 4; background: linear-gradient(150deg, #1b1b1f, #0a0a0a); overflow: hidden; }
+    .mk-card__img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+    .mk-card__img.mk-noimg::after { content: 'Podgląd makiety'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12.5px; }
+    .mk-zoom { position: absolute; top: 9px; right: 9px; width: 32px; height: 32px; border: 0; border-radius: 8px; background: rgba(0, 0, 0, 0.55); color: #fff; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+    .mk-zoom:hover { background: rgba(0, 0, 0, 0.82); }
+    .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
+    .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
+    .mk-card__brief { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+    .mk-pick { margin-top: auto; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 11px; padding: 12px; font-size: 13.5px; font-weight: 800; cursor: pointer; transition: filter 0.15s; }
+    .mk-pick:hover { filter: brightness(1.08); }
+    .mk-card.is-chosen .mk-pick { background: rgba(0, 217, 126, 0.16); color: var(--accent); cursor: default; }
+    .mk-gennote { margin-top: 16px; font-size: 13px; color: var(--text-muted); text-align: center; }
+    .mk-card--skel .mk-card__img { display: flex; align-items: center; justify-content: center; }
+    .mk-skel-line { height: 13px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); width: 70%; }
+    .mk-skel-btn { height: 40px; border-radius: 11px; background: rgba(255, 255, 255, 0.05); margin-top: auto; }
+    .sk-frame-wrap { border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; background: #fff; height: min(72vh, 760px); }
+    .sk-frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+    .sk-actions { display: flex; justify-content: center; margin-top: 16px; }
+
     /* Werdykt: teza serifem + zegar potencjału */
     .rk-hero {
         position: relative;
@@ -5360,6 +5398,23 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
                 <span class="side__label">Potencjał rynku</span><span class="side__status" data-status-for="rynek" hidden></span>
             </button>
+            <!-- PIPELINE ETAP 2 — sekwencyjne zakładki (odsłaniane po kolei) -->
+            <button type="button" class="side__item" data-tab="ustalenia" data-view="ustalenia" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"></path><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"></path></svg>
+                <span class="side__label">Ustalenia</span><span class="side__status" data-status-for="ustalenia" hidden></span>
+            </button>
+            <button type="button" class="side__item" data-tab="makiety" data-view="makiety" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+                <span class="side__label">Makiety</span><span class="side__status" data-status-for="makiety" hidden></span>
+            </button>
+            <button type="button" class="side__item" data-tab="reklamy" data-view="reklamy-tab" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <span class="side__label">Reklamy</span><span class="side__status" data-status-for="reklamy-tab" hidden></span>
+            </button>
+            <button type="button" class="side__item" data-tab="sklep" data-view="sklep" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M9 13h6"></path></svg>
+                <span class="side__label">Sklep</span><span class="side__status" data-status-for="sklep" hidden></span>
+            </button>
             <button type="button" class="side__item" data-tab="projekt" data-pjview="economics" data-view="economics" hidden>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                 <span class="side__label">Czy to zarabia</span><span class="side__status" data-status-for="economics" hidden></span>
@@ -5442,6 +5497,10 @@
         <!-- Zakładki projektu (projekt = karta + ekrany / potencjał rynku / współpraca) -->
         <div class="tabpane" id="pane-projekt"><div class="tabpane__inner" id="pane-projekt-body"></div></div>
         <div class="tabpane" id="pane-rynek"><div class="tabpane__inner" id="pane-rynek-body"></div></div>
+        <div class="tabpane" id="pane-ustalenia"><div class="tabpane__inner" id="pane-ustalenia-body"></div></div>
+        <div class="tabpane" id="pane-makiety"><div class="tabpane__inner" id="pane-makiety-body"></div></div>
+        <div class="tabpane" id="pane-reklamy"><div class="tabpane__inner" id="pane-reklamy-body"></div></div>
+        <div class="tabpane" id="pane-sklep"><div class="tabpane__inner" id="pane-sklep-body"></div></div>
         <div class="tabpane" id="pane-wspolpraca"><div class="tabpane__inner" id="pane-wspolpraca-body"></div></div>
     </section>
 
@@ -5610,6 +5669,9 @@
         lastBrief: null,        // ostatni brief <projekt> (nazwa/opis do nagłówka zakładki Projekt)
         chosenProduct: null,    // wybrany viralowy produkt z karuzeli (ETAP 1) — karta w sidebarze
         mockupUrl: null,        // pionowy mockup strony sprzedażowej (bud-mockup; cache per-produkt)
+        mockups: null,          // 4 makiety w 4 stylach [{style,label,brief,url}] (bud-mockup; ETAP 2 picker)
+        chosenStyle: null,      // wybrany styl makiety (klucz `style`) — zapisuje serwer, front trzyma lokalnie
+        ustalenia: null,        // ustalenia „dla kogo" (z syncu serwera) — lustro rozmowy w zakładce Ustalenia
         suiteAds: null,         // 4 reklamy (copy+grafika) jako posty FB (bud-ads; cache per-produkt)
         landingHtml: null,      // gotowy landing HTML (bud-landing-gen; cache per-produkt)
         editsUsed: 0,           // wykorzystane rundy poprawek projektu (limit EDIT_ROUNDS_MAX)
@@ -5634,7 +5696,7 @@
     var pendingAuth = null; // {userId, provider, email, name}
     // Dogrywane elementy projektu (pigułka, plan, raport rynku, landing):
     // statusy per aktywna rozmowa — 'idle' | 'gen' | 'fail' (fail = przycisk retry)
-    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle', reklamy: 'idle', gtmBanners: 'idle' };
+    var extras = { summary: 'idle', plan: 'idle', raport: 'idle', landing: 'idle', prototype: 'idle', economics: 'idle', gtm: 'idle', reklamy: 'idle', gtmBanners: 'idle', mockups: 'idle', ads: 'idle', landingTab: 'idle' };
     var activeTab = 'chat';
     // Kropka „nowość" na chipie Przychody, gdy plan policzył się w tle —
     // scroll-spy zdejmuje ją, gdy user doscrolluje do sekcji planu
@@ -5773,6 +5835,9 @@
             lastBrief: state.lastBrief || null,
             chosenProduct: state.chosenProduct || null,
             mockupUrl: state.mockupUrl || null,
+            mockups: state.mockups || null,
+            chosenStyle: state.chosenStyle || null,
+            ustalenia: state.ustalenia || null,
             suiteAds: state.suiteAds || null,
             landingHtml: state.landingHtml || null,
             editsUsed: state.editsUsed || 0,
@@ -5913,9 +5978,19 @@
         slReset();           // finalny wybór — czyść shortlistę/seen i chowaj pasek
         persistSession();
         renderChosenProduct();
+        // SEKWENCJA (nie równolegle): najpierw RAPORT. Reszta etapów (ustalenia → makiety →
+        // reklamy → sklep) odpala się po kolei, każdy po akceptacji poprzedniego.
+        kickSnapshot();      // snapshot aukcji AliExpress w tle (zasili makiety/landing)
         kickReport(false);   // raport strategiczny startuje od razu po wyborze (w tle)
-        kickMockup(false);   // pionowy mockup strony — równolegle (w tle); po jego gotowości rusza landing
-        kickAds(false);      // 4 reklamy (posty FB) — równolegle (w tle)
+    }
+    // Snapshot aukcji AliExpress (tytuł, zdjęcia) — cache po stronie serwera (bud_tt_products).
+    // Sesja powstaje po 1. wiadomości bud-chat → retry na 404.
+    function kickSnapshot(attempt) {
+        attempt = attempt || 0;
+        var c = state.chosenProduct; if (!c || !c.id || !state.sessionId) { if (attempt < 8) setTimeout(function () { kickSnapshot(attempt + 1); }, 3500); return; }
+        fetch(SB_URL + '/functions/v1/bud-ali-snapshot', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: state.sessionId, productKey: c.id }) })
+            .then(function (r) { if ((r.status === 404 || r.status === 400) && attempt < 8) setTimeout(function () { kickSnapshot(attempt + 1); }, 3500); })
+            .catch(function () { if (attempt < 8) setTimeout(function () { kickSnapshot(attempt + 1); }, 3500); });
     }
     function renderChosenProduct() {
         var box = el('side-chosen'); if (!box) return;
@@ -5958,6 +6033,9 @@
         state.lastBrief = saved.lastBrief || null;
         state.chosenProduct = saved.chosenProduct || null;
         state.mockupUrl = saved.mockupUrl || null;
+        state.mockups = saved.mockups || null;
+        state.chosenStyle = saved.chosenStyle || null;
+        state.ustalenia = saved.ustalenia || null;
         state.suiteAds = saved.suiteAds || null;
         state.landingHtml = saved.landingHtml || null;
         renderChosenProduct();
@@ -5982,10 +6060,15 @@
         extras.prototype = 'idle';
         extras.economics = 'idle';
         extras.gtm = 'idle';
+        extras.mockups = 'idle';
+        extras.ads = 'idle';
+        extras.landingTab = 'idle';
         extrasStart = {};
         pjView = 'dash';
         pjNewPlan = false;
         rkNew = false;
+        budNewTabs = {};
+        budSeenTabs = {};
         state.previews = {};
         state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
@@ -6157,6 +6240,44 @@
                 persistSession();
                 changed = true;
             }
+            // ── PIPELINE ETAP 2: ustalenia / chosen_style / makiety / reklamy / landing z serwera ──
+            // (serwer = źródło prawdy; jeśli sync ich nie zwraca, te bloki są no-op,
+            //  a makiety i tak dociągamy pollingiem bud-mockup.)
+            if (p.ustalenia && typeof p.ustalenia === 'object'
+                && JSON.stringify(p.ustalenia) !== JSON.stringify(state.ustalenia)) {
+                state.ustalenia = p.ustalenia;
+                if (activeTab !== 'ustalenia' && !budSeenTabs.ustalenia) budNewTabs.ustalenia = true;
+                persistSession();
+                changed = true;
+            }
+            if (typeof p.chosen_style === 'string' && p.chosen_style && p.chosen_style !== state.chosenStyle) {
+                state.chosenStyle = p.chosen_style;
+                persistSession();
+                changed = true;
+            }
+            if (Array.isArray(p.mockups) && p.mockups.length
+                && JSON.stringify(p.mockups) !== JSON.stringify(state.mockups)) {
+                state.mockups = p.mockups;
+                extras.mockups = 'idle';
+                if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
+                persistSession();
+                changed = true;
+            }
+            var srvAds = Array.isArray(p.session_ads) ? p.session_ads : (Array.isArray(p.ads) ? p.ads : null);
+            if (srvAds && srvAds.length && JSON.stringify(srvAds) !== JSON.stringify(state.suiteAds)) {
+                state.suiteAds = srvAds;
+                extras.ads = 'idle';
+                if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
+                persistSession();
+                changed = true;
+            }
+            if (typeof p.landing_html === 'string' && p.landing_html && p.landing_html !== state.landingHtml) {
+                state.landingHtml = p.landing_html;
+                extras.landingTab = 'idle';
+                if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
+                persistSession();
+                changed = true;
+            }
             if (typeof p.landing_url === 'string' && p.landing_url && p.landing_url !== state.landingUrl) {
                 state.landingUrl = p.landing_url;
                 extras.landing = 'idle';
@@ -6241,6 +6362,10 @@
                 updateConvoMeta();
                 if (activeTab === 'projekt') renderPaneProjekt();
                 if (activeTab === 'rynek') renderPaneRynek();
+                if (activeTab === 'ustalenia') renderPaneUstalenia();
+                if (activeTab === 'makiety') renderPaneMakiety();
+                if (activeTab === 'reklamy') renderPaneReklamy();
+                if (activeTab === 'sklep') renderPaneSklep();
             }
         }).catch(function () { });
     }
@@ -6508,16 +6633,20 @@
         });
     }
     function switchTab(tab) {
-        if (tab === 'rynek' || tab === 'wspolpraca') gaEvent('app_tab_view', { tab: tab });
+        if (tab === 'rynek' || tab === 'wspolpraca' || tab === 'ustalenia' || tab === 'makiety' || tab === 'reklamy' || tab === 'sklep') gaEvent('app_tab_view', { tab: tab });
         activeTab = tab;
         updateSideNav();
         var isPane = tab !== 'chat';
         el('view-chat').classList.toggle('is-pane', isPane);
-        ['projekt', 'rynek', 'wspolpraca'].forEach(function (t) {
+        ['projekt', 'rynek', 'ustalenia', 'makiety', 'reklamy', 'sklep', 'wspolpraca'].forEach(function (t) {
             el('pane-' + t).classList.toggle('is-active', tab === t);
         });
         if (tab === 'projekt') { renderPaneProjekt(); }
         if (tab === 'rynek') { renderPaneRynek(); rkNew = false; if (revAccessible('rynek')) markSeen('rynek'); }
+        if (tab === 'ustalenia') { renderPaneUstalenia(); budSeen('ustalenia'); }
+        if (tab === 'makiety') { renderPaneMakiety(); budSeen('makiety'); }
+        if (tab === 'reklamy') { renderPaneReklamy(); budSeen('reklamy'); }
+        if (tab === 'sklep') { renderPaneSklep(); budSeen('sklep'); }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
         if (tab === 'chat') scrollToBottom(true);
         setTabHash(tab === 'chat' ? '' : tab);
@@ -6539,8 +6668,10 @@
         } catch (e) { }
     }
     function applyHashTab() {
-        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan|economics|gtm))?$/);
+        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|ustalenia|makiety|reklamy|sklep|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan|economics|gtm))?$/);
         if (!m) return;
+        // nowe zakładki pipeline dostępne tylko gdy ich etap aktywny — inaczej hash ignorujemy
+        if ((m[1] === 'ustalenia' || m[1] === 'makiety' || m[1] === 'reklamy' || m[1] === 'sklep') && !budTabVisible(m[1])) return;
         var sub = m[2] === 'marka' ? 'strona' : m[2]; // stare linki #projekt-marka → Twoja strona
         if (m[1] === 'projekt' && sub) pjView = sub; // hash otwiera detal kafla
         switchTab(m[1]); // nadpisze hash samą zakładką…
@@ -6569,6 +6700,7 @@
             b.hidden = !subShow[b.dataset.pjview];
         });
         updateSideStatus();
+        if (typeof updateBudNav === 'function') updateBudNav();   // pipeline ETAP 2 — odsłanianie/statusy nowych zakładek
         var khMode = (state.stage === 'knowhow' || state.stage === 'build');
         // W etapie know-how/budowa „Współpraca" i „Potencjał rynku" zbędne na wierzchu
         // (rynek nadal dostępny z pulpitu Etap 1); „Pulpit projektu" → „Etap 1".
@@ -6938,9 +7070,12 @@
         return null;                                          // brak treści i nic się nie dzieje → brak labela
     }
     var LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+    var BUD_PIPELINE_STATUS = { ustalenia: 1, makiety: 1, 'reklamy-tab': 1, sklep: 1 };
     function updateSideStatus() {
         var anyGen = false;
         document.querySelectorAll('.side__status[data-status-for]').forEach(function (el2) {
+            // statusy zakładek pipeline ETAP 2 są zarządzane przez updateBudNav — pomiń
+            if (BUD_PIPELINE_STATUS[el2.getAttribute('data-status-for')]) return;
             var item = el2.closest('.side__item');
             var st = viewStatus(el2.getAttribute('data-status-for'));
             if (!st) { el2.hidden = true; el2.removeAttribute('title'); if (item) item.classList.remove('is-generating'); return; }
@@ -6971,7 +7106,9 @@
         if (sideGenTimer) return;
         sideGenTimer = setInterval(function () {
             updateSideStatus();
-            var anyGen = Object.keys(GEN_KEY).some(function (v) { return extras[GEN_KEY[v]] === 'gen'; });
+            if (typeof updateBudNav === 'function') updateBudNav();   // pipeline ETAP 2 — odśwież „generuję"
+            var anyGen = Object.keys(GEN_KEY).some(function (v) { return extras[GEN_KEY[v]] === 'gen'; })
+                || extras.mockups === 'gen' || extras.ads === 'gen' || extras.landingTab === 'gen';
             if (!anyGen) { clearInterval(sideGenTimer); sideGenTimer = null; }
         }, 1200);
     }
@@ -7180,46 +7317,9 @@
                 if (activeTab === 'rynek') renderPaneRynek();
             });
     }
-    // #2 MOCKUP strony — pionowy obraz (bud-mockup), generowany w tle równolegle z raportem,
-    // cache per-produkt. Pokazywany na górze zakładki raportu.
+    // #2 MAKIETY — bud-mockup zwraca 4 style {mockups:[...]} (picker w zakładce Makiety).
+    // Endpoint współdzielony; poller/kick są w bloku PIPELINE ETAP 2 (kickMockup/_doMockup4).
     var SPAR_MOCKUP_ENDPOINT = SB_URL + '/functions/v1/bud-mockup';
-    var mockupGen = false;
-    function kickMockup(force) {
-        if (!state.chosenProduct || !state.sessionId) return;
-        if (!force && state.mockupUrl) return;
-        if (mockupGen) return;
-        mockupGen = true;
-        _doMockup(state.sessionId, !!force, 0);
-    }
-    function _doMockup(sid, force, attempt) {
-        fetch(SPAR_MOCKUP_ENDPOINT, {
-            method: 'POST', headers: authHeaders(),
-            body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct })
-        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
-            .then(function (res) {
-                if (state.sessionId !== sid) return;
-                if (res.ok && res.d && res.d.mockup_url) {
-                    state.mockupUrl = res.d.mockup_url; persistSession(); mockupGen = false;
-                    if (activeTab === 'rynek') renderPaneRynek();
-                    kickLanding(false);   // landing korzysta z gotowego mockupu jako referencji
-                    return;
-                }
-                if (res.ok && res.d && res.d.pending) {
-                    if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, false, attempt + 1); }, 12000);
-                    else { mockupGen = false; kickLanding(false); }   // mockup nie wyszedł — landing i tak (tekstowo)
-                    return;
-                }
-                if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) {
-                    setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, force, attempt + 1); }, 3500);
-                    return;
-                }
-                mockupGen = false; kickLanding(false);   // fallback: landing bez mockupu
-            }).catch(function () {
-                if (state.sessionId !== sid) return;
-                if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.mockupUrl) _doMockup(sid, force, attempt + 1); }, 3500); return; }
-                mockupGen = false; kickLanding(false);
-            });
-    }
     // #3 REKLAMY (bud-ads) — 4 posty FB, cache per-produkt, w tle.
     var SPAR_ADS_ENDPOINT = SB_URL + '/functions/v1/bud-ads';
     var adsGen = false;
@@ -7228,6 +7328,9 @@
         if (!force && state.suiteAds) return;
         if (adsGen) return;
         adsGen = true;
+        extras.ads = 'gen';
+        if (typeof updateBudNav === 'function') updateBudNav();
+        if (activeTab === 'reklamy') renderPaneReklamy();
         _doAds(state.sessionId, !!force, 0);
     }
     function _doAds(sid, force, attempt) {
@@ -7235,11 +7338,18 @@
             .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
-                if (res.ok && res.d && Array.isArray(res.d.ads) && res.d.ads.length) { state.suiteAds = res.d.ads; persistSession(); adsGen = false; if (activeTab === 'rynek') renderPaneRynek(); return; }
-                if (res.ok && res.d && res.d.pending) { if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else adsGen = false; return; }
+                if (res.ok && res.d && Array.isArray(res.d.ads) && res.d.ads.length) {
+                    state.suiteAds = res.d.ads; persistSession(); adsGen = false; extras.ads = 'idle';
+                    if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
+                    updateBudNav();
+                    if (activeTab === 'reklamy') renderPaneReklamy();
+                    kickLanding(false);   // reklamy gotowe → buduj stronę (sklep)
+                    return;
+                }
+                if (res.ok && res.d && res.d.pending) { if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; }
-                adsGen = false;
-            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; });
+                adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy();
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); });
     }
 
     // #4 LANDING HTML (bud-landing-gen, gpt-5.5 z mockupu) — cache per-produkt, w tle.
@@ -7250,6 +7360,9 @@
         if (!force && state.landingHtml) return;
         if (landingGen) return;
         landingGen = true;
+        extras.landingTab = 'gen';
+        if (typeof updateBudNav === 'function') updateBudNav();   // odsłania zakładkę „Sklep"
+        if (activeTab === 'sklep') renderPaneSklep();
         _doLanding(state.sessionId, !!force, 0);
     }
     function _doLanding(sid, force, attempt) {
@@ -7257,11 +7370,17 @@
             .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
-                if (res.ok && res.d && res.d.landing_html) { state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; if (activeTab === 'rynek') renderPaneRynek(); return; }
-                if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else landingGen = false; return; }
+                if (res.ok && res.d && res.d.landing_html) {
+                    state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle';
+                    if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
+                    updateBudNav();
+                    if (activeTab === 'sklep') renderPaneSklep();
+                    return;
+                }
+                if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else { landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; }
-                landingGen = false;
-            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; });
+                landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep();
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); });
     }
 
     function showRaportReadyModal() {
@@ -8845,16 +8964,8 @@
             (dla ? '<div class="rkg-for">Raport przygotowany dla: <b>' + esc(dla) + '</b></div>' : '') +
             (r.lead ? '<p class="rkg-lead">' + escMd(r.lead) + '</p>' : '') + '</section>';
 
-        // #2 Mockup strony — pionowy podgląd (jeśli gotowy)
-        if (state.mockupUrl) {
-            html += '<section class="rk-sec rk-reveal"><div class="rkg-mockup">' +
-                '<div class="rkg-mockup__lab">🖥️ Tak może wyglądać Twoja strona sprzedażowa</div>' +
-                '<img loading="lazy" src="' + esc(state.mockupUrl) + '" alt="Podgląd strony sprzedażowej">' +
-                '</div></section>';
-        } else if (state.chosenProduct) {
-            kickMockup(false);
-        }
-
+        // ETAP 2 — makiety/reklamy/landing PRZENIESIONE do osobnych zakładek pipeline.
+        // renderPaneRynek pokazuje TYLKO raport strategiczny.
         var rkNo = 0;
         sekcje.forEach(function (sx) {
             if (!sx || !sx.tytul) return;
@@ -8870,30 +8981,7 @@
                 '<h3>' + esc(sx.tytul) + '</h3></div>' + inner + '</section>';
         });
 
-        // #3 REKLAMY — posty FB (pokaż gdy gotowe; inaczej dociągnij w tle)
-        if (Array.isArray(state.suiteAds) && state.suiteAds.length) {
-            var posts = state.suiteAds.map(function (a) {
-                return '<div class="fbpost">' +
-                    '<div class="fbpost__top"><div class="fbpost__av"></div><div><div class="fbpost__name">Twoja marka</div><div class="fbpost__meta">Sponsorowane · ✔</div></div></div>' +
-                    (a.primary_text ? '<div class="fbpost__txt">' + esc(a.primary_text) + '</div>' : '') +
-                    (a.image_url ? '<div class="fbpost__img"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(a.image_url) + '" onerror="this.style.display=\'none\'"></div>' : '') +
-                    (a.headline ? '<div class="fbpost__cta"><div class="fbpost__hl">' + esc(a.headline) + '</div><span class="fbpost__btn">Kup teraz</span></div>' : '') +
-                    '<div class="fbpost__bar"><span>👍 Lubię to</span><span>💬 Komentarz</span><span>↗ Udostępnij</span></div>' +
-                    '</div>';
-            }).join('');
-            html += '<section class="rk-sec rk-reveal"><div class="rk-sec__head"><span class="rk-sec__no" aria-hidden="true">' + (++rkNo < 10 ? '0' + rkNo : rkNo) + '</span><h3>Reklamy<span>tak będą wyglądać Twoje reklamy na Facebooku/Instagramie</span></h3></div><div class="fbposts">' + posts + '</div></section>';
-        } else if (state.chosenProduct) {
-            kickAds(false);
-            html += '<section class="rk-sec rk-reveal"><div class="rkg-gen">🎨 Przygotowuję 4 reklamy (grafika + copy)…</div></section>';
-        }
-
-        // #4 LANDING — przycisk do pełnoekranowego podglądu (pokaż gdy gotowy)
-        if (state.landingHtml) {
-            html += '<section class="rk-sec rk-reveal"><div class="rk-sec__head"><span class="rk-sec__no" aria-hidden="true">' + (++rkNo < 10 ? '0' + rkNo : rkNo) + '</span><h3>Twoja strona sprzedażowa<span>gotowy landing — kliknij, by zobaczyć na pełnym ekranie</span></h3></div>' +
-                '<button type="button" class="rkg-landing-btn" id="rk-landing-open">🖥️ Otwórz podgląd strony</button></section>';
-        } else if (state.chosenProduct) {
-            html += '<section class="rk-sec rk-reveal"><div class="rkg-gen">🛠️ Buduję Twoją stronę sprzedażową…</div></section>';
-        }
+        // (Makiety, reklamy i landing wyjechały do osobnych zakładek pipeline ETAP 2.)
 
         if (srcs.length) {
             html += '<section class="rk-sec" id="rk-sec-zrodla"><details class="pj-assume"><summary>Źródła raportu (' + srcs.length + ')</summary><ol class="rk-srcs">' +
@@ -8905,7 +8993,6 @@
         html += '<div class="pj-plan__note">Raport przygotowany automatycznie na podstawie publicznych źródeł. Pełną strategię i plan wdrożenia dopracujesz z Tomkiem po rezerwacji.</div>';
 
         body.innerHTML = html;
-        var lbtn = el('rk-landing-open'); if (lbtn) lbtn.addEventListener('click', openLandingPreview);
 
         if ('IntersectionObserver' in window) {
             // Wjazd sekcji + start animacji zegara i kropek
@@ -8918,6 +9005,321 @@
         } else {
             body.querySelectorAll('.rk-reveal, .rk-gauge, .rk-dots').forEach(function (n) { n.classList.add('is-in'); });
         }
+    }
+
+    /* ============================================================
+       PIPELINE ETAP 2 — sekwencyjne zakładki:
+       RAPORT → USTALENIA → MAKIETY (picker) → REKLAMY → SKLEP.
+       Każda następna odsłania się po akceptacji poprzedniej.
+       ============================================================ */
+    // Stan widoczności/nowości zakładek pipeline (poza istniejącym mechanizmem
+    // revAccessible/seen, który jest przywiązany do starych widoków projektu).
+    var budNewTabs = {};   // {tab:true} — etap aktywny, user jeszcze nie wszedł (kropka „nowe")
+    var budSeenTabs = {};  // {tab:true} — user otworzył zakładkę
+
+    // Czy dany etap pipeline jest aktywny (odsłaniany w nav). Bramkowanie:
+    //  ustalenia — gdy raport gotowy; makiety — gdy ustalenia ustalone (marker
+    //  <ustalenia> ustawia extras.mockups, albo serwer zwrócił mockupy/chosenStyle);
+    //  reklamy — po wyborze stylu (chosenStyle) lub gdy reklamy już są;
+    //  sklep — gdy landing gotowy/generuje się.
+    function budTabVisible(tab) {
+        if (tab === 'ustalenia') return !!state.raport || !!state.ustalenia;
+        if (tab === 'makiety') return extras.mockups === 'gen' || !!state.mockups || !!state.chosenStyle || (Array.isArray(state.suiteAds) && state.suiteAds.length) || !!state.landingHtml;
+        if (tab === 'reklamy') return !!state.chosenStyle || extras.ads === 'gen' || (Array.isArray(state.suiteAds) && state.suiteAds.length) || !!state.landingHtml;
+        if (tab === 'sklep') return extras.landingTab === 'gen' || landingGen || !!state.landingHtml;
+        return false;
+    }
+    function budSeen(tab) {
+        if (budSeenTabs[tab]) return;
+        budSeenTabs[tab] = true;
+        budNewTabs[tab] = false;
+        updateBudNav();
+    }
+    // Czy zakładka ma realną, gotową treść (do statusu „gotowe")
+    function budTabReady(tab) {
+        if (tab === 'ustalenia') return !!state.ustalenia;
+        if (tab === 'makiety') return Array.isArray(state.mockups) && state.mockups.length > 0;
+        if (tab === 'reklamy') return Array.isArray(state.suiteAds) && state.suiteAds.length > 0;
+        if (tab === 'sklep') return !!state.landingHtml;
+        return false;
+    }
+    function budTabGenerating(tab) {
+        if (tab === 'makiety') return extras.mockups === 'gen' && !budTabReady('makiety');
+        if (tab === 'reklamy') return extras.ads === 'gen' && !budTabReady('reklamy');
+        if (tab === 'sklep') return (extras.landingTab === 'gen' || landingGen) && !budTabReady('sklep');
+        return false;
+    }
+    // Odsłania zakładki pipeline w nav + ustawia statusy (nowe/gotowe/generuję).
+    // Wołane z updateSideBadges (każda tura + enterChat) oraz po zmianach stanu.
+    function updateBudNav() {
+        var khMode = (state.stage === 'knowhow' || state.stage === 'build');
+        ['ustalenia', 'makiety', 'reklamy', 'sklep'].forEach(function (tab) {
+            var sel = (tab === 'reklamy') ? 'reklamy' : tab;   // data-tab
+            var item = document.querySelector('.side__item[data-tab="' + sel + '"][data-view]');
+            if (!item) return;
+            var vis = budTabVisible(tab) && !khMode;
+            // etap aktywny, user nie był na zakładce i nie patrzy na nią teraz → kropka „nowe"
+            if (vis && !budSeenTabs[tab] && activeTab !== tab) budNewTabs[tab] = true;
+            item.hidden = !vis;
+            var statForKey = (tab === 'reklamy') ? 'reklamy-tab' : tab;
+            var stEl = item.querySelector('.side__status[data-status-for="' + statForKey + '"]');
+            if (!stEl) return;
+            if (!vis) { stEl.hidden = true; item.classList.remove('is-generating'); return; }
+            var st = null;
+            if (budTabGenerating(tab)) st = { label: 'generuję', cls: 'gen' };
+            else if (budTabReady(tab)) st = budSeenTabs[tab] ? { label: 'gotowe', cls: 'done' } : { label: 'nowe', cls: 'new' };
+            else if (budNewTabs[tab] && !budSeenTabs[tab]) st = { label: 'nowe', cls: 'new' };
+            if (!st) { stEl.hidden = true; item.classList.remove('is-generating'); return; }
+            stEl.hidden = false;
+            stEl.className = 'side__status side__status--' + st.cls;
+            stEl.textContent = st.label;
+            if (st.cls === 'gen') { item.classList.add('is-generating'); startSideGen(); }
+            else item.classList.remove('is-generating');
+        });
+    }
+
+    // ── MAKIETY: 4 style (bud-mockup zwraca {mockups:[{style,label,brief,url}]}) ──
+    // Osobny poller od starego _doMockup (single mockup_url do raportu — wyłączony).
+    var mockups4Gen = false;
+    function kickMockup(force) {
+        // NOWE: makiety pipeline (4 style). Nazwa zachowana — woła ją marker <ustalenia>
+        // oraz renderPaneMakiety. Stary single-mockup do raportu już nieużywany.
+        if (!state.chosenProduct || !state.sessionId) return;
+        if (!force && Array.isArray(state.mockups) && state.mockups.length) return;
+        if (mockups4Gen) return;
+        mockups4Gen = true;
+        extras.mockups = 'gen';
+        budTabVisible('makiety'); // no-op guard
+        updateBudNav();
+        if (activeTab === 'makiety') renderPaneMakiety();
+        _doMockup4(state.sessionId, !!force, 0);
+    }
+    function _doMockup4(sid, force, attempt) {
+        fetch(SPAR_MOCKUP_ENDPOINT, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct })
+        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+            .then(function (res) {
+                if (state.sessionId !== sid) return;
+                if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
+                    state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle';
+                    if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
+                    updateBudNav();
+                    if (activeTab === 'makiety') renderPaneMakiety();
+                    return;
+                }
+                if (res.ok && res.d && res.d.pending) {
+                    if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, false, attempt + 1); }, 12000);
+                    else { mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); }
+                    return;
+                }
+                if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) {
+                    setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, force, attempt + 1); }, 3500);
+                    return;
+                }
+                mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety();
+            }).catch(function () {
+                if (state.sessionId !== sid) return;
+                if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, force, attempt + 1); }, 3500); return; }
+                mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety();
+            });
+    }
+
+    // Wybór stylu makiety → zapisz lokalnie, wyślij do czatu (serwer zapisze chosen_style),
+    // odsłoń REKLAMY i odpal kickAds. (kickAds po sukcesie sam odpala kickLanding.)
+    function pickMockupStyle(styleKey) {
+        var m = (state.mockups || []).filter(function (x) { return x && x.style === styleKey; })[0];
+        if (!m) return;
+        state.chosenStyle = styleKey;
+        persistSession();
+        // podświetl wybraną kartę
+        var body = el('pane-makiety-body');
+        if (body) {
+            Array.prototype.forEach.call(body.querySelectorAll('.mk-card'), function (c) {
+                c.classList.toggle('is-chosen', c.getAttribute('data-style') === styleKey);
+            });
+        }
+        // odsłoń reklamy + start
+        budNewTabs.reklamy = true;
+        updateBudNav();
+        kickAds(false);
+        // potwierdzenie do AI (bud-chat zapisze chosen_style + potwierdzi w rozmowie)
+        if (streaming) { showToast('Zapisano wybór stylu'); return; }
+        switchTab('chat');               // pokaż potwierdzenie AI
+        sendOpening('Wybieram styl: ' + (m.label || styleKey));
+    }
+
+    // Marker <ustalenia> z tury AI — ustalenia domknięte, ruszamy makiety.
+    function onUstaleniaDone() {
+        // odsłoń zakładkę MAKIETY z kropką „nowe" i wystartuj generowanie 4 stylów
+        if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
+        kickMockup(false);   // ustawia extras.mockups='gen', woła updateBudNav
+        updateBudNav();
+    }
+
+    /* ── RENDER: USTALENIA (lustro rozmowy „dla kogo to jest") ── */
+    function renderPaneUstalenia() {
+        var body = el('pane-ustalenia-body');
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 1 z 4</div>' +
+            '<h2 class="tabpane__title">Ustalenia — dla kogo to jest</h2>' +
+            '<p class="tabpane__sub">Tu zbieram, do kogo mówimy: grupa odbiorców, kąt sprzedaży, ton i kluczowe korzyści. Doprecyzowujemy to w rozmowie.</p></div>';
+        var u = state.ustalenia;
+        if (!u || typeof u !== 'object') {
+            body.innerHTML = head +
+                '<div class="tabpane__empty">Ustalamy to teraz w rozmowie — odpowiedz na pytania w czacie, a tutaj pojawi się gotowe podsumowanie.<br>' +
+                '<button type="button" class="preview-retry" data-go-chat>Wróć do rozmowy</button></div>';
+            var gc = body.querySelector('[data-go-chat]'); if (gc) gc.addEventListener('click', function () { switchTab('chat'); });
+            return;
+        }
+        var rows = [
+            ['Dla kogo', u.dla_kogo || u.dlaKogo || u.audience],
+            ['Kąt sprzedaży', u.kat || u.kąt || u.angle],
+            ['Ton komunikacji', u.ton || u.tone],
+            ['Kluczowe korzyści', u.korzysci || u.korzyści || u.benefits]
+        ];
+        var html = head + '<div class="mk-set">';
+        rows.forEach(function (r) {
+            if (!r[1]) return;
+            var val = Array.isArray(r[1])
+                ? '<ul class="rkg-body">' + r[1].map(function (x) { return '<li>' + esc(String(x)) + '</li>'; }).join('') + '</ul>'
+                : '<div class="rkg-body">' + renderRich(String(r[1])) + '</div>';
+            html += '<section class="rk-sec"><div class="rk-sec__head"><h3>' + esc(r[0]) + '</h3></div>' + val + '</section>';
+        });
+        html += '</div><div class="pj-plan__note">Coś dopowiedzieć? Napisz w czacie — zaktualizuję ustalenia.</div>';
+        body.innerHTML = html;
+    }
+
+    /* ── RENDER: MAKIETY (4 style + picker) ── */
+    function renderPaneMakiety() {
+        var body = el('pane-makiety-body');
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 2 z 4</div>' +
+            '<h2 class="tabpane__title">Makiety — wybierz styl</h2>' +
+            '<p class="tabpane__sub">Przygotowałem 4 propozycje wyglądu strony w różnych stylach. Wybierz ten, który najbardziej do Ciebie pasuje — na nim zbuduję resztę.</p></div>';
+        var mk = state.mockups;
+        if (!Array.isArray(mk) || !mk.length) {
+            if (extras.mockups === 'fail') {
+                body.innerHTML = head +
+                    '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować makiet.</b>' +
+                    '<span>Spróbuj jeszcze raz — to chwila.</span></div>' +
+                    '<button type="button" class="preview-retry" id="mk-retry">Spróbuj ponownie</button></div>';
+                var rb = el('mk-retry'); if (rb) rb.addEventListener('click', function () { extras.mockups = 'idle'; mockups4Gen = false; kickMockup(true); });
+                return;
+            }
+            // generuje się (lub zaraz odpali) — 4 skeletony
+            if (extras.mockups !== 'gen') kickMockup(false);
+            var sk = '';
+            for (var i = 0; i < 4; i++) sk += '<div class="mk-card mk-card--skel"><div class="mk-card__img"><span class="share__spin" aria-hidden="true"></span></div><div class="mk-card__b"><div class="mk-skel-line"></div><div class="mk-skel-btn"></div></div></div>';
+            body.innerHTML = head + '<div class="mk-grid">' + sk + '</div>' +
+                '<div class="mk-gennote">Tworzę 4 propozycje wyglądu… potrwa około minuty.</div>';
+            return;
+        }
+        var cards = mk.map(function (m) {
+            var chosen = state.chosenStyle && m.style === state.chosenStyle;
+            return '<div class="mk-card' + (chosen ? ' is-chosen' : '') + '" data-style="' + esc(m.style || '') + '">' +
+                '<div class="mk-card__img">' +
+                  (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mk-noimg\');this.remove();">' : '') +
+                  '<button type="button" class="mk-zoom" data-mk-zoom="' + esc(m.url || '') + '" aria-label="Powiększ">⤢</button>' +
+                  (chosen ? '<span class="mk-badge">✓ Wybrany</span>' : '') +
+                '</div>' +
+                '<div class="mk-card__b">' +
+                  '<div class="mk-card__lab">' + esc(m.label || 'Styl') + '</div>' +
+                  (m.brief ? '<div class="mk-card__brief">' + esc(m.brief) + '</div>' : '') +
+                  '<button type="button" class="mk-pick" data-mk-pick="' + esc(m.style || '') + '">' + (chosen ? 'Wybrany ✓' : 'Wybieram ten styl') + '</button>' +
+                '</div>' +
+                '</div>';
+        }).join('');
+        body.innerHTML = head + '<div class="mk-grid">' + cards + '</div>' +
+            '<div class="pj-plan__note">Masz uwagi do wyglądu? Napisz je w czacie — uwzględnię przy budowie strony.</div>';
+        wireMakietyDelegation();
+    }
+    // Delegacja kliknięć w pickerze makiet (IIFE → inline onclick NIE działa).
+    // Podpinamy raz na element body (jest statyczny mimo przerysowań innerHTML).
+    var mkDelegationWired = false;
+    function wireMakietyDelegation() {
+        if (mkDelegationWired) return;
+        var body = el('pane-makiety-body'); if (!body) return;
+        mkDelegationWired = true;
+        body.addEventListener('click', function (e) {
+            var pick = e.target.closest && e.target.closest('[data-mk-pick]');
+            if (pick) { pickMockupStyle(pick.getAttribute('data-mk-pick')); return; }
+            var zoom = e.target.closest && e.target.closest('[data-mk-zoom]');
+            if (zoom) { var u = zoom.getAttribute('data-mk-zoom'); if (u) openMockupZoom(u); return; }
+        });
+    }
+    // Powiększenie makiety — pełnoekranowy obraz (reuse stylu lpm).
+    function openMockupZoom(url) {
+        if (!url) return;
+        var old = el('mk-zoom-modal'); if (old) old.remove();
+        var ov = document.createElement('div');
+        ov.id = 'mk-zoom-modal'; ov.className = 'lpm';
+        ov.innerHTML = '<div class="lpm-bar"><span>Podgląd makiety</span><button type="button" class="lpm-x" id="mkz-x" aria-label="Zamknij">✕</button></div>' +
+            '<div class="lpm-body lpm-body--img"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="Makieta"></div>';
+        document.body.appendChild(ov);
+        function close() { var m = el('mk-zoom-modal'); if (m) m.remove(); document.removeEventListener('keydown', onKey); }
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        el('mkz-x').addEventListener('click', close);
+        ov.addEventListener('click', function (e) { if (e.target === ov || (e.target.className && String(e.target.className).indexOf('lpm-body') >= 0)) close(); });
+        document.addEventListener('keydown', onKey);
+    }
+
+    /* ── RENDER: REKLAMY (posty FB) — przeniesione z renderPaneRynek ── */
+    function renderPaneReklamy() {
+        var body = el('pane-reklamy-body');
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 3 z 4</div>' +
+            '<h2 class="tabpane__title">Reklamy</h2>' +
+            '<p class="tabpane__sub">Tak będą wyglądać Twoje reklamy na Facebooku i Instagramie — grafika i tekst gotowe do uruchomienia.</p></div>';
+        if (Array.isArray(state.suiteAds) && state.suiteAds.length) {
+            var posts = state.suiteAds.map(function (a) {
+                return '<div class="fbpost">' +
+                    '<div class="fbpost__top"><div class="fbpost__av"></div><div><div class="fbpost__name">Twoja marka</div><div class="fbpost__meta">Sponsorowane · ✔</div></div></div>' +
+                    (a.primary_text ? '<div class="fbpost__txt">' + esc(a.primary_text) + '</div>' : '') +
+                    (a.image_url ? '<div class="fbpost__img"><img loading="lazy" referrerpolicy="no-referrer" src="' + esc(a.image_url) + '" onerror="this.style.display=\'none\'"></div>' : '') +
+                    (a.headline ? '<div class="fbpost__cta"><div class="fbpost__hl">' + esc(a.headline) + '</div><span class="fbpost__btn">Kup teraz</span></div>' : '') +
+                    '<div class="fbpost__bar"><span>👍 Lubię to</span><span>💬 Komentarz</span><span>↗ Udostępnij</span></div>' +
+                    '</div>';
+            }).join('');
+            body.innerHTML = head + '<div class="fbposts">' + posts + '</div>';
+            return;
+        }
+        if (extras.ads === 'fail') {
+            body.innerHTML = head +
+                '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować reklam.</b>' +
+                '<span>Spróbuj jeszcze raz.</span></div>' +
+                '<button type="button" class="preview-retry" id="ad-retry">Spróbuj ponownie</button></div>';
+            var rb = el('ad-retry'); if (rb) rb.addEventListener('click', function () { extras.ads = 'idle'; adsGen = false; kickAds(true); });
+            return;
+        }
+        if (extras.ads !== 'gen') kickAds(false);
+        body.innerHTML = head + genProgressHTML('reklamy', 'Przygotowuję 4 reklamy (grafika + copy)…', 'dopasowane do wybranego stylu i Twojej grupy odbiorców');
+        startPjTicker();
+    }
+
+    /* ── RENDER: SKLEP (landing w iframe pełnoekranowym) ── */
+    function renderPaneSklep() {
+        var body = el('pane-sklep-body');
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 4 z 4</div>' +
+            '<h2 class="tabpane__title">Twój sklep</h2>' +
+            '<p class="tabpane__sub">Gotowa strona sprzedażowa Twojego produktu — zobacz ją na pełnym ekranie.</p></div>';
+        if (state.landingHtml) {
+            body.innerHTML = head +
+                '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
+                '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button></div>' +
+                '<div class="pj-plan__note">Masz uwagi do strony? Napisz w czacie — poprawię.</div>';
+            try { el('sk-frame').srcdoc = state.landingHtml; } catch (e) { }
+            var fs = el('sk-fs'); if (fs) fs.addEventListener('click', openLandingPreview);
+            return;
+        }
+        if (extras.landingTab === 'fail') {
+            body.innerHTML = head +
+                '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować strony.</b>' +
+                '<span>Spróbuj jeszcze raz.</span></div>' +
+                '<button type="button" class="preview-retry" id="sk-retry">Spróbuj ponownie</button></div>';
+            var rb = el('sk-retry'); if (rb) rb.addEventListener('click', function () { extras.landingTab = 'idle'; landingGen = false; kickLanding(true); });
+            return;
+        }
+        if (!landingGen && extras.landingTab !== 'gen') kickLanding(false);
+        body.innerHTML = head + genProgressHTML('landing', 'Buduję Twoją stronę sprzedażową…', 'składam pełny landing na bazie wybranego stylu i ustaleń');
+        startPjTicker();
     }
 
     // Hero state: przed pierwszą wiadomością usera wszystko (powitanie + pasek)
@@ -10402,7 +10804,8 @@
         state.previewHistory = {};
         state.emailKnown = false; // nowa sesja = nowy wiersz w bazie, serwer maila jeszcze nie ma
         state.lastBrief = null;
-        state.chosenProduct = null; state.mockupUrl = null; state.suiteAds = null; state.landingHtml = null; renderChosenProduct();
+        state.chosenProduct = null; state.mockupUrl = null; state.suiteAds = null; state.landingHtml = null;
+        state.mockups = null; state.chosenStyle = null; state.ustalenia = null; renderChosenProduct();
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
@@ -10424,10 +10827,16 @@
         extras.prototype = 'idle';
         extras.economics = 'idle';
         extras.gtm = 'idle';
+        extras.mockups = 'idle';
+        extras.ads = 'idle';
+        extras.landingTab = 'idle';
         extrasStart = {};
         pjView = 'dash';
         pjNewPlan = false;
         rkNew = false;
+        budNewTabs = {};
+        budSeenTabs = {};
+        mockups4Gen = false;
         if (activeTab !== 'chat') switchTab('chat');
         if (!state.pSlug) state.profession = null;
         messages = [];
@@ -10441,7 +10850,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -10467,7 +10876,8 @@
             .replace(/<propbrak>[\s\S]*?<\/propbrak>/g, '').replace(/<propbrak\s*\/?>/g, '')
             .replace(/<kamien>[\s\S]*?<\/kamien>/g, '')
             .replace(/<bierny>[\s\S]*?<\/bierny>/g, '').replace(/<bierny\s*\/?>/g, '')
-            .replace(/<rezygnacja>[\s\S]*?<\/rezygnacja>/g, '').replace(/<rezygnacja\s*\/?>/g, '');
+            .replace(/<rezygnacja>[\s\S]*?<\/rezygnacja>/g, '').replace(/<rezygnacja\s*\/?>/g, '')
+            .replace(/<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/g, '').replace(/<ustalenia\b[^>]*\/?>/g, '');
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
             var i = t.indexOf(HIDDEN_MARKS[m]);
@@ -11284,6 +11694,9 @@
                 } else if (wskaz) {
                     setTimeout(function () { applyWskaz(wskaz); }, 60);
                 }
+                // ETAP 2 — marker <ustalenia>: AI domknęło „dla kogo to jest" → odsłoń
+                // zakładkę MAKIETY i odpal generowanie (mockup czyta ustalenia z serwera).
+                if (parseUstalenia(raw)) onUstaleniaDone();
                 // Propozycje produktów (K1) — fallback z markera <propozycje>, gdy
                 // backend wstawi listę w treści tury zamiast SSE bud_propozycje.
                 // Pomijamy, jeśli karuzela już zrenderowana przez SSE (brak duplikatu).
@@ -11467,6 +11880,13 @@
         if (!raw) return null;
         var m = raw.match(/<karuzela\b[^>]*?cat\s*=\s*["']([^"']+)["'][^>]*\/?>/i);
         return m ? m[1] : null;
+    }
+    // <ustalenia> — AI domknęło etap „dla kogo to jest" (ustalenia zapisuje serwer).
+    // Wykrywamy SAMĄ OBECNOŚĆ markera (treść/JSON opcjonalna — front i tak czyta
+    // ustalenia z syncu serwera). Wspiera blok ...</ustalenia> i self-closing.
+    function parseUstalenia(raw) {
+        if (!raw) return false;
+        return /<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/.test(raw) || /<ustalenia\b[^>]*\/>/.test(raw);
     }
     // Podświetl rekomendowaną kartę (zielony pierścień + scroll). Front-only, bez backendu.
     function applyWskaz(w) {
