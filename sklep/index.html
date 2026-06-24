@@ -8995,9 +8995,9 @@
         .vp-more{background:rgba(255,255,255,.05);border:1px solid var(--glass-border);color:var(--text-strong);border-radius:9px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:color .15s,border-color .15s}
         .vp-more:hover{border-color:var(--accent);color:var(--accent)}
         .vp-count{font-size:11.5px;color:var(--text-muted)}
-        .vpm{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:99999;display:none;align-items:center;justify-content:center;padding:16px}
+        .vpm{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:99999;display:none;align-items:center;justify-content:center;padding:16px 16px 108px}
         .vpm.show{display:flex}
-        .vpm-card{position:relative;display:flex;gap:16px;align-items:stretch;width:100%;max-width:840px;max-height:92vh}
+        .vpm-card{position:relative;display:flex;gap:16px;align-items:stretch;width:100%;max-width:840px;max-height:calc(100vh - 132px)}
         .vpm-video{flex:0 0 auto}
         .vpm-video iframe{width:min(330px,78vw);height:min(86vh,586px);border:0;border-radius:16px;background:#000;display:block}
         .vpm-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;background:#0b0b0b;border:1px solid var(--glass-border);border-radius:16px;padding:20px;overflow-y:auto}
@@ -9019,9 +9019,20 @@
         .vpm-prev{left:14px}.vpm-next{right:14px}
         .vpm-x{position:fixed;top:16px;right:18px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4}
         .vpm-x:hover{background:rgba(255,255,255,.22)}
+        /* ── FILMSTRIP: klikalne miniatury innych hitów (dół lightboxa, responsywne) ── */
+        .vpm-strip{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;gap:8px;align-items:center;overflow-x:auto;padding:11px 14px calc(11px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,rgba(0,0,0,.98),rgba(0,0,0,.72));border-top:1px solid var(--glass-border);scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+        .vpm-strip::-webkit-scrollbar{height:6px}
+        .vpm-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
+        .vpm-thumb{flex:0 0 auto;width:48px;height:66px;border-radius:8px;overflow:hidden;border:2px solid transparent;background:#141414;cursor:pointer;padding:0;opacity:.5;position:relative;transition:opacity .15s,border-color .15s,transform .12s}
+        .vpm-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+        .vpm-thumb:hover{opacity:1;transform:translateY(-2px)}
+        .vpm-thumb.cur{opacity:1;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+        .vpm-thumb.vpm-noimg2{display:flex;align-items:center;justify-content:center}
+        .vpm-thumb .vpm-thumb-ph{font-size:14px;color:#777}
+        .vpm-thumb.vpm-thumb--in::after{content:'✓';position:absolute;top:2px;right:2px;font-size:9px;font-weight:800;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:0 3px;line-height:1.5}
         /* ── SHORTLISTA „Rozważam" (hybryda C) — tokeny Geist 1:1 ── */
-        .vp-add{position:absolute;top:9px;right:47px;width:32px;height:32px;border:1px solid var(--glass-border);border-radius:8px;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;line-height:1;transition:background .15s,border-color .15s,color .15s}
-        .vp-add:hover{background:rgba(0,0,0,.82);border-color:var(--accent)}
+        .vp-add{position:absolute;bottom:10px;left:10px;z-index:3;height:34px;padding:0 13px;border:1px solid var(--accent);border-radius:9px;background:rgba(0,0,0,.62);color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;line-height:1;letter-spacing:.1px;backdrop-filter:blur(3px);box-shadow:0 2px 10px rgba(0,0,0,.45);transition:background .15s,border-color .15s,color .15s,transform .12s}
+        .vp-add:hover{background:rgba(0,0,0,.86);transform:translateY(-1px)}
         .vp-add.is-in{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
         .vp-card--rec{border-color:var(--accent)!important;box-shadow:0 0 0 2px var(--accent)}
         .vp-card.sl-pop{animation:slPop .32s ease}
@@ -9078,7 +9089,7 @@
           .vpm-card{flex-direction:column;gap:0;max-width:none;max-height:100vh;height:100vh;overflow-y:auto}
           .vpm-video{padding:52px 0 4px;display:flex;justify-content:center;background:#000}
           .vpm-video iframe{width:min(92vw,360px);height:min(56vh,500px);border-radius:12px}
-          .vpm-side{border:0;border-radius:0;flex:0 0 auto;padding:14px 18px 30px}
+          .vpm-side{border:0;border-radius:0;flex:0 0 auto;padding:14px 18px 110px}
           .vpm-nav{top:28vh;width:40px;height:40px;font-size:22px}
           .vpm-prev{left:6px}.vpm-next{right:6px}
         }
@@ -9091,6 +9102,8 @@
             if (e.target.closest('.vpm-x')) { closeVP(); return; }
             if (e.target.closest('.vpm-prev')) { lbStep(-1); return; }
             if (e.target.closest('.vpm-next')) { lbStep(1); return; }
+            var th = e.target.closest('.vpm-thumb');
+            if (th) { var ti = +th.getAttribute('data-idx'); var its = VP_STATE.items || []; if (ti >= 0 && ti < its.length) { VP_STATE.lbIndex = ti; vpMarkSeen(its[ti]); renderLightbox(); } return; }
             var pk = e.target.closest('.vpm-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct((VP_STATE.items || [])[VP_STATE.lbIndex || 0]); closeVP(); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
             var ad = e.target.closest('.vpm-add'); if (ad) { var cur = (VP_STATE.items || [])[VP_STATE.lbIndex || 0]; if (!cur) return; if (slHas(cur)) removeFromShortlist(slKey(cur)); else addToShortlist(cur); renderLightbox(); return; }
             var pt = e.target.closest('.vpm-pot'); if (pt) { if (streaming || el('inline-gate')) return; closeVP(); sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
@@ -9128,6 +9141,15 @@
         if (p.newest_days != null) meta.push(p.newest_days + ' dni temu');
         if (p.is_ad) meta.push('<span class="ad">reklamowany</span>');
         var stat = function (v, l) { return '<div class="vpm-stat"><b>' + v + '</b><span>' + l + '</span></div>'; };
+        // Filmstrip: klikalne miniatury pozostałych hitów (z aktualnej strony karuzeli).
+        var curIdx = VP_STATE.lbIndex || 0;
+        var strip = items.map(function (it, j) {
+            var inIt = slHas(it);
+            var th = it.cover
+                ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(it.cover) + '" onerror="this.parentNode.classList.add(\'vpm-noimg2\');this.parentNode.innerHTML=\'<span class=&quot;vpm-thumb-ph&quot;>▶</span>\'">'
+                : '<span class="vpm-thumb-ph">▶</span>';
+            return '<button type="button" class="vpm-thumb' + (j === curIdx ? ' cur' : '') + (inIt ? ' vpm-thumb--in' : '') + (it.cover ? '' : ' vpm-noimg2') + '" data-idx="' + j + '" title="' + esc(it.name || '') + '" aria-label="Pokaż: ' + esc(it.name || '') + '">' + th + '</button>';
+        }).join('');
         el('vpm-body').innerHTML =
             '<button type="button" class="vpm-x" aria-label="Zamknij">✕</button>' +
             '<button type="button" class="vpm-nav vpm-prev" aria-label="Poprzedni">‹</button>' +
@@ -9152,7 +9174,11 @@
                   '<button type="button" class="vpm-pot" data-pot="' + esc(p.name) + '">Jaki ma potencjał?</button>' +
                 '</div>' +
               '</div>' +
-            '</div>';
+            '</div>' +
+            '<div class="vpm-strip" id="vpm-strip">' + strip + '</div>';
+        // wyśrodkuj bieżącą miniaturę w pasku
+        var cur = el('vpm-strip') && el('vpm-strip').querySelector('.vpm-thumb.cur');
+        if (cur) { try { cur.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch (e) {} }
     }
     function lbStep(dir) {
         var items = VP_STATE.items || [];
@@ -9230,7 +9256,7 @@
                         (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
                         (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
                         '<button type="button" class="vp-fs" data-idx="' + i + '" aria-label="Pełny ekran">⛶</button>' +
-                        '<button type="button" class="vp-add' + (slHas(p) ? ' is-in' : '') + '" data-idx="' + i + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '" title="' + (slHas(p) ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania') + '" aria-label="Rozważam">' + (slHas(p) ? '✓' : '+') + '</button>' +
+                        '<button type="button" class="vp-add' + (slHas(p) ? ' is-in' : '') + '" data-idx="' + i + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '" title="' + (slHas(p) ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania') + '" aria-label="Rozważam">' + (slHas(p) ? '✓ Rozważam' : '+ Rozważam') + '</button>' +
                         '<div class="vp-play"><span>▶</span></div>' +
                     '</div>' +
                     '<div class="vp-b">' +
@@ -9294,7 +9320,7 @@
             btn.classList.toggle('is-in', !!inIt);
             btn.setAttribute('aria-pressed', inIt ? 'true' : 'false');
             btn.setAttribute('title', inIt ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania');
-            btn.innerHTML = inIt ? '✓' : '+';
+            btn.innerHTML = inIt ? '✓ Rozważam' : '+ Rozważam';
         });
         // lightbox (jeśli otwarty) — przerysuj przycisk Rozważam
         var m = el('vpm'); if (m && m.classList.contains('show')) renderLightbox();
