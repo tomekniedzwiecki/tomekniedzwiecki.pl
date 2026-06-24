@@ -11609,6 +11609,10 @@
                 failedBeforeText = !gotText;
                 sysMsg('Dobiliśmy do limitu 30 tur tej rozmowy. Sparing tyle nie potrzebuje — jeśli werdykt nie padł, zacznij nową rozmowę z węższym problemem.', true);
                 lockComposer('Limit 30 tur osiągnięty — rozmowa zamknięta.');
+            } else if (err && err.status === 429 && err.code === 'limit_sesji') {
+                failedBeforeText = !gotText;
+                restoreFailedMessage(text);
+                sysMsg('Za dużo nowych rozmów w krótkim czasie z tego połączenia. Odczekaj chwilę albo zaloguj się, żeby kontynuować.', true);
             } else if (err && err.status === 429) {
                 failedBeforeText = !gotText;
                 restoreFailedMessage(text);
