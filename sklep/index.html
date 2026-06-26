@@ -11096,11 +11096,12 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia', '<zielone']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
             .replace(/<werdykt>[\s\S]*?<\/werdykt>/g, '')
+            .replace(/<zielone>[\s\S]*?<\/zielone>/g, '').replace(/<zielone\s*\/?>/g, '')
             .replace(/<ocena>[\s\S]*?<\/ocena>/g, '')
             .replace(/<projekt>[\s\S]*?<\/projekt>/g, '')
             .replace(/<opcje_multi>[\s\S]*?<\/opcje_multi>/g, '')
@@ -11219,6 +11220,47 @@
         return div;
     }
 
+    // Karta ZIELONE ŚWIATŁO (pozytywna decyzja przed rezerwacją) — kulminacja: mocne
+    // strony z raportu + „co dopracujemy razem" + przycisk rezerwacji. Zawiera już CTA,
+    // więc to ona jest momentem rezerwacji w głównym flow.
+    function greenCardEl(data) {
+        data = data || {};
+        var mocne = (data.mocne && data.mocne.length) ? data.mocne : ['Realny popyt — produkt już viraluje na TikToku', 'Przestrzeń na markę i wyższą marżę niż anonimowy odpowiednik', 'Gotowy lejek: raport, makiety, reklamy i strona już są'];
+        var dopr = (data.dopracowac && data.dopracowac.length) ? data.dopracowac : ['Dopięcie oferty i ceny pod Twój rynek', 'Pierwsze kreacje reklamowe', 'Plan startu sprzedaży'];
+        var li = function (arr, color) { return arr.slice(0, 4).map(function (x) { return '<li style="margin:4px 0;padding-left:16px;position:relative;line-height:1.45"><span style="position:absolute;left:0;color:' + color + '">•</span>' + esc(String(x)) + '</li>'; }).join(''); };
+        var div = document.createElement('div');
+        div.className = 'mk-card';
+        div.style.cssText = 'border:1px solid rgba(0,217,126,.5);box-shadow:0 0 40px -16px rgba(0,217,126,.5)';
+        div.innerHTML =
+            '<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.05em;color:#00d97e;background:rgba(0,217,126,.12);border:1px solid rgba(0,217,126,.4);padding:5px 11px;border-radius:999px;margin-bottom:10px"><i class="ph ph-check-circle" style="font-size:15px"></i> ZIELONE ŚWIATŁO</div>' +
+            '<div class="mk-card__title">Przeanalizowaliśmy Twój produkt i rynek — wchodzimy w to z Tobą.</div>' +
+            '<div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 4px">' +
+            '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#00d97e;margin-bottom:5px">Dlaczego to ma potencjał</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(mocne, '#00d97e') + '</ul></div>' +
+            '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:5px">Co dopracujemy razem</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(dopr, '#a1a1aa') + '</ul></div>' +
+            '</div>' +
+            '<p class="mk-card__d">Żeby doprowadzić to do gotowości i finalnie dopracować resztę — robimy to <strong>razem</strong>. Pierwszy krok to zwrotna rezerwacja wspólnej rozmowy z Tomkiem.</p>' +
+            '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję rozmowę → 500 zł</a>' +
+            '<p class="mk-card__note">BLIK, karta lub przelew · w pełni zwrotne · 500 zł wraca, jeśli nie wejdziemy we współpracę</p>';
+        return div;
+    }
+    // Pokaż zielone światło. animate=true → krótki beat „oceniamy potencjał…" (poczucie
+    // realnej oceny), potem karta. Ustawia i utrwala verdict='zielony' (odblokowuje rezerwację).
+    function showGreenLight(data, animate) {
+        if (state.verdict !== 'zielony') { state.verdict = 'zielony'; persistSession(); if (typeof updateSideBadges === 'function') updateSideBadges(); }
+        if (el('zl-card')) return;            // już pokazana w tej rozmowie
+        var host = el('chat-msgs'); if (!host) return;
+        var wrap = document.createElement('div'); wrap.id = 'zl-card'; host.appendChild(wrap);
+        var reveal = function () {
+            wrap.innerHTML = ''; wrap.appendChild(greenCardEl(data)); scrollToBottom(false);
+            try { gaEvent('app_verdict', { verdict: 'zielony', source: 'zielone_swiatlo' }); } catch (e) {}
+        };
+        if (animate) {
+            wrap.innerHTML = '<div class="mk-card" style="display:flex;align-items:center;gap:10px;border-color:rgba(0,217,126,.4)"><span style="width:15px;height:15px;border:2px solid rgba(0,217,126,.25);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span><span style="font-size:13.5px;color:var(--text,#e7e7ea)">Oceniamy potencjał Twojego sklepu…</span></div>';
+            scrollToBottom(false);
+            setTimeout(reveal, 2800);
+        } else { reveal(); }
+    }
+
     function appendMessage(role, content) {
         var div = document.createElement('div');
         div.className = 'msg msg--' + (role === 'user' ? 'user' : 'ai');
@@ -11235,7 +11277,10 @@
             var pp = parsePropozycje(content);
             if (pp) el('chat-msgs').appendChild(renderPropozycjeEl(pp.items, pp.runda));
             else if (hasPropBrak(content)) el('chat-msgs').appendChild(buildPropBrakEl());
-            if (hasMakieta(content)) el('chat-msgs').appendChild(mkCardEl());
+            var zg = parseZielone(content);
+            if (zg) showGreenLight(zg, false);   // replay historii — bez beatu
+            // Karta rezerwacji w czacie czeka na ZIELONE ŚWIATŁO (główny flow).
+            if (hasMakieta(content) && state.verdict === 'zielony' && !zg) el('chat-msgs').appendChild(mkCardEl());
         }
         pinPickerBottom();   // karuzela ETAP 1 zawsze na dole, pod najnowszą wiadomością
         scrollToBottom(false);
@@ -11962,7 +12007,12 @@
                     anchor.insertAdjacentElement('afterend', prEl);
                     anchor = prEl;
                 }
-                if (hasMakieta(raw)) anchor.insertAdjacentElement('afterend', mkCardEl());
+                // ZIELONE ŚWIATŁO — pozytywna decyzja PRZED rezerwacją (kulminacja).
+                var zg = parseZielone(raw);
+                if (zg) showGreenLight(zg, true);   // live → beat „oceniamy…" + karta z CTA rezerwacji
+                // Karta rezerwacji <makieta> czeka na zielone światło; w turze zielonego pomijamy
+                // (karta zielonego ma juz wlasne CTA — bez dublowania).
+                if (hasMakieta(raw) && state.verdict === 'zielony' && !zg) anchor.insertAdjacentElement('afterend', mkCardEl());
             } else {
                 bubble.remove();
             }
@@ -12054,6 +12104,14 @@
         var m = raw.match(/<werdykt>([\s\S]*?)<\/werdykt>/);
         if (!m) return null;
         try { return JSON.parse(m[1]); } catch (e) { return null; }
+    }
+
+    // ZIELONE ŚWIATŁO (pozytywna decyzja przed rezerwacją). Marker <zielone>{mocne:[],dopracowac:[]}</zielone>.
+    function parseZielone(raw) {
+        if (!raw) return null;
+        var m = raw.match(/<zielone\b[^>]*>([\s\S]*?)<\/zielone>/);
+        if (!m) return (/<zielone\s*\/>/.test(raw) ? {} : null);   // pusty marker = generyczna karta
+        try { var o = JSON.parse(m[1]); return (o && typeof o === 'object') ? o : {}; } catch (e) { return {}; }
     }
 
     function parseProjektJson(raw) {
