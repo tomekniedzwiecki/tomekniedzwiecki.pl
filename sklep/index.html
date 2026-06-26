@@ -1852,6 +1852,13 @@
     .mk-set { display: flex; flex-direction: column; gap: 6px; }
     .mk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 620px) { .mk-grid { grid-template-columns: 1fr; } }
+    /* Mobile LANDSCAPE (niski viewport): pozwól przewijać panel i ścieśnij karty,
+       żeby przyciski wyboru (makiety/reklamy) zawsze były w zasięgu, nie poza ekranem. */
+    @media (max-height: 600px) and (orientation: landscape) {
+      .tabpane.is-active { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .mk-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .mk-card__img { max-height: 38vh; }
+    }
     .mk-card {
         border: 1px solid var(--glass-border);
         border-radius: 16px;
@@ -5734,7 +5741,36 @@
         try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
     }
     function saveJSON(key, val) {
-        try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+        try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+        catch (e) {
+            // QuotaExceeded (słabsze telefony, tryb prywatny) — zwolnij miejsce usuwając
+            // największe NIEistotne wpisy i ponów raz; gdy dalej brak miejsca — uprzedź usera
+            // (serwer i tak jest źródłem prawdy, ale lokalna lista mogłaby się nie zapisać).
+            var quota = e && (e.name === 'QuotaExceededError' || e.code === 22 || e.code === 1014 || e.name === 'NS_ERROR_DOM_QUOTA_REACHED');
+            if (quota) {
+                try { pruneLocalStorage(key); localStorage.setItem(key, JSON.stringify(val)); return true; }
+                catch (e2) { try { if (typeof toast === 'function') toast('Mało miejsca w przeglądarce — część lokalnej historii mogła się nie zapisać.'); } catch (_) {} }
+            }
+            return false;
+        }
+    }
+    // Usuwa do 3 największych NIEistotnych wpisów localStorage, by zwolnić miejsce.
+    // Esencjonalne wskaźniki (konto/aktywna rozmowa/tracking) zostają nietknięte.
+    function pruneLocalStorage(keepKey) {
+        var essential = { 'bud_owner': 1, 'bud_has_account': 1, 'bud_active': 1, 'bud_tracking': 1 };
+        if (keepKey) essential[keepKey] = 1;
+        for (var n = 0; n < 3; n++) {
+            var biggest = null, biggestSize = 0;
+            for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (!k || essential[k]) continue;
+                var v = '';
+                try { v = localStorage.getItem(k) || ''; } catch (e) {}
+                if (v.length > biggestSize) { biggestSize = v.length; biggest = k; }
+            }
+            if (!biggest) break;
+            try { localStorage.removeItem(biggest); } catch (e) {}
+        }
     }
     function esc(s) {
         // także " i ' — esc ląduje w atrybutach (value="...", url('...'))
@@ -6594,6 +6630,10 @@
         if (state.leadId) u += '&lead_id=' + encodeURIComponent(state.leadId);
         if (state.email) u += '&spar_email=' + encodeURIComponent(state.email);
         if (state.sessionId) u += '&sid=' + encodeURIComponent(state.sessionId);
+        // Dołącz click-ID/UTM JAWNIE do URL checkoutu — żeby atrybucja Purchase
+        // (Meta/Google/TikTok) nie zależała wyłącznie od pośredniego linku
+        // lead_id→lead_tracking (działa też zanim lead dostanie ID).
+        try { var qs = (typeof getTrackingQS === 'function') ? getTrackingQS() : ''; if (qs) u += '&' + qs; } catch (e) {}
         return u;
     }
 
@@ -8911,7 +8951,8 @@
         ov.innerHTML = '<div class="lpm-bar"><span>Podgląd Twojej strony sprzedażowej</span><button type="button" class="lpm-x" id="lpm-x" aria-label="Zamknij">✕</button></div>' +
             '<div class="lpm-body"><iframe id="lpm-frame" sandbox="" title="Podgląd strony"></iframe></div>';
         document.body.appendChild(ov);
-        try { el('lpm-frame').srcdoc = state.landingHtml; } catch (e) { }
+        try { el('lpm-frame').srcdoc = state.landingHtml; }
+        catch (e) { try { if (typeof toast === 'function') toast('Nie udało się wczytać podglądu strony.'); } catch (_) {} var m0 = el('landing-modal'); if (m0) m0.remove(); return; }
         function close() { var m = el('landing-modal'); if (m) m.remove(); document.removeEventListener('keydown', onKey); }
         function onKey(e) { if (e.key === 'Escape') close(); }
         el('lpm-x').addEventListener('click', close);
@@ -9185,8 +9226,29 @@
                 : '<div class="rkg-body">' + renderRich(String(r[1])) + '</div>';
             html += '<section class="rk-sec"><div class="rk-sec__head"><h3>' + esc(r[0]) + '</h3></div>' + val + '</section>';
         });
+        // Propozycje nazwy marki z raportu (sekcja „Marka i pozycjonowanie" → nazwy[]) —
+        // klient nie musi skakać między zakładkami; klik = dopisanie wyboru w rozmowie.
+        var brandNames = [];
+        try {
+            var secs = (state.raport && Array.isArray(state.raport.sekcje)) ? state.raport.sekcje : [];
+            for (var bi = 0; bi < secs.length; bi++) { if (secs[bi] && Array.isArray(secs[bi].nazwy) && secs[bi].nazwy.length) { brandNames = secs[bi].nazwy.slice(0, 6); break; } }
+        } catch (e) {}
+        if (brandNames.length) {
+            html += '<section class="rk-sec"><div class="rk-sec__head"><h3>Propozycje nazwy marki</h3></div>' +
+                '<div class="ust-names">' + brandNames.map(function (n) {
+                    return '<button type="button" class="ust-name" data-name="' + esc(String(n)) + '" style="display:inline-block;margin:4px 6px 0 0;padding:6px 13px;border:1px solid var(--glass-border);border-radius:999px;background:rgba(255,255,255,.05);color:inherit;cursor:pointer;font-size:.9em;transition:border-color .15s">' + esc(String(n)) + '</button>';
+                }).join('') + '</div>' +
+                '<div class="rkg-body" style="margin-top:7px;opacity:.7;font-size:.85em">Kliknij nazwę, którą chcesz — dopiszę ją w rozmowie do dopracowania.</div></section>';
+        }
         html += '</div><div class="pj-plan__note">Coś dopowiedzieć? Napisz w czacie — zaktualizuję ustalenia.</div>';
         body.innerHTML = html;
+        Array.prototype.forEach.call(body.querySelectorAll('.ust-name'), function (b) {
+            b.addEventListener('click', function () {
+                var nm = b.getAttribute('data-name') || '';
+                switchTab('chat');
+                var inp = el('chat-input'); if (inp) { inp.value = 'Podoba mi się nazwa marki: ' + nm; inp.focus(); }
+            });
+        });
     }
 
     /* ── RENDER: MAKIETY (4 style + picker) ── */
@@ -9223,7 +9285,8 @@
                 '</div>' +
                 '<div class="mk-card__b">' +
                   '<div class="mk-card__lab">' + esc(m.label || 'Styl') + '</div>' +
-                  (m.brief ? '<div class="mk-card__brief">' + esc(m.brief) + '</div>' : '') +
+                  // brief = techniczny prompt obrazu PO ANGIELSKU — NIE pokazujemy klientowi
+                  // (dezorientuje); sam polski label + podgląd wystarczą do wyboru.
                   '<button type="button" class="mk-pick" data-mk-pick="' + esc(m.style || '') + '">' + (chosen ? 'Wybrany ✓' : 'Wybieram ten styl') + '</button>' +
                 '</div>' +
                 '</div>';
@@ -9305,7 +9368,15 @@
                 '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
                 '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button></div>' +
                 '<div class="pj-plan__note">Masz uwagi do strony? Napisz w czacie — poprawię.</div>';
-            try { el('sk-frame').srcdoc = state.landingHtml; } catch (e) { }
+            try { el('sk-frame').srcdoc = state.landingHtml; }
+            catch (e) {
+                body.innerHTML = head +
+                    '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się załadować strony.</b>' +
+                    '<span>Spróbuj jeszcze raz — to chwila.</span></div>' +
+                    '<button type="button" class="preview-retry" id="sk-retry2">Spróbuj ponownie</button></div>';
+                var rb2 = el('sk-retry2'); if (rb2) rb2.addEventListener('click', function () { renderPaneSklep(); });
+                return;
+            }
             var fs = el('sk-fs'); if (fs) fs.addEventListener('click', openLandingPreview);
             return;
         }
@@ -9508,7 +9579,7 @@
             if (th) { var ti = +th.getAttribute('data-idx'); var its = VP_STATE.items || []; if (ti >= 0 && ti < its.length) { VP_STATE.lbIndex = ti; vpMarkSeen(its[ti]); renderLightbox(); } return; }
             var pk = e.target.closest('.vpm-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct((VP_STATE.items || [])[VP_STATE.lbIndex || 0]); closeVP(); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
             var ad = e.target.closest('.vpm-add'); if (ad) { var cur = (VP_STATE.items || [])[VP_STATE.lbIndex || 0]; if (!cur) return; if (slHas(cur)) removeFromShortlist(slKey(cur)); else addToShortlist(cur); renderLightbox(); return; }
-            var pt = e.target.closest('.vpm-pot'); if (pt) { if (streaming || el('inline-gate')) return; closeVP(); sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
+            var pt = e.target.closest('.vpm-pot'); if (pt) { if (streaming || el('inline-gate')) return; closeVP(); sendOpening(potOpening(pt)); return; }
         });
         document.body.appendChild(m);
         document.addEventListener('keydown', function (e) {
@@ -9573,7 +9644,7 @@
                 '<div class="vpm-actions">' +
                   '<button type="button" class="vpm-pick" data-pick="' + esc(p.name) + '">Wybieram ten produkt</button>' +
                   '<button type="button" class="vpm-add' + (slHas(p) ? ' is-in' : '') + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '">' + (slHas(p) ? '✓ W rozważam' : '+ Rozważam') + '</button>' +
-                  '<button type="button" class="vpm-pot" data-pot="' + esc(p.name) + '">Jaki ma potencjał?</button>' +
+                  '<button type="button" class="vpm-pot" data-pot="' + esc(p.name) + '" data-sv="' + (p.saves || '') + '" data-pl="' + (p.plays || '') + '" data-cm="' + (p.comments || '') + '" data-ag="' + (p.newest_days != null ? p.newest_days : '') + '" data-ct="' + esc(p.category || (typeof VP_STATE !== 'undefined' && VP_STATE.cat) || '') + '">Jaki ma potencjał?</button>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -9655,7 +9726,7 @@
             cards +=
                 '<div class="vp-card">' +
                     '<div class="vp-vid' + (p.cover ? '' : ' vp-noimg') + '" data-idx="' + i + '">' +
-                        (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
+                        (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" alt="' + esc(p.name || 'Produkt') + '" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
                         (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
                         '<button type="button" class="vp-fs" data-idx="' + i + '" aria-label="Pełny ekran">⛶</button>' +
                         '<button type="button" class="vp-add' + (slHas(p) ? ' is-in' : '') + '" data-idx="' + i + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '" title="' + (slHas(p) ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania') + '" aria-label="Rozważam">' + (slHas(p) ? '✓ Rozważam' : '+ Rozważam') + '</button>' +
@@ -9669,7 +9740,7 @@
                             '<span class="vp-stat"><b>' + fmtVP(p.comments) + '</b> komentarzy</span>' +
                         '</div>' +
                         '<button type="button" class="vp-pick" data-idx="' + i + '" data-pick="' + esc(p.name) + '">Wybieram ten</button>' +
-                        '<button type="button" class="vp-pot" data-pot="' + esc(p.name) + '">Jaki ma potencjał?</button>' +
+                        '<button type="button" class="vp-pot" data-pot="' + esc(p.name) + '" data-sv="' + (p.saves || '') + '" data-pl="' + (p.plays || '') + '" data-cm="' + (p.comments || '') + '" data-ag="' + (p.newest_days != null ? p.newest_days : '') + '" data-ct="' + esc(p.category || VP_STATE.cat || '') + '">Jaki ma potencjał?</button>' +
                     '</div>' +
                 '</div>';
         });
@@ -9908,7 +9979,7 @@
             var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openProductLightbox(+fs.getAttribute('data-idx')); return; }
             var ad = e.target.closest('.vp-add'); if (ad) { e.stopPropagation(); var pa = VP_STATE.items[+ad.getAttribute('data-idx')]; if (!pa) return; if (slHas(pa)) removeFromShortlist(slKey(pa)); else addToShortlist(pa); return; }
             var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct(VP_STATE.items[+pk.getAttribute('data-idx')]); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
-            var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening('Opowiedz mi więcej o potencjale tego produktu: ' + pt.getAttribute('data-pot')); return; }
+            var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening(potOpening(pt)); return; }
             var v = e.target.closest('.vp-vid'); if (v) {
                 var vi = +v.getAttribute('data-idx');
                 // double-tap (<300ms) na kadrze = dodaj do Rozważam (gest social, smaczek z A)
@@ -11892,6 +11963,19 @@
         if (!raw) return false;
         return /<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/.test(raw) || /<ustalenia\b[^>]*\/>/.test(raw);
     }
+    // Buduje bogaty „opening" o potencjale produktu z danych przyciętych na przycisku
+    // (liczby z TikToka), żeby AI miało konkrety do oceny, a nie samą nazwę.
+    function potOpening(btn) {
+        var name = (btn && btn.getAttribute('data-pot')) || 'ten produkt';
+        var pl = btn.getAttribute('data-pl'), sv = btn.getAttribute('data-sv'), cm = btn.getAttribute('data-cm'), ag = btn.getAttribute('data-ag'), ct = btn.getAttribute('data-ct');
+        var bits = [];
+        if (pl) bits.push(pl + ' wyświetleń');
+        if (sv) bits.push(sv + ' zapisów');
+        if (cm) bits.push(cm + ' komentarzy');
+        var sig = bits.length ? ' Sygnały z TikToka: ' + bits.join(', ') + (ag ? ', najnowszy film sprzed ' + ag + ' dni' : '') + '.' : '';
+        var cat = ct ? ' (kategoria: ' + ct + ')' : '';
+        return 'Opowiedz mi więcej o potencjale tego produktu: ' + name + cat + '.' + sig + ' Odnieś się do tych liczb i oceń realny potencjał sprzedaży w Polsce.';
+    }
     // Podświetl rekomendowaną kartę (zielony pierścień + scroll). Front-only, bez backendu.
     function applyWskaz(w) {
         if (!w) return;
@@ -11899,8 +11983,23 @@
         var items = VP_STATE.items || [];
         var idx = (w.idx != null) ? w.idx : -1;
         if (idx < 0 && w.nazwa) {
-            var nm = w.nazwa.trim().toLowerCase();
-            for (var j = 0; j < items.length; j++) { if ((items[j].name || '').trim().toLowerCase() === nm) { idx = j; break; } }
+            var nrm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9ąćęłńóśźż ]/g, '').replace(/\s+/g, ' ').trim(); };
+            var nm = nrm(w.nazwa);
+            // 1) dokładne dopasowanie (po normalizacji)
+            for (var j = 0; j < items.length; j++) { if (nrm(items[j].name) === nm) { idx = j; break; } }
+            // 2) fuzzy: zawieranie lub pokrycie tokenów — odporne na drobne zmiany nazwy
+            //    w ingescie TikTok (strict === gubiło podświetlenie przy najmniejszej różnicy).
+            if (idx < 0 && nm) {
+                var best = -1, bestScore = 0, toks = nm.split(' ').filter(Boolean);
+                for (var k = 0; k < items.length; k++) {
+                    var cand = nrm(items[k].name); if (!cand) continue;
+                    var score;
+                    if (cand.indexOf(nm) >= 0 || nm.indexOf(cand) >= 0) score = 0.9;
+                    else { var ct = cand.split(' ').filter(Boolean); var inter = toks.filter(function (t) { return ct.indexOf(t) >= 0; }).length; score = inter / Math.max(toks.length, ct.length, 1); }
+                    if (score > bestScore) { bestScore = score; best = k; }
+                }
+                if (best >= 0 && bestScore >= 0.5) idx = best;
+            }
         }
         if (idx < 0 || idx >= items.length) return;
         Array.prototype.forEach.call(wrap.querySelectorAll('.vp-card--rec'), function (c) { c.classList.remove('vp-card--rec'); });
