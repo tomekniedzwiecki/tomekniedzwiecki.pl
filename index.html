@@ -1405,6 +1405,105 @@
         .hero__h1-line__inner { transform: none; transition: none; }
         .nav__brand-dot { animation: none; }
     }
+    /* ============================================================
+       GALERIA „na żywo" — aplikacje, które właśnie powstają
+       (przeniesione z /aplikacja, ostylowane pod design hubu:
+        accent-blue = persona aplikacji, accent-green = „świeże").
+        Marquee mini-okien z prawdziwymi ekranami; klik → /inspiracje.
+       ============================================================ */
+    .applab {
+        position: relative;
+        z-index: 2;
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+        padding: clamp(4px, 1.5vh, 20px) 0 clamp(52px, 8vh, 96px);
+        text-align: center;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    .applab.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    }
+    .applab__eyebrow {
+        font-family: var(--serif); font-style: italic;
+        font-size: clamp(16px, 2vw, 26px);
+        color: var(--text-muted);
+        margin-bottom: clamp(8px, 1.4vh, 16px);
+        padding: 0 24px;
+    }
+    .applab__title {
+        font-family: var(--sans); font-weight: 800;
+        font-size: clamp(26px, 4vw, 54px); line-height: 1.04;
+        letter-spacing: -0.045em; color: var(--text-strong);
+        margin: 0 0 clamp(20px, 3.2vh, 40px);
+        padding: 0 24px;
+    }
+    .applab__title .ser { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent-blue); }
+    .applab__strip {
+        overflow: hidden; width: 100%;
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+                mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    }
+    .applab__track {
+        display: inline-flex; gap: clamp(14px, 1.6vw, 22px);
+        padding: 6px 0; white-space: nowrap;
+        animation: applabScroll 64s linear infinite; will-change: transform;
+    }
+    .applab__strip:hover .applab__track { animation-play-state: paused; }
+    @keyframes applabScroll { to { transform: translateX(-50%); } }
+    .applab__card {
+        flex: 0 0 auto;
+        width: clamp(238px, 23vw, 336px);
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #0a0a10;
+        overflow: hidden;
+        box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.9);
+        white-space: normal;
+    }
+    .applab__bar {
+        display: flex; align-items: center; gap: 6px;
+        padding: 8px 11px; border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .applab__dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.13); flex-shrink: 0; }
+    .applab__name {
+        margin-left: 4px; flex: 1; min-width: 0;
+        font-size: 11.5px; font-weight: 700; color: var(--text);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;
+    }
+    .applab__time {
+        flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px;
+        font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+        color: var(--text-faint); font-variant-numeric: tabular-nums;
+    }
+    .applab__time.is-fresh { color: var(--accent-green); }
+    .applab__time.is-fresh i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); animation: applabPulse 1.8s ease-in-out infinite; }
+    @keyframes applabPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .applab__screen { position: relative; aspect-ratio: 3 / 2; background: #0b0b11; }
+    .applab__screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    .applab__more {
+        display: inline-flex; align-items: center; gap: 8px;
+        margin-top: clamp(20px, 3vh, 38px);
+        font-family: var(--serif); font-style: italic;
+        font-size: clamp(16px, 1.9vw, 24px); color: var(--accent-blue);
+        transition: gap 0.25s var(--ease);
+    }
+    .applab__more .arr { transition: transform 0.25s var(--ease); }
+    .applab__more:hover { gap: 12px; }
+    .applab__more:hover .arr { transform: translateX(4px); }
+    @media (max-width: 820px) {
+        .applab { padding: 0 0 clamp(40px, 6vh, 64px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .applab { opacity: 1; transform: none; transition: none; }
+        .applab__track { animation: none; }
+        .applab__strip { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    }
+
     </style>
 </head>
 <body>
@@ -1529,6 +1628,20 @@
             </span>
         </a>
 
+    </section>
+
+    <!-- GALERIA „na żywo" — aplikacje, które właśnie powstają (feed publiczny) -->
+    <section class="applab" id="applab" aria-label="Aplikacje, które właśnie powstają" data-reveal data-delay="100">
+        <p class="applab__eyebrow">to nie są mockupy.</p>
+        <h2 class="applab__title">
+            Aplikacje, które <span class="ser">właśnie powstają</span>.
+        </h2>
+        <div class="applab__strip">
+            <div class="applab__track" id="applab-track"></div>
+        </div>
+        <a class="applab__more" href="https://tomekniedzwiecki.pl/aplikacja/inspiracje/">
+            Zobacz całą galerię <span class="arr" aria-hidden="true">→</span>
+        </a>
     </section>
 
     <!-- SIDE — ZWOLNIĘ (poboczny kierunek: dla prowadzących firmę) -->
@@ -1739,6 +1852,57 @@
     wire('.path--a', 'build');     // AWE — Zbuduję sklep online → /zbuduje/
     wire('.path--b', 'stworze');   // Stworzę — Zbuduję aplikację → /aplikacja/
     wire('.side__card', 'optimize'); // Prezesi — Zwolnię → /zwolnie/
+})();
+</script>
+
+<!-- GALERIA „na żywo" — marquee app-okien z feedu publicznego (jak na /aplikacja) -->
+<script>
+(function () {
+    'use strict';
+    var track = document.getElementById('applab-track');
+    if (!track) return;
+
+    var FEED_URL = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-public-feed';
+
+    function lightImg(url, w) {
+        // resize=contain obowiązkowo — bez niego render API tnie boki
+        return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') +
+            '?format=webp&width=' + (w || 760) + '&quality=70&resize=contain';
+    }
+    function sceneTime(iso) {
+        var d = new Date(iso);
+        if (isNaN(d)) return '';
+        var now = new Date();
+        var hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        if (d.toDateString() === now.toDateString()) return 'dziś ' + hm;
+        var y = new Date(now - 864e5);
+        if (d.toDateString() === y.toDateString()) return 'wczoraj ' + hm;
+        return d.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ', ' + hm;
+    }
+    var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+    var fresh = function (iso) { return (Date.now() - new Date(iso).getTime()) < 3600e3; };
+
+    function build(items) {
+        var list = (items || []).filter(function (p) { return p && p.img; }).slice(0, 12);
+        if (!list.length) return; // brak danych — zostaje sam nagłówek + link do galerii
+        var cards = list.map(function (p) {
+            var f = fresh(p.generated_at);
+            return '<article class="applab__card">' +
+                '<div class="applab__bar"><span class="applab__dot"></span><span class="applab__dot"></span><span class="applab__dot"></span>' +
+                '<span class="applab__name">' + esc(p.nazwa) + '</span>' +
+                '<span class="applab__time' + (f ? ' is-fresh' : '') + '">' + (f ? '<i></i>' : '') + esc(sceneTime(p.generated_at)) + '</span></div>' +
+                '<div class="applab__screen"><img src="' + esc(lightImg(p.img, 560)) + '" alt="' + esc(p.nazwa + ' — ekran aplikacji') + '" loading="lazy" decoding="async"></div>' +
+                '</article>';
+        }).join('');
+        // podwojenie ciągu = płynna pętla translateX(-50%); dopychamy do min. 8 kart
+        var unit = cards;
+        while (unit && (unit.match(/applab__card/g) || []).length < 8) unit += cards;
+        track.innerHTML = unit + unit;
+    }
+
+    fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        build((d && d.projekty) || []);
+    }).catch(function () { });
 })();
 </script>
 
