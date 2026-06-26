@@ -5601,7 +5601,7 @@
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
     var OPENER_PROMISE = 'Który bierzemy?';
 
-    var OPENER_GENERIC = OPENER_HI + '\n\nTomek od 15 lat buduje sklepy internetowe **razem z ludźmi** i zostaje wspólnikiem, kiedy zaczynają zarabiać. Wszystko rusza od jednego: **dobrego produktu** — dlatego przejrzałem **setki tysięcy filmów na TikToku** i wyłowiłem te, które sprzedają się właśnie teraz.\n\n**Wybierz jeden, który Cię ciekawi** — bez ślęczenia, to dopiero **pierwszy z wielu**. Na nim pokażę Ci, jak to działa: zrobimy **badanie rynku**, **branding** i **stronę sprzedażową**.\n\n' + OPENER_PROMISE;
+    var OPENER_GENERIC = OPENER_HI + ' Wyłowiłem z TikToka produkty, które **sprzedają się właśnie teraz** — wybierzesz jeden, a ja pokażę Ci na nim, jak budujemy z tego biznes: **badanie rynku, branding i gotowa strona sprzedażowa**.\n\nTo dopiero pierwszy z wielu, więc bez ślęczenia — zawsze weźmiemy inny. Gotowy? Klikaj 👇';
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
     var START_CHIPS = [
@@ -10042,6 +10042,24 @@
     }
 
     // Start świeżej rozmowy (ETAP 1): karuzela viralowych produktów z bud-tt-featured.
+    // Start świeżej rozmowy: button „ZACZYNAMY" — karuzelę produktów pokazujemy DOPIERO
+    // po kliknięciu (decyzja Tomka: nie wyrzucaj produktów od razu na wejściu).
+    function renderStartButton() {
+        if (el('vp-picker') || el('start-cta') || el('qr-chips')) return;
+        var div = document.createElement('div');
+        div.id = 'start-cta';
+        div.style.cssText = 'width:100%;max-width:740px;margin:16px auto 0;text-align:center';
+        div.innerHTML = '<button type="button" id="start-cta-btn" style="font:inherit;font-size:16px;font-weight:800;letter-spacing:.04em;cursor:pointer;border:0;border-radius:14px;padding:15px 42px;background:var(--accent,#00d97e);color:var(--accent-ink,#04130c);box-shadow:0 12px 32px -12px rgba(0,217,126,.6);transition:transform .15s ease,box-shadow .15s ease">ZACZYNAMY →</button>';
+        el('chat-msgs').appendChild(div);
+        scrollToBottom(false);
+        var b = el('start-cta-btn');
+        if (b) {
+            b.addEventListener('mouseenter', function () { b.style.transform = 'translateY(-2px)'; });
+            b.addEventListener('mouseleave', function () { b.style.transform = 'none'; });
+            b.addEventListener('click', function () { div.remove(); renderChips(); });
+        }
+    }
+
     function renderChips() {
         if (el('vp-picker')) return;
         injectVpStyle();
@@ -13568,7 +13586,7 @@
             // werdykt padł bez kontaktu (typowo: adopcja linkiem ?id=) → poproś o kontakt
             if (gatePending()) renderInlineGate();
         } else if (userCount === 0) {
-            renderChips();
+            renderStartButton();   // button „ZACZYNAMY" → karuzela dopiero po kliknięciu
         } else if (gatePending()) {
             renderInlineGate();
         } else if (isResume && messages.length > 1) {
@@ -13643,6 +13661,7 @@
                 if (!state.verdict && !el('inline-gate') && !streaming &&
                     messages.filter(function (m) { return m.role === 'user'; }).length === 0) {
                     removeChips();
+                    var _sc = el('start-cta'); if (_sc) _sc.remove();   // deep-link auto-wyboru pomija button
                     sendOpening(autoChoice.slice(0, 200));
                 }
             }
