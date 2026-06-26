@@ -5986,6 +5986,13 @@
     // więc usunięcie się nie cofa. Jeśli kasujemy aktywną — przeskocz na inną albo zacznij świeżą.
     function deleteConvo(sid, title) {
         if (!confirm('Usunąć rozmowę „' + (title || 'Rozmowa') + '"? Tej operacji nie cofniesz.')) return;
+        // USUŃ NA SERWERZE (konto) — inaczej syncAccountConvos przy odświeżeniu przywróci
+        // rozmowę z listy konta (serwer = źródło prawdy). Best-effort, nie blokuje lokalnego.
+        try {
+            if (authState && authState.token) {
+                fetch(SPAR_PROJECT_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ action: 'delete', sessionId: sid }) }).catch(function () { });
+            }
+        } catch (e) { }
         try {
             localStorage.removeItem(sessionKey(sid));
             localStorage.removeItem(messagesKey(sid));
@@ -7446,24 +7453,22 @@
     // research żyje, i nie czuje ciszy. Reużywa istniejący pasek postępu (genProgressHTML +
     // ticker, GEN_ETA.raport). Po gotowości karta zamienia się na „Zobacz raport".
     function rkChatCardInner(done) {
-        var nm = esc((state.chosenProduct && state.chosenProduct.name) || 'Twojego produktu');
+        // Świadomie MINIMALNIE — tylko pasek postępu z 3 info (decyzja Tomka:
+        // „nie pokazuj w całości, tylko pasek"). Bez nagłówka „Analizuję rynek dla X"
+        // ani akapitu — te treści i tak mówi AI w rozmowie.
         if (done) {
-            return '<div class="mk-card__eyebrow">Badanie rynku</div>' +
-                '<div class="mk-card__title">Raport strategiczny gotowy ✓</div>' +
-                '<p class="mk-card__d">Konkurencja, widełki cenowe, potencjał i kąt wejścia dla „' + nm + '" — gotowe. Zajrzyj, a potem dopniemy ustalenia „dla kogo to robimy".</p>' +
-                '<button type="button" class="side-cta__btn" id="rk-chat-open">Zobacz raport →</button>';
+            return '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>Raport potencjału rynku — gotowy</div>' +
+                '<button type="button" id="rk-chat-open" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">Zobacz raport →</button>';
         }
-        return '<div class="mk-card__eyebrow">Badanie rynku — w toku</div>' +
-            '<div class="mk-card__title">Analizuję rynek dla „' + nm + '"</div>' +
-            '<p class="mk-card__d">Realny research na żywo: konkurencja, ceny, luka rynkowa. To chwila — w międzyczasie spokojnie odpowiadaj na moje pytania, przydadzą się przy ustaleniach i stronie.</p>' +
-            genProgressHTML('raport', 'Raport potencjału rynku', 'konkurencja · ceny · luka rynkowa');
+        return genProgressHTML('raport', 'Raport potencjału rynku', 'konkurencja · ceny · luka rynkowa');
     }
     function showRaportProgressInChat() {
         if (!el('chat-msgs')) return;
         if (state.raport) return;            // już gotowy — bez paska
         if (el('rk-chat-card')) return;      // już pokazany
         var div = document.createElement('div');
-        div.className = 'mk-card'; div.id = 'rk-chat-card';
+        div.id = 'rk-chat-card';
+        div.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
         div.innerHTML = rkChatCardInner(false);
         el('chat-msgs').appendChild(div);
         startPjTicker();                     // animuje pasek (data-gen-key="raport")
@@ -9068,7 +9073,14 @@
 
         html += '<div class="pj-plan__note">Raport przygotowany automatycznie na podstawie publicznych źródeł. Pełną strategię i plan wdrożenia dopracujesz z Tomkiem po rezerwacji.</div>';
 
+        // PRZYKLEJONY pasek powrotu — żeby user nie utknął na raporcie i wiedział, co dalej.
+        // Sticky: trzyma się dołu panelu przy przewijaniu (najważniejsza akcja zawsze widoczna).
+        html += '<div class="rk-next-cta" style="position:sticky;bottom:0;margin:16px -2px 0;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:linear-gradient(0deg,rgba(8,8,10,.98),rgba(8,8,10,.82));border-top:1px solid var(--glass-border,rgba(255,255,255,.1));backdrop-filter:blur(6px);z-index:6">' +
+            '<span style="flex:1;min-width:170px;font-size:13px;line-height:1.45;color:var(--text-muted,#a1a1aa)"><b style="color:#e7e7ea">Co dalej:</b> wracamy do rozmowy — ustalimy „dla kogo to robimy", a potem zrobię 4 makiety sklepu do wyboru.</span>' +
+            '<button type="button" class="side-cta__btn" data-go-chat style="white-space:nowrap">Wróć do rozmowy →</button></div>';
+
         body.innerHTML = html;
+        var rkGc = body.querySelector('[data-go-chat]'); if (rkGc) rkGc.addEventListener('click', function () { switchTab('chat'); scrollToBottom(true); });
 
         if ('IntersectionObserver' in window) {
             // Wjazd sekcji + start animacji zegara i kropek
@@ -10960,7 +10972,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -10980,6 +10992,7 @@
             .replace(/<karuzela>[\s\S]*?<\/karuzela>/g, '')
             .replace(/<karuzela\b[^>]*\/?>/g, '')                 // <karuzela cat="X"> — przełączenie kategorii
             .replace(/<wskaz\b[^>]*>[\s\S]*?<\/wskaz>/g, '').replace(/<wskaz\b[^>]*\/?>/g, '') // <wskaz idx=N> — rekomendacja karty
+            .replace(/<wybor\b[^>]*>[\s\S]*?<\/wybor>/g, '').replace(/<wybor\b[^>]*\/?>/g, '') // <wybor nazwa="..."> — wybór produktu w rozmowie
             .replace(/<kierunki>[\s\S]*?<\/kierunki>/g, '')
             .replace(/<propozycje_zadaj>[\s\S]*?<\/propozycje_zadaj>/g, '').replace(/<propozycje_zadaj\s*\/?>/g, '')
             .replace(/<propozycje>[\s\S]*?<\/propozycje>/g, '')
@@ -11808,6 +11821,10 @@
                 } else if (wskaz) {
                     setTimeout(function () { applyWskaz(wskaz); }, 60);
                 }
+                // ETAP 1 — WYBÓR produktu w rozmowie (<wybor nazwa="...">): user zdecydował
+                // tekstem → zaznacz produkt jak klik „Wybieram ten" (setChosenProduct + raport).
+                var wyb = parseWybor(raw);
+                if (wyb) setTimeout(function () { applyWybor(wyb); }, 40);
                 // ETAP 2 — marker <ustalenia>: AI domknęło „dla kogo to jest" → odsłoń
                 // zakładkę MAKIETY i odpal generowanie (mockup czyta ustalenia z serwera).
                 if (parseUstalenia(raw)) onUstaleniaDone();
@@ -11988,6 +12005,48 @@
         if (idxM) out.idx = +idxM[1];
         if (nameM) out.nazwa = nameM[1];
         return (out.idx != null || out.nazwa) ? out : null;
+    }
+    // <wybor nazwa="..."> / <wybor idx="N"> — AI POTWIERDZA wybór produktu w rozmowie
+    // (np. „lecimy w klamkę", „biorę endoskop"). Front zaznacza go jak klik „Wybieram ten":
+    // setChosenProduct + chowa karuzelę + rusza raport. Bez tego wybór tekstem nic nie robił.
+    function parseWybor(raw) {
+        if (!raw) return null;
+        var mAttr = raw.match(/<wybor\b([^>]*?)\/?>/i);
+        var attrs = mAttr ? (mAttr[1] || '') : '';
+        var idxM = attrs.match(/idx\s*=\s*["']?(\d+)/i);
+        var nameM = attrs.match(/nazwa\s*=\s*["']([^"']+)["']/i);
+        var out = {};
+        if (idxM) out.idx = +idxM[1];
+        if (nameM) out.nazwa = nameM[1];
+        if (!out.nazwa && out.idx == null) {           // wariant blokowy <wybor>NAZWA</wybor>
+            var mBlock = raw.match(/<wybor\b[^>]*>([\s\S]*?)<\/wybor>/i);
+            if (mBlock && mBlock[1].trim()) out.nazwa = mBlock[1].trim();
+        }
+        return (out.idx != null || out.nazwa) ? out : null;
+    }
+    function applyWybor(w) {
+        if (!w || state.chosenProduct) return;          // już wybrany (klik kafla) — nie dubluj
+        var items = (typeof VP_STATE !== 'undefined' && VP_STATE.items) || [];
+        var idx = (w.idx != null) ? w.idx : -1;
+        if (idx < 0 && w.nazwa) {
+            var nrm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9ąćęłńóśźż ]/g, '').replace(/\s+/g, ' ').trim(); };
+            var nm = nrm(w.nazwa);
+            for (var j = 0; j < items.length; j++) { if (nrm(items[j].name) === nm) { idx = j; break; } }
+            if (idx < 0 && nm) {                        // fuzzy: zawieranie / pokrycie tokenów (jak applyWskaz)
+                var best = -1, bestScore = 0, toks = nm.split(' ').filter(Boolean);
+                for (var k = 0; k < items.length; k++) {
+                    var cand = nrm(items[k].name); if (!cand) continue;
+                    var score;
+                    if (cand.indexOf(nm) >= 0 || nm.indexOf(cand) >= 0) score = 0.9;
+                    else { var ct = cand.split(' ').filter(Boolean); var inter = toks.filter(function (t) { return ct.indexOf(t) >= 0; }).length; score = inter / Math.max(toks.length, ct.length, 1); }
+                    if (score > bestScore) { bestScore = score; best = k; }
+                }
+                if (best >= 0 && bestScore >= 0.5) idx = best;
+            }
+        }
+        if (idx < 0 || idx >= items.length) return;     // nie dopasowano — zostaw picker (user kliknie sam)
+        setChosenProduct(items[idx]);                   // zaznacza + persist + kickReport/kickSnapshot
+        removePicker();                                 // chowa karuzelę
     }
     // <karuzela cat="X"> — AI przełącza kategorię (analogicznie do kliknięcia chipa).
     function parseKaruzelaCat(raw) {
