@@ -7333,10 +7333,12 @@
                     updateSideBadges();
                     if (activeTab === 'rynek') renderPaneRynek();
                     if (activeTab === 'projekt') renderPaneProjekt();
+                    markRaportReadyInChat();   // pasek w rozmowie → „Zobacz raport"
                     showRaportReadyModal();
                     return;
                 }
                 if (res.ok && res.d && res.d.pending) {
+                    showRaportProgressInChat();   // pasek generowania wprost w rozmowie
                     // generowanie w tle (serwer) — dociągaj co 15s aż raport się zapisze (cap ~6 min)
                     if (attempt < 26) {
                         setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, false, attempt + 1); }, 15000);
@@ -7438,6 +7440,39 @@
         el('rr-open').addEventListener('click', function () { ov.remove(); switchTab('rynek'); });
         el('rr-close').addEventListener('click', function () { ov.remove(); });
         ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });
+    }
+
+    // Pasek generowania raportu WPROST W ROZMOWIE (poza sidebarem) — user widzi, że
+    // research żyje, i nie czuje ciszy. Reużywa istniejący pasek postępu (genProgressHTML +
+    // ticker, GEN_ETA.raport). Po gotowości karta zamienia się na „Zobacz raport".
+    function rkChatCardInner(done) {
+        var nm = esc((state.chosenProduct && state.chosenProduct.name) || 'Twojego produktu');
+        if (done) {
+            return '<div class="mk-card__eyebrow">Badanie rynku</div>' +
+                '<div class="mk-card__title">Raport strategiczny gotowy ✓</div>' +
+                '<p class="mk-card__d">Konkurencja, widełki cenowe, potencjał i kąt wejścia dla „' + nm + '" — gotowe. Zajrzyj, a potem dopniemy ustalenia „dla kogo to robimy".</p>' +
+                '<button type="button" class="side-cta__btn" id="rk-chat-open">Zobacz raport →</button>';
+        }
+        return '<div class="mk-card__eyebrow">Badanie rynku — w toku</div>' +
+            '<div class="mk-card__title">Analizuję rynek dla „' + nm + '"</div>' +
+            '<p class="mk-card__d">Realny research na żywo: konkurencja, ceny, luka rynkowa. To chwila — w międzyczasie spokojnie odpowiadaj na moje pytania, przydadzą się przy ustaleniach i stronie.</p>' +
+            genProgressHTML('raport', 'Raport potencjału rynku', 'konkurencja · ceny · luka rynkowa');
+    }
+    function showRaportProgressInChat() {
+        if (!el('chat-msgs')) return;
+        if (state.raport) return;            // już gotowy — bez paska
+        if (el('rk-chat-card')) return;      // już pokazany
+        var div = document.createElement('div');
+        div.className = 'mk-card'; div.id = 'rk-chat-card';
+        div.innerHTML = rkChatCardInner(false);
+        el('chat-msgs').appendChild(div);
+        startPjTicker();                     // animuje pasek (data-gen-key="raport")
+        scrollToBottom(false);
+    }
+    function markRaportReadyInChat() {
+        var card = el('rk-chat-card'); if (!card) return;
+        card.innerHTML = rkChatCardInner(true);
+        var b = el('rk-chat-open'); if (b) b.addEventListener('click', function () { switchTab('rynek'); });
     }
 
     // (Grafiki „marka istnieje" — sklep/telefon — wycofane decyzją Tomka
@@ -9945,7 +9980,10 @@
         sendOpening('Pomóż mi wybrać — który z tych produktów ma największy potencjał i dlaczego?\n' + lines);
     }
     function vpFetch(wrap) {
-        var u = VP_ENDPOINT + '?n=' + VP_STATE.n + '&page=' + VP_STATE.page + (VP_STATE.cat ? '&cat=' + encodeURIComponent(VP_STATE.cat) : '');
+        // Seed różnicowania (ustawiany świeżo przy otwarciu karuzeli — patrz renderChips);
+        // stabilny dla paginacji „Pokaż inne", różny między rozmowami. Fallback gdy brak.
+        if (!VP_STATE.seed) VP_STATE.seed = Math.floor(Math.random() * 1e9) + 1;
+        var u = VP_ENDPOINT + '?n=' + VP_STATE.n + '&page=' + VP_STATE.page + '&seed=' + VP_STATE.seed + (VP_STATE.cat ? '&cat=' + encodeURIComponent(VP_STATE.cat) : '');
         return fetch(u).then(function (r) { return r.json(); }).then(function (j) {
             if (!el('vp-picker')) return;
             if (j && j.categories) VP_STATE.cats = j.categories;
@@ -9965,6 +10003,7 @@
         if (el('vp-picker')) return;
         injectVpStyle();
         VP_STATE.cat = ''; VP_STATE.page = 0;
+        VP_STATE.seed = Math.floor(Math.random() * 1e9) + 1;   // świeży seed = inny zestaw produktów co rozmowę
         VP_STATE.shortlist = []; VP_STATE.seen = {};   // świeży start; potem ewentualne wskrzeszenie z LS tej sesji
         slRestore();                                    // przeżyj F5 / „Pokaż inne" w obrębie tej samej rozmowy
         var wrap = document.createElement('div'); wrap.className = 'vp'; wrap.id = 'vp-picker';
