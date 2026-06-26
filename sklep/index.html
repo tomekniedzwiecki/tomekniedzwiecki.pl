@@ -6023,8 +6023,15 @@
         renderChosenProduct();
         // SEKWENCJA (nie równolegle): najpierw RAPORT. Reszta etapów (ustalenia → makiety →
         // reklamy → sklep) odpala się po kolei, każdy po akceptacji poprzedniego.
-        kickSnapshot();      // snapshot aukcji AliExpress w tle (zasili makiety/landing)
-        kickReport(false);   // raport strategiczny startuje od razu po wyborze (w tle)
+        // BRAMKA KONTAKTU PRZED RAPORTEM (decyzja Tomka): imię + nazwisko + e-mail, żeby
+        // raport NIE generował się dla anonimowej sesji. Po domknięciu bramki (lub gdy
+        // kontakt już jest) ruszają snapshot + raport; reszta etapów po kolei jak wcześniej.
+        var _startGen = function () {
+            kickSnapshot();      // snapshot aukcji AliExpress w tle (zasili makiety/landing)
+            kickReport(false);   // raport strategiczny startuje po skompletowaniu kontaktu (w tle)
+        };
+        if (requireLeadBeforeReport(_startGen)) return;
+        _startGen();
     }
     // Snapshot aukcji AliExpress (tytuł, zdjęcia) — cache po stronie serwera (bud_tt_products).
     // Sesja powstaje po 1. wiadomości bud-chat → retry na 404.
@@ -7331,7 +7338,7 @@
         if (activeTab === 'rynek') renderPaneRynek();
         fetch(SPAR_RAPORT_ENDPOINT, {
             method: 'POST', headers: authHeaders(),
-            body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, recipient: state.name || '' })
+            body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, recipient: state.name || '', email: state.email || '' })
         }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
@@ -7344,12 +7351,18 @@
                     showRaportReadyModal();
                     return;
                 }
+                // Backstop: serwer odmówił generacji bez kontaktu (anonimowa sesja) — pokaż bramkę.
+                if (res.ok && res.d && res.d.needs_contact) {
+                    extras.raport = 'idle';
+                    requireLeadBeforeReport(function () { extras.raport = 'gen'; _doReport(sid, false, 0); });
+                    return;
+                }
                 if (res.ok && res.d && res.d.pending) {
                     showRaportProgressInChat();   // pasek generowania wprost w rozmowie
                     // generowanie w tle (serwer) — dociągaj co 15s aż raport się zapisze (cap ~6 min)
                     if (attempt < 26) {
                         setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, false, attempt + 1); }, 15000);
-                    } else { extras.raport = 'fail'; updateSideBadges(); if (activeTab === 'rynek') renderPaneRynek(); }
+                    } else { extras.raport = 'fail'; updateSideBadges(); if (activeTab === 'rynek') renderPaneRynek(); genFailMsg('raport', function () { kickReport(true); }); }
                     return;
                 }
                 // Sesja jeszcze nie istnieje na serwerze (404) — bud-chat tworzy ją po 1. wiadomości. Ponów.
@@ -7395,7 +7408,7 @@
                     kickLanding(false);   // reklamy gotowe → buduj stronę (sklep)
                     return;
                 }
-                if (res.ok && res.d && res.d.pending) { if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); } return; }
+                if (res.ok && res.d && res.d.pending) { if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; }
                 adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy();
             }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); });
@@ -7426,7 +7439,7 @@
                     if (activeTab === 'sklep') renderPaneSklep();
                     return;
                 }
-                if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else { landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); } return; }
+                if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else { landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; }
                 landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep();
             }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); });
@@ -7478,6 +7491,24 @@
         var card = el('rk-chat-card'); if (!card) return;
         card.innerHTML = rkChatCardInner(true);
         var b = el('rk-chat-open'); if (b) b.addEventListener('click', function () { switchTab('rynek'); });
+    }
+    // Uczciwy komunikat zamiast cichego fail / wiszącego w nieskończoność spinnera.
+    // Pokazuje, że dany etap trwa dłużej, daje „Spróbuj ponownie" i uspokaja, że
+    // reszta jest niezależna (nie blokujemy drogi do rezerwacji).
+    function genFailMsg(stage, retryFn) {
+        var labels = { raport: 'raportu', makiety: 'makiet', reklamy: 'reklam', sklep: 'strony sprzedażowej' };
+        var lab = labels[stage] || 'tego etapu';
+        var id = 'genfail-' + stage;
+        if (el(id) || !el('chat-msgs')) return;
+        var div = document.createElement('div');
+        div.id = id;
+        div.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid rgba(245,158,11,.35);border-radius:14px;background:rgba(245,158,11,.08)';
+        div.innerHTML = '<div style="font-size:13px;color:var(--text,#e7e7ea);margin-bottom:8px">Generowanie ' + lab + ' trwa dłużej niż zwykle. Możesz spróbować ponownie — reszta etapów jest niezależna, więc spokojnie idziemy dalej.</div>' +
+            '<button type="button" id="' + id + '-retry" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">Spróbuj ponownie</button>';
+        el('chat-msgs').appendChild(div);
+        scrollToBottom(false);
+        var b = el(id + '-retry');
+        if (b) b.addEventListener('click', function () { div.remove(); try { retryFn(); } catch (e) {} });
     }
 
     // (Grafiki „marka istnieje" — sklep/telefon — wycofane decyzją Tomka
@@ -9198,7 +9229,7 @@
                 }
                 if (res.ok && res.d && res.d.pending) {
                     if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, false, attempt + 1); }, 12000);
-                    else { mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); }
+                    else { mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); genFailMsg('makiety', function () { kickMockup(true); }); }
                     return;
                 }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) {
@@ -10299,9 +10330,11 @@
     // Lekki zapis kontaktu (event:'contact') — przypina konto/mail/telefon do
     // sesji bez pełnej tury. JWT (gdy zalogowany) decyduje o tożsamości na serwerze.
     function syncContactToServer() {
-        if (!sbAuth || !state.sessionId) return;
+        if (!sbAuth || !state.sessionId) return null;
         try {
-            fetch(SPAR_ENDPOINT, {
+            // Zwraca promise — bramka lead czeka na zapis kontaktu, zanim odpali raport
+            // (bud-raport bramkuje generację na obecności session.email).
+            return fetch(SPAR_ENDPOINT, {
                 method: 'POST',
                 headers: authHeaders(),
                 body: JSON.stringify({
@@ -10312,7 +10345,7 @@
                     phone: state.phone || null
                 })
             }).catch(function () { });
-        } catch (e) { }
+        } catch (e) { return null; }
     }
     function initAuth() {
         if (!sbAuth) { authState.ready = true; renderAuthUI(); return; }
@@ -10754,6 +10787,97 @@
         // („wow" przychodzi PO kontakcie) — generowanie i tak jest twardo bramkowane
         // przez requireContactBeforeGen.
         return gateContactMissing();
+    }
+
+    // ── Bramka LEAD PRZED raportem (nowy lejek /sklep) ──────────────────────────
+    // Cel (Tomek): zero anonimowych sesji odpalających generację. Zanim ruszy raport,
+    // zbieramy imię + nazwisko + e-mail (lekko, bez wymuszania logowania OAuth — to
+    // przyszłoby dopiero przy głębszych etapach). Po domknięciu ruszamy odłożony genFn.
+    var LEAD_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    function leadGateMissing() {
+        return !(state.email && LEAD_EMAIL_RE.test(state.email) && state.name && state.name.trim());
+    }
+    function requireLeadBeforeReport(genFn) {
+        if (!leadGateMissing()) return false;
+        pendingGen = genFn;
+        renderLeadGate();
+        return true;
+    }
+    function renderLeadGate() {
+        if (el('lead-gate')) return;
+        removeChips();
+        setComposerEnabled(false);
+        var div = document.createElement('div');
+        div.className = 'msg msg--ai msg--gate';
+        div.id = 'lead-gate';
+        div.innerHTML =
+            '<div class="gate2">' +
+            '<h3 class="gate2__title">Zostaw kontakt — zbuduję Twój raport</h3>' +
+            '<p class="gate2__sub">Przygotuję dedykowaną analizę Twojego produktu — rynek, grupa docelowa, marka i plan. Zajmie mi to ok. 2 minuty.</p>' +
+            '<form id="lead-form" class="gate2__form" novalidate>' +
+            '<input class="f-input" type="text" id="lead-first" placeholder="Imię" autocomplete="given-name" maxlength="60" required>' +
+            '<div class="f-error" id="lead-first-error">Podaj imię.</div>' +
+            '<input class="f-input" type="text" id="lead-last" placeholder="Nazwisko" autocomplete="family-name" maxlength="80" required>' +
+            '<div class="f-error" id="lead-last-error">Podaj nazwisko.</div>' +
+            '<input class="f-input" type="email" inputmode="email" id="lead-email" placeholder="Twój e-mail" autocomplete="email" maxlength="160" required>' +
+            '<div class="f-error" id="lead-email-error">Podaj poprawny e-mail.</div>' +
+            '<button type="submit" class="btn" id="lead-submit" style="width:100%;margin-top:6px">Generuj mój raport →</button>' +
+            '</form>' +
+            '<p class="gate2__note">Bez spamu. Kontakt służy temu projektowi i rozmowie z Tomkiem.</p>' +
+            '</div>';
+        el('chat-msgs').appendChild(div);
+        scrollToBottom(true);
+        setTimeout(function () {
+            var f = el('lead-first');
+            if (f) { try { f.focus(); } catch (e) {} if (f.scrollIntoView) f.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+        }, 280);
+        el('lead-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var first = el('lead-first').value.trim();
+            var last = el('lead-last').value.trim();
+            var mail = el('lead-email').value.trim();
+            var ok = true;
+            el('lead-first-error').classList.toggle('is-shown', !first); if (!first) ok = false;
+            el('lead-last-error').classList.toggle('is-shown', !last); if (!last) ok = false;
+            var mailOk = LEAD_EMAIL_RE.test(mail);
+            el('lead-email-error').classList.toggle('is-shown', !mailOk); if (!mailOk) ok = false;
+            if (!ok) return;
+            state.name = (first + ' ' + last).trim();
+            state.email = mail;
+            state.emailKnown = true;
+            persistSession();
+            // Kontakt prosto do bazy ZANIM ruszy generacja (bud-raport sprawdza session.email);
+            // po zapisie (lub po krótkim fallbacku) odpalamy odłożony genFn.
+            var done = false;
+            var go = function () {
+                if (done) return; done = true;
+                div.remove();
+                fireLeadConversion();
+                setComposerEnabled(true);
+                sysMsg('Dzięki, ' + first + '. Buduję Twój raport — to potrwa ok. 2 minuty. W tym czasie pogadajmy o Twoim biznesie.');
+                resumePendingGen();
+            };
+            var p = syncContactToServer();
+            if (p && p.then) { p.then(go, go); setTimeout(go, 4000); } else { go(); }
+        });
+    }
+    // Konwersja LEAD (mail skompletowany) — keyed na e-mail, dedup raz na sesję.
+    // Odpowiednik bloku z bramki telefonu, by /sklep liczył leady już na e-mailu.
+    function fireLeadConversion() {
+        try {
+            var k = 'bud_lead_evt_' + state.sessionId;
+            if (state.email && !sessionStorage.getItem(k)) {
+                sessionStorage.setItem(k, '1');
+                var id = 'lead_' + state.sessionId;
+                if (typeof gtag === 'function') gtag('event', 'generate_lead', { persona: 'stworze', method: 'lead_gate' });
+                gaEvent('form_complete', { method: 'lead_gate' });
+                gaEvent('app_lead', { method: 'lead_gate' });
+                if (window.fbq) fbq('track', 'Lead', { content_name: 'sklep_lead' }, { eventID: id });
+                if (window.ttq) ttq.track('CompleteRegistration', { content_name: 'sklep_lead' }, { event_id: id });
+                if (typeof metaCapi === 'function') metaCapi('Lead', { event_id: id, content_name: 'sklep_lead' });
+                if (typeof tiktokCapi === 'function') tiktokCapi('CompleteRegistration', { event_id: id, content_name: 'sklep_lead' });
+            }
+        } catch (e) {}
     }
 
     // Bramka kontaktu PRZED generowaniem. Gdy brak maila/telefonu — pokazujemy
