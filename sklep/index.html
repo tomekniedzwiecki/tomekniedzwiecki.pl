@@ -11625,7 +11625,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia', '<zielone']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia', '<zielone', '<dopytanie']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -11654,7 +11654,8 @@
             .replace(/<kamien>[\s\S]*?<\/kamien>/g, '')
             .replace(/<bierny>[\s\S]*?<\/bierny>/g, '').replace(/<bierny\s*\/?>/g, '')
             .replace(/<rezygnacja>[\s\S]*?<\/rezygnacja>/g, '').replace(/<rezygnacja\s*\/?>/g, '')
-            .replace(/<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/g, '').replace(/<ustalenia\b[^>]*\/?>/g, '');
+            .replace(/<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/g, '').replace(/<ustalenia\b[^>]*\/?>/g, '')
+            .replace(/<dopytanie>[\s\S]*?<\/dopytanie>/g, '');   // 2. wiadomość (pytania) — renderowana osobno po pasku raportu
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
             var i = t.indexOf(HIDDEN_MARKS[m]);
@@ -11790,6 +11791,21 @@
         } else { reveal(); }
     }
 
+    // Po wyborze produktu 1. tura mózgu = potwierdzenie + „zaczynam analizę" (widoczne),
+    // a pytania ustaleń są w <dopytanie>…</dopytanie> → renderowane OSOBNYM dymkiem PO pasku raportu.
+    function parseDopytanie(content) {
+        var m = String(content || '').match(/<dopytanie>([\s\S]*?)<\/dopytanie>/);
+        return (m && m[1].trim()) ? m[1].trim() : null;
+    }
+    function appendDopytanie(q) {
+        showRaportProgressInChat();   // pasek raportu MIĘDZY potwierdzeniem a pytaniem (idempotentny)
+        var d = document.createElement('div');
+        d.className = 'msg msg--ai';
+        d.innerHTML = renderRich(q);
+        el('chat-msgs').appendChild(d);
+        scrollToBottom(false);
+        return d;
+    }
     function appendMessage(role, content) {
         var div = document.createElement('div');
         div.className = 'msg msg--' + (role === 'user' ? 'user' : 'ai');
@@ -11809,6 +11825,8 @@
             var zg = parseZielone(content);
             if (zg) { if (state.verdict !== 'zielony') state.verdict = 'zielony'; renderVerdict('zielony', state.karta); }   // replay → karta „Projekt zdefiniowany"
             if (hasMakieta(content) && state.verdict === 'zielony' && !zg) el('chat-msgs').appendChild(mkCardEl());
+            var dqR = parseDopytanie(content);
+            if (dqR) appendDopytanie(dqR);   // reload: pytania jako osobny dymek
         }
         pinPickerBottom();   // karuzela ETAP 1 zawsze na dole, pod najnowszą wiadomością
         scrollToBottom(false);
@@ -12509,6 +12527,10 @@
                     anchor.insertAdjacentElement('afterend', krEl);
                     anchor = krEl;
                 }
+                // 1. tura po wyborze produktu: pytania ustaleń w <dopytanie> → OSOBNY dymek
+                // po pasku raportu (krótkie opóźnienie, żeby „doszły" jak druga wiadomość).
+                var dopyt = parseDopytanie(raw);
+                if (dopyt) setTimeout(function () { appendDopytanie(dopyt); }, 650);
                 // ETAP 1 — tryb PRZEWODNIK: AI przełącza kategorię (<karuzela cat="X">)
                 // i/lub wskazuje 1 hit (<wskaz idx="N">). Front-only: cat → vpFetch jak klik chipa,
                 // potem podświetl wskazaną kartę zielonym pierścieniem + scroll.
