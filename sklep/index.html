@@ -1954,6 +1954,10 @@
     .brand-logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
     .brand-logo { padding: 0; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); border-radius: 12px; overflow: hidden; background: #fff; cursor: pointer; aspect-ratio: 1; transition: border-color 0.15s, transform 0.15s; }
     .brand-logo:hover { border-color: var(--accent, #00d97e); transform: translateY(-2px); }
+    .brand-logo.is-sel { border-color: var(--accent, #00d97e); box-shadow: 0 0 0 2px rgba(0, 217, 126, 0.35); }
+    .brand-logo-go { margin-top: 12px; width: 100%; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); background: rgba(255, 255, 255, 0.05); color: var(--text-muted, #9a9aa2); padding: 9px 14px; border-radius: 8px; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .brand-logo-go:disabled { cursor: default; opacity: 0.55; }
+    .brand-logo-go.is-ready { background: #fff; color: #000; border-color: #fff; }
     .brand-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .brand-chosen { margin: 12px 0 6px; }
     .brand-chosen img { max-width: 160px; width: 100%; border-radius: 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); background: #fff; }
@@ -1965,9 +1969,10 @@
     .stagebar__cta:hover { background: rgba(0, 112, 243, 0.22); color: #fff; }
     /* D: marka (logo) w panelu bocznym */
     .side__brand { margin: 2px 0 8px; }
-    .side-brand { display: flex; align-items: center; gap: 10px; padding: 9px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09)); border-radius: 10px; background: rgba(255, 255, 255, 0.022); }
-    .side-brand__logo { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #fff; display: grid; place-items: center; }
-    .side-brand__logo img { width: 100%; height: 100%; object-fit: contain; }
+    .side-brand { display: flex; align-items: center; justify-content: center; padding: 8px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09)); border-radius: 10px; background: rgba(255, 255, 255, 0.022); }
+    /* FIX(7): sam logo, przycięte w pionie (góra/dół) tak, by został środkowy pas z nazwą marki */
+    .side-brand__logo { flex: 1 1 auto; width: 100%; height: 34px; border-radius: 8px; overflow: hidden; background: #fff; display: grid; place-items: center; }
+    .side-brand__logo img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
     .side-brand__meta { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     .side-brand__name { font-size: 13px; font-weight: 600; color: var(--text-strong, #ededed); letter-spacing: -0.01em; }
     .side-brand__dom { font: 400 11px/1.3 ui-monospace, "Geist Mono", SFMono-Regular, monospace; color: var(--text-muted, #8a8a8a); }
@@ -6854,9 +6859,8 @@
         var b = state.brand;
         if (!b || !b.chosen_logo) { box.hidden = true; box.innerHTML = ''; return; }
         box.hidden = false;
-        box.innerHTML = '<div class="side__sect">Twoja marka</div>' +
-            '<div class="side-brand"><span class="side-brand__logo"><img referrerpolicy="no-referrer" src="' + esc(b.chosen_logo) + '" alt="logo"></span>' +
-            '<span class="side-brand__meta"><span class="side-brand__name">' + esc(b.chosen_name || '') + '</span>' + (b.chosen_domain ? '<span class="side-brand__dom">' + esc(b.chosen_domain) + '</span>' : '') + '</span></div>';
+        // FIX(7): tylko logo (nazwa jest na samym obrazie) — przycięte w pionie przez CSS .side-brand__logo
+        box.innerHTML = '<div class="side-brand"><span class="side-brand__logo"><img referrerpolicy="no-referrer" src="' + esc(b.chosen_logo) + '" alt="' + esc(b.chosen_name || 'logo') + '"></span></div>';
     }
     function renderBrandResumeCard() {
         var b = state.brand;
@@ -7601,6 +7605,7 @@
                 if (res.ok && res.d && res.d.landing_html) {
                     state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle';
                     genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
+                    if (pendingShopSugg) { renderSuggestions(pendingShopSugg.opts, pendingShopSugg.multi); pendingShopSugg = null; }   // FIX(5): odroczone „co poprawić" — teraz sklep gotowy
                     if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                     updateBudNav();
                     if (activeTab === 'sklep') renderPaneSklep();
@@ -7713,6 +7718,8 @@
             '<button type="button" id="' + bid + '" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">' + (btnLabel || 'Zobacz →') + '</button>';
         var b = el(bid); if (b) b.addEventListener('click', function () { switchTab(openTab); });
         Array.prototype.forEach.call(card.querySelectorAll('.genthumb'), function (t) { t.addEventListener('click', function () { switchTab(openTab); }); });
+        // FIX(6): gotowa karta REKLAM = najnowsza wiadomość → na DÓŁ czatu (flip robił to w miejscu starego paska, wyżej).
+        if (id === 'ad-chat-card') { var _m = el('chat-msgs'); if (_m && card.parentNode === _m && _m.lastChild !== card) _m.appendChild(card); }
     }
     // Uczciwy komunikat zamiast cichego fail / wiszącego w nieskończoność spinnera.
     // Pokazuje, że dany etap trwa dłużej, daje „Spróbuj ponownie" i uspokaja, że
@@ -9568,6 +9575,10 @@
             card.querySelectorAll('.brand-name').forEach(function (b) {
                 b.addEventListener('click', function () { pickBrandName(card, names[+b.getAttribute('data-i')]); });
             });
+            // FIX(1): nie czekaj na klik — automatycznie weź pierwszą nazwę z wolną domeną i OD RAZU
+            // generuj logo (rozmowa się nie zacina). Klik w inną nazwę nadal nadpisuje wybór.
+            var autoN = names.filter(function (x) { return x && x.available; })[0] || names[0];
+            if (autoN && !state._brandAuto) { state._brandAuto = true; pickBrandName(card, autoN); }
         }).catch(function () { card.innerHTML = '<div class="brand-card__t">Nie udało się dobrać nazw. Spróbuj odświeżyć.</div>'; });
     }
     function pickBrandName(card, n) {
@@ -9575,11 +9586,21 @@
         brandFetch('logos', { name: n.name, domain: n.domain }).then(function (d) {
             var logos = (d && d.logos) || [];
             if (!logos.length) { card.innerHTML = '<div class="brand-card__t">Logo się nie udało — spróbujemy przy budowie strony. Marka: <b>' + esc(n.name) + '</b>.</div>'; brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () {}); state.brandDone = true; return; }
-            card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub">Użyję go na Twojej stronie sprzedażowej:</div></div>' +
-                '<div class="brand-logos">' + logos.map(function (u, i) { return '<button type="button" class="brand-logo" data-i="' + i + '"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt="logo ' + (i + 1) + '"></button>'; }).join('') + '</div>';
+            card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub">Kliknij to, które czujesz, a potem potwierdź:</div></div>' +
+                '<div class="brand-logos">' + logos.map(function (u, i) { return '<button type="button" class="brand-logo" data-i="' + i + '"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt="logo ' + (i + 1) + '"></button>'; }).join('') + '</div>' +
+                '<button type="button" class="brand-logo-go" disabled>Najpierw wybierz logo</button>';
+            // FIX(3): klik zaznacza KANDYDATA; dopiero przycisk „Wybieram to logo" finalizuje wybór.
+            var chosenLogoUrl = null;
+            var goBtn = card.querySelector('.brand-logo-go');
             card.querySelectorAll('.brand-logo').forEach(function (b) {
-                b.addEventListener('click', function () { pickBrandLogo(card, n, logos[+b.getAttribute('data-i')]); });
+                b.addEventListener('click', function () {
+                    chosenLogoUrl = logos[+b.getAttribute('data-i')];
+                    card.querySelectorAll('.brand-logo').forEach(function (x) { x.classList.remove('is-sel'); });
+                    b.classList.add('is-sel');
+                    goBtn.disabled = false; goBtn.classList.add('is-ready'); goBtn.textContent = 'Wybieram to logo';
+                });
             });
+            goBtn.addEventListener('click', function () { if (chosenLogoUrl) pickBrandLogo(card, n, chosenLogoUrl); });
         }).catch(function () { card.innerHTML = '<div class="brand-card__t">Logo się nie udało. Spróbujemy przy budowie strony.</div>'; });
     }
     function pickBrandLogo(card, n, url) {
@@ -9612,7 +9633,7 @@
         var rows = [
             ['Dla kogo', u.dla_kogo || u.dlaKogo || u.audience],
             ['Kąt sprzedaży', u.kat || u.kąt || u.angle],
-            ['Ton komunikacji', u.ton || u.tone],
+            ['Ton komunikacji', u.ton_marki || u.ton || u.tone],
             ['Kluczowe korzyści', u.korzysci || u.korzyści || u.benefits]
         ];
         var html = head + '<div class="ust-card">';
@@ -11988,6 +12009,11 @@
         var s = parseOpcje(content);
         return s ? { opts: s, multi: false } : null;
     }
+    // FIX(5): podpowiedzi „co poprawić w sklepie" mają sens DOPIERO gdy sklep (landing) gotowy.
+    var pendingShopSugg = null;
+    function suggIsShopEdit(opts) {
+        return Array.isArray(opts) && opts.some(function (o) { return /domow|technicznie|popraw|tekst|doradź|doradz|wygląd|sklep|stron/i.test(String(o)); });
+    }
 
     var chipStreak = 0;      // kliknięcia w dymki z rzędu (bez własnego tekstu)
     var nudgeShown = false;  // jednorazowy nudge „możesz też pisać"
@@ -12548,7 +12574,14 @@
                 if (wyb) setTimeout(function () { applyWybor(wyb); }, 40);
                 // ETAP 2 — marker <ustalenia>: AI domknęło „dla kogo to jest" → odsłoń
                 // zakładkę MAKIETY i odpal generowanie (mockup czyta ustalenia z serwera).
-                if (parseUstalenia(raw)) onUstaleniaDone();
+                var _ust = parseUstalenia(raw);
+                if (_ust) {
+                    if (typeof _ust === 'object' && Object.keys(_ust).length && JSON.stringify(_ust) !== JSON.stringify(state.ustalenia)) {
+                        state.ustalenia = _ust; persistSession();
+                        if (activeTab === 'ustalenia') renderPaneUstalenia();
+                    }
+                    onUstaleniaDone();
+                }
                 // Propozycje produktów (K1) — fallback z markera <propozycje>, gdy
                 // backend wstawi listę w treści tury zamiast SSE bud_propozycje.
                 // Pomijamy, jeśli karuzela już zrenderowana przez SSE (brak duplikatu).
@@ -12630,7 +12663,9 @@
             } else if (widget) {
                 renderWidget(widget);
             } else if (sugg) {
-                renderSuggestions(sugg.opts, sugg.multi);
+                // chipy o poprawkach sklepu pokazujemy DOPIERO, gdy landing gotowy (inaczej user czeka ~4 min)
+                if (suggIsShopEdit(sugg.opts) && !state.landingHtml) { pendingShopSugg = sugg; }
+                else renderSuggestions(sugg.opts, sugg.multi);
             }
             updateStages();
             scrollToBottom(false);
@@ -12793,9 +12828,16 @@
     // <ustalenia> — AI domknęło etap „dla kogo to jest" (ustalenia zapisuje serwer).
     // Wykrywamy SAMĄ OBECNOŚĆ markera (treść/JSON opcjonalna — front i tak czyta
     // ustalenia z syncu serwera). Wspiera blok ...</ustalenia> i self-closing.
+    // FIX(2): zwraca OBIEKT ustaleń z markera (nie boolean) — żeby zakładka „Ustalenia" miała treść
+    // od razu (zgodnie z badge „gotowe"), nie czekając na sync serwera. {} = znacznik bez treści.
     function parseUstalenia(raw) {
-        if (!raw) return false;
-        return /<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/.test(raw) || /<ustalenia\b[^>]*\/>/.test(raw);
+        if (!raw) return null;
+        var m = raw.match(/<ustalenia\b[^>]*>([\s\S]*?)<\/ustalenia>/i) || raw.match(/<ustalenia\b([^>]*)\/>/i);
+        if (!m) return null;
+        var inner = (m[1] || '').trim();
+        if (inner && inner.charAt(0) === '{') { try { var j = JSON.parse(inner); if (j && typeof j === 'object' && !Array.isArray(j)) return j; } catch (e) { /* niepoprawny JSON — niżej */ } }
+        var attrs = {}; m[0].replace(/([\w-]+)\s*=\s*"([^"]*)"/g, function (_, k, v) { attrs[k] = v; return ''; });
+        return Object.keys(attrs).length ? attrs : {};
     }
     // Buduje bogaty „opening" o potencjale produktu z danych przyciętych na przycisku
     // (liczby z TikToka), żeby AI miało konkrety do oceny, a nie samą nazwę.
