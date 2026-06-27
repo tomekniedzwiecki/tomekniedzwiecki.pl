@@ -9889,7 +9889,7 @@
             '<button type="button" class="vp-more">Pokaż inne ↻</button>' +
             '<span class="vp-count">' + VP_STATE.total + ' hitów' + (VP_STATE.cat ? ' w „' + esc(VP_STATE.cat) + '”' : '') + '</span>' +
         '</div>';
-        var cap = '<div class="vp-cap">Przesuń w bok, kliknij ▶ żeby obejrzeć film. Te które Cię ciekawią dorzuć do „Rozważam” — zestawię je obok siebie. To dopiero pierwszy z wielu produktów.</div>';
+        var cap = '';   // (usunięto podpis-instrukcję pod karuzelą — decyzja Tomka)
         wrap.innerHTML = catsHtml + '<div class="vp-track">' + cards + '</div>' + foot + cap;
         renderShortlistBar();
     }
