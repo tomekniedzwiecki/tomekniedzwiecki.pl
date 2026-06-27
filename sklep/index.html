@@ -1893,6 +1893,50 @@
     .ust-name { padding: 7px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); border-radius: 999px; background: rgba(255, 255, 255, 0.05); color: var(--text, #e7e7ea); cursor: pointer; font-size: 13.5px; transition: border-color 0.15s, background 0.15s; }
     .ust-name:hover { border-color: var(--accent, #00d97e); background: rgba(0, 217, 126, 0.1); }
     .ust-hint { margin-top: 9px; font-size: 12.5px; color: var(--text-muted, #a1a1a1); line-height: 1.5; }
+    /* G: karta pełnych danych produktu (TikTok + AliExpress) */
+    .chosen__more { margin-top: 10px; width: 100%; padding: 8px 12px; border: 1px solid rgba(37, 99, 235, 0.45); border-radius: 10px; background: rgba(37, 99, 235, 0.12); color: #5b9bff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .chosen__more:hover { background: rgba(37, 99, 235, 0.2); }
+    .pjd-prodtile__thumb { display: block; width: 100%; height: 120px; border-radius: 10px; overflow: hidden; margin-bottom: 10px; background: #111; }
+    .pjd-prodtile__thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .prodm-scroll { overflow-y: auto; background: #0b0b0e; padding: 18px 16px 44px; }
+    .prodm { max-width: 720px; margin: 0 auto; color: var(--text, #e7e7ea); }
+    .prodm-empty { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 60px 20px; color: var(--text-muted, #a1a1a1); }
+    .prodm-hero { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 22px; }
+    .prodm-vid { position: relative; flex: 0 0 168px; width: 168px; aspect-ratio: 9/16; border-radius: 14px; overflow: hidden; display: block; background: #000; }
+    .prodm-vid img { width: 100%; height: 100%; object-fit: cover; }
+    .prodm-play { position: absolute; inset: 0; margin: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .prodm-vidcap { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px; font-size: 11.5px; font-weight: 600; color: #fff; background: linear-gradient(transparent, rgba(0, 0, 0, 0.8)); text-align: center; }
+    .prodm-heroinfo { flex: 1; min-width: 200px; }
+    .prodm-name { font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .prodm-cat { font-size: 13px; color: var(--text-muted, #a1a1a1); margin-top: 4px; }
+    .prodm-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .prodm-badge { font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12)); }
+    .prodm-badge--ad { background: rgba(245, 158, 11, 0.14); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; }
+    .prodm-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .prodm-chip { font-size: 11.5px; padding: 3px 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); color: var(--text-muted, #bdbdbd); }
+    .prodm-sec { margin-top: 20px; }
+    .prodm-sect { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted, #a1a1a1); margin-bottom: 10px; }
+    .prodm-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .prodm-metric { padding: 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(255, 255, 255, 0.025); text-align: center; }
+    .prodm-metric__v { font-size: 18px; font-weight: 700; }
+    .prodm-metric__l { font-size: 11.5px; color: var(--text-muted, #a1a1a1); margin-top: 2px; }
+    .prodm-author { margin-top: 10px; font-size: 13px; color: var(--text-muted, #bdbdbd); }
+    .prodm-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .prodm-gimg { flex: 0 0 auto; width: 110px; height: 140px; object-fit: cover; border-radius: 10px; cursor: zoom-in; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); }
+    .prodm-facts { display: flex; flex-wrap: wrap; gap: 8px; }
+    .prodm-fact { font-size: 13px; padding: 7px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); }
+    .prodm-vars { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .prodm-desc { font-size: 13.5px; line-height: 1.6; color: var(--text, #e7e7ea); white-space: pre-line; }
+    .prodm-reviews { display: flex; flex-direction: column; gap: 12px; }
+    .prodm-rev { padding: 12px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(255, 255, 255, 0.025); }
+    .prodm-revtop { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .prodm-stars { color: #fbbf24; font-size: 13px; letter-spacing: 1px; }
+    .prodm-revname { font-size: 12.5px; color: var(--text-muted, #a1a1a1); }
+    .prodm-revtxt { font-size: 13.5px; line-height: 1.55; }
+    .prodm-revimgs { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .prodm-revimgs img { width: 62px; height: 62px; object-fit: cover; border-radius: 8px; cursor: zoom-in; }
+    .prodm-note { font-size: 13px; color: var(--text-muted, #a1a1a1); padding: 8px 0; }
+    @media (max-width: 520px) { .prodm-metrics { grid-template-columns: repeat(2, 1fr); } .prodm-vid { flex-basis: 140px; width: 140px; } }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -6069,8 +6113,10 @@
                   '<span><b>' + fmtVP(c.plays) + '</b> wyświetleń</span>' +
                 '</div>' +
                 (c.newest_days != null ? '<div class="chosen__price">🔥 viral z ostatnich ' + c.newest_days + ' dni</div>' : '') +
+                (c.id ? '<button type="button" class="chosen__more" id="chosen-more">Zobacz pełne dane produktu →</button>' : '') +
               '</div>' +
             '</div>';
+        var cm = el('chosen-more'); if (cm) cm.addEventListener('click', function () { openProductModal(c.id); });
     }
     function applySavedState(saved) {
         state.pSlug = saved.pSlug || state.pSlug;
@@ -8579,6 +8625,14 @@
         var _ads = Array.isArray(state.suiteAds) ? state.suiteAds : [];
         var _adThumb = _ads.filter(function (a) { return a && a.image_url; })[0];
 
+        if (state.chosenProduct && state.chosenProduct.id) {
+            tiles += '<button type="button" class="pjd-tile pjd-tile--w3 pjd-prodtile" data-prod="' + esc(state.chosenProduct.id) + '">' +
+                pjGoIcon() +
+                (state.chosenProduct.cover ? '<span class="pjd-prodtile__thumb"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(state.chosenProduct.cover) + '" alt=""></span>' : '') +
+                '<span class="pjd-tile__t">Wybrany produkt</span>' +
+                '<span class="pjd-tile__sub">' + esc(state.chosenProduct.name || '') + ' — TikTok + pełne dane AliExpress</span>' +
+                '</button>';
+        }
         tiles += stageTile('rynek', ICO_RYN, 'Potencjał rynku', 'konkurencja, ceny, luka rynkowa',
             { ready: !!state.raport, gen: extras.raport === 'gen', key: 'raport', genLabel: 'Analizuję rynek…' });
         tiles += stageTile('ustalenia', ICO_UST, 'Ustalenia',
@@ -8789,6 +8843,9 @@
         });
         body.querySelectorAll('[data-go-tab]').forEach(function (t) {
             t.addEventListener('click', function () { switchTab(t.getAttribute('data-go-tab')); });
+        });
+        body.querySelectorAll('[data-prod]').forEach(function (t) {
+            t.addEventListener('click', function () { openProductModal(t.getAttribute('data-prod')); });
         });
         var rkTile = body.querySelector('[data-pjd-rynek]');
         if (rkTile) rkTile.addEventListener('click', function () { switchTab('rynek'); });
@@ -9471,6 +9528,86 @@
         el('mkz-x').addEventListener('click', close);
         ov.addEventListener('click', function (e) { if (e.target === ov || (e.target.className && String(e.target.className).indexOf('lpm-body') >= 0)) close(); });
         document.addEventListener('keydown', onKey);
+    }
+
+    // ── G: PEŁNE DANE PRODUKTU (TikTok + AliExpress) — modal pełnoekranowy ──
+    function prodMetric(v, lab) {
+        return '<div class="prodm-metric"><div class="prodm-metric__v">' + v + '</div><div class="prodm-metric__l">' + lab + '</div></div>';
+    }
+    function productDetailHTML(p) {
+        if (!p) return '<div class="prodm-empty">Brak danych produktu.</div>';
+        var er = p.eng_rate ? (Math.round(p.eng_rate * 1000) / 10).toString().replace('.', ',') + '%' : '—';
+        var tags = Array.isArray(p.tags) ? p.tags : [];
+        var html = '<div class="prodm">';
+        html += '<div class="prodm-hero">' +
+            (p.cover ? '<a class="prodm-vid" href="' + esc(p.tiktok_url || '#') + '" target="_blank" rel="noopener">' +
+                '<img referrerpolicy="no-referrer" src="' + esc(p.cover) + '" alt="">' +
+                '<span class="prodm-play">▶</span><span class="prodm-vidcap">Obejrzyj na TikToku ↗</span></a>' : '') +
+            '<div class="prodm-heroinfo">' +
+                '<div class="prodm-name">' + esc(p.name || 'Produkt') + '</div>' +
+                (p.category ? '<div class="prodm-cat">' + esc(p.category) + '</div>' : '') +
+                '<div class="prodm-badges">' +
+                    (p.is_ad ? '<span class="prodm-badge prodm-badge--ad">Reklama</span>' : '<span class="prodm-badge">Organiczny viral</span>') +
+                    (p.newest_days != null ? '<span class="prodm-badge">🔥 viral z ' + p.newest_days + ' dni</span>' : '') +
+                '</div>' +
+                (tags.length ? '<div class="prodm-tags">' + tags.map(function (t) { return '<span class="prodm-chip">#' + esc(String(t).replace(/\s+/g, '')) + '</span>'; }).join('') + '</div>' : '') +
+            '</div></div>';
+        html += '<div class="prodm-sec"><div class="prodm-sect">TikTok — parametry</div><div class="prodm-metrics">' +
+            prodMetric(fmtVP(p.plays), 'wyświetleń') + prodMetric(fmtVP(p.saves), 'zapisów') +
+            prodMetric(fmtVP(p.comments), 'komentarzy') + prodMetric(fmtVP(p.shares), 'udostępnień') +
+            prodMetric(er, 'zaangażowanie') + prodMetric(fmtVP(p.followers), 'obserw. autora') +
+            '</div>' + (p.author ? '<div class="prodm-author">Autor: <b>' + esc(p.author) + '</b></div>' : '') + '</div>';
+        var a = p.ali;
+        if (a) {
+            if (a.images && a.images.length) {
+                html += '<div class="prodm-sec"><div class="prodm-sect">AliExpress — zdjęcia</div><div class="prodm-gallery">' +
+                    a.images.map(function (u) { return '<img class="prodm-gimg" referrerpolicy="no-referrer" loading="lazy" data-zoom="' + esc(u) + '" src="' + esc(u) + '" alt="">'; }).join('') + '</div></div>';
+            }
+            var rs = a.review_stats;
+            var facts = '';
+            if (rs && rs.avg) facts += '<span class="prodm-fact">★ <b>' + String(rs.avg).replace('.', ',') + '</b>/5 · ' + (rs.numRatings || 0) + ' ocen' + (rs.positivePct ? ' · ' + String(rs.positivePct).replace('.', ',') + '% pozytywnych' : '') + '</span>';
+            if (p.price) facts += '<span class="prodm-fact">Cena ref.: <b>' + esc(String(p.price)) + '</b></span>';
+            if (a.variants && a.variants.length) facts += '<span class="prodm-fact"><b>' + a.variants.length + '</b> wariantów</span>';
+            if (facts) html += '<div class="prodm-sec"><div class="prodm-facts">' + facts + '</div>' +
+                ((a.variants && a.variants.length) ? '<div class="prodm-vars">' + a.variants.map(function (v) { var lab = (typeof v === 'string') ? v : ((v && (v.name || v.label || v.value || v.title)) || ''); return lab ? '<span class="prodm-chip">' + esc(String(lab).slice(0, 40)) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
+            if (a.description) html += '<div class="prodm-sec"><div class="prodm-sect">Opis</div><div class="prodm-desc">' + esc(a.description) + '</div></div>';
+            if (a.reviews && a.reviews.length) {
+                html += '<div class="prodm-sec"><div class="prodm-sect">Opinie klientów (' + a.reviews.length + ')</div><div class="prodm-reviews">' +
+                    a.reviews.map(function (r) {
+                        var st = Math.max(0, Math.min(5, r.stars || 5));
+                        return '<div class="prodm-rev">' +
+                            '<div class="prodm-revtop"><span class="prodm-stars">' + new Array(st + 1).join('★') + new Array(6 - st).join('☆') + '</span>' + (r.name ? '<span class="prodm-revname">' + esc(r.name) + '</span>' : '') + '</div>' +
+                            (r.text ? '<div class="prodm-revtxt">' + esc(r.text) + '</div>' : '') +
+                            ((r.images && r.images.length) ? '<div class="prodm-revimgs">' + r.images.map(function (u) { return '<img referrerpolicy="no-referrer" loading="lazy" data-zoom="' + esc(u) + '" src="' + esc(u) + '" alt="">'; }).join('') + '</div>' : '') +
+                            '</div>';
+                    }).join('') + '</div></div>';
+            }
+        } else {
+            html += '<div class="prodm-sec"><div class="prodm-note">Dane z AliExpress jeszcze się zaciągają — zajrzyj za chwilę.</div></div>';
+        }
+        html += '</div>';
+        return html;
+    }
+    function openProductModal(pid) {
+        if (!pid) return;
+        var old = el('prod-modal'); if (old) old.remove();
+        var ov = document.createElement('div'); ov.id = 'prod-modal'; ov.className = 'lpm';
+        ov.innerHTML = '<div class="lpm-bar"><span>Dane produktu</span><button type="button" class="lpm-x" id="prodm-x" aria-label="Zamknij">✕</button></div>' +
+            '<div class="lpm-body prodm-scroll"><div class="prodm-empty"><span class="share__spin" aria-hidden="true"></span> Wczytuję dane produktu…</div></div>';
+        document.body.appendChild(ov);
+        function close() { var m = el('prod-modal'); if (m) m.remove(); document.removeEventListener('keydown', onKey); }
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        el('prodm-x').addEventListener('click', close);
+        ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+        document.addEventListener('keydown', onKey);
+        fetch(VP_ENDPOINT + '?id=' + encodeURIComponent(pid))
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var b = ov.querySelector('.prodm-scroll'); if (!b) return;
+                b.innerHTML = productDetailHTML(d && d.product);
+                b.querySelectorAll('[data-zoom]').forEach(function (im) { im.addEventListener('click', function () { openMockupZoom(im.getAttribute('data-zoom')); }); });
+            })
+            .catch(function () { var b = ov.querySelector('.prodm-scroll'); if (b) b.innerHTML = '<div class="prodm-empty">Nie udało się wczytać danych produktu.</div>'; });
     }
 
     /* ── RENDER: REKLAMY (posty FB) — przeniesione z renderPaneRynek ── */
