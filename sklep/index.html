@@ -1968,15 +1968,8 @@
     .stagebar__txt b { color: var(--text, #ededed); }
     .stagebar__cta { flex: 0 0 auto; padding: 8px 14px; border: 1px solid rgba(0, 112, 243, 0.5); border-radius: 8px; background: rgba(0, 112, 243, 0.12); color: #5b9bff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
     .stagebar__cta:hover { background: rgba(0, 112, 243, 0.22); color: #fff; }
-    /* D: marka (logo) w panelu bocznym */
+    /* Nagłówek marki „Sklep" w panelu bocznym (badge z logo marki usunięty — pokazujemy logo tylko na karcie „Marka gotowa" w czacie) */
     .side__brand { margin: 2px 0 8px; }
-    .side-brand { display: flex; align-items: center; justify-content: center; padding: 8px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09)); border-radius: 10px; background: rgba(255, 255, 255, 0.022); }
-    /* FIX(7): sam logo, przycięte w pionie (góra/dół) tak, by został środkowy pas z nazwą marki */
-    .side-brand__logo { flex: 1 1 auto; width: 100%; height: 34px; border-radius: 8px; overflow: hidden; background: #fff; display: grid; place-items: center; }
-    .side-brand__logo img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
-    .side-brand__meta { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .side-brand__name { font-size: 13px; font-weight: 600; color: var(--text-strong, #ededed); letter-spacing: -0.01em; }
-    .side-brand__dom { font: 400 11px/1.3 ui-monospace, "Geist Mono", SFMono-Regular, monospace; color: var(--text-muted, #8a8a8a); }
     /* „Wybrany produkt" jako zwykła pozycja menu (miniaturka zamiast ikony) */
     .side__item--prod .side__prodthumb { flex: 0 0 20px; width: 20px; height: 20px; border-radius: 5px; overflow: hidden; background: #111; display: grid; place-items: center; }
     .side__item--prod .side__prodthumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -5506,7 +5499,6 @@
             <nav class="side__convolist" id="side-convolist"></nav>
         </div>
         <div class="side__chosen" id="side-chosen" hidden></div>
-        <div class="side__brand" id="side-brand" hidden></div>
         <div class="side__sect">Projekt</div>
         <nav class="side__nav">
             <button type="button" class="side__item side__item--prod" id="side-prod" hidden>
@@ -6860,12 +6852,9 @@
     }
     // ── C/D: marka (logo) w panelu bocznym + przywracanie na resumie ──
     function renderBrandSidebar() {
-        var box = el('side-brand'); if (!box) return;
-        var b = state.brand;
-        if (!b || !b.chosen_logo) { box.hidden = true; box.innerHTML = ''; return; }
-        box.hidden = false;
-        // FIX(7): tylko logo (nazwa jest na samym obrazie) — przycięte w pionie przez CSS .side-brand__logo
-        box.innerHTML = '<div class="side-brand"><span class="side-brand__logo"><img referrerpolicy="no-referrer" src="' + esc(b.chosen_logo) + '" alt="' + esc(b.chosen_name || 'logo') + '"></span></div>';
+        // Badge marki (biały box z logo) w panelu bocznym USUNIĘTY — logo marki
+        // pokazujemy na pulpicie projektu i na karcie „Marka gotowa" w czacie.
+        var box = el('side-brand'); if (box) { box.hidden = true; box.innerHTML = ''; }
     }
     function renderBrandResumeCard() {
         var b = state.brand;
