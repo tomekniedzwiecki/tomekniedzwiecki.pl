@@ -1937,6 +1937,22 @@
     .prodm-revimgs img { width: 62px; height: 62px; object-fit: cover; border-radius: 8px; cursor: zoom-in; }
     .prodm-note { font-size: 13px; color: var(--text-muted, #a1a1a1); padding: 8px 0; }
     @media (max-width: 520px) { .prodm-metrics { grid-template-columns: repeat(2, 1fr); } .prodm-vid { flex-basis: 140px; width: 140px; } }
+    /* H2: picker nazwy marki + logo w rozmowie */
+    .brand-card__t { font-size: 14px; color: var(--text, #e7e7ea); line-height: 1.5; }
+    .brand-card__sub { font-size: 12.5px; color: var(--text-muted, #a1a1a1); margin-top: 4px; }
+    .brand-load { padding: 12px 0 2px; }
+    .brand-names { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .brand-name { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); border-radius: 12px; background: rgba(255, 255, 255, 0.04); color: var(--text, #e7e7ea); cursor: pointer; text-align: left; transition: border-color 0.15s, background 0.15s; }
+    .brand-name:hover { border-color: var(--accent, #00d97e); background: rgba(0, 217, 126, 0.08); }
+    .brand-name__n { font-size: 14.5px; font-weight: 600; }
+    .brand-name__d { font-size: 12px; color: var(--text-muted, #a1a1a1); white-space: nowrap; }
+    .brand-free { font-style: normal; color: #22c55e; font-weight: 600; margin-left: 4px; }
+    .brand-logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+    .brand-logo { padding: 0; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); border-radius: 12px; overflow: hidden; background: #fff; cursor: pointer; aspect-ratio: 1; transition: border-color 0.15s, transform 0.15s; }
+    .brand-logo:hover { border-color: var(--accent, #00d97e); transform: translateY(-2px); }
+    .brand-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .brand-chosen { margin: 12px 0 6px; }
+    .brand-chosen img { max-width: 160px; width: 100%; border-radius: 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); background: #fff; }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -9400,6 +9416,54 @@
         if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
         kickMockup(false);   // ustawia extras.mockups='gen', woła updateBudNav
         updateBudNav();
+        // H2: po ustaleniach pokaż w rozmowie wybór nazwy marki (z wolną domeną .pl) → 3 logo
+        setTimeout(renderBrandPicker, 500);
+    }
+
+    // ── H2: wybór nazwy marki (5 nazw z WOLNĄ domeną .pl) → 3 logo → logo w landingu ──
+    function brandFetch(action, extra) {
+        return fetch(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action }, extra || {})) }).then(function (r) { return r.json(); });
+    }
+    function renderBrandPicker() {
+        if (!el('chat-msgs') || el('brand-card') || !state.sessionId) return;
+        if (state.brandDone) return;
+        var card = document.createElement('div'); card.id = 'brand-card';
+        card.style.cssText = 'margin:10px 0;padding:14px 16px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
+        card.innerHTML = '<div class="brand-card__t"><b>Nazwa marki</b> — sprawdzam wolne domeny .pl…</div><div class="brand-load"><span class="share__spin" aria-hidden="true"></span></div>';
+        el('chat-msgs').appendChild(card); scrollToBottom(false);
+        brandFetch('names').then(function (d) {
+            var names = (d && d.names) || [];
+            if (!names.length) { card.innerHTML = '<div class="brand-card__t">Nie udało się dobrać nazw — napisz w czacie, jaką nazwę chcesz.</div>'; return; }
+            card.innerHTML = '<div class="brand-card__t"><b>Wybierz nazwę marki</b><div class="brand-card__sub">5 propozycji z wolną domeną .pl — kliknij tę, którą czujesz:</div></div>' +
+                '<div class="brand-names">' + names.map(function (n, i) {
+                    return '<button type="button" class="brand-name" data-i="' + i + '"><span class="brand-name__n">' + esc(n.name) + '</span>' +
+                        '<span class="brand-name__d">' + esc(n.domain) + (n.available ? ' <i class="brand-free">✓ wolna</i>' : '') + '</span></button>';
+                }).join('') + '</div>';
+            card.querySelectorAll('.brand-name').forEach(function (b) {
+                b.addEventListener('click', function () { pickBrandName(card, names[+b.getAttribute('data-i')]); });
+            });
+        }).catch(function () { card.innerHTML = '<div class="brand-card__t">Nie udało się dobrać nazw. Spróbuj odświeżyć.</div>'; });
+    }
+    function pickBrandName(card, n) {
+        card.innerHTML = '<div class="brand-card__t"><b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '<div class="brand-card__sub">Tworzę 3 propozycje logo…</div></div><div class="brand-load"><span class="share__spin" aria-hidden="true"></span></div>';
+        brandFetch('logos', { name: n.name, domain: n.domain }).then(function (d) {
+            var logos = (d && d.logos) || [];
+            if (!logos.length) { card.innerHTML = '<div class="brand-card__t">Logo się nie udało — spróbujemy przy budowie strony. Marka: <b>' + esc(n.name) + '</b>.</div>'; brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () {}); state.brandDone = true; return; }
+            card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub">Użyję go na Twojej stronie sprzedażowej:</div></div>' +
+                '<div class="brand-logos">' + logos.map(function (u, i) { return '<button type="button" class="brand-logo" data-i="' + i + '"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt="logo ' + (i + 1) + '"></button>'; }).join('') + '</div>';
+            card.querySelectorAll('.brand-logo').forEach(function (b) {
+                b.addEventListener('click', function () { pickBrandLogo(card, n, logos[+b.getAttribute('data-i')]); });
+            });
+        }).catch(function () { card.innerHTML = '<div class="brand-card__t">Logo się nie udało. Spróbujemy przy budowie strony.</div>'; });
+    }
+    function pickBrandLogo(card, n, url) {
+        state.brandDone = true;
+        card.innerHTML = '<div class="brand-card__t"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:4px"></i>Marka gotowa: <b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '</div>' +
+            '<div class="brand-chosen"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="logo"></div>' +
+            '<div class="brand-card__sub">Wplotę to logo w Twój sklep.</div>';
+        brandFetch('pick', { name: n.name, domain: n.domain, logo_url: url }).then(function () {
+            if (state.landingHtml) kickLanding(true);   // strona już gotowa → przebuduj z logo
+        }).catch(function () {});
     }
 
     /* ── RENDER: USTALENIA (lustro rozmowy „dla kogo to jest") ── */
@@ -9437,13 +9501,8 @@
             var secs = (state.raport && Array.isArray(state.raport.sekcje)) ? state.raport.sekcje : [];
             for (var bi = 0; bi < secs.length; bi++) { if (secs[bi] && Array.isArray(secs[bi].nazwy) && secs[bi].nazwy.length) { brandNames = secs[bi].nazwy.slice(0, 6); break; } }
         } catch (e) {}
-        if (brandNames.length) {
-            html += '<div class="ust-row"><span class="ust-label">Propozycje nazwy marki</span>' +
-                '<div class="ust-names">' + brandNames.map(function (n) {
-                    return '<button type="button" class="ust-name" data-name="' + esc(String(n)) + '">' + esc(String(n)) + '</button>';
-                }).join('') + '</div>' +
-                '<div class="ust-hint">Kliknij nazwę, którą chcesz — dopiszę ją w rozmowie do dopracowania.</div></div>';
-        }
+        html += '<div class="ust-row"><span class="ust-label">Nazwa marki i logo</span>' +
+            '<div class="ust-val">Nazwę marki (z wolną domeną .pl) i logo wybierasz w rozmowie — propozycje pojawiają się na czacie po ustaleniach.</div></div>';
         html += '</div><div class="pj-plan__note">Coś dopowiedzieć? Napisz w czacie — zaktualizuję ustalenia.</div>';
         body.innerHTML = html;
         Array.prototype.forEach.call(body.querySelectorAll('.ust-name'), function (b) {
