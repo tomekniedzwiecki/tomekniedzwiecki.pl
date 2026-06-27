@@ -6080,6 +6080,8 @@
         var _startGen = function () {
             kickSnapshot();      // snapshot aukcji AliExpress w tle (zasili makiety/landing)
             kickReport(_isPivot);   // raport po kontakcie (w tle); pivot = force (świeży produkt, bez cache)
+            // L4: nazwa marki + logo lecą PODCZAS generowania raportu (martwy czas), logo jest ważniejsze.
+            setTimeout(renderBrandPicker, 1500);
         };
         if (requireLeadBeforeReport(_startGen)) return;
         _startGen();
@@ -7419,6 +7421,7 @@
                     if (activeTab === 'rynek') renderPaneRynek();
                     if (activeTab === 'projekt') renderPaneProjekt();
                     markRaportReadyInChat();   // pasek w rozmowie → „Zobacz raport"
+                    if (state._mockPending) { state._mockPending = false; kickMockup(false); }   // L4: ustalenia domknięte przed raportem → makiety teraz
                     showRaportReadyModal();
                     return;
                 }
@@ -9422,17 +9425,17 @@
     function onUstaleniaDone() {
         // B5: karta w czacie — ustalenia to jedyny etap bez karty kierunkującej; odeślij do zakładki
         genCardReadyInChat('us-chat-card', 'Ustalenia gotowe — wiemy, dla kogo to i jak', 'ustalenia', 'Zobacz ustalenia →');
-        // odsłoń zakładkę MAKIETY z kropką „nowe" i wystartuj generowanie 4 stylów
         if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
-        kickMockup(false);   // ustawia extras.mockups='gen', woła updateBudNav
+        // L4: makiety+reklamy ruszają na bazie RAPORTU + USTALEŃ — dopiero gdy raport gotowy
+        // (nazwa+logo i ustalenia biegły PODCZAS generowania raportu).
+        if (state.raport) kickMockup(false);
+        else state._mockPending = true;   // raport jeszcze się liczy → makiety odpalą się po jego gotowości
         updateBudNav();
-        // H2: po ustaleniach pokaż w rozmowie wybór nazwy marki (z wolną domeną .pl) → 3 logo
-        setTimeout(renderBrandPicker, 500);
     }
 
     // ── H2: wybór nazwy marki (5 nazw z WOLNĄ domeną .pl) → 3 logo → logo w landingu ──
     function brandFetch(action, extra) {
-        return fetch(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action }, extra || {})) }).then(function (r) { return r.json(); });
+        return fetch(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action, product: state.chosenProduct || null }, extra || {})) }).then(function (r) { return r.json(); });
     }
     function renderBrandPicker() {
         if (!el('chat-msgs') || el('brand-card') || !state.sessionId) return;
@@ -10486,6 +10489,13 @@
         if (c) c.remove();
         var w = el('bud-widget');
         if (w) w.remove();
+    }
+    // L1: karuzela to powierzchnia wyboru produktu — pokaż ją, gdy user PISZE w openerze
+    // (zamiast klikać „ZACZYNAMY"), żeby AI nie odsyłał do karuzeli/„Rozważam", której nie ma.
+    function ensureCarousel() {
+        if (state.chosenProduct || el('vp-picker')) return;
+        var sc = el('start-cta'); if (sc) sc.remove();   // zbędny już button ZACZYNAMY
+        renderChips();
     }
     // #6 — przy wyborze chipa: płynne zniknięcie zamiast nagłego skoku
     function fadeRemoveChips() {
@@ -11789,6 +11799,7 @@
         messages.push({ role: 'user', content: text });
         saveMessages();
         appendMessage('user', text);
+        ensureCarousel();   // L1: w openerze (brak produktu) pokaż karuzelę produktów
         ta.value = '';
         autosize();
         updateCharCount();
@@ -11806,6 +11817,7 @@
         messages.push({ role: 'user', content: text });
         saveMessages();
         appendMessage('user', text);
+        ensureCarousel();   // L1
         updateStages();
         updateHero();
         if (priorUser === 0) gaEvent('app_chat_start', { entry: 'chip' });
