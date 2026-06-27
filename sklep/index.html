@@ -1971,6 +1971,17 @@
     .side-brand__meta { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     .side-brand__name { font-size: 13px; font-weight: 600; color: var(--text-strong, #ededed); letter-spacing: -0.01em; }
     .side-brand__dom { font: 400 11px/1.3 ui-monospace, "Geist Mono", SFMono-Regular, monospace; color: var(--text-muted, #8a8a8a); }
+    /* „Wybrany produkt" jako zwykła pozycja menu (miniaturka zamiast ikony) */
+    .side__item--prod .side__prodthumb { flex: 0 0 20px; width: 20px; height: 20px; border-radius: 5px; overflow: hidden; background: #111; display: grid; place-items: center; }
+    .side__item--prod .side__prodthumb img { width: 100%; height: 100%; object-fit: cover; }
+    .side__item--prod .side__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Miniaturki wygenerowanej treści w kartach czatu (makiety/reklamy/sklep) */
+    .genthumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 2px 0 10px; }
+    .genthumbs--one { grid-template-columns: 1fr; max-width: 240px; }
+    .genthumb { display: block; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 1px solid var(--glass-border, rgba(255,255,255,.1)); background: #0c0c0e; cursor: pointer; transition: border-color .15s; }
+    .genthumbs--one .genthumb { aspect-ratio: 4/3; }
+    .genthumb:hover { border-color: rgba(37,99,235,.6); }
+    .genthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -5477,6 +5488,10 @@
         <div class="side__brand" id="side-brand" hidden></div>
         <div class="side__sect">Projekt</div>
         <nav class="side__nav">
+            <button type="button" class="side__item side__item--prod" id="side-prod" hidden>
+                <span class="side__prodthumb"><img id="side-prod-img" referrerpolicy="no-referrer" alt=""></span>
+                <span class="side__label" id="side-prod-label">Wybrany produkt</span>
+            </button>
             <button type="button" class="side__item is-active" data-tab="chat">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 <span class="side__label">Rozmowa</span>
@@ -6130,29 +6145,15 @@
             .catch(function () { if (attempt < 8) setTimeout(function () { kickSnapshot(attempt + 1); }, 3500); });
     }
     function renderChosenProduct() {
-        var box = el('side-chosen'); if (!box) return;
+        var box = el('side-chosen'); if (box) { box.hidden = true; box.innerHTML = ''; }   // stary rozbudowany box wyłączony
+        var item = el('side-prod'); if (!item) return;
         var c = state.chosenProduct;
-        if (!c || !c.name) { box.hidden = true; box.innerHTML = ''; return; }
-        box.hidden = false;
+        if (!c || !c.name) { item.hidden = true; return; }
+        item.hidden = false;
         var img = c.image || c.cover || '';   // czysty kadr produktu (AliExpress) > okładka filmu
-        box.innerHTML =
-            '<div class="side__sect">Wybrany produkt</div>' +
-            '<div class="chosen">' +
-              '<div class="chosen__media">' +
-                (img ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(img) + '" onerror="this.style.display=\'none\'">' : '') +
-              '</div>' +
-              '<div class="chosen__body">' +
-                '<div class="chosen__name">' + esc(c.name) + '</div>' +
-                (c.category ? '<div class="chosen__cat">' + esc(c.category) + '</div>' : '') +
-                '<div class="chosen__stats">' +
-                  '<span><b>' + fmtVP(c.saves) + '</b> zapisów</span>' +
-                  '<span><b>' + fmtVP(c.plays) + '</b> wyświetleń</span>' +
-                '</div>' +
-                (c.newest_days != null ? '<div class="chosen__price">🔥 viral z ostatnich ' + c.newest_days + ' dni</div>' : '') +
-                (c.id ? '<button type="button" class="chosen__more" id="chosen-more">Zobacz pełne dane produktu →</button>' : '') +
-              '</div>' +
-            '</div>';
-        var cm = el('chosen-more'); if (cm) cm.addEventListener('click', function () { openProductModal(c.id); });
+        var imgEl = el('side-prod-img'); if (imgEl) { imgEl.src = img; imgEl.onerror = function () { imgEl.style.display = 'none'; }; }
+        var lab = el('side-prod-label'); if (lab) lab.textContent = c.name;
+        item.onclick = function () { if (c.id) openProductModal(c.id); };
     }
     function applySavedState(saved) {
         state.pSlug = saved.pSlug || state.pSlug;
@@ -7647,10 +7648,20 @@
     // niezależnie czy zrobił to poller, czy sync sesji (poller bywa zatrzymany guardem !state.x).
     // Flip TYLKO raz (gdy karta istnieje, dane są, a nie ma jeszcze przycisku „Zobacz").
     function reconcileGenCards() {
-        if (state.raport && el('rk-chat-card') && !el('rk-chat-open')) markRaportReadyInChat();
-        if (state.mockups && state.mockups.length && el('mk-chat-card') && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
-        if (state.suiteAds && state.suiteAds.length && el('ad-chat-card') && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — 4 kreacje', 'reklamy', 'Zobacz reklamy →');
-        if (state.landingHtml && el('ln-chat-card') && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
+        if (!el('chat-msgs')) return;
+        // Każdy etap: TWÓRZ kartę gdy dane są a karty brak (resume po odświeżeniu / świeże urządzenie),
+        // albo FLIP gdy karta-pasek istnieje a danych dopiero co przybyło. genCardReadyInChat robi oba.
+        if (state.raport && !el('rk-chat-open')) {
+            var rc = el('rk-chat-card');
+            if (!rc) { rc = document.createElement('div'); rc.id = 'rk-chat-card'; rc.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)'; el('chat-msgs').appendChild(rc); }
+            rc.innerHTML = rkChatCardInner(true);
+            var rb = el('rk-chat-open'); if (rb) rb.addEventListener('click', function () { switchTab('rynek'); });
+        }
+        if (state.ustalenia && !el('us-chat-card-open')) genCardReadyInChat('us-chat-card', 'Ustalenia gotowe — wiemy, dla kogo to i jak', 'ustalenia', 'Zobacz ustalenia →');
+        renderBrandResumeCard();   // marka (logo) — po ustaleniach
+        if (state.mockups && state.mockups.length && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
+        if (state.suiteAds && state.suiteAds.length && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
+        if (state.landingHtml && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
     }
     // Generyczny pasek generowania W ROZMOWIE (nie tylko w panelu bocznym) — makiety/reklamy/strona.
     function genCardInChat(id, key, label, sub) {
@@ -7663,6 +7674,15 @@
         startPjTicker();
         scrollToBottom(false);
     }
+    // Miniaturki wygenerowanej treści w karcie czatu (makiety/reklamy/sklep) — „pokaż co wygenerowałeś"
+    function genThumbs(stage) {
+        var urls = [];
+        if (stage === 'makiety') urls = (state.mockups || []).map(function (m) { return m && m.url; }).filter(Boolean).slice(0, 4);
+        else if (stage === 'reklamy') urls = (state.suiteAds || []).map(function (a) { return a && a.image_url; }).filter(Boolean).slice(0, 4);
+        else if (stage === 'sklep') { var mk = (state.mockups || []).filter(function (m) { return m && m.style === state.chosenStyle; })[0] || (state.mockups || [])[0]; if (mk && mk.url) urls = [mk.url]; }
+        if (!urls.length) return '';
+        return '<div class="genthumbs' + (urls.length === 1 ? ' genthumbs--one' : '') + '">' + urls.map(function (u) { return '<span class="genthumb"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '"></span>'; }).join('') + '</div>';
+    }
     function genCardReadyInChat(id, doneLabel, openTab, btnLabel) {
         var card = el(id);
         if (!card) {   // etap gotowy bez paska startu (np. ustalenia) → utwórz kartę w locie
@@ -7672,9 +7692,12 @@
             el('chat-msgs').appendChild(card); scrollToBottom(false);
         }
         var bid = id + '-open';
-        card.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>' + doneLabel + '</div>' +
+        var stageMap = { 'mk-chat-card': 'makiety', 'ad-chat-card': 'reklamy', 'ln-chat-card': 'sklep' };
+        var content = stageMap[id] ? genThumbs(stageMap[id]) : '';
+        card.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>' + doneLabel + '</div>' + content +
             '<button type="button" id="' + bid + '" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">' + (btnLabel || 'Zobacz →') + '</button>';
         var b = el(bid); if (b) b.addEventListener('click', function () { switchTab(openTab); });
+        Array.prototype.forEach.call(card.querySelectorAll('.genthumb'), function (t) { t.addEventListener('click', function () { switchTab(openTab); }); });
     }
     // Uczciwy komunikat zamiast cichego fail / wiszącego w nieskończoność spinnera.
     // Pokazuje, że dany etap trwa dłużej, daje „Spróbuj ponownie" i uspokaja, że
@@ -13994,8 +14017,9 @@
         }
         messages.forEach(function (m) { appendMessage(m.role, m.content); });
         settleProposalsHistory();
+        renderChosenProduct();     // 1: „Wybrany produkt" jako pozycja menu
         renderBrandSidebar();      // C/D: marka (logo) w panelu bocznym
-        renderBrandResumeCard();   // C: przywróć kartę marki w czacie na resumie (nie tylko tekst)
+        reconcileGenCards();       // C/2/3: przywróć w czacie karty etapów (raport/ustalenia/marka/makiety/reklamy/sklep) z miniaturkami
 
         // Resume podglądu: jeśli w historii był marker <projekt>, odtwórz obrazek
         // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem.
