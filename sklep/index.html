@@ -370,14 +370,15 @@
     .side__convo-row:hover .side__convo-del { opacity: 0.7; }
     .side__convo-del:hover { opacity: 1; color: #ff6b6b; background: rgba(255, 107, 107, 0.12); }
     .side__chosen { margin: 2px 0 8px; }
-    .chosen { display: flex; gap: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border); border-radius: 12px; padding: 9px; align-items: flex-start; }
-    .chosen__media { flex: 0 0 54px; width: 54px; height: 54px; border-radius: 9px; overflow: hidden; background: #161616; display: grid; place-items: center; }
+    /* Karta „Wybrany produkt" — styl Geist/Vercel (dark): 1px hairline, mono liczby, nagłówek 600 */
+    .chosen { display: flex; gap: 11px; background: rgba(255,255,255,0.022); border: 1px solid var(--glass-border, rgba(255,255,255,.09)); border-radius: 10px; padding: 11px; align-items: flex-start; }
+    .chosen__media { flex: 0 0 56px; width: 56px; height: 56px; border-radius: 8px; overflow: hidden; background: #111; display: grid; place-items: center; }
     .chosen__media img { width: 100%; height: 100%; object-fit: cover; }
-    .chosen__body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
-    .chosen__name { font-size: 12.5px; font-weight: 700; color: var(--text-strong); line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .chosen__cat { font-size: 10.5px; color: var(--text-muted); }
-    .chosen__stats { display: flex; gap: 9px; flex-wrap: wrap; font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-    .chosen__stats b { color: var(--accent); font-weight: 700; }
+    .chosen__body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .chosen__name { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; color: var(--text-strong, #ededed); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .chosen__cat { font: 400 10px/1.3 ui-monospace, "Geist Mono", SFMono-Regular, Menlo, monospace; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-muted, #8a8a8a); }
+    .chosen__stats { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted, #8a8a8a); margin-top: 2px; }
+    .chosen__stats b { color: var(--text-strong, #ededed); font-weight: 600; font-variant-numeric: tabular-nums; }
     .chosen__price { font-size: 11px; color: var(--text-strong); font-weight: 600; margin-top: 2px; }
     .side__convo-dot {
         width: 7px;
@@ -1894,8 +1895,8 @@
     .ust-name:hover { border-color: var(--accent, #00d97e); background: rgba(0, 217, 126, 0.1); }
     .ust-hint { margin-top: 9px; font-size: 12.5px; color: var(--text-muted, #a1a1a1); line-height: 1.5; }
     /* G: karta pełnych danych produktu (TikTok + AliExpress) */
-    .chosen__more { margin-top: 10px; width: 100%; padding: 8px 12px; border: 1px solid rgba(37, 99, 235, 0.45); border-radius: 10px; background: rgba(37, 99, 235, 0.12); color: #5b9bff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .chosen__more:hover { background: rgba(37, 99, 235, 0.2); }
+    .chosen__more { margin-top: 11px; width: 100%; padding: 8px 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text, #ededed); font: inherit; font-size: 12px; font-weight: 500; letter-spacing: -0.01em; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+    .chosen__more:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.22); }
     .pjd-prodtile__thumb { display: block; width: 100%; height: 120px; border-radius: 10px; overflow: hidden; margin-bottom: 10px; background: #111; }
     .pjd-prodtile__thumb img { width: 100%; height: 100%; object-fit: cover; }
     .prodm-scroll { overflow-y: auto; background: #0b0b0e; padding: 18px 16px 44px; }
@@ -1907,7 +1908,7 @@
     .prodm-play { position: absolute; inset: 0; margin: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .prodm-vidcap { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px; font-size: 11.5px; font-weight: 600; color: #fff; background: linear-gradient(transparent, rgba(0, 0, 0, 0.8)); text-align: center; }
     .prodm-heroinfo { flex: 1; min-width: 200px; }
-    .prodm-name { font-size: 20px; font-weight: 700; line-height: 1.2; }
+    .prodm-name { font-size: 21px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
     .prodm-cat { font-size: 13px; color: var(--text-muted, #a1a1a1); margin-top: 4px; }
     .prodm-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .prodm-badge { font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.07); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12)); }
@@ -1915,16 +1916,17 @@
     .prodm-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
     .prodm-chip { font-size: 11.5px; padding: 3px 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); color: var(--text-muted, #bdbdbd); }
     .prodm-sec { margin-top: 20px; }
-    .prodm-sect { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted, #a1a1a1); margin-bottom: 10px; }
+    .prodm-sect { font: 400 11px/1.4 ui-monospace, "Geist Mono", SFMono-Regular, Menlo, monospace; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted, #8a8a8a); margin-bottom: 12px; }
     .prodm-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .prodm-metric { padding: 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(255, 255, 255, 0.025); text-align: center; }
-    .prodm-metric__v { font-size: 18px; font-weight: 700; }
-    .prodm-metric__l { font-size: 11.5px; color: var(--text-muted, #a1a1a1); margin-top: 2px; }
+    .prodm-metric { padding: 13px 13px 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09)); border-radius: 8px; background: rgba(255, 255, 255, 0.02); text-align: left; }
+    .prodm-metric__v { font: 600 19px/1 ui-monospace, "Geist Mono", SFMono-Regular, Menlo, monospace; letter-spacing: -0.01em; color: var(--text, #ededed); font-variant-numeric: tabular-nums; }
+    .prodm-metric__l { font-size: 11px; color: var(--text-muted, #8a8a8a); margin-top: 6px; }
     .prodm-author { margin-top: 10px; font-size: 13px; color: var(--text-muted, #bdbdbd); }
     .prodm-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .prodm-gimg { flex: 0 0 auto; width: 110px; height: 140px; object-fit: cover; border-radius: 10px; cursor: zoom-in; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); }
     .prodm-facts { display: flex; flex-wrap: wrap; gap: 8px; }
-    .prodm-fact { font-size: 13px; padding: 7px 12px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); }
+    .prodm-fact { font-size: 13px; padding: 7px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09)); }
+    .prodm-fact b { font-variant-numeric: tabular-nums; }
     .prodm-vars { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .prodm-desc { font-size: 13.5px; line-height: 1.6; color: var(--text, #e7e7ea); white-space: pre-line; }
     .prodm-reviews { display: flex; flex-direction: column; gap: 12px; }
