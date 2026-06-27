@@ -1847,6 +1847,9 @@
     .lpm-body iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
     .lpm-body--img { background: #0a0a0a; display: flex; align-items: flex-start; justify-content: center; padding: 24px; }
     .lpm-body--img img { max-width: 420px; width: 100%; height: auto; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.12); }
+    /* Zoom makiety = pełna, czytelna strona (przewijalna pionowo) — nie ciasny 420px */
+    .lpm-body--mk { align-items: flex-start; }
+    .lpm-body--mk img { max-width: min(680px, 94vw); border-radius: 8px; }
 
     /* ── PIPELINE ETAP 2 — picker makiet (4 style), ustalenia, sklep ── */
     .mk-set { display: flex; flex-direction: column; gap: 6px; }
@@ -5715,7 +5718,7 @@
     // Timestampy startu generacji (klucz extras → Date.now()) — paski ETA na kaflach
     var extrasStart = {};
     // Orientacyjny czas generacji w sekundach (z pomiarów produkcyjnych)
-    var GEN_ETA = { landing: 240, raport: 130, plan: 45, summary: 75, prototype: 300, economics: 50, gtm: 90 };
+    var GEN_ETA = { landing: 240, raport: 130, mockups: 130, ads: 90, plan: 45, summary: 75, prototype: 300, economics: 50, gtm: 90 };
     // Mapa: pozycja menu (data-status-for) → klucz extras, który sygnalizuje
     // generację ('gen'). Dzięki temu menu pokazuje „generuję” + pasek na tej
     // samej zasadzie, na której pulpit pokazuje pasek postępu.
@@ -7412,6 +7415,7 @@
         extras.ads = 'gen';
         if (typeof updateBudNav === 'function') updateBudNav();
         if (activeTab === 'reklamy') renderPaneReklamy();
+        genCardInChat('ad-chat-card', 'ads', 'Reklamy pod Twój sklep', '4 gotowe kreacje za chwilę');
         _doAds(state.sessionId, !!force, 0);
     }
     function _doAds(sid, force, attempt) {
@@ -7421,6 +7425,7 @@
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.ads) && res.d.ads.length) {
                     state.suiteAds = res.d.ads; persistSession(); adsGen = false; extras.ads = 'idle';
+                    genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — 4 kreacje', 'reklamy', 'Zobacz reklamy →');
                     if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
                     updateBudNav();
                     if (activeTab === 'reklamy') renderPaneReklamy();
@@ -7444,6 +7449,7 @@
         extras.landingTab = 'gen';
         if (typeof updateBudNav === 'function') updateBudNav();   // odsłania zakładkę „Sklep"
         if (activeTab === 'sklep') renderPaneSklep();
+        genCardInChat('ln-chat-card', 'landing', 'Twój sklep — strona sprzedażowa', 'składam pełną stronę');
         _doLanding(state.sessionId, !!force, 0);
     }
     function _doLanding(sid, force, attempt) {
@@ -7453,6 +7459,7 @@
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && res.d.landing_html) {
                     state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle';
+                    genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
                     if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                     updateBudNav();
                     if (activeTab === 'sklep') renderPaneSklep();
@@ -7510,6 +7517,24 @@
         var card = el('rk-chat-card'); if (!card) return;
         card.innerHTML = rkChatCardInner(true);
         var b = el('rk-chat-open'); if (b) b.addEventListener('click', function () { switchTab('rynek'); });
+    }
+    // Generyczny pasek generowania W ROZMOWIE (nie tylko w panelu bocznym) — makiety/reklamy/strona.
+    function genCardInChat(id, key, label, sub) {
+        if (!el('chat-msgs') || el(id)) return;
+        var div = document.createElement('div');
+        div.id = id;
+        div.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
+        div.innerHTML = genProgressHTML(key, label, sub);
+        el('chat-msgs').appendChild(div);
+        startPjTicker();
+        scrollToBottom(false);
+    }
+    function genCardReadyInChat(id, doneLabel, openTab, btnLabel) {
+        var card = el(id); if (!card) return;
+        var bid = id + '-open';
+        card.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>' + doneLabel + '</div>' +
+            '<button type="button" id="' + bid + '" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">' + (btnLabel || 'Zobacz →') + '</button>';
+        var b = el(bid); if (b) b.addEventListener('click', function () { switchTab(openTab); });
     }
     // Uczciwy komunikat zamiast cichego fail / wiszącego w nieskończoność spinnera.
     // Pokazuje, że dany etap trwa dłużej, daje „Spróbuj ponownie" i uspokaja, że
@@ -9230,6 +9255,7 @@
         budTabVisible('makiety'); // no-op guard
         updateBudNav();
         if (activeTab === 'makiety') renderPaneMakiety();
+        genCardInChat('mk-chat-card', 'mockups', 'Makiety Twojego sklepu', '4 style do wyboru');
         _doMockup4(state.sessionId, !!force, 0);
     }
     function _doMockup4(sid, force, attempt) {
@@ -9241,6 +9267,7 @@
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
                     state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle';
+                    genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
                     if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                     updateBudNav();
                     if (activeTab === 'makiety') renderPaneMakiety();
@@ -9376,7 +9403,7 @@
             var chosen = state.chosenStyle && m.style === state.chosenStyle;
             return '<div class="mk-card' + (chosen ? ' is-chosen' : '') + '" data-style="' + esc(m.style || '') + '">' +
                 '<div class="mk-card__img">' +
-                  (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mk-noimg\');this.remove();">' : '') +
+                  (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" data-mk-zoom="' + esc(m.url) + '" style="cursor:zoom-in" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mk-noimg\');this.remove();">' : '') +
                   '<button type="button" class="mk-zoom" data-mk-zoom="' + esc(m.url || '') + '" aria-label="Powiększ">⤢</button>' +
                   (chosen ? '<span class="mk-badge">✓ Wybrany</span>' : '') +
                 '</div>' +
@@ -9413,7 +9440,7 @@
         var ov = document.createElement('div');
         ov.id = 'mk-zoom-modal'; ov.className = 'lpm';
         ov.innerHTML = '<div class="lpm-bar"><span>Podgląd makiety</span><button type="button" class="lpm-x" id="mkz-x" aria-label="Zamknij">✕</button></div>' +
-            '<div class="lpm-body lpm-body--img"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="Makieta"></div>';
+            '<div class="lpm-body lpm-body--img lpm-body--mk"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="Makieta"></div>';
         document.body.appendChild(ov);
         function close() { var m = el('mk-zoom-modal'); if (m) m.remove(); document.removeEventListener('keydown', onKey); }
         function onKey(e) { if (e.key === 'Escape') close(); }
