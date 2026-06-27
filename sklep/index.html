@@ -5796,7 +5796,7 @@
     // Timestampy startu generacji (klucz extras → Date.now()) — paski ETA na kaflach
     var extrasStart = {};
     // Orientacyjny czas generacji w sekundach (z pomiarów produkcyjnych)
-    var GEN_ETA = { landing: 240, raport: 130, mockups: 130, ads: 90, plan: 45, summary: 75, prototype: 300, economics: 50, gtm: 90 };
+    var GEN_ETA = { landing: 240, raport: 130, mockups: 130, ads: 600, plan: 45, summary: 75, prototype: 300, economics: 50, gtm: 90 };
     // Mapa: pozycja menu (data-status-for) → klucz extras, który sygnalizuje
     // generację ('gen'). Dzięki temu menu pokazuje „generuję” + pasek na tej
     // samej zasadzie, na której pulpit pokazuje pasek postępu.
@@ -7541,7 +7541,7 @@
         extras.ads = 'gen';
         if (typeof updateBudNav === 'function') updateBudNav();
         if (activeTab === 'reklamy') renderPaneReklamy();
-        genCardInChat('ad-chat-card', 'ads', 'Reklamy pod Twój sklep', '4 gotowe kreacje za chwilę');
+        genCardInChat('ad-chat-card', 'ads', 'Reklamy pod Twój sklep', 'studio AI składa 4 banery — to potrwa kilka–kilkanaście minut');
         _doAds(state.sessionId, !!force, 0);
     }
     function _doAds(sid, force, attempt) {
@@ -7551,14 +7551,14 @@
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.ads) && res.d.ads.length) {
                     state.suiteAds = res.d.ads; persistSession(); adsGen = false; extras.ads = 'idle';
-                    genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — 4 kreacje', 'reklamy', 'Zobacz reklamy →');
+                    genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + res.d.ads.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
                     if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
                     updateBudNav();
                     if (activeTab === 'reklamy') renderPaneReklamy();
                     kickLanding(false);   // reklamy gotowe → buduj stronę (sklep)
                     return;
                 }
-                if (res.ok && res.d && res.d.pending) { if (attempt < 30) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); } return; }
+                if (res.ok && res.d && res.d.pending) { if (attempt === 0) kickLanding(false); /* strona buduje się RÓWNOLEGLE — nie czeka na wolne reklamy Manus (do ~30 min) */ if (attempt < 160) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; }
                 adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy();
             }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); });
