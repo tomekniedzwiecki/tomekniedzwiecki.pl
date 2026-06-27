@@ -6803,6 +6803,7 @@
     }
 
     function updateSideBadges() {
+        reconcileGenCards();   // FIX: dociągnij flip kart w czacie, gdy dane przyszły sync'iem (poller bywa ubity guardem !state.x)
         // podpozycje sekcji pulpitu pokazują się, gdy sekcja ma już treść (albo po
         // zielonym werdykcie — wtedy bramkowane pozycje pokazują status „zablokowane")
         var subShow = {
@@ -7565,6 +7566,15 @@
         var card = el('rk-chat-card'); if (!card) return;
         card.innerHTML = rkChatCardInner(true);
         var b = el('rk-chat-open'); if (b) b.addEventListener('click', function () { switchTab('rynek'); });
+    }
+    // FIX: karty generowania w czacie flipują na „gotowe", gdy dane są już w stanie —
+    // niezależnie czy zrobił to poller, czy sync sesji (poller bywa zatrzymany guardem !state.x).
+    // Flip TYLKO raz (gdy karta istnieje, dane są, a nie ma jeszcze przycisku „Zobacz").
+    function reconcileGenCards() {
+        if (state.raport && el('rk-chat-card') && !el('rk-chat-open')) markRaportReadyInChat();
+        if (state.mockups && state.mockups.length && el('mk-chat-card') && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
+        if (state.suiteAds && state.suiteAds.length && el('ad-chat-card') && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — 4 kreacje', 'reklamy', 'Zobacz reklamy →');
+        if (state.landingHtml && el('ln-chat-card') && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
     }
     // Generyczny pasek generowania W ROZMOWIE (nie tylko w panelu bocznym) — makiety/reklamy/strona.
     function genCardInChat(id, key, label, sub) {
