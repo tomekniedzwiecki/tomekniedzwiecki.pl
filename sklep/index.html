@@ -2872,8 +2872,10 @@
         max-width: min(620px, 92%);
         padding: 14px 18px;
         border-radius: var(--r-bubble);
-        font-size: 15.5px;
-        line-height: 1.65;
+        font-size: 16px;
+        line-height: 1.55;
+        letter-spacing: -0.01em;
+        font-feature-settings: "ss01", "ss02";   /* geometryczne alternaty Inter → wizualnie bliżej Geist */
         animation: msgIn 0.38s var(--ease) backwards;
         overflow-wrap: break-word;
     }
@@ -2887,11 +2889,12 @@
     /* Mini-markdown w dymkach */
     .rich-h {
         margin: 14px 0 6px;
-        font-size: 12.5px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
+        font-family: var(--mono, ui-monospace, "Geist Mono", SFMono-Regular, monospace);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
-        color: var(--accent);
+        color: var(--text-muted);
     }
     .rich-h:first-child { margin-top: 0; }
     .rich-list { margin: 8px 0 10px; padding-left: 20px; }
