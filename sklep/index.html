@@ -1880,6 +1880,19 @@
     .mk-zoom:hover { background: rgba(0, 0, 0, 0.82); }
     .mk-pickbanner { margin: 0 0 14px; padding: 11px 14px; border: 1px solid rgba(37, 99, 235, 0.4); background: rgba(37, 99, 235, 0.1); border-radius: 12px; font-size: 13.5px; color: var(--text, #e7e7ea); line-height: 1.5; }
     .mk-pickbanner b { color: #5b9bff; }
+    /* Karta Ustaleń — czytelne wiersze etykieta/wartość zamiast reużycia stylów raportu */
+    .ust-card { display: flex; flex-direction: column; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 16px; background: rgba(255, 255, 255, 0.025); overflow: hidden; }
+    .ust-row { padding: 14px 16px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+    .ust-row:first-child { border-top: 0; }
+    .ust-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted, #a1a1a1); margin-bottom: 6px; }
+    .ust-val { font-size: 14.5px; line-height: 1.55; color: var(--text, #e7e7ea); }
+    .ust-list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .ust-list li { position: relative; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--text, #e7e7ea); }
+    .ust-list li::before { content: ''; position: absolute; left: 2px; top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #00d97e); }
+    .ust-names { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+    .ust-name { padding: 7px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); border-radius: 999px; background: rgba(255, 255, 255, 0.05); color: var(--text, #e7e7ea); cursor: pointer; font-size: 13.5px; transition: border-color 0.15s, background 0.15s; }
+    .ust-name:hover { border-color: var(--accent, #00d97e); background: rgba(0, 217, 126, 0.1); }
+    .ust-hint { margin-top: 9px; font-size: 12.5px; color: var(--text-muted, #a1a1a1); line-height: 1.5; }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -9324,13 +9337,13 @@
             ['Ton komunikacji', u.ton || u.tone],
             ['Kluczowe korzyści', u.korzysci || u.korzyści || u.benefits]
         ];
-        var html = head + '<div class="mk-set">';
+        var html = head + '<div class="ust-card">';
         rows.forEach(function (r) {
             if (!r[1]) return;
             var val = Array.isArray(r[1])
-                ? '<ul class="rkg-body">' + r[1].map(function (x) { return '<li>' + esc(String(x)) + '</li>'; }).join('') + '</ul>'
-                : '<div class="rkg-body">' + renderRich(String(r[1])) + '</div>';
-            html += '<section class="rk-sec"><div class="rk-sec__head"><h3>' + esc(r[0]) + '</h3></div>' + val + '</section>';
+                ? '<ul class="ust-list">' + r[1].map(function (x) { return '<li>' + esc(String(x)) + '</li>'; }).join('') + '</ul>'
+                : '<div class="ust-val">' + renderRich(String(r[1])) + '</div>';
+            html += '<div class="ust-row"><span class="ust-label">' + esc(r[0]) + '</span>' + val + '</div>';
         });
         // Propozycje nazwy marki z raportu (sekcja „Marka i pozycjonowanie" → nazwy[]) —
         // klient nie musi skakać między zakładkami; klik = dopisanie wyboru w rozmowie.
@@ -9340,11 +9353,11 @@
             for (var bi = 0; bi < secs.length; bi++) { if (secs[bi] && Array.isArray(secs[bi].nazwy) && secs[bi].nazwy.length) { brandNames = secs[bi].nazwy.slice(0, 6); break; } }
         } catch (e) {}
         if (brandNames.length) {
-            html += '<section class="rk-sec"><div class="rk-sec__head"><h3>Propozycje nazwy marki</h3></div>' +
+            html += '<div class="ust-row"><span class="ust-label">Propozycje nazwy marki</span>' +
                 '<div class="ust-names">' + brandNames.map(function (n) {
-                    return '<button type="button" class="ust-name" data-name="' + esc(String(n)) + '" style="display:inline-block;margin:4px 6px 0 0;padding:6px 13px;border:1px solid var(--glass-border);border-radius:999px;background:rgba(255,255,255,.05);color:inherit;cursor:pointer;font-size:.9em;transition:border-color .15s">' + esc(String(n)) + '</button>';
+                    return '<button type="button" class="ust-name" data-name="' + esc(String(n)) + '">' + esc(String(n)) + '</button>';
                 }).join('') + '</div>' +
-                '<div class="rkg-body" style="margin-top:7px;opacity:.7;font-size:.85em">Kliknij nazwę, którą chcesz — dopiszę ją w rozmowie do dopracowania.</div></section>';
+                '<div class="ust-hint">Kliknij nazwę, którą chcesz — dopiszę ją w rozmowie do dopracowania.</div></div>';
         }
         html += '</div><div class="pj-plan__note">Coś dopowiedzieć? Napisz w czacie — zaktualizuję ustalenia.</div>';
         body.innerHTML = html;
