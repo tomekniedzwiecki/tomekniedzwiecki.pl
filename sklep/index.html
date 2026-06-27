@@ -1935,8 +1935,10 @@
     .prodm-stars { color: #fbbf24; font-size: 13px; letter-spacing: 1px; }
     .prodm-revname { font-size: 12.5px; color: var(--text-muted, #a1a1a1); }
     .prodm-revtxt { font-size: 13.5px; line-height: 1.55; }
-    .prodm-revimgs { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-    .prodm-revimgs img { width: 62px; height: 62px; object-fit: cover; border-radius: 8px; cursor: zoom-in; }
+    .prodm-revimgs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .prodm-revimgs img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; cursor: zoom-in; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08)); }
+    .prodm-ali { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12)); border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text, #ededed); font-size: 13px; font-weight: 500; text-decoration: none; transition: border-color 0.15s, background 0.15s; }
+    .prodm-ali:hover { border-color: #0070f3; color: #fff; background: rgba(0, 112, 243, 0.12); }
     .prodm-note { font-size: 13px; color: var(--text-muted, #a1a1a1); padding: 8px 0; }
     @media (max-width: 520px) { .prodm-metrics { grid-template-columns: repeat(2, 1fr); } .prodm-vid { flex-basis: 140px; width: 140px; } }
     /* H2: picker nazwy marki + logo w rozmowie */
@@ -1955,6 +1957,20 @@
     .brand-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .brand-chosen { margin: 12px 0 6px; }
     .brand-chosen img { max-width: 160px; width: 100%; border-radius: 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); background: #fff; }
+    /* E: uniwersalny pasek etapu „Co dalej" w zakładkach panelu */
+    .stagebar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 11px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(255, 255, 255, 0.025); }
+    .stagebar__txt { flex: 1; min-width: 200px; font-size: 13px; line-height: 1.5; color: var(--text-muted, #a1a1a1); }
+    .stagebar__txt b { color: var(--text, #ededed); }
+    .stagebar__cta { flex: 0 0 auto; padding: 8px 14px; border: 1px solid rgba(0, 112, 243, 0.5); border-radius: 8px; background: rgba(0, 112, 243, 0.12); color: #5b9bff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .stagebar__cta:hover { background: rgba(0, 112, 243, 0.22); color: #fff; }
+    /* D: marka (logo) w panelu bocznym */
+    .side__brand { margin: 2px 0 8px; }
+    .side-brand { display: flex; align-items: center; gap: 10px; padding: 9px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09)); border-radius: 10px; background: rgba(255, 255, 255, 0.022); }
+    .side-brand__logo { flex: 0 0 46px; width: 46px; height: 46px; border-radius: 8px; overflow: hidden; background: #fff; display: grid; place-items: center; }
+    .side-brand__logo img { width: 100%; height: 100%; object-fit: contain; }
+    .side-brand__meta { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .side-brand__name { font-size: 13px; font-weight: 600; color: var(--text-strong, #ededed); letter-spacing: -0.01em; }
+    .side-brand__dom { font: 400 11px/1.3 ui-monospace, "Geist Mono", SFMono-Regular, monospace; color: var(--text-muted, #8a8a8a); }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -5458,6 +5474,7 @@
             <nav class="side__convolist" id="side-convolist"></nav>
         </div>
         <div class="side__chosen" id="side-chosen" hidden></div>
+        <div class="side__brand" id="side-brand" hidden></div>
         <div class="side__sect">Projekt</div>
         <nav class="side__nav">
             <button type="button" class="side__item is-active" data-tab="chat">
@@ -5939,7 +5956,8 @@
             fullPaid: !!state.fullPaid,
             khClosed: !!state.khClosed,
             seen: state.seen || {},
-            seenTabs: budSeenTabs || {}
+            seenTabs: budSeenTabs || {},
+            brand: state.brand || null
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -6082,8 +6100,6 @@
         var _startGen = function () {
             kickSnapshot();      // snapshot aukcji AliExpress w tle (zasili makiety/landing)
             kickReport(_isPivot);   // raport po kontakcie (w tle); pivot = force (świeży produkt, bez cache)
-            // L4: nazwa marki + logo lecą PODCZAS generowania raportu (martwy czas), logo jest ważniejsze.
-            setTimeout(renderBrandPicker, 1500);
         };
         if (requireLeadBeforeReport(_startGen)) return;
         _startGen();
@@ -6193,6 +6209,7 @@
         budNewTabs = {};
         // F: stan „obejrzane" zakładek przeżywa odświeżenie → badge GOTOWE nie wraca do NOWE
         budSeenTabs = (saved.seenTabs && typeof saved.seenTabs === 'object') ? saved.seenTabs : {};
+        state.brand = (saved.brand && typeof saved.brand === 'object') ? saved.brand : null;   // C: marka (logo) przeżywa odświeżenie
         state.previews = {};
         state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
@@ -6407,6 +6424,9 @@
                 extras.landing = 'idle';
                 persistSession();
                 changed = true;
+            }
+            if (p.brand && typeof p.brand === 'object' && p.brand.chosen_logo && JSON.stringify(p.brand) !== JSON.stringify(state.brand)) {
+                state.brand = p.brand; persistSession(); renderBrandSidebar(); changed = true;   // C/D: marka (logo) z serwera
             }
             if (p.business_plan && typeof p.business_plan === 'object'
                 && JSON.stringify(p.business_plan) !== JSON.stringify(state.bizplan)) {
@@ -6776,9 +6796,60 @@
         if (tab === 'reklamy') { renderPaneReklamy(); budSeen('reklamy'); }
         if (tab === 'sklep') { renderPaneSklep(); budSeen('sklep'); }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
+        if (['projekt', 'rynek', 'ustalenia', 'makiety', 'reklamy', 'sklep'].indexOf(tab) >= 0) injectStageBar(tab);   // E: pasek etapu we wszystkich zakładkach panelu
         if (tab === 'chat') scrollToBottom(true);
         setTabHash(tab === 'chat' ? '' : tab);
         closeSide();
+    }
+
+    // ── E/F: uniwersalny pasek etapu „Co dalej" + powrót (we wszystkich zakładkach panelu) ──
+    function currentStage() {
+        if (state.verdict === 'zielony') return 'wspolpraca';
+        if (state.landingHtml) return 'sklep';
+        if ((state.suiteAds && state.suiteAds.length) || state.chosenStyle) return 'reklamy';
+        if (state.mockups && state.mockups.length) return 'makiety';
+        if (state.ustalenia || state.raport) return 'ustalenia';
+        if (state.chosenProduct) return 'raport';
+        return 'pick';
+    }
+    var STAGE_INFO = {
+        pick: { txt: 'Wybierz produkt z karuzeli — od niego ruszymy z raportem i budową.', cta: 'Wróć do rozmowy →', tab: 'chat' },
+        raport: { txt: 'Liczę raport rynku; w rozmowie wybieramy teraz nazwę marki i logo.', cta: 'Wróć do rozmowy →', tab: 'chat' },
+        ustalenia: { txt: 'Domykamy „dla kogo to jest" — potem ruszają makiety i reklamy.', cta: 'Wróć do rozmowy →', tab: 'chat' },
+        makiety: { txt: 'Wybierz makietę, którą czujesz — na niej zbuduję resztę.', cta: 'Wróć do rozmowy →', tab: 'chat' },
+        reklamy: { txt: 'Składam reklamy i sklep na bazie wybranego stylu.', cta: 'Wróć do rozmowy →', tab: 'chat' },
+        sklep: { txt: 'Sklep gotowy — obejrzyj go i wróć powiedzieć, jak Ci się podoba.', cta: 'Wróć do rozmowy →', tab: 'chat' },
+        wspolpraca: { txt: 'Projekt zdefiniowany — następny krok to wspólny biznes z Tomkiem.', cta: 'Przejdź do współpracy →', tab: 'wspolpraca' }
+    };
+    function injectStageBar(tab) {
+        var body = el('pane-' + tab + '-body') || el('pane-' + tab);
+        if (!body) return;
+        var old = body.querySelector('.stagebar'); if (old) old.remove();
+        var s = STAGE_INFO[currentStage()] || STAGE_INFO.raport;
+        var bar = document.createElement('div'); bar.className = 'stagebar';
+        bar.innerHTML = '<div class="stagebar__txt"><b>Co dalej:</b> ' + s.txt + '</div>' +
+            '<button type="button" class="stagebar__cta">' + s.cta + '</button>';
+        body.insertBefore(bar, body.firstChild);
+        var c = bar.querySelector('.stagebar__cta'); if (c) c.addEventListener('click', function () { switchTab(s.tab); });
+    }
+    // ── C/D: marka (logo) w panelu bocznym + przywracanie na resumie ──
+    function renderBrandSidebar() {
+        var box = el('side-brand'); if (!box) return;
+        var b = state.brand;
+        if (!b || !b.chosen_logo) { box.hidden = true; box.innerHTML = ''; return; }
+        box.hidden = false;
+        box.innerHTML = '<div class="side__sect">Twoja marka</div>' +
+            '<div class="side-brand"><span class="side-brand__logo"><img referrerpolicy="no-referrer" src="' + esc(b.chosen_logo) + '" alt="logo"></span>' +
+            '<span class="side-brand__meta"><span class="side-brand__name">' + esc(b.chosen_name || '') + '</span>' + (b.chosen_domain ? '<span class="side-brand__dom">' + esc(b.chosen_domain) + '</span>' : '') + '</span></div>';
+    }
+    function renderBrandResumeCard() {
+        var b = state.brand;
+        if (!b || !b.chosen_logo || !el('chat-msgs') || el('brand-card')) return;
+        var card = document.createElement('div'); card.id = 'brand-card';
+        card.style.cssText = 'margin:10px 0;padding:14px 16px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
+        card.innerHTML = '<div class="brand-card__t"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:4px"></i>Marka gotowa: <b>' + esc(b.chosen_name || '') + '</b>' + (b.chosen_domain ? ' · ' + esc(b.chosen_domain) : '') + '</div>' +
+            '<div class="brand-chosen"><img referrerpolicy="no-referrer" src="' + esc(b.chosen_logo) + '" alt="logo"></div>';
+        el('chat-msgs').appendChild(card);
     }
 
     // CTA z modalu „zablokowane" prowadzi do zakładki Współpraca (nie wprost do płatności).
@@ -9433,6 +9504,8 @@
         if (state.raport) kickMockup(false);
         else state._mockPending = true;   // raport jeszcze się liczy → makiety odpalą się po jego gotowości
         updateBudNav();
+        // B: nazwa marki + logo DOPIERO po domknięciu ustaleń (max 2 pytania) — logo oddaje już kierunek z ustaleń
+        setTimeout(renderBrandPicker, 500);
     }
 
     // ── H2: wybór nazwy marki (5 nazw z WOLNĄ domeną .pl) → 3 logo → logo w landingu ──
@@ -9473,6 +9546,9 @@
     }
     function pickBrandLogo(card, n, url) {
         state.brandDone = true;
+        state.brand = { chosen_name: n.name, chosen_domain: n.domain, chosen_logo: url };   // C/D: zapamiętaj markę (resume + sidebar)
+        persistSession();
+        renderBrandSidebar();
         card.innerHTML = '<div class="brand-card__t"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:4px"></i>Marka gotowa: <b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '</div>' +
             '<div class="brand-chosen"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="logo"></div>' +
             '<div class="brand-card__sub">Wplotę to logo w Twój sklep.</div>';
@@ -9644,7 +9720,9 @@
             if (a.variants && a.variants.length) facts += '<span class="prodm-fact"><b>' + a.variants.length + '</b> wariantów</span>';
             if (facts) html += '<div class="prodm-sec"><div class="prodm-facts">' + facts + '</div>' +
                 ((a.variants && a.variants.length) ? '<div class="prodm-vars">' + a.variants.map(function (v) { var lab = (typeof v === 'string') ? v : ((v && (v.name || v.label || v.value || v.title)) || ''); return lab ? '<span class="prodm-chip">' + esc(String(lab).slice(0, 40)) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
-            if (a.description) html += '<div class="prodm-sec"><div class="prodm-sect">Opis</div><div class="prodm-desc">' + esc(a.description) + '</div></div>';
+            var _desc = a.description || a.title || '';
+            if (_desc) html += '<div class="prodm-sec"><div class="prodm-sect">Opis (AliExpress)</div><div class="prodm-desc">' + esc(_desc) + '</div></div>';
+            if (p.product_link) html += '<div class="prodm-sec"><a class="prodm-ali" href="' + esc(p.product_link) + '" target="_blank" rel="noopener">Zobacz produkt na AliExpress ↗</a></div>';
             if (a.reviews && a.reviews.length) {
                 html += '<div class="prodm-sec"><div class="prodm-sect">Opinie klientów (' + a.reviews.length + ')</div><div class="prodm-reviews">' +
                     a.reviews.map(function (r) {
@@ -13916,6 +13994,8 @@
         }
         messages.forEach(function (m) { appendMessage(m.role, m.content); });
         settleProposalsHistory();
+        renderBrandSidebar();      // C/D: marka (logo) w panelu bocznym
+        renderBrandResumeCard();   // C: przywróć kartę marki w czacie na resumie (nie tylko tekst)
 
         // Resume podglądu: jeśli w historii był marker <projekt>, odtwórz obrazek
         // z localStorage (bez kosztu) albo wznow generowanie przerwane refreshem.
