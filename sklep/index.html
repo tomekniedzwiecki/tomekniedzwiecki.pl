@@ -8445,14 +8445,14 @@
             ? verIdx : versions.length - 1;
         var k = hasKarta ? versions[cur] : null;
         var brief = state.lastBrief || {};
-        var nazwa = (k && k.nazwa) || brief.nazwa || 'Twoje narzędzie';
+        var nazwa = (k && k.nazwa) || (state.chosenProduct && (state.chosenProduct.nazwa || state.chosenProduct.name)) || (state.ustalenia && state.ustalenia.nazwa) || brief.nazwa || 'Twój sklep';
 
         // dock ze starego układu mógł zostać w DOM — sprzątamy
         var oldDock = el('pj-dock');
         if (oldDock) oldDock.remove();
 
         // Pusty stan: nic jeszcze nie powstało
-        if (!hasKarta && !items.length) {
+        if (!hasKarta && !items.length && !state.raport && !state.ustalenia && !(state.mockups && state.mockups.length) && !state.suiteAds && !state.landingHtml) {
             body.innerHTML = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój sklep</div>' +
                 '<h2 class="tabpane__title">Tu rośnie Twój biznes</h2>' +
                 '<p class="tabpane__sub">Makieta sklepu i karta biznesu pojawią się tu w trakcie rozmowy — kilka pytań i zobaczysz pierwsze efekty.</p></div>' +
@@ -8473,8 +8473,8 @@
             items: items, oldShots: oldShots, versions: versions, cur: cur, k: k,
             nazwa: nazwa, brief: brief, hasKarta: hasKarta,
             hasShots: items.length > 0 || oldShots.length > 0,
-            hasPlanSec: hasKarta && state.verdict === 'zielony',
-            hasBrandSec: state.verdict === 'zielony'
+            hasPlanSec: false,
+            hasBrandSec: false
         };
 
         // Generacje startują od razu (niezależnie od widoku)
@@ -8545,29 +8545,54 @@
                 '</span></' + tag + '>';
         }
 
-        // EKRANY — kafel-bohater z głównym ekranem
-        if (ctx.hasShots) {
-            var thumb = ctx.items.length ? ctx.items[0].url : (ctx.oldShots.length ? ctx.oldShots[0].url : '');
-            tiles += mediaTile({
-                cls: 'pjd-tile--hero', data: 'data-pjd="ekrany"', img: thumb,
-                title: 'Makieta sklepu',
-                sub: ctx.items.length ? ctx.items.length + ' ' + (ctx.items.length === 1 ? 'widok' : 'widoki') + ' — kliknij, żeby obejrzeć' : 'wcześniejsze wersje w archiwum'
-            });
+        // ── BENTO realnych etapów /sklep: rynek → ustalenia → makiety → reklamy → sklep ──
+        var ICO_RYN = '<circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>';
+        var ICO_UST = '<path d="M9 11l3 3 8-8"></path><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"></path>';
+        var ICO_MAK = '<rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect>';
+        var ICO_REK = '<rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>';
+        var ICO_SKL = '<path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M9 13h6"></path>';
+        function stageTile(tab, iconInner, title, sub, o) {
+            o = o || {};
+            if (o.ready && o.thumb) {
+                return mediaTile({ cls: o.cls || '', data: 'data-go-tab="' + tab + '"', img: o.thumb, title: title, sub: sub });
+            }
+            if (o.ready) {
+                return '<button type="button" class="pjd-tile ' + (o.cls || '') + '" data-go-tab="' + tab + '">' +
+                    pjGoIcon() + '<span class="pjd-badge pjd-badge--wysoki">gotowe</span>' +
+                    '<span class="pjd-tile__ico">' + pjIco(iconInner) + '</span>' +
+                    '<span class="pjd-tile__t">' + title + '</span>' +
+                    '<span class="pjd-tile__sub">' + sub + '</span></button>';
+            }
+            if (o.gen) {
+                return '<div class="pjd-tile ' + (o.cls || '') + ' pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(iconInner) + '</span>' +
+                    '<span class="pjd-tile__t">' + title + '</span>' +
+                    genProgressHTML(o.key || tab, o.genLabel || ('Przygotowuję ' + title.toLowerCase() + '…'), sub) + '</div>';
+            }
+            return '<div class="pjd-tile ' + (o.cls || '') + ' pjd-tile--static pjd-tile--dim">' +
+                '<span class="pjd-tile__ico">' + pjIco(iconInner) + '</span>' +
+                '<span class="pjd-tile__t">' + title + '</span>' +
+                '<span class="pjd-tile__sub">' + (o.wait || 'pojawi się w trakcie rozmowy') + '</span></div>';
         }
+        var _mk = Array.isArray(state.mockups) ? state.mockups : [];
+        var _mkChosen = _mk.filter(function (x) { return x && x.style === state.chosenStyle; })[0] || _mk[0] || null;
+        var _ads = Array.isArray(state.suiteAds) ? state.suiteAds : [];
+        var _adThumb = _ads.filter(function (a) { return a && a.image_url; })[0];
 
-        // KARTA — cytat problemu jako treść kafla
-        var kartaInner;
-        if (ctx.k) {
-            kartaInner = (ctx.k.problem ? '<span class="pjd-quote">' + esc(ctx.k.problem) + '</span>' : '') +
-                '<span class="pjd-tile__sub">' + (ctx.versions.length > 1 ? 'Wersja ' + ctx.versions.length + ' · aktualna' : 'problem, klienci i zakres pierwszej wersji') + '</span>';
-        } else {
-            kartaInner = '<span class="pjd-tile__sub">uzupełni się, gdy domkniemy ustalenia w rozmowie</span>';
-        }
-        tiles += '<button type="button" class="pjd-tile' + (ctx.k ? '' : ' pjd-tile--dim') + '" data-pjd="karta"' + (ctx.k ? '' : ' disabled') + '>' +
-            pjGoIcon() +
-            '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.karta) + '</span>' +
-            '<span class="pjd-tile__t">Karta projektu</span>' + kartaInner +
-            '</button>';
+        tiles += stageTile('rynek', ICO_RYN, 'Potencjał rynku', 'konkurencja, ceny, luka rynkowa',
+            { ready: !!state.raport, gen: extras.raport === 'gen', key: 'raport', genLabel: 'Analizuję rynek…' });
+        tiles += stageTile('ustalenia', ICO_UST, 'Ustalenia',
+            (state.ustalenia && (state.ustalenia.dla_kogo || state.ustalenia.dlaKogo)) ? esc(String(state.ustalenia.dla_kogo || state.ustalenia.dlaKogo).slice(0, 90)) : 'dla kogo, kąt, ton marki',
+            { ready: !!state.ustalenia, wait: 'domknie się w rozmowie' });
+        tiles += stageTile('makiety', ICO_MAK, 'Makiety',
+            state.chosenStyle ? 'wybrany styl — kliknij, by zobaczyć' : (_mk.length ? '4 style — wybierz jeden' : 'wygląd Twojego sklepu'),
+            { ready: _mk.length > 0, gen: extras.mockups === 'gen', key: 'mockups', thumb: _mkChosen && _mkChosen.url, cls: 'pjd-tile--hero', genLabel: 'Tworzę makiety…' });
+        tiles += stageTile('reklamy', ICO_REK, 'Reklamy',
+            _ads.length ? _ads.length + ' gotowych kreacji' : 'reklamy na Facebooka i Instagram',
+            { ready: _ads.length > 0, gen: extras.ads === 'gen', key: 'ads', thumb: _adThumb && _adThumb.image_url, cls: 'pjd-tile--w3', genLabel: 'Składam reklamy…' });
+        tiles += stageTile('sklep', ICO_SKL, 'Sklep',
+            state.landingHtml ? 'gotowa strona sprzedażowa — wejdź' : 'Twoja strona sprzedażowa',
+            { ready: !!state.landingHtml, gen: (extras.landingTab === 'gen' || landingGen), key: 'landing', cls: 'pjd-tile--w3', genLabel: 'Buduję sklep…' });
 
         if (ctx.hasBrandSec) {
             // Kolejność kafli = kolejność menu: plan → rynek → economics → gtm →
@@ -8761,6 +8786,9 @@
         bindProjektCommon(body, ctx);
         body.querySelectorAll('[data-pjd]').forEach(function (t) {
             t.addEventListener('click', function () { pjOpenDetail(t.getAttribute('data-pjd')); });
+        });
+        body.querySelectorAll('[data-go-tab]').forEach(function (t) {
+            t.addEventListener('click', function () { switchTab(t.getAttribute('data-go-tab')); });
         });
         var rkTile = body.querySelector('[data-pjd-rynek]');
         if (rkTile) rkTile.addEventListener('click', function () { switchTab('rynek'); });
