@@ -4969,7 +4969,22 @@
     .side__item:hover svg, .side__item.is-active svg { color: #fff !important; }
     .side-cta { background: #0a0a0a !important; border: 1px solid var(--glass-border) !important; border-radius: 10px !important; box-shadow: none !important; }
     .side-cta:hover { transform: none !important; box-shadow: none !important; border-color: #454545 !important; }
-    .side-cta__btn { color: var(--accent) !important; }
+    /* Primary CTA = Geist (biały/czarny/6px/600, bez gradientu i glow) — spójnie z .btn / .composer__send.
+       Obejmuje „ZACZYNAMY", „Wróć do rozmowy/Zaczynamy rozmowę" (.side-cta__btn) i know-how (.khov-go).
+       #start-cta-btn z !important pokonuje inline'y, więc nie trzeba ruszać HTML buttona. */
+    .side-cta__btn, .khov-go, #start-cta-btn {
+        background: #fff !important;
+        color: #000 !important;
+        border: 0 !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.01em !important;
+        text-transform: none !important;
+        transform: none !important;
+    }
+    #start-cta-btn { font-size: 15px !important; padding: 13px 30px !important; }
+    .side-cta__btn:hover, .khov-go:hover, #start-cta-btn:hover { background: #ededed !important; transform: none !important; box-shadow: none !important; }
 
     /* COMPOSER — płaskie pole, 10px, focus = niebieski ring 1px */
     .composer__bar { background: #0a0a0a !important; border: 1px solid var(--border-strong) !important; border-radius: 10px !important; box-shadow: none !important; padding: 8px 8px 8px 12px !important; gap: 8px !important; }
@@ -5682,7 +5697,7 @@
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
     var OPENER_PROMISE = 'Który bierzemy?';
 
-    var OPENER_GENERIC = OPENER_HI + ' Wyłowiłem z TikToka produkty, które **sprzedają się właśnie teraz** — wybierzesz jeden, a ja pokażę Ci na nim, jak budujemy z tego biznes: **badanie rynku, branding i gotowa strona sprzedażowa**.\n\nTo dopiero pierwszy z wielu, więc bez ślęczenia — zawsze weźmiemy inny. Gotowy? Klikaj 👇';
+    var OPENER_GENERIC = 'Cześć, tu AI Tomka Niedźwieckiego. **Zbudujemy teraz sklep online.** Wskaż jeden z produktów, a zobaczysz na żywo, jak powstaje z niego biznes online: **analiza rynku, gotowa marka i strona, na której da się sprzedawać, grafiki reklamowe i wiele więcej**.\n\nBędziemy sprzedawać wiele produktów — wybierz pierwszy na początek 👇';
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
     var START_CHIPS = [
@@ -10538,7 +10553,7 @@
         var div = document.createElement('div');
         div.id = 'start-cta';
         div.style.cssText = 'width:100%;max-width:740px;margin:16px auto 0;text-align:center';
-        div.innerHTML = '<button type="button" id="start-cta-btn" style="font:inherit;font-size:16px;font-weight:800;letter-spacing:.04em;cursor:pointer;border:0;border-radius:14px;padding:15px 42px;background:var(--accent,#00d97e);color:var(--accent-ink,#04130c);box-shadow:0 12px 32px -12px rgba(0,217,126,.6);transition:transform .15s ease,box-shadow .15s ease">ZACZYNAMY →</button>';
+        div.innerHTML = '<button type="button" id="start-cta-btn" style="font:inherit;font-size:16px;font-weight:800;letter-spacing:.04em;cursor:pointer;border:0;border-radius:14px;padding:15px 42px;background:var(--accent,#00d97e);color:var(--accent-ink,#04130c);box-shadow:0 12px 32px -12px rgba(0,217,126,.6);transition:transform .15s ease,box-shadow .15s ease">Zaczynamy →</button>';
         el('chat-msgs').appendChild(div);
         scrollToBottom(false);
         var b = el('start-cta-btn');
