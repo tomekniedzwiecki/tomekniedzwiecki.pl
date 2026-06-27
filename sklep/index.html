@@ -5828,6 +5828,7 @@
     var streaming = false;
     var streamAbort = null; // AbortController bieżącego streamu (przycisk „Zatrzymaj")
     var stickBottom = true;
+    var turnAnchored = false;   // nowa tura zakotwiczona na GÓRZE (pytanie usera) — blokuje auto-follow na dół, aż user dojedzie do dołu
     var genScreen = null;        // 'badanie' | 'ekrany' | null — ekran generowania, na którym user teraz jest
     var leaveBeaconSent = false; // beacon „wyszedłem" wysyłany raz na dany ekran
     // Kontakt PRZED generowaniem (decyzja Tomka): żadnych ekranów/raportu, dopóki
@@ -11883,7 +11884,17 @@
 
     function scrollToBottom(force) {
         var sc = el('chat-scroll');
-        if (force || stickBottom) sc.scrollTop = sc.scrollHeight;
+        // turnAnchored: w czasie tury NIE ciągnij na dół (user czyta od początku odpowiedzi).
+        if (force || (stickBottom && !turnAnchored)) sc.scrollTop = sc.scrollHeight;
+    }
+    // Nowa tura: ustaw POCZĄTEK (pytanie usera) u góry kadru i zostaw widok tam — user scrolluje sam.
+    function anchorTurnTop() {
+        var sc = el('chat-scroll'); if (!sc) return;
+        var users = el('chat-msgs').querySelectorAll('.msg--user');
+        var anchor = users.length ? users[users.length - 1] : null;
+        if (!anchor) { sc.scrollTop = sc.scrollHeight; return; }   // brak pytania (opener/system) → klasycznie na dół
+        var rel = anchor.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop;
+        sc.scrollTop = Math.max(0, rel - 12);   // mały oddech nad pytaniem
     }
 
     /* ============================================================
@@ -12273,7 +12284,7 @@
         genScreen = null; // user aktywnie pisze → nie jest „utknięty" na ekranie generowania
         streaming = true;
         setComposerEnabled(false);
-        stickBottom = true;
+        stickBottom = false; turnAnchored = true;   // zakotwicz nową turę na GÓRZE (patrz anchorTurnTop niżej)
         setJumpVisible(false);
         // #3 — przycisk wysyłki zmienia się w „Zatrzymaj" (aktywny mimo zablokowanego pola)
         streamAbort = window.AbortController ? new AbortController() : null;
@@ -12288,7 +12299,7 @@
         bubble.setAttribute('aria-live', 'off'); // #4 — nie ogłaszamy każdego tokenu czytnikowi
         bubble.innerHTML = '<span class="typing" aria-label="Sparing pisze"><i></i><i></i><i></i></span>';
         el('chat-msgs').appendChild(bubble);
-        scrollToBottom(true);
+        anchorTurnTop();   // FIX: początek tury (pytanie usera) u góry kadru — nie skacz na dół podczas odpowiedzi
 
         var raw = '';
         var meta = { verdict: null, leadId: null, projekt: null };
@@ -14298,13 +14309,13 @@
             // Przewinięcie W GÓRĘ = user czyta → odczepiamy auto-scroll (nie szarpiemy go
             // na dół podczas streamingu). Powrót blisko dołu (<60px) ponownie doczepia.
             if (sc.scrollTop < lastScrollTop - 4) stickBottom = false;
-            else if (dist < 60) stickBottom = true;
+            else if (dist < 60) { stickBottom = true; turnAnchored = false; }   // dojechał do dołu → auto-follow wraca
             lastScrollTop = sc.scrollTop;
             setJumpVisible(dist > 240); // #2 — „na dół" gdy odjechaliśmy od końca rozmowy
         }, { passive: true });
         el('btn-restart').addEventListener('click', newConvo);
         el('jump-btn').addEventListener('click', function () { // #2 — skok do najnowszej
-            stickBottom = true; scrollToBottom(true); setJumpVisible(false);
+            stickBottom = true; turnAnchored = false; scrollToBottom(true); setJumpVisible(false);
         });
         updateSendState();
 
