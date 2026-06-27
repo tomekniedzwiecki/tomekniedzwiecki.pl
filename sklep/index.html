@@ -5702,7 +5702,10 @@
     var OPENER_HI = 'Cześć! Tu AI Tomka Niedźwieckiego.';
     var OPENER_PROMISE = 'Który bierzemy?';
 
-    var OPENER_GENERIC = 'Cześć, tu AI Tomka Niedźwieckiego. **Zbudujemy teraz sklep online.** Wskaż jeden z produktów, a zobaczysz na żywo, jak powstaje z niego biznes online: **analiza rynku, gotowa marka i strona, na której da się sprzedawać, grafiki reklamowe i wiele więcej**.\n\nBędziemy sprzedawać wiele produktów — wybierz pierwszy na początek 👇';
+    // Otwarcie w DWÓCH wiadomościach: P1 od razu, potem (efekt pisania ~3,5s) P2 + karuzela produktów.
+    var OPENER_P1 = 'Cześć, tu AI Tomka Niedźwieckiego. **Zbudujemy teraz sklep online.** Wskaż jeden z produktów, a zobaczysz na żywo, jak powstaje z niego biznes online: **analiza rynku, gotowa marka i strona, na której da się sprzedawać, grafiki reklamowe i wiele więcej**.';
+    var OPENER_P2 = 'Będziemy sprzedawać wiele produktów — wybierz pierwszy na początek 👇';
+    var OPENER_GENERIC = OPENER_P1 + '\n\n' + OPENER_P2;
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
     var START_CHIPS = [
@@ -9961,7 +9964,23 @@
     function addOpener() {
         // Nowe flow: zawsze ten sam wstęp prowadzący do wyboru viralowego produktu
         // (koniec routingu po zainteresowaniach z reklamy ?p=).
-        messages.push({ role: 'assistant', content: OPENER_GENERIC, local: true });
+        messages.push({ role: 'assistant', content: OPENER_P1, local: true });   // P2 dochodzi z efektem pisania (stageOpener2)
+    }
+    // Otwarcie cz.2: po ~3,5s efektu pisania dochodzi DRUGA wiadomość, a zaraz po niej — od razu produkty.
+    function stageOpener2() {
+        if (state.chosenProduct || el('vp-picker')) { ensureCarousel(); return; }
+        var typing = document.createElement('div');
+        typing.className = 'msg msg--ai';
+        typing.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+        el('chat-msgs').appendChild(typing); scrollToBottom(false);
+        setTimeout(function () {
+            if (!el('chat-msgs') || state.chosenProduct) { if (typing) typing.remove(); return; }
+            typing.remove();
+            messages.push({ role: 'assistant', content: OPENER_P2, local: true });
+            appendMessage('assistant', OPENER_P2);
+            saveMessages();
+            ensureCarousel();   // od razu pokaż produkty
+        }, 3500);
     }
 
     // EKRAN WYBORU 3 KIERUNKÓW (start świeżej rozmowy). Karty reużywają stylu
@@ -14167,7 +14186,10 @@
             // werdykt padł bez kontaktu (typowo: adopcja linkiem ?id=) → poproś o kontakt
             if (gatePending()) renderInlineGate();
         } else if (userCount === 0) {
-            renderStartButton();   // button „ZACZYNAMY" → karuzela dopiero po kliknięciu
+            // Otwarcie: P1 już w dymku. PIERWSZE wejście → efekt pisania → P2 → od razu produkty.
+            // Resume świeżego startu (oba dymki już są) → od razu produkty, bez ponownego stagingu/buttona.
+            if (isResume) ensureCarousel();
+            else stageOpener2();
         } else if (gatePending()) {
             renderInlineGate();
         } else if (isResume && messages.length > 1) {
