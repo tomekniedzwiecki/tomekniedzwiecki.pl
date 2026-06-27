@@ -6426,7 +6426,7 @@
                 changed = true;
             }
             if (p.brand && typeof p.brand === 'object' && p.brand.chosen_logo && JSON.stringify(p.brand) !== JSON.stringify(state.brand)) {
-                state.brand = p.brand; persistSession(); renderBrandSidebar(); changed = true;   // C/D: marka (logo) z serwera
+                state.brand = p.brand; persistSession(); renderBrandSidebar(); renderBrandResumeCard(); changed = true;   // C/D: marka (logo) z serwera + karta w czacie
             }
             if (p.business_plan && typeof p.business_plan === 'object'
                 && JSON.stringify(p.business_plan) !== JSON.stringify(state.bizplan)) {
