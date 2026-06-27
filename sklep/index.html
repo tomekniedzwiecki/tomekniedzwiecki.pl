@@ -1878,6 +1878,8 @@
     .mk-card__img.mk-noimg::after { content: 'Podgląd makiety'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12.5px; }
     .mk-zoom { position: absolute; top: 9px; right: 9px; width: 32px; height: 32px; border: 0; border-radius: 8px; background: rgba(0, 0, 0, 0.55); color: #fff; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
     .mk-zoom:hover { background: rgba(0, 0, 0, 0.82); }
+    .mk-pickbanner { margin: 0 0 14px; padding: 11px 14px; border: 1px solid rgba(37, 99, 235, 0.4); background: rgba(37, 99, 235, 0.1); border-radius: 12px; font-size: 13.5px; color: var(--text, #e7e7ea); line-height: 1.5; }
+    .mk-pickbanner b { color: #5b9bff; }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -5391,19 +5393,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"></rect><rect x="14" y="4" width="7" height="7" rx="1.5"></rect><rect x="3" y="15" width="7" height="7" rx="1.5"></rect><rect x="14" y="15" width="7" height="7" rx="1.5"></rect></svg>
                 <span class="side__label">Twój sklep</span>
             </button>
-            <!-- kolejność = kolejność powstawania -->
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="ekrany" data-view="ekrany" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"></rect><path d="M8 21h8"></path><path d="M12 18v3"></path></svg>
-                <span class="side__label">Makieta sklepu</span><span class="side__status" data-status-for="ekrany" hidden></span>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="karta" data-view="karta" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h6"></path><path d="M7 13h10"></path><path d="M7 17h4"></path></svg>
-                <span class="side__label">Karta biznesu</span><span class="side__status" data-status-for="karta" hidden></span>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="plan" data-view="plan" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg>
-                <span class="side__label">Plan przychodu</span><span class="side__status" data-status-for="plan" hidden></span>
-            </button>
+            <!-- relikty forku /stworze (ekrany/karta/plan) usunięte 2026-06-27 — /sklep pipeline: rynek → ustalenia → makiety → reklamy → sklep -->
             <button type="button" class="side__item" data-tab="rynek" data-view="rynek">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
                 <span class="side__label">Potencjał rynku</span><span class="side__status" data-status-for="rynek" hidden></span>
@@ -5425,26 +5415,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M9 13h6"></path></svg>
                 <span class="side__label">Sklep</span><span class="side__status" data-status-for="sklep" hidden></span>
             </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="economics" data-view="economics" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                <span class="side__label">Czy to zarabia</span><span class="side__status" data-status-for="economics" hidden></span>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="gtm" data-view="gtm" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg>
-                <span class="side__label">Gdzie szukać klientów</span><span class="side__status" data-status-for="gtm" hidden></span>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="reklamy" data-view="reklamy" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                <span class="side__label">Reklamy</span><span class="side__status" data-status-for="reklamy" hidden></span>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="strona" data-view="strona" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                <span class="side__label">Strona sklepu</span><span class="side__status" data-status-for="strona" hidden></span>
-            </button>
-            <button type="button" class="side__item" data-tab="projekt" data-pjview="prototyp" data-view="prototyp" hidden>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-6 1.5L16 20l-3 1-3-6.5L5 18z"></path></svg>
-                <span class="side__label">Podgląd sklepu</span><span class="side__status" data-status-for="prototyp" hidden></span>
-            </button>
+            <!-- relikty forku /stworze (economics/gtm/reklamy-dup/strona/prototyp) usunięte 2026-06-27 -->
             <button type="button" class="side__item side__item--ai" data-tab="wspolpraca">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17a5 5 0 0 1-5 5H3v-3a5 5 0 0 1 5-5"></path><path d="M13 7a5 5 0 0 1 5-5h3v3a5 5 0 0 1-5 5"></path><path d="M8 16l8-8"></path></svg>
                 <span class="side__label">Współpraca</span>
@@ -5892,7 +5863,8 @@
             stage: state.stage || null,
             fullPaid: !!state.fullPaid,
             khClosed: !!state.khClosed,
-            seen: state.seen || {}
+            seen: state.seen || {},
+            seenTabs: budSeenTabs || {}
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -6140,7 +6112,8 @@
         pjNewPlan = false;
         rkNew = false;
         budNewTabs = {};
-        budSeenTabs = {};
+        // F: stan „obejrzane" zakładek przeżywa odświeżenie → badge GOTOWE nie wraca do NOWE
+        budSeenTabs = (saved.seenTabs && typeof saved.seenTabs === 'object') ? saved.seenTabs : {};
         state.previews = {};
         state.previewHistory = {};
         var savedPrev = loadJSON(previewKey(saved.sessionId));
@@ -7530,7 +7503,13 @@
         scrollToBottom(false);
     }
     function genCardReadyInChat(id, doneLabel, openTab, btnLabel) {
-        var card = el(id); if (!card) return;
+        var card = el(id);
+        if (!card) {   // etap gotowy bez paska startu (np. ustalenia) → utwórz kartę w locie
+            if (!el('chat-msgs')) return;
+            card = document.createElement('div'); card.id = id;
+            card.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
+            el('chat-msgs').appendChild(card); scrollToBottom(false);
+        }
         var bid = id + '-open';
         card.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>' + doneLabel + '</div>' +
             '<button type="button" id="' + bid + '" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">' + (btnLabel || 'Zobacz →') + '</button>';
@@ -9196,6 +9175,7 @@
         if (budSeenTabs[tab]) return;
         budSeenTabs[tab] = true;
         budNewTabs[tab] = false;
+        persistSession();   // F: „obejrzane" przeżywa odświeżenie (GOTOWE nie wraca do NOWE)
         updateBudNav();
     }
     // Czy zakładka ma realną, gotową treść (do statusu „gotowe")
@@ -9316,6 +9296,8 @@
 
     // Marker <ustalenia> z tury AI — ustalenia domknięte, ruszamy makiety.
     function onUstaleniaDone() {
+        // B5: karta w czacie — ustalenia to jedyny etap bez karty kierunkującej; odeślij do zakładki
+        genCardReadyInChat('us-chat-card', 'Ustalenia gotowe — wiemy, dla kogo to i jak', 'ustalenia', 'Zobacz ustalenia →');
         // odsłoń zakładkę MAKIETY z kropką „nowe" i wystartuj generowanie 4 stylów
         if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
         kickMockup(false);   // ustawia extras.mockups='gen', woła updateBudNav
@@ -9415,7 +9397,8 @@
                 '</div>' +
                 '</div>';
         }).join('');
-        body.innerHTML = head + '<div class="mk-grid">' + cards + '</div>' +
+        var pickBanner = state.chosenStyle ? '' : '<div class="mk-pickbanner"><b>Wybierz styl, żeby zbudować resztę.</b> Po Twoim wyborze reklamy i sklep złożą się automatycznie.</div>';
+        body.innerHTML = head + pickBanner + '<div class="mk-grid">' + cards + '</div>' +
             '<div class="pj-plan__note">Masz uwagi do wyglądu? Napisz je w czacie — uwzględnię przy budowie strony.</div>';
         wireMakietyDelegation();
     }
@@ -9535,8 +9518,10 @@
         if (state.landingHtml) {
             body.innerHTML = head +
                 '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
-                '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button></div>' +
-                '<div class="pj-plan__note">Masz uwagi do strony? Napisz w czacie — poprawię.</div>';
+                '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button>' +
+                (state.verdict === 'zielony' ? '<button type="button" class="rkg-landing-btn sk-collab" id="sk-collab">Zobacz, jak budujemy to razem →</button>' : '') +
+                '</div>' +
+                '<div class="pj-plan__note">' + (state.verdict === 'zielony' ? 'To podgląd Twojego sklepu. Żeby ruszyć z nim naprawdę — zobacz, jak budujemy to razem. Masz uwagi? Napisz w czacie, poprawię.' : 'Masz uwagi do strony? Napisz w czacie — poprawię.') + '</div>';
             try { el('sk-frame').srcdoc = landingRevealed ? state.landingHtml : withReveal(state.landingHtml); landingRevealed = true; }
             catch (e) {
                 body.innerHTML = head +
@@ -9547,6 +9532,7 @@
                 return;
             }
             var fs = el('sk-fs'); if (fs) fs.addEventListener('click', openLandingPreview);
+            var cb = el('sk-collab'); if (cb) cb.addEventListener('click', function () { switchTab('wspolpraca'); });
             return;
         }
         if (extras.landingTab === 'fail') {
@@ -11446,8 +11432,7 @@
             if (pp) el('chat-msgs').appendChild(renderPropozycjeEl(pp.items, pp.runda));
             else if (hasPropBrak(content)) el('chat-msgs').appendChild(buildPropBrakEl());
             var zg = parseZielone(content);
-            if (zg) showGreenLight(zg, false);   // replay historii — bez beatu
-            // Karta rezerwacji w czacie czeka na ZIELONE ŚWIATŁO (główny flow).
+            if (zg) { if (state.verdict !== 'zielony') state.verdict = 'zielony'; renderVerdict('zielony', state.karta); }   // replay → karta „Projekt zdefiniowany"
             if (hasMakieta(content) && state.verdict === 'zielony' && !zg) el('chat-msgs').appendChild(mkCardEl());
         }
         pinPickerBottom();   // karuzela ETAP 1 zawsze na dole, pod najnowszą wiadomością
@@ -12175,11 +12160,11 @@
                     anchor.insertAdjacentElement('afterend', prEl);
                     anchor = prEl;
                 }
-                // ZIELONE ŚWIATŁO — pozytywna decyzja PRZED rezerwacją (kulminacja).
+                // PROJEKT ZDEFINIOWANY (dawniej „zielone światło" — karta usunięta 2026-06-27, decyzja Tomka):
+                // <zielone> ustawia werdykt 'zielony'; kartę „Projekt zdefiniowany" (CTA „Zobacz, jak budujemy
+                // to razem") renderuje blok werdyktu niżej. Bez osobnej zielonej karty z CTA rezerwacji 500 zł.
                 var zg = parseZielone(raw);
-                if (zg) showGreenLight(zg, true);   // live → beat „oceniamy…" + karta z CTA rezerwacji
-                // Karta rezerwacji <makieta> czeka na zielone światło; w turze zielonego pomijamy
-                // (karta zielonego ma juz wlasne CTA — bez dublowania).
+                if (zg && state.verdict !== 'zielony') { state.verdict = 'zielony'; persistSession(); }
                 if (hasMakieta(raw) && state.verdict === 'zielony' && !zg) anchor.insertAdjacentElement('afterend', mkCardEl());
             } else {
                 bubble.remove();
@@ -12187,9 +12172,9 @@
             // Loader propozycji nie powinien przeżyć tury (gdy nie dostaliśmy 'gotowe')
             if (!document.getElementById(PROP_WRAP_ID)) { var pl = document.getElementById(PROP_LOADER_ID); if (pl) pl.remove(); }
 
-            // Werdykt: spar_meta ma priorytet, fallback = parsowanie markera
+            // Werdykt: spar_meta ma priorytet, fallback = parsowanie markera; <zielone> = werdykt zielony
             var parsed = parseWerdykt(raw);
-            var verdict = meta.verdict || (parsed && parsed.kolor) || null;
+            var verdict = meta.verdict || (parsed && parsed.kolor) || (zg ? 'zielony' : null);
             if (verdict) {
                 if (verdict !== state.verdict) gaEvent('app_verdict', { verdict: verdict, ocena: window.__lastOcena || '' });
                 state.verdict = verdict;
