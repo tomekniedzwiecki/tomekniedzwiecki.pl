@@ -9585,6 +9585,26 @@
         .vp-track::-webkit-scrollbar{display:none}
         .vp-card{flex:0 0 234px;scroll-snap-align:start;border:1px solid var(--glass-border);border-radius:16px;background:#0b0b0b;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s}
         @media(max-width:560px){.vp-card{flex:0 0 81vw;max-width:310px}}
+        /* Afordancja przewijania: fade na krawędziach + strzałki (że jest więcej w prawo) */
+        .vp-trackwrap{position:relative}
+        .vp-trackwrap::before,.vp-trackwrap::after{content:'';position:absolute;top:0;bottom:12px;width:48px;pointer-events:none;z-index:2;opacity:0;transition:opacity .2s}
+        .vp-trackwrap::before{left:0;background:linear-gradient(to right,#0a0a0b,transparent)}
+        .vp-trackwrap::after{right:0;background:linear-gradient(to left,#0a0a0b,transparent)}
+        .vp-trackwrap.has-l::before{opacity:1}
+        .vp-trackwrap.has-r::after{opacity:1}
+        .vp-arrow{position:absolute;top:33%;transform:translateY(-50%);z-index:3;width:38px;height:38px;border-radius:50%;border:1px solid var(--glass-border);background:rgba(12,12,14,.9);color:#fff;font-size:21px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 4px 16px rgba(0,0,0,.55)}
+        .vp-arrow:hover{background:rgba(22,22,26,.97);border-color:var(--text-muted)}
+        .vp-arrow--l{left:-4px}.vp-arrow--r{right:-4px}
+        .vp-trackwrap.has-l .vp-arrow--l{display:flex}
+        .vp-trackwrap.has-r .vp-arrow--r{display:flex}
+        .vp-trackwrap.has-r .vp-arrow--r{animation:vpNudge 1.5s ease-in-out 3}
+        @keyframes vpNudge{0%,100%{transform:translateY(-50%)}50%{transform:translateY(-50%) translateX(4px)}}
+        @media(max-width:560px){.vp-arrow{width:34px;height:34px;font-size:19px}.vp-trackwrap::before,.vp-trackwrap::after{width:36px}}
+        /* Karta „Pokaż więcej" na końcu karuzeli */
+        .vp-card--more{align-items:center;justify-content:center;gap:9px;flex-direction:column;color:var(--text-muted);cursor:pointer;font-size:14px;font-weight:700;line-height:1.15;text-align:center;background:rgba(255,255,255,.02);border-style:dashed;border-color:var(--text-muted);min-height:160px;transition:color .15s,border-color .15s,background .15s}
+        .vp-card--more:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.05)}
+        .vp-card--more .vpm-plus{font-size:30px;font-weight:300;line-height:1}
+        .vp-card--more.is-loading{opacity:.6;pointer-events:none}
         .vp-card:hover{border-color:var(--accent)}
         .vp-vid{position:relative;width:100%;aspect-ratio:9/16;max-height:46vh;background:#000;cursor:pointer}
         .vp-vid.vp-noimg{background:linear-gradient(145deg,#1c1c1f,#0a0a0a)}
@@ -9854,44 +9874,87 @@
         return '<div class="vp-cats">' + chips + '</div>';
     }
 
+    function vpCardHTML(p, i) {
+        var hot = p.newest_days != null && p.newest_days <= 14;
+        return '<div class="vp-card">' +
+            '<div class="vp-vid' + (p.cover ? '' : ' vp-noimg') + '" data-idx="' + i + '">' +
+                (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" alt="' + esc(p.name || 'Produkt') + '" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
+                (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
+                '<button type="button" class="vp-fs" data-idx="' + i + '" aria-label="Pełny ekran">⛶</button>' +
+                '<button type="button" class="vp-add' + (slHas(p) ? ' is-in' : '') + '" data-idx="' + i + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '" title="' + (slHas(p) ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania') + '" aria-label="Rozważam">' + (slHas(p) ? '✓ Rozważam' : '+ Rozważam') + '</button>' +
+                '<div class="vp-play"><span>▶</span></div>' +
+            '</div>' +
+            '<div class="vp-b">' +
+                '<div class="vp-name">' + esc(p.name) + '</div>' +
+                '<div class="vp-stats">' +
+                    '<span class="vp-stat"><b>' + fmtVP(p.saves) + '</b> zapisów</span>' +
+                    '<span class="vp-stat"><b>' + fmtVP(p.plays) + '</b> wyświetleń</span>' +
+                    '<span class="vp-stat"><b>' + fmtVP(p.comments) + '</b> komentarzy</span>' +
+                '</div>' +
+                '<button type="button" class="vp-pick" data-idx="' + i + '" data-pick="' + esc(p.name) + '">Wybieram ten</button>' +
+                '<button type="button" class="vp-pot" data-pot="' + esc(p.name) + '" data-sv="' + (p.saves || '') + '" data-pl="' + (p.plays || '') + '" data-cm="' + (p.comments || '') + '" data-ag="' + (p.newest_days != null ? p.newest_days : '') + '" data-ct="' + esc(p.category || VP_STATE.cat || '') + '">Jaki ma potencjał?</button>' +
+            '</div>' +
+        '</div>';
+    }
+    function vpMoreCardHTML() {
+        return VP_STATE.hasMore ? '<button type="button" class="vp-card vp-card--more" data-more aria-label="Pokaż więcej produktów"><span class="vpm-plus">+</span><span>Pokaż<br>więcej</span></button>' : '';
+    }
     function renderViralProducts(wrap, products) {
         injectVpStyle();
-        var catsHtml = vpCatsBar();
         if (!products.length) {
-            wrap.innerHTML = catsHtml + '<div class="vp-load">Brak produktów w tej kategorii — wybierz inną albo napisz, a poszukamy razem.</div>';
+            wrap.innerHTML = '<div class="vp-load">Brak produktów — napisz, a poszukamy razem.</div>';
             return;
         }
-        var cards = '';
-        products.forEach(function (p, i) {
-            var hot = p.newest_days != null && p.newest_days <= 14;
-            cards +=
-                '<div class="vp-card">' +
-                    '<div class="vp-vid' + (p.cover ? '' : ' vp-noimg') + '" data-idx="' + i + '">' +
-                        (p.cover ? '<img loading="lazy" referrerpolicy="no-referrer" alt="' + esc(p.name || 'Produkt') + '" src="' + esc(p.cover) + '" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'vp-noimg\')">' : '') +
-                        (p.newest_days != null ? '<div class="vp-badge' + (hot ? ' hot' : '') + '">' + (hot ? '🔥 ' : '') + p.newest_days + ' dni</div>' : '') +
-                        '<button type="button" class="vp-fs" data-idx="' + i + '" aria-label="Pełny ekran">⛶</button>' +
-                        '<button type="button" class="vp-add' + (slHas(p) ? ' is-in' : '') + '" data-idx="' + i + '" aria-pressed="' + (slHas(p) ? 'true' : 'false') + '" title="' + (slHas(p) ? 'Kliknij, żeby wyjąć' : 'Dodaj do porównania') + '" aria-label="Rozważam">' + (slHas(p) ? '✓ Rozważam' : '+ Rozważam') + '</button>' +
-                        '<div class="vp-play"><span>▶</span></div>' +
-                    '</div>' +
-                    '<div class="vp-b">' +
-                        '<div class="vp-name">' + esc(p.name) + '</div>' +
-                        '<div class="vp-stats">' +
-                            '<span class="vp-stat"><b>' + fmtVP(p.saves) + '</b> zapisów</span>' +
-                            '<span class="vp-stat"><b>' + fmtVP(p.plays) + '</b> wyświetleń</span>' +
-                            '<span class="vp-stat"><b>' + fmtVP(p.comments) + '</b> komentarzy</span>' +
-                        '</div>' +
-                        '<button type="button" class="vp-pick" data-idx="' + i + '" data-pick="' + esc(p.name) + '">Wybieram ten</button>' +
-                        '<button type="button" class="vp-pot" data-pot="' + esc(p.name) + '" data-sv="' + (p.saves || '') + '" data-pl="' + (p.plays || '') + '" data-cm="' + (p.comments || '') + '" data-ag="' + (p.newest_days != null ? p.newest_days : '') + '" data-ct="' + esc(p.category || VP_STATE.cat || '') + '">Jaki ma potencjał?</button>' +
-                    '</div>' +
-                '</div>';
-        });
-        var foot = '<div class="vp-foot">' +
-            '<button type="button" class="vp-more">Pokaż inne ↻</button>' +
-            '<span class="vp-count">' + VP_STATE.total + ' hitów' + (VP_STATE.cat ? ' w „' + esc(VP_STATE.cat) + '”' : '') + '</span>' +
-        '</div>';
-        var cap = '';   // (usunięto podpis-instrukcję pod karuzelą — decyzja Tomka)
-        wrap.innerHTML = catsHtml + '<div class="vp-track">' + cards + '</div>' + foot + cap;
+        var cards = products.map(function (p, i) { return vpCardHTML(p, i); }).join('') + vpMoreCardHTML();
+        var foot = '<div class="vp-foot"><button type="button" class="vp-more">Pokaż inne ↻</button>' +
+            '<span class="vp-count">' + VP_STATE.total + ' hitów</span></div>';
+        wrap.innerHTML = '<div class="vp-trackwrap"><div class="vp-track">' + cards + '</div>' +
+            '<button type="button" class="vp-arrow vp-arrow--l" aria-label="Przewiń w lewo">‹</button>' +
+            '<button type="button" class="vp-arrow vp-arrow--r" aria-label="Przewiń w prawo">›</button></div>' + foot;
+        vpWireScroll(wrap);
         renderShortlistBar();
+    }
+    // Afordancja przewijania: strzałki ‹ › + gradient-fade na krawędziach (że jest więcej w prawo).
+    function vpWireScroll(wrap) {
+        var tw = wrap.querySelector('.vp-trackwrap'); if (!tw) return;
+        var track = tw.querySelector('.vp-track'); if (!track) return;
+        var upd = function () {
+            var maxL = track.scrollWidth - track.clientWidth - 2;
+            tw.classList.toggle('has-l', track.scrollLeft > 4);
+            tw.classList.toggle('has-r', track.scrollLeft < maxL);
+        };
+        track.addEventListener('scroll', upd, { passive: true });
+        try { window.addEventListener('resize', upd); } catch (e) {}
+        var card = track.querySelector('.vp-card');
+        var step = (card ? card.offsetWidth : 240) + 13;
+        var al = tw.querySelector('.vp-arrow--l'), ar = tw.querySelector('.vp-arrow--r');
+        if (al) al.addEventListener('click', function () { track.scrollBy({ left: -step, behavior: 'smooth' }); });
+        if (ar) ar.addEventListener('click', function () { track.scrollBy({ left: step, behavior: 'smooth' }); });
+        track.__updEdges = upd;
+        setTimeout(upd, 60);
+    }
+    var vpMoreBusy = false;
+    // „Pokaż więcej" — DOŁĄCZA następną stronę produktów (ciągły scroll), nie resetuje karuzeli.
+    function vpLoadMore(wrap) {
+        if (vpMoreBusy || !VP_STATE.hasMore) return;
+        vpMoreBusy = true;
+        var track = wrap.querySelector('.vp-track');
+        var moreBtn = wrap.querySelector('.vp-card--more');
+        if (moreBtn) moreBtn.classList.add('is-loading');
+        var nextPage = (VP_STATE.page || 0) + 1, base = (VP_STATE.items || []).length;
+        var u = VP_ENDPOINT + '?n=' + VP_STATE.n + '&page=' + nextPage + '&seed=' + VP_STATE.seed + (VP_STATE.cat ? '&cat=' + encodeURIComponent(VP_STATE.cat) : '');
+        fetch(u).then(function (r) { return r.json(); }).then(function (j) {
+            vpMoreBusy = false;
+            if (!el('vp-picker') || !track) return;
+            var ps = (j && j.products) || [];
+            VP_STATE.page = nextPage; VP_STATE.hasMore = !!(j && j.has_more);
+            VP_STATE.items = (VP_STATE.items || []).concat(ps);
+            var html = ps.map(function (p, k) { return vpCardHTML(p, base + k); }).join('');
+            if (moreBtn) moreBtn.insertAdjacentHTML('beforebegin', html); else track.insertAdjacentHTML('beforeend', html);
+            if (!VP_STATE.hasMore && moreBtn) moreBtn.remove();
+            else if (moreBtn) moreBtn.classList.remove('is-loading');
+            if (track.__updEdges) track.__updEdges();
+        }).catch(function () { vpMoreBusy = false; if (moreBtn) moreBtn.classList.remove('is-loading'); });
     }
 
     /* ============================================================
@@ -9922,7 +9985,7 @@
     function slShake() {
         var b = el('sl-bar'); if (!b) return;
         b.classList.remove('sl-shake'); void b.offsetWidth; b.classList.add('sl-shake');
-        var mc = b.querySelector('.sl-msg'); if (mc) { mc.textContent = 'Komplet 3/3 — wyrzuć któryś, żeby dobrać nowy.'; }
+        var mc = b.querySelector('.sl-msg'); if (mc) { mc.textContent = 'Masz już 3 — wyjmij któryś, żeby dodać inny.'; }
     }
     // Odśwież stan przycisków „+ Rozważam" na widocznych kartach (bez pełnego re-renderu).
     function refreshVpAddButtons() {
@@ -9966,19 +10029,16 @@
                 '<span class="sl-x" aria-hidden="true">✕</span>' +
             '</button>';
         }).join('');
-        var label = n === 0 ? 'Klikaj „+ Rozważam" przy tym, co Cię ciekawi'
-            : 'Rozważasz: ' + n + '/' + SL_MAX;
-        var hint = n === 1 ? '<span class="sl-msg">Dorzuć jeszcze jeden do porównania</span>'
-            : n >= SL_MAX ? '<span class="sl-msg">Masz komplet — podmień, jeśli coś lepszego wpadnie Ci w oko</span>'
+        var label = n === 0 ? 'Dodaj do „Rozważam" to, co Cię ciekawi'
+            : 'Rozważasz: ' + n + (n >= SL_MAX ? ' (max)' : '');
+        var hint = n === 1 ? '<span class="sl-msg">dorzuć jeszcze 1, żeby porównać</span>'
             : '<span class="sl-msg"></span>';
         var cmp = n >= 2 ? '<button type="button" class="sl-compare">Porównaj →</button>'
             : '<button type="button" class="sl-compare" disabled>Porównaj →</button>';
-        var seen = seenCount();
-        var meter = '<span class="sl-meter">Obejrzane: ' + seen + (n ? ' · Odłożone: ' + n : '') + '</span>';
         bar.innerHTML =
             '<div class="sl-lead">' + esc(label) + '</div>' +
             '<div class="sl-thumbs">' + thumbs + '</div>' +
-            hint + cmp + meter;
+            hint + cmp;
     }
     // Overlay porównania (reuse stylu .vpm): 2-3 kolumny + lider wiersza --accent.
     function openCompare() {
@@ -10135,10 +10195,10 @@
         el('chat-msgs').appendChild(wrap); scrollToBottom(false);
         // Delegacja zdarzeń raz, na trwałym kontenerze (innerHTML przy re-renderze nie gubi listenera).
         wrap.addEventListener('click', function (e) {
-            var ct = e.target.closest('.vp-cat');
-            if (ct) { VP_STATE.cat = ct.getAttribute('data-cat') || ''; VP_STATE.page = 0; vpFetch(wrap); return; }
+            var moreCard = e.target.closest('[data-more]');
+            if (moreCard) { vpLoadMore(wrap); return; }   // end-card → DOŁĄCZ kolejną stronę
             var mr = e.target.closest('.vp-more');
-            if (mr) { VP_STATE.page = VP_STATE.hasMore ? VP_STATE.page + 1 : 0; vpFetch(wrap); return; }
+            if (mr) { VP_STATE.seed = Math.floor(Math.random() * 1e9) + 1; VP_STATE.page = 0; vpFetch(wrap); return; }   // „Pokaż inne" → przetasuj
             var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openProductLightbox(+fs.getAttribute('data-idx')); return; }
             var ad = e.target.closest('.vp-add'); if (ad) { e.stopPropagation(); var pa = VP_STATE.items[+ad.getAttribute('data-idx')]; if (!pa) return; if (slHas(pa)) removeFromShortlist(slKey(pa)); else addToShortlist(pa); return; }
             var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct(VP_STATE.items[+pk.getAttribute('data-idx')]); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
