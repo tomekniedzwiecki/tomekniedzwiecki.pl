@@ -1644,7 +1644,9 @@
     .pjx-win__addr { flex: 1; min-width: 0; font-family: var(--mono); font-size: 11px; color: var(--text-muted); background: rgba(255, 255, 255, .04); border-radius: 5px; padding: 3px 9px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .pjx-win__addr .cur { color: var(--accent); animation: pjxBlink 1s step-end infinite; }
     @keyframes pjxBlink { 50% { opacity: 0; } }
-    .pjx-win__view { position: relative; height: 152px; overflow: hidden; background: #fff; }
+    .pjx-win__view { display: block; position: relative; height: 152px; overflow: hidden; background: #fff; }
+    .pjx-win, .pjx-win__bar, .pjx-win__addr { display: block; }
+    .pjx-win__bar { display: flex; }
     .pjx-win__view iframe { position: absolute; top: 0; left: 0; width: 286%; height: 434px; border: 0; transform: scale(.35); transform-origin: top left; pointer-events: none; }
     .pjx-win__view--sk { background: #0d0d0d; }
     .pjx-badge { align-self: flex-start; font-size: 10px; font-weight: 600; letter-spacing: .02em; color: var(--accent); background: rgba(0, 217, 126, .10); border: 1px solid rgba(0, 217, 126, .30); border-radius: 6px; padding: 2px 8px; }
