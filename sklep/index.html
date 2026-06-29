@@ -6916,6 +6916,125 @@
             }, 3000);
         }).catch(function () { fail(); });
     }
+    // ── REZERWACJA 500 zł — modal BLIK W ROZMOWIE (styl jak paywall /aplikacji) ──
+    // BLIK inline + „inne metody" → pełna kasa. Order tworzy bud-project 'buy_reservation'
+    // (spar_session_id=sid → webhook ustawi bud_sessions.paid_at; opis 'Rezerwacja … sklep').
+    function reservationConfirmed() {
+        var box = el('reserv-paywall'); if (box) box.remove();
+        if (activeTab !== 'chat') switchTab('chat');
+        sysMsg('Rezerwacja przyjęta — dziękuję! 🤝 Tomek osobiście ułoży plan Twojego sklepu i odezwie się do Ciebie.');
+    }
+    function openReservationCheckout() {
+        var u = checkoutURL();
+        if (typeof isInAppWebView === 'function' && isInAppWebView()) { try { window.location.assign(u); } catch (e) { window.location.href = u; } }
+        else window.open(u, '_blank', 'noopener');
+    }
+    function showReservationPaywall() {
+        if (state.paid) { reservationConfirmed(); return; }
+        if (activeTab !== 'chat') switchTab('chat');
+        var old = el('reserv-paywall'); if (old) old.remove();
+        var loggedIn = !!authState.user;
+        var ov = document.createElement('div');
+        ov.className = 'auth-modal'; ov.id = 'reserv-paywall'; ov.hidden = false;
+        var dg = '';
+        for (var bi = 0; bi < 6; bi++) dg += '<input class="cpw-digit" inputmode="numeric" autocomplete="' + (bi === 0 ? 'one-time-code' : 'off') + '" maxlength="1" data-i="' + bi + '" aria-label="Cyfra ' + (bi + 1) + ' kodu BLIK">';
+        var blikBody =
+            '<style>' +
+            '.cpw-blik-row{display:flex;gap:8px;justify-content:center;margin:12px 0 2px}' +
+            '.cpw-digit{width:42px;height:52px;text-align:center;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text-strong);background:#000;border:1px solid var(--border-strong);border-radius:8px;caret-color:var(--accent);transition:border-color .15s,box-shadow .15s,background .15s}' +
+            '.cpw-digit:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}' +
+            '.cpw-digit.filled{border-color:var(--accent);background:var(--accent-soft)}' +
+            '</style>' +
+            '<label class="f-label" style="margin-top:4px;text-align:center">Kod BLIK</label>' +
+            '<div class="cpw-blik-row" id="rpw-blik-row">' + dg + '</div>' +
+            '<div class="f-error" id="rpw-blik-err" style="text-align:center"></div>' +
+            '<button type="button" class="btn" id="rpw-blik-pay" style="width:100%;margin-top:10px">Zapłać BLIK-iem — 500 zł</button>' +
+            '<div id="rpw-status" style="display:none;margin-top:12px;font-size:13px;line-height:1.5;color:var(--text)"></div>' +
+            '<button type="button" id="rpw-other" style="' + cpwLink + '">Inne metody (karta / przelew) →</button>' +
+            '<button type="button" id="rpw-paid" style="' + cpwLink + ';margin-top:4px">Już zapłaciłem — odśwież</button>';
+        ov.innerHTML =
+            '<div class="auth-modal__backdrop" id="rpw-bd"></div>' +
+            '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Rezerwacja rozmowy z Tomkiem">' +
+            '<button type="button" class="auth-modal__close" id="rpw-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
+            '<h2 class="auth-modal__title">Zarezerwuj rozmowę z Tomkiem</h2>' +
+            '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Tomek osobiście ułoży plan Twojego sklepu i odezwie się do Ciebie. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
+            (loggedIn ? blikBody : '<button type="button" class="btn" id="rpw-login" style="width:100%">Zaloguj się, żeby zarezerwować</button>') +
+            '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.</p>' +
+            '</div>';
+        document.body.appendChild(ov);
+        var close = function () { ov.remove(); };
+        el('rpw-x').addEventListener('click', close);
+        el('rpw-bd').addEventListener('click', close);
+        if (loggedIn) {
+            var digits = ov.querySelectorAll('.cpw-digit');
+            var syncDigits = function () { for (var k = 0; k < digits.length; k++) digits[k].classList.toggle('filled', !!digits[k].value); };
+            for (var di = 0; di < digits.length; di++) (function (input, idx) {
+                input.addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 1); syncDigits(); if (this.value && idx < 5) digits[idx + 1].focus(); });
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !this.value && idx > 0) { digits[idx - 1].focus(); digits[idx - 1].value = ''; syncDigits(); }
+                    else if (e.key === 'ArrowLeft' && idx > 0) digits[idx - 1].focus();
+                    else if (e.key === 'ArrowRight' && idx < 5) digits[idx + 1].focus();
+                    else if (e.key === 'Enter') buyReservationBlik();
+                });
+                input.addEventListener('paste', function (e) { e.preventDefault(); var p = (((e.clipboardData || window.clipboardData).getData('text')) || '').replace(/\D/g, '').slice(0, 6); for (var j = 0; j < p.length; j++) if (digits[j]) digits[j].value = p[j]; syncDigits(); digits[Math.min(p.length, 5)].focus(); });
+                input.addEventListener('focus', function () { this.select(); });
+            })(digits[di], di);
+            el('rpw-blik-pay').addEventListener('click', buyReservationBlik);
+            el('rpw-other').addEventListener('click', function () { openReservationCheckout(); });
+            el('rpw-paid').addEventListener('click', function () {
+                var b = el('rpw-paid'); b.textContent = 'Sprawdzam…';
+                try { syncProjectFromServer(); } catch (e) { }
+                setTimeout(function () { if (state.paid) reservationConfirmed(); else b.textContent = 'Jeszcze nie widzę wpłaty — kliknij ponownie'; }, 1600);
+            });
+            setTimeout(function () { try { digits[0].focus(); } catch (e) { } }, 120);
+        } else {
+            el('rpw-login').addEventListener('click', function () { close(); openAuthModal('Zaloguj się, żeby zarezerwować rozmowę.'); });
+        }
+    }
+    function buyReservationBlik() {
+        if (!authState.user) { showReservationPaywall(); return; }
+        var row = el('rpw-blik-row'); if (!row) return;
+        var _pb = el('rpw-blik-pay'); if (_pb && _pb.disabled) return;   // re-entry guard (R4 #7)
+        var boxes = row.querySelectorAll('.cpw-digit');
+        var code = ''; for (var k = 0; k < boxes.length; k++) code += (boxes[k].value || '');
+        code = code.replace(/\D/g, '');
+        var errEl = el('rpw-blik-err'), payBtn = el('rpw-blik-pay'), statusEl = el('rpw-status');
+        if (code.length !== 6) { errEl.textContent = 'Wpisz 6-cyfrowy kod BLIK.'; errEl.classList.add('is-shown'); try { boxes[Math.max(0, code.length)].focus(); } catch (e) { } return; }
+        errEl.classList.remove('is-shown');
+        payBtn.disabled = true; payBtn.textContent = 'Łączę z bankiem…';
+        statusEl.style.display = 'block'; statusEl.textContent = 'Tworzę płatność…';
+        var fail = function (msg) {
+            statusEl.style.display = 'none';
+            errEl.textContent = msg || 'Płatność się nie powiodła. Spróbuj ponownie albo wybierz inne metody.';
+            errEl.classList.add('is-shown');
+            payBtn.disabled = false; payBtn.textContent = 'Zapłać BLIK-iem — 500 zł';
+        };
+        fetch(SPAR_PROJECT_ENDPOINT, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ action: 'buy_reservation', sessionId: state.sessionId, email: state.email || (authState.user && authState.user.email) || '' })
+        }).then(function (r) { return r.json(); }).then(function (d) {
+            if (!d || !d.orderId) throw new Error('order');
+            return fetch(TPAY_CREATE_ENDPOINT, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
+                body: JSON.stringify({ orderId: d.orderId, blikCode: code, paymentType: 'blik' })
+            }).then(function (r) { return r.json(); });
+        }).then(function (tp) {
+            if (!tp || !tp.success) throw new Error('tpay');
+            statusEl.innerHTML = '<strong>Potwierdź płatność w aplikacji banku.</strong><br>Czekam na potwierdzenie…';
+            payBtn.textContent = 'Czekam na potwierdzenie…';
+            var tries = 0;
+            var iv = setInterval(function () {
+                tries++;
+                if (state.paid) { clearInterval(iv); reservationConfirmed(); return; }
+                try { syncProjectFromServer(); } catch (e) { }
+                if (tries >= 40) {
+                    clearInterval(iv);
+                    statusEl.innerHTML = 'Nie zdążyłem potwierdzić w czasie. Jeśli zapłaciłeś — kliknij „Już zapłaciłem — odśwież".';
+                    payBtn.disabled = false; payBtn.textContent = 'Zapłać BLIK-iem — 500 zł';
+                }
+            }, 3000);
+        }).catch(function () { fail(); });
+    }
     function newConvo() {
         if (convoIndex().length < allowedConvos()) { startFresh(true); return; }
         // może właśnie opłacił — odśwież raz, potem ewentualnie paywall
@@ -15382,6 +15501,17 @@
             if (!a || a.href.indexOf(CHECKOUT_BASE) < 0) return;
             var loc = a.id === 'auth-menu-reserve' ? 'konto_menu' : (a.closest('.mk-card') ? 'makieta_card' : (a.closest('#pane-wspolpraca') ? 'wspolpraca' : 'inne'));
             gaEvent('app_reservation_cta', { location: loc });
+        }, true);
+        // CTA REZERWACJI 500 zł (OFFER_ID) → modal BLIK W ROZMOWIE zamiast skoku do kasy.
+        // „Inne metody" w modalu prowadzi do pełnej kasy. Dotyczy TYLKO rezerwacji — czat
+        // 49 zł (CONVO_OFFER_ID) i inne linki bez zmian. capture + stopImmediate, by ubiec
+        // handler webview (#8). gaEvent powyżej i tak już zalogował intencję.
+        document.addEventListener('click', function (e) {
+            var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+            if (!a || a.href.indexOf(CHECKOUT_BASE) < 0 || a.href.indexOf(OFFER_ID) < 0) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            if (!state.paid) showReservationPaywall();
         }, true);
         // #8: w in-app webview (TikTok/IG/FB) nowa karta (target=_blank) bywa nie do
         // zamknięcia i gubi powrót — otwórz checkout w TYM oknie (top-level nawigacja
