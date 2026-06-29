@@ -3824,11 +3824,15 @@
     .auth-top__menu-cta:hover { filter: brightness(1.07); }
     .auth-top__menu-cta svg { width: 15px; height: 15px; opacity: .9; flex-shrink: 0; }
 
-    .auth-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 18px; }
+    /* #5/#13: align-items:flex-start + overflow-y:auto + card max-height/scroll —
+       przy otwartej klawiaturze (auth + paywall BLIK) hasło i przycisk nie chowają
+       się pod klawiaturą; pole po focusie scrolluje się w widoczny obszar. */
+    .auth-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-start; justify-content: center; padding: 18px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .auth-modal[hidden] { display: none; }
-    .auth-modal__backdrop { position: absolute; inset: 0; background: rgba(5,6,10,0.72); backdrop-filter: blur(6px); }
+    .auth-modal__backdrop { position: fixed; inset: 0; background: rgba(5,6,10,0.72); backdrop-filter: blur(6px); }
     .auth-modal__card {
-        position: relative; width: 100%; max-width: 420px;
+        position: relative; width: 100%; max-width: 420px; margin: auto;
+        max-height: calc(100dvh - 36px); overflow-y: auto;
         background: var(--card, #15161c); border: 1px solid rgba(255,255,255,0.12);
         border-radius: 20px; padding: 28px 26px 22px;
         box-shadow: 0 30px 80px rgba(0,0,0,0.55);
@@ -6449,6 +6453,8 @@
     // Bramka właściciela: serwer zwraca 403, gdy rozmowa jest przypięta do konta,
     // a my nie jesteśmy zalogowanym właścicielem (link ?id= przestał działać jak hasło).
     var ownerGate = {}; // sid -> { retried: bool, shown: bool }
+    var resumeById = false; // #11: powrót z ?id= na świeżym urządzeniu — czekamy na sync, nie pchamy karuzeli wyboru produktu
+    var gateHidComposer = false; // #19: czy to BRAMKA schowała composer (przywracamy tylko to, co sami schowaliśmy)
     function onOwnerDenied(sid, hadToken) {
         // Wejście z linku: getSession() rozwiązuje się asynchronicznie — nie wyciągaj
         // wniosków zanim auth będzie gotowy (zalogowany właściciel nie może dostać
@@ -6492,7 +6498,7 @@
             '<p style="margin:0 0 20px;font-size:14px;line-height:1.5;color:var(--text-muted,#9a9aa2);">' +
             (loggedWrong
                 ? 'Jesteś zalogowany na koncie, które nie ma dostępu do tej rozmowy. Zaloguj się na właściwe konto.'
-                : 'Zaloguj się na konto, do którego należy ten projekt, aby zobaczyć jego zawartość.') +
+                : 'To Twój projekt? Zaloguj się tym samym e-mailem. Nie pamiętasz hasła — kliknij „Nie pamiętasz hasła?" pod formularzem, wyślę Ci link na e-mail (działa na każdym urządzeniu).') +
             '</p>' +
             (loggedWrong
                 ? '<button type="button" class="btn" id="owner-lock-switch" style="width:100%;">Zaloguj się na inne konto</button>'
@@ -6519,7 +6525,13 @@
             if (r.status === 403 || r.status === 401) { onOwnerDenied(sid, hadToken); return null; }
             return r.ok ? r.json() : null;
         }).then(function (d) {
+            // #11: ?id= na świeżym urządzeniu wskazał PUSTĄ sesję → pokaż jednak karuzelę.
+            if (resumeById && d && !d.projekt && state.sessionId === sid) {
+                resumeById = false;
+                if (activeTab === 'chat' && !el('vp-picker') && !state.chosenProduct) stageOpener2();
+            }
             if (!d || !d.projekt || state.sessionId !== sid) return;
+            resumeById = false;   // udany resume — karuzela pozostaje ukryta
             // Serwer wydał treść = jesteśmy uprawnieni → zdejmij ewentualny blok.
             unlockSession(); if (ownerGate[sid]) ownerGate[sid] = {};
             if (Array.isArray(d.historia) && !historySynced[sid]) {
@@ -6568,6 +6580,13 @@
             if (!state.lastBrief && (p.nazwa || p.opis)) {
                 state.lastBrief = { nazwa: p.nazwa || null, opis: p.opis || null };
                 changed = true;
+            }
+            // #10 (R4): resume wybranego produktu na świeżym urządzeniu — bez tego pollery
+            // (kick*) bailują na !state.chosenProduct i pipeline nie wznawia się po powrocie.
+            if (!state.chosenProduct && p.chosen_product && typeof p.chosen_product === 'object') {
+                state.chosenProduct = p.chosen_product;
+                changed = true;
+                try { renderChosenProduct(); } catch (e) { }
             }
             if (changed) persistSession();
             function archive(view, u) {
@@ -6849,6 +6868,9 @@
     function buyConvoBlik() {
         if (!authState.user) { showConvoPaywall(); return; }
         var row = el('cpw-blik-row'); if (!row) return;
+        // #7: płatność już w toku (przycisk disabled) → Enter w polu kodu / podwójny tap
+        // NIE może utworzyć DRUGIEGO zamówienia i DRUGIEJ transakcji BLIK.
+        var _pb = el('cpw-blik-pay'); if (_pb && _pb.disabled) return;
         var boxes = row.querySelectorAll('.cpw-digit');
         var code = ''; for (var k = 0; k < boxes.length; k++) code += (boxes[k].value || '');
         code = code.replace(/\D/g, '');
@@ -7018,7 +7040,7 @@
         // długiego raportu); injectStageBar dawał DRUGI pasek z inną treścią (szum/„bug").
         if (['projekt', 'ustalenia', 'makiety', 'reklamy', 'sklep'].indexOf(tab) >= 0) injectStageBar(tab);   // E: pasek etapu w zakładkach panelu
         if (tab === 'chat') scrollToBottom(true);
-        setTabHash(tab === 'chat' ? '' : tab);
+        pushTabHash(tab === 'chat' ? '' : tab);
         closeSide();
     }
 
@@ -7088,6 +7110,28 @@
             history.replaceState(null, '', location.pathname + location.search + (h ? '#' + h : ''));
         } catch (e) { }
     }
+    // #12: wejście na NIE-czatową zakładkę dokłada wpis do historii, żeby gest „wstecz"
+    // (częsty w webview TikToka/IG) cofał do poprzedniej zakładki / rozmowy, a NIE
+    // wyrzucał z całego lejka. Powrót na czat / nawigacja z popstate tylko podmienia hash.
+    var _navFromPop = false;
+    function pushTabHash(h) {
+        var target = h ? '#' + h : '';
+        try {
+            var url = location.pathname + location.search + target;
+            if (!_navFromPop && (location.hash || '') !== target && h) history.pushState(null, '', url);
+            else history.replaceState(null, '', url);
+        } catch (e) { }
+    }
+    window.addEventListener('popstate', function () {
+        _navFromPop = true;
+        try {
+            var m = (location.hash || '').slice(1).match(/^(projekt|rynek|ustalenia|makiety|reklamy|sklep|wspolpraca)/);
+            var tab = m ? m[1] : 'chat';
+            if (['ustalenia', 'makiety', 'reklamy', 'sklep'].indexOf(tab) >= 0 && !budTabVisible(tab)) tab = 'chat';
+            switchTab(tab);
+        } catch (e) { }
+        _navFromPop = false;
+    });
     function applyHashTab() {
         var m = (location.hash || '').slice(1).match(/^(projekt|rynek|ustalenia|makiety|reklamy|sklep|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan|economics|gtm))?$/);
         if (!m) return;
@@ -7752,12 +7796,26 @@
             if (!streaming && !el('inline-gate') && !el('qr-chips') && !state.ustalenia) streamReply('', false, { reportEngage: true });
         }, 600);
     }
+    // #3: fetch z twardym timeoutem (AbortController). Na telefonie request bez
+    // limitu potrafi wisieć w nieskończoność — tu po `ms` przerywamy go, a odrzut
+    // wpada do .catch pollera (który teraz ponawia w ramach capa pending — #2).
+    function fetchT(url, opts, ms) {
+        opts = opts || {};
+        var ctrl = null;
+        try { ctrl = new AbortController(); opts = Object.assign({}, opts, { signal: ctrl.signal }); } catch (e) { ctrl = null; }
+        var p = fetch(url, opts);
+        if (!ctrl) return p;
+        return new Promise(function (resolve, reject) {
+            var timer = setTimeout(function () { try { ctrl.abort(); } catch (e) { } reject(new Error('timeout')); }, ms || 45000);
+            p.then(function (r) { clearTimeout(timer); resolve(r); }, function (e) { clearTimeout(timer); reject(e); });
+        });
+    }
     function _doReport(sid, force, attempt) {
         if (activeTab === 'rynek') renderPaneRynek();
-        fetch(SPAR_RAPORT_ENDPOINT, {
+        fetchT(SPAR_RAPORT_ENDPOINT, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, recipient: state.name || '', email: state.email || '' })
-        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+        }, 45000).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && res.d.raport) {
@@ -7798,7 +7856,9 @@
                 genFailMsg('raport', function () { kickReport(true); });   // #7: nie umieraj cicho
             }).catch(function () {
                 if (state.sessionId !== sid) return;
-                if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, force, attempt + 1); }, 3500); return; }
+                // #2/#3: błąd sieci/timeout w trakcie pending = zgubiony poll, NIE koniec
+                // generacji — ponawiaj do pełnego capa pending (serwer dokańcza w tle).
+                if (attempt < 26) { setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, false, attempt + 1); }, attempt < 8 ? 3500 : 15000); return; }
                 extras.raport = 'fail';
                 if (activeTab === 'rynek') renderPaneRynek();
                 genFailMsg('raport', function () { kickReport(true); });   // #7
@@ -7822,7 +7882,7 @@
         _doAds(state.sessionId, !!force, 0);
     }
     function _doAds(sid, force, attempt) {
-        fetch(SPAR_ADS_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct }) })
+        fetchT(SPAR_ADS_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct }) }, 45000)
             .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
@@ -7838,7 +7898,7 @@
                 if (res.ok && res.d && res.d.pending) { if (attempt === 0) kickLanding(false); /* strona buduje się RÓWNOLEGLE — nie czeka na wolne reklamy Manus (do ~30 min) */ if (attempt < 160) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; }
                 adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); });   // #7
-            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); });   // #7
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 160) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, attempt < 8 ? 3500 : 12000); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); });   // #2/#3/#7
     }
 
     // #4 LANDING HTML (bud-landing-gen, gpt-5.5 z mockupu) — cache per-produkt, w tle.
@@ -7856,7 +7916,7 @@
         _doLanding(state.sessionId, !!force, 0);
     }
     function _doLanding(sid, force, attempt) {
-        fetch(SPAR_LANDING_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, mockup_url: state.mockupUrl || '' }) })
+        fetchT(SPAR_LANDING_ENDPOINT, { method: 'POST', headers: authHeaders(), body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct, mockup_url: state.mockupUrl || '' }) }, 45000)
             .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
@@ -7872,7 +7932,7 @@
                 if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else { landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; }
                 landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); });   // #7
-            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); }); });   // #7
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 40) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, attempt < 8 ? 3500 : 12000); return; } landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); }); });   // #2/#3/#7
     }
 
     function showRaportReadyModal() {
@@ -10138,10 +10198,10 @@
         _doMockup4(state.sessionId, !!force, 0);
     }
     function _doMockup4(sid, force, attempt) {
-        fetch(SPAR_MOCKUP_ENDPOINT, {
+        fetchT(SPAR_MOCKUP_ENDPOINT, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ sessionId: sid, force: force, product: state.chosenProduct })
-        }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
+        }, 45000).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; }); })
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
@@ -10164,7 +10224,7 @@
                 mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); genFailMsg('makiety', function () { kickMockup(true); });   // #7
             }).catch(function () {
                 if (state.sessionId !== sid) return;
-                if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, force, attempt + 1); }, 3500); return; }
+                if (attempt < 30) { setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, false, attempt + 1); }, attempt < 8 ? 3500 : 12000); return; }   // #2/#3
                 mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); genFailMsg('makiety', function () { kickMockup(true); });   // #7
             });
     }
@@ -10209,7 +10269,9 @@
 
     // ── H2: wybór nazwy marki (5 nazw z WOLNĄ domeną .pl) → 3 logo → logo w landingu ──
     function brandFetch(action, extra) {
-        return fetch(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action, product: state.chosenProduct || null }, extra || {})) }).then(function (r) { return r.json(); });
+        // #17: timeout (logo = 3 obrazy, bywa ~60-90s) — bez niego spinner marki wisi
+        // w nieskończoność na słabym łączu. Po timeoucie odrzut wpada do .catch (fallback).
+        return fetchT(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action, product: state.chosenProduct || null }, extra || {})) }, 120000).then(function (r) { return r.json(); });
     }
     function renderBrandPicker() {
         if (!el('chat-msgs') || el('brand-card') || !state.sessionId) return;
@@ -10233,7 +10295,11 @@
             // generuj logo (rozmowa się nie zacina). Klik w inną nazwę nadal nadpisuje wybór.
             var autoN = names.filter(function (x) { return x && x.available; })[0] || names[0];
             if (autoN && !state._brandAuto) { state._brandAuto = true; pickBrandName(card, autoN); }
-        }).catch(function () { card.innerHTML = '<div class="brand-card__t">Nie udało się dobrać nazw. Spróbuj odświeżyć.</div>'; });
+        }).catch(function () {
+            // #17: nie zacinaj marki — odblokuj pipeline (logo/markę dokończymy przy budowie sklepu).
+            state.brandDone = true; persistSession();
+            card.innerHTML = '<div class="brand-card__t">Nazwę i logo dokończymy przy budowie sklepu — idziemy dalej. Chcesz konkretną nazwę? Napisz ją w czacie.</div>';
+        });
     }
     function pickBrandName(card, n) {
         card.innerHTML = '<div class="brand-card__t"><b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '<div class="brand-card__sub">Tworzę 3 propozycje logo…</div></div><div class="brand-load"><span class="share__spin" aria-hidden="true"></span></div>';
@@ -10255,7 +10321,12 @@
                 });
             });
             goBtn.addEventListener('click', function () { if (chosenLogoUrl) pickBrandLogo(card, n, chosenLogoUrl); });
-        }).catch(function () { card.innerHTML = '<div class="brand-card__t">Logo się nie udało. Spróbujemy przy budowie strony.</div>'; });
+        }).catch(function () {
+            // #17: timeout/błąd logo — zapisz przynajmniej nazwę i idź dalej (logo przy budowie strony).
+            state.brandDone = true; persistSession();
+            brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () { });
+            card.innerHTML = '<div class="brand-card__t">Marka: <b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '. Logo dopracujemy przy budowie sklepu.</div>';
+        });
     }
     function pickBrandLogo(card, n, url) {
         state.brandDone = true;
@@ -11513,10 +11584,35 @@
             }).catch(function () { });
         } catch (e) { }
     }
-    document.addEventListener('visibilitychange', function () { if (document.hidden) sendLeaveBeacon(); });
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { sendLeaveBeacon(); return; }
+        // #18: powrót z tła — długie uśpienie webview może wyczerpać okno pollingu;
+        // dociągnij stan z serwera i wznów wiszące generacje (guardy chronią przed duplikatem).
+        if (state.sessionId) {
+            try { syncProjectFromServer(); } catch (e) { }
+            try { if (typeof resumeReportIfNeeded === 'function') resumeReportIfNeeded(); } catch (e) { }
+        }
+    });
     window.addEventListener('pagehide', sendLeaveBeacon);
     // Powrót z kasy (BLIK/karta) → odśwież liczbę opłaconych rozmów, by odblokować „Nowa rozmowa"
-    window.addEventListener('focus', function () { if (authState.user) refreshConvoEntitlement(); });
+    var _paidPollTimer = null, _paidPollTries = 0;
+    function pollPaidAfterReturn() {
+        // #6: powrót z checkoutu 500 zł (nowa karta) — oryginalna karta uczy się o wpłacie
+        // TYLKO przez syncProjectFromServer (state.paid z paid_at). Webhook tpay bywa
+        // opóźniony o kilka sekund → krótki polling aż dotrze (max ~60s), potem stop.
+        if (_paidPollTimer || state.paid || !state.sessionId) return;
+        _paidPollTries = 0;
+        _paidPollTimer = setInterval(function () {
+            _paidPollTries++;
+            if (state.paid || _paidPollTries > 12 || !state.sessionId) { clearInterval(_paidPollTimer); _paidPollTimer = null; return; }
+            try { syncProjectFromServer(); } catch (e) { }
+        }, 5000);
+        try { syncProjectFromServer(); } catch (e) { }   // pierwszy strzał od razu
+    }
+    window.addEventListener('focus', function () {
+        if (authState.user) refreshConvoEntitlement();
+        if (state.sessionId && !state.paid) pollPaidAfterReturn();   // #6
+    });
     function authFirstName() {
         if (!authState.user) return null;
         var meta = authState.user.user_metadata || {};
@@ -11597,9 +11693,34 @@
     }
     function initAuth() {
         if (!sbAuth) { authState.ready = true; renderAuthUI(); return; }
+        // Sprzątanie po (nie)udanym OAuth/recovery: jeśli wróciliśmy z ?error= lub
+        // ?code=, a sesja się nie zmaterializowała (typowe w webview — zgubiony PKCE
+        // verifier), pokaż czytelny komunikat i wyczyść parametry, by F5 nie powtarzał
+        // martwej wymiany.
+        var sp = null;
+        try { sp = new URLSearchParams(location.search); } catch (e) { sp = null; }
+        var oauthErr = sp && (sp.get('error') || sp.get('error_description'));
+        var oauthCode = sp && sp.get('code');
+        function cleanOAuthParams() {
+            if (!sp) return;
+            ['error', 'error_description', 'error_code', 'code', 'state'].forEach(function (k) { sp.delete(k); });
+            var qs = sp.toString();
+            try { history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash); } catch (e) { }
+        }
         sbAuth.auth.getSession().then(function (r) {
-            setAuthSession(r && r.data ? r.data.session : null);
-        }).catch(function () { authState.ready = true; renderAuthUI(); });
+            var sess = r && r.data ? r.data.session : null;
+            setAuthSession(sess);
+            if (!sess && (oauthErr || oauthCode)) {
+                setTimeout(function () {
+                    if (!authState.user) {
+                        try { openAuthModal(); } catch (e) { }
+                        var e2 = el('auth-modal-error') || el('gate-auth-error');
+                        if (e2) { e2.textContent = 'Nie udało się dokończyć logowania przez Google. Zaloguj się e-mailem i hasłem.'; e2.classList.add('is-shown'); }
+                    }
+                }, 400);
+            }
+            if (oauthErr || oauthCode) cleanOAuthParams();
+        }).catch(function () { authState.ready = true; renderAuthUI(); if (oauthErr || oauthCode) cleanOAuthParams(); });
         sbAuth.auth.onAuthStateChange(function (evt, session) {
             setAuthSession(session);
             // Powrót z linku „zmiana hasła" → wymuś ustawienie nowego hasła
@@ -11725,6 +11846,30 @@
         });
     }
 
+    // Wykrywa przeglądarkę wbudowaną w aplikację (TikTok/Instagram/Facebook itp.).
+    // W in-app webview OAuth Google zwraca disallowed_useragent (twardy mur na
+    // pierwszym kroku bramki), dlatego tam pokazujemy logowanie WYŁĄCZNIE e-mailem.
+    var _webviewCache = null;
+    function isInAppWebView() {
+        if (_webviewCache !== null) return _webviewCache;
+        var ua = navigator.userAgent || '';
+        var inApp = /FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|BytedanceWebview|Line\/|Snapchat|Pinterest|GSA\/|; wv\)/i.test(ua);
+        // iOS webview: WebKit bez „Safari" w UA (Safari zawsze go dokleja);
+        // CriOS/FxiOS/EdgiOS to pełne przeglądarki → wyklucz.
+        if (!inApp && /iPhone|iPad|iPod/i.test(ua) && /AppleWebKit/i.test(ua) && !/Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS/i.test(ua)) inApp = true;
+        _webviewCache = inApp;
+        return inApp;
+    }
+    // Czy zapis lokalny działa (webview czasem blokuje localStorage → sesja Auth i
+    // PKCE cicho się nie utrwalają). Wynik wykorzystywany do ostrzeżenia usera.
+    var _storageOkCache = null;
+    function storageWorks() {
+        if (_storageOkCache !== null) return _storageOkCache;
+        try { localStorage.setItem('__sw', '1'); localStorage.removeItem('__sw'); _storageOkCache = true; }
+        catch (e) { _storageOkCache = false; }
+        return _storageOkCache;
+    }
+
     function startOAuthLogin(provider) {
         if (!sbAuth) return;
         persistSession();
@@ -11767,16 +11912,23 @@
     // Wspólny markup logowania (modal + bramka): OAuth + e-mail z hasłem.
     // prefix rozróżnia id-ki obu osadzeń.
     function authFormHTML(prefix, ctaText) {
+        // In-app webview (TikTok/IG/FB): OAuth Google jest zablokowane przez Google
+        // (disallowed_useragent) → chowamy przyciski OAuth i dywizor, zostaje samo
+        // e-mail+hasło (czysty fetch do Supabase, działa w webview). Plus wskazówka.
+        var webview = isInAppWebView();
         // Facebook ukryty do czasu konfiguracji providera w Supabase (App Secret
         // + Live). Włączenie: AUTH_FACEBOOK_ENABLED = true (+ provider w Supabase).
-        var oauthRow = '<div class="gate-oauth-row"' + (AUTH_FACEBOOK_ENABLED ? '' : ' style="grid-template-columns:1fr"') + '>' +
+        var oauthRow = webview ? '' : ('<div class="gate-oauth-row"' + (AUTH_FACEBOOK_ENABLED ? '' : ' style="grid-template-columns:1fr"') + '>' +
             '<button type="button" class="gate-oauth" id="' + prefix + '-google">' + AUTH_GOOGLE_ICO + 'Kontynuuj z Google</button>' +
             (AUTH_FACEBOOK_ENABLED
                 ? '<button type="button" class="gate-oauth" id="' + prefix + '-fb">' + AUTH_FB_ICO + 'Kontynuuj z Facebookiem</button>'
                 : '') +
-            '</div>';
-        return oauthRow +
-            '<div class="gate-divider"><span>albo przez e-mail</span></div>' +
+            '</div>');
+        var divider = webview ? '' : '<div class="gate-divider"><span>albo przez e-mail</span></div>';
+        var webviewHint = (webview || !storageWorks())
+            ? '<p class="auth-info is-shown" style="margin:0 0 12px;line-height:1.4">Jeśli logowanie się nie powiedzie, otwórz tę stronę w Safari lub Chrome (ikona <strong>⋯</strong> albo „Udostępnij" → „Otwórz w przeglądarce").</p>'
+            : '';
+        return oauthRow + divider + webviewHint +
             '<form id="' + prefix + '-otp-form" novalidate>' +
             '<label class="f-label" for="' + prefix + '-email">E-mail</label>' +
             '<input class="f-input" type="email" id="' + prefix + '-email" placeholder="ty@firma.pl" autocomplete="email">' +
@@ -12221,16 +12373,26 @@
     function renderInlineGate() {
         if (el('inline-gate')) return;   // bramka już jest
         if (!gatePending()) {
-            // Bramka NIE jest potrzebna. Jeśli composer wyłączyła chwilowa bramka (wyścig
-            // restore'u auth na F5: gatePending true zanim authState się załaduje → bramka
-            // mignęła i zniknęła w onSignedIn), przywróć composer — inaczej martwy input.
-            if (!streaming && !genScreen && el('composer') && !el('composer').hidden) setComposerEnabled(true);
+            // Bramka NIE jest potrzebna. Jeśli composer wyłączyła/schowała chwilowa bramka
+            // (wyścig restore'u auth na F5: gatePending true zanim authState się załaduje →
+            // bramka mignęła i zniknęła w onSignedIn), przywróć composer — inaczej martwy input.
+            if (!streaming && !genScreen && el('composer')) {
+                if (gateHidComposer) { el('composer').hidden = false; gateHidComposer = false; }   // #19: odsłoń, jeśli to bramka schowała
+                if (!el('composer').hidden) setComposerEnabled(true);
+            }
             return;
         }
         removeChips();
         setComposerEnabled(false);
         var step = stepGateStepNeeded();
-        if (!step) { if (!streaming && !genScreen) setComposerEnabled(true); return; } // komplet kontaktu — nie zostawiaj martwego composera
+        if (!step) { // komplet kontaktu — nie zostawiaj martwego composera
+            if (gateHidComposer && el('composer')) { el('composer').hidden = false; gateHidComposer = false; }
+            if (!streaming && !genScreen) setComposerEnabled(true);
+            return;
+        }
+        // #19: bramka pokazuje WŁASNY formularz (pola w dymku) — schowaj martwy composer
+        // pod nią, żeby przy otwartej klawiaturze nie ściskał przycisku „Generuj raport".
+        if (el('composer') && !el('composer').hidden) { el('composer').hidden = true; gateHidComposer = true; }
         var div = document.createElement('div');
         div.className = 'msg msg--ai msg--gate';
         div.id = 'inline-gate';
@@ -13080,6 +13242,13 @@
                     e.status = res.status;
                     e.code = err && err.error;
                     throw e;
+                });
+            }
+            if (!res.body || typeof res.body.getReader !== 'function') {
+                // #9: webview bez streamu (ReadableStream) — pobierz całość naraz i przetwórz
+                // te same zdarzenia SSE (split \n\n), zamiast wpadać w „Połączenie przerwane".
+                return res.text().then(function (t) {
+                    String(t || '').replace(/\r\n/g, '\n').split('\n\n').forEach(function (part) { if (part.trim()) handleEvent(part); });
                 });
             }
             var reader = res.body.getReader();
@@ -14965,7 +15134,9 @@
         } else if (userCount === 0) {
             // Otwarcie: P1 już w dymku. PIERWSZE wejście → efekt pisania → P2 → od razu produkty.
             // Resume świeżego startu (oba dymki już są) → od razu produkty, bez ponownego stagingu/buttona.
-            if (isResume) ensureCarousel();
+            // #11: powrót z ?id= (resumeById) — NIE pchaj karuzeli; sync dociągnie projekt.
+            if (resumeById) { /* czekamy na syncProjectFromServer */ }
+            else if (isResume) ensureCarousel();
             else stageOpener2();
         } else if (gatePending()) {
             renderInlineGate();
@@ -15131,6 +15302,16 @@
             var loc = a.id === 'auth-menu-reserve' ? 'konto_menu' : (a.closest('.mk-card') ? 'makieta_card' : (a.closest('#pane-wspolpraca') ? 'wspolpraca' : 'inne'));
             gaEvent('app_reservation_cta', { location: loc });
         }, true);
+        // #8: w in-app webview (TikTok/IG/FB) nowa karta (target=_blank) bywa nie do
+        // zamknięcia i gubi powrót — otwórz checkout w TYM oknie (top-level nawigacja
+        // jest w webview pewniejsza). Poza webview zostaje target=_blank.
+        document.addEventListener('click', function (e) {
+            if (!isInAppWebView()) return;
+            var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+            if (!a || a.href.indexOf(CHECKOUT_BASE) < 0) return;
+            e.preventDefault();
+            try { window.location.assign(a.href); } catch (err) { window.location.href = a.href; }
+        });
 
         // Klawiatura ekranowa (iOS/Android): layout kurczy się do realnie
         // widocznego viewportu, composer nie znika pod klawiaturą
@@ -15212,14 +15393,17 @@
                 applyHashTab();
                 return;
             }
+            // #11: świeże urządzenie (?id= bez lokalnej sesji) — lead ma już projekt,
+            // więc NIE pokazujemy karuzeli wyboru produktu. Powitanie powrotu + sync
+            // dociąga artefakty; gdyby sesja okazała się pusta, syncProjectFromServer
+            // pokaże jednak karuzelę.
             state.sessionId = urlId;
             state.pSlug = state.pSlug || null;
-            messages = [];
-            addOpener();
+            resumeById = true;
+            messages = [{ role: 'assistant', content: 'Wracasz do swojego projektu — wszystko, co już zrobiliśmy (raport, makiety, sklep), czeka w menu obok. Napisz, jeśli chcesz coś zmienić.', local: true }];
             persistSession();
             saveMessages();
-            enterChat(false);
-            sysMsg('Wróciłeś do zapisanej rozmowy — wcześniejsze wiadomości mam zapisane po swojej stronie. Pisz dalej.');
+            enterChat(false);   // enterChat na końcu woła syncProjectFromServer → hydratacja
             applyHashTab();
             return;
         }
