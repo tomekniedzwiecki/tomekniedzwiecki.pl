@@ -11938,7 +11938,16 @@
         if (!gateContactMissing()) return false;
         pendingGen = genFn;
         forceContactGate = true;
-        renderInlineGate();
+        // KOLEJNOŚĆ: nie pokazuj bramki w trakcie/tuż przed streamem — wskoczyłaby NAD
+        // potwierdzeniem wyboru produktu (wybór i raport-gate odpalają się razem przy
+        // kliknięciu „Wybieram ten"). Odkładamy o tik: gdy zaraz rusza stream
+        // (sendOpening po wyborze), streaming=true → bramkę pokaże handler po zakończeniu
+        // tury (gatePending, ~13247), już POD potwierdzeniem i odpowiedzią AI. Bez streamu
+        // (np. F5-resume) pokazujemy od razu.
+        setTimeout(function () {
+            if (el('inline-gate') || streaming) return;
+            if (gatePending()) renderInlineGate();
+        }, 0);
         return true;
     }
     function renderLeadGate() {
