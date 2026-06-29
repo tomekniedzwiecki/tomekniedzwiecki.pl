@@ -10472,22 +10472,49 @@
         if (state.brandDone) return;
         var card = document.createElement('div'); card.id = 'brand-card';
         card.style.cssText = 'margin:10px 0;padding:14px 16px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
-        card.innerHTML = '<div class="brand-card__t"><b>Nazwa marki</b> — sprawdzam wolne domeny .pl…</div><div class="brand-load"><span class="share__spin" aria-hidden="true"></span></div>';
+        // Wyraźny loader (dobór nazw + sprawdzanie domen .pl trwa ~20-30s): spinner +
+        // pasek postępu (asymptotyczny pełzak) + zmienny status — żeby nie wyglądało, że nic się nie dzieje.
+        card.innerHTML =
+            '<div style="display:flex;align-items:center;gap:11px">' +
+            '<span style="flex-shrink:0;width:20px;height:20px;border:2.5px solid rgba(0,217,126,.22);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span>' +
+            '<div style="min-width:0"><div class="brand-card__t" style="margin:0"><b>Dobieram nazwę Twojej marki</b></div>' +
+            '<div class="brand-card__sub" id="brand-load-sub" style="margin-top:2px">Generuję propozycje nazw…</div></div></div>' +
+            '<div style="height:4px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:12px"><i id="brand-load-bar" style="display:block;height:100%;width:6%;border-radius:3px;background:linear-gradient(90deg,var(--accent,#00d97e),#22c55e);transition:width .5s ease"></i></div>';
         el('chat-msgs').appendChild(card); scrollToBottom(false);
+        var blPct = 6;
+        var blTimer = setInterval(function () {
+            var bar = el('brand-load-bar'); if (!bar) { clearInterval(blTimer); return; }   // loader zniknął (przyszły nazwy) → stop
+            blPct = Math.min(93, blPct + (93 - blPct) * 0.07);
+            bar.style.width = blPct.toFixed(1) + '%';
+            var sub = el('brand-load-sub');
+            if (sub) sub.textContent = blPct < 38 ? 'Generuję propozycje nazw…' : (blPct < 72 ? 'Sprawdzam wolne domeny .pl…' : 'Już prawie — finalizuję listę…');
+        }, 600);
         brandFetch('names').then(function (d) {
+            clearInterval(blTimer);
             var names = (d && d.names) || [];
             if (!names.length) { card.innerHTML = '<div class="brand-card__t">Nie udało się dobrać nazw — napisz w czacie, jaką nazwę chcesz.</div>'; return; }
+            // Re-roll: raz na sesję user może poprosić o INNE propozycje nazw/domen.
+            var rerollHtml = !state._brandReroll
+                ? '<button type="button" id="brand-reroll" style="display:block;width:100%;margin-top:12px;background:none;border:0;color:var(--text-muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline">Pokaż inne propozycje</button>'
+                : '';
             card.innerHTML = '<div class="brand-card__t"><b>Wybierz nazwę marki</b><div class="brand-card__sub">5 propozycji z wolną domeną .pl — kliknij tę, którą czujesz:</div></div>' +
                 '<div class="brand-names">' + names.map(function (n, i) {
                     return '<button type="button" class="brand-name" data-i="' + i + '"><span class="brand-name__n">' + esc(n.name) + '</span>' +
                         '<span class="brand-name__d">' + esc(n.domain) + (n.available ? ' <i class="brand-free">✓ wolna</i>' : '') + '</span></button>';
-                }).join('') + '</div>';
+                }).join('') + '</div>' + rerollHtml;
             card.querySelectorAll('.brand-name').forEach(function (b) {
                 b.addEventListener('click', function () { pickBrandName(card, names[+b.getAttribute('data-i')]); });
+            });
+            var rerollBtn = el('brand-reroll');
+            if (rerollBtn) rerollBtn.addEventListener('click', function () {
+                state._brandReroll = true; persistSession();   // tylko jeden raz na sesję
+                card.remove();                                 // zdejmij obecną kartę → renderBrandPicker zbuduje nową (loader + świeże nazwy)
+                renderBrandPicker();
             });
             // Decyzja Tomka: NIE auto-wybieramy domeny za usera — pokazujemy 5 nazw z wolnymi
             // domenami i czekamy, aż wybierze. Po kliknięciu nazwy → pickBrandName generuje logo.
         }).catch(function () {
+            clearInterval(blTimer);
             // #17: nie zacinaj marki — odblokuj pipeline (logo/markę dokończymy przy budowie sklepu).
             state.brandDone = true; persistSession();
             revealQueuedChatCards();
