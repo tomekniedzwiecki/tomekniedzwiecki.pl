@@ -6610,6 +6610,7 @@
                 && JSON.stringify(p.mockups) !== JSON.stringify(state.mockups)) {
                 state.mockups = p.mockups;
                 extras.mockups = 'idle';
+                clearGenFail('makiety');   // artefakt dotarł sync'iem → zdejmij ewentualną kartę „nie udało się" (wyścig na resume)
                 if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                 persistSession();
                 changed = true;
@@ -6618,6 +6619,7 @@
             if (srvAds && srvAds.length && JSON.stringify(srvAds) !== JSON.stringify(state.suiteAds)) {
                 state.suiteAds = srvAds;
                 extras.ads = 'idle';
+                clearGenFail('reklamy');
                 if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
                 persistSession();
                 changed = true;
@@ -6625,6 +6627,7 @@
             if (typeof p.landing_html === 'string' && p.landing_html && p.landing_html !== state.landingHtml) {
                 state.landingHtml = p.landing_html;
                 extras.landingTab = 'idle';
+                clearGenFail('sklep');
                 if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                 persistSession();
                 changed = true;
@@ -7751,7 +7754,7 @@
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && res.d.raport) {
-                    state.raport = res.d.raport; persistSession(); extras.raport = 'idle';
+                    state.raport = res.d.raport; persistSession(); extras.raport = 'idle'; clearGenFail('raport');
                     updateSideBadges();
                     if (activeTab === 'rynek') renderPaneRynek();
                     if (activeTab === 'projekt') renderPaneProjekt();
@@ -7817,7 +7820,7 @@
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.ads) && res.d.ads.length) {
-                    state.suiteAds = res.d.ads; persistSession(); adsGen = false; extras.ads = 'idle';
+                    state.suiteAds = res.d.ads; persistSession(); adsGen = false; extras.ads = 'idle'; clearGenFail('reklamy');
                     genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + res.d.ads.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
                     if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
                     updateBudNav();
@@ -7851,7 +7854,7 @@
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && res.d.landing_html) {
-                    state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle';
+                    state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle'; clearGenFail('sklep');
                     genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
                     if (pendingShopSugg) { renderSuggestions(pendingShopSugg.opts, pendingShopSugg.multi); pendingShopSugg = null; }   // FIX(5): odroczone „co poprawić" — teraz sklep gotowy
                     if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
@@ -7991,7 +7994,12 @@
     // Uczciwy komunikat zamiast cichego fail / wiszącego w nieskończoność spinnera.
     // Pokazuje, że dany etap trwa dłużej, daje „Spróbuj ponownie" i uspokaja, że
     // reszta jest niezależna (nie blokujemy drogi do rezerwacji).
+    function clearGenFail(stage) { var c = el('genfail-' + stage); if (c) c.remove(); }
     function genFailMsg(stage, retryFn) {
+        // Nie pokazuj „nie udało się", jeśli artefakt tego etapu JUŻ dotarł (wyścig na resume:
+        // _do* zgłasza fail, a artefakt przyszedł inną drogą — sync/poll). Usuń też starą kartę.
+        var have = { raport: !!state.raport, makiety: !!(state.mockups && state.mockups.length), reklamy: !!(state.suiteAds && state.suiteAds.length), sklep: !!state.landingHtml };
+        if (have[stage]) { clearGenFail(stage); return; }
         var labels = { raport: 'raportu', makiety: 'makiet', reklamy: 'reklam', sklep: 'strony sprzedażowej' };
         var lab = labels[stage] || 'tego etapu';
         var id = 'genfail-' + stage;
@@ -10115,7 +10123,7 @@
             .then(function (res) {
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
-                    state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle';
+                    state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle'; clearGenFail('makiety');
                     genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
                     if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                     updateBudNav();
