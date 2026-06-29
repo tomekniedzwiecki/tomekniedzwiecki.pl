@@ -7039,7 +7039,15 @@
         // #9: 'rynek' WYKLUCZONY — renderPaneRynek ma własny sticky pasek „Co dalej" (lepszy dla
         // długiego raportu); injectStageBar dawał DRUGI pasek z inną treścią (szum/„bug").
         if (['projekt', 'ustalenia', 'makiety', 'reklamy', 'sklep'].indexOf(tab) >= 0) injectStageBar(tab);   // E: pasek etapu w zakładkach panelu
-        if (tab === 'chat') scrollToBottom(true);
+        if (tab === 'chat') {
+            scrollToBottom(true);
+            // Sieć bezpieczeństwa: wracając do czatu nie zostawiaj SCHOWANEGO inputu,
+            // jeśli nic go legalnie nie chowa (bramka / blokada werdyktu / streaming / generacja).
+            var _lk = el('chat-locked'); var _locked = _lk && _lk.hidden === false;
+            if (el('composer') && el('composer').hidden && !_locked && !el('inline-gate') && !streaming && !genScreen && !gatePending()) {
+                el('composer').hidden = false; gateHidComposer = false; setComposerEnabled(true);
+            }
+        }
         pushTabHash(tab === 'chat' ? '' : tab);
         closeSide();
     }
@@ -12471,6 +12479,10 @@
             syncContactToServer();
             fireContactLeadEvents();
             div.remove();
+            // #19 FIX: bramka domknięta (ostatni krok) — ODSŁOŃ composer, który bramka
+            // schowała. Ta ścieżka nie woła renderInlineGate, więc musi przywrócić sama,
+            // inaczej input znika po przejściu do raportu/rozmowy.
+            if (gateHidComposer && el('composer')) { el('composer').hidden = false; gateHidComposer = false; }
             forceContactGate = false;
             renderAuthUI();
             var first = (state.name || 'super').split(' ')[0];
