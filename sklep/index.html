@@ -2083,7 +2083,9 @@
     .brand-chosen { margin: 12px 0 6px; }
     .brand-chosen img { max-width: 160px; width: 100%; border-radius: 12px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.14)); background: #fff; }
     /* E: uniwersalny pasek etapu „Co dalej" w zakładkach panelu */
-    .stagebar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 11px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(255, 255, 255, 0.025); }
+    /* #9: sticky u góry panelu, żeby „Wróć do rozmowy" nie ginęło przy scrollu (np. długi raport).
+       Nieprzezroczyste tło + blur, by treść nie przeświecała pod paskiem. */
+    .stagebar { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 11px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(12, 12, 14, 0.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
     .stagebar__txt { flex: 1; min-width: 200px; font-size: 13px; line-height: 1.5; color: var(--text-muted, #a1a1a1); }
     .stagebar__txt b { color: var(--text, #ededed); }
     .stagebar__cta { flex: 0 0 auto; padding: 8px 14px; border: 1px solid rgba(0, 112, 243, 0.5); border-radius: 8px; background: rgba(0, 112, 243, 0.12); color: #5b9bff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
@@ -6174,7 +6176,10 @@
             khClosed: !!state.khClosed,
             seen: state.seen || {},
             seenTabs: budSeenTabs || {},
-            brand: state.brand || null
+            brand: state.brand || null,
+            brandDone: !!state.brandDone,             // #2: marka sfinalizowana (przeżywa F5)
+            mockPending: !!state._mockPending,        // #1: ustalenia gotowe, makiety czekają na raport
+            reportEngagePending: !!state.reportEngagePending  // #3: proaktywna tura ustaleń jeszcze nie domknięta
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -6394,6 +6399,9 @@
         state.stage = saved.stage || null;
         state.fullPaid = !!saved.fullPaid;
         state.khClosed = !!saved.khClosed;
+        state.brandDone = !!saved.brandDone;                  // #2 resume marki
+        state._mockPending = !!saved.mockPending;             // #1 resume makiet
+        state.reportEngagePending = !!saved.reportEngagePending;  // #3 resume zaczepki ustaleń
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
@@ -7694,10 +7702,45 @@
     // wyborze lub wejściu w zakładkę „Potencjał rynku"; na zakładce czatu po odświeżeniu
     // wisiał w nieskończoność („raport nie generuje się w ogóle"). kickReport sam pobierze
     // cache (gdy serwer dokończył w tle), ponowi pending albo poprosi o kontakt.
+    // Po reload/F5 domyka KAŻDĄ granicę pipeline'u opierając się WYŁĄCZNIE o trwały stan
+    // (nie o ulotne markery, które zjada odświeżenie). Wszystkie kick*/picker są idempotentne
+    // (własne guardy), więc bezpiecznie wołać je przy każdym wejściu. To zamyka dead-endy
+    // makiety/marka/reklamy/sklep, gdy F5 trafił w okno generacji.
     function resumeReportIfNeeded() {
-        if (state.chosenProduct && state.chosenProduct.id && !state.raport && extras.raport !== 'gen') {
-            kickReport(false);
+        if (!state.chosenProduct || !state.chosenProduct.id) return;
+        // RAPORT: brak raportu → wznów (kickReport jest twardo gated kontaktem)
+        if (!state.raport && extras.raport !== 'gen') kickReport(false);
+        // Dalej tylko z kompletem kontaktu — inaczej bramka prowadzi rozmowę
+        if (gateContactMissing()) return;
+        // #3 ZACZEPKA USTALEŃ: proaktywna tura po bramce nie domknęła się (F5 ją zjadł) → ponów.
+        // reportEngagePending czyści się po pierwszej realnej turze AI (lub wiadomości usera).
+        if (state.reportEngagePending && !state.ustalenia && !streaming && !el('inline-gate')) {
+            streamReply('', false, { reportEngage: true });
+            return;
         }
+        // #1 MAKIETY: ustalenia domknięte, makiety nie ruszyły → domknij przejście
+        if (state.ustalenia && !(state.mockups && state.mockups.length) && !state.chosenStyle && extras.mockups !== 'gen') {
+            if (state.raport) kickMockup(false);
+            else state._mockPending = true;   // raport jeszcze leci → makiety po jego gotowości
+        }
+        // #2 MARKA: ustalenia domknięte, marka nie sfinalizowana → wznów picker (idempotentny)
+        if (state.ustalenia && !state.brandDone && (!state.brand || !state.brand.chosen_logo) && !el('brand-card')) {
+            setTimeout(renderBrandPicker, 500);
+        }
+        // KOLEJNE GRANICE: styl wybrany, ale reklamy/sklep nie ruszyły → domknij
+        if (state.chosenStyle && !state.suiteAds && extras.ads !== 'gen' && typeof kickAds === 'function') kickAds(false);
+        if (state.chosenStyle && !state.landingHtml && !landingGen && typeof kickLanding === 'function') kickLanding(false);
+    }
+    // #5: gdy raport wskoczył, a ustaleń jeszcze nie domknęliśmy i rozmowa STOI bezczynnie
+    // (nie streamuje, brak chipów do odpowiedzi, brak bramki) — odpal proaktywną turę, żeby
+    // mózg sam zaproponował kierunek (zamiast „za chwilę zaproponuję…" i ciszy). Odpala się raz.
+    function maybeProposeAfterReport() {
+        if (!state.reportProposePending) return;
+        if (state.ustalenia || gateContactMissing() || streaming || el('inline-gate') || el('qr-chips')) return;
+        state.reportProposePending = false;
+        setTimeout(function () {
+            if (!streaming && !el('inline-gate') && !el('qr-chips') && !state.ustalenia) streamReply('', false, { reportEngage: true });
+        }, 600);
     }
     function _doReport(sid, force, attempt) {
         if (activeTab === 'rynek') renderPaneRynek();
@@ -7716,6 +7759,9 @@
                     if (state._mockPending) { state._mockPending = false; kickMockup(false); }   // L4: ustalenia domknięte przed raportem → makiety teraz
                     // BEZ modala „raport gotowy" (decyzja Tomka): raport żyje w zakładce
                     // „Potencjał rynku" + mailach, w tle — nie robimy z niego efektu WOW.
+                    // #5: gdy raport wskoczył a ustaleń jeszcze nie domknęliśmy, mózg ma SAM
+                    // poprowadzić temat dalej (zaproponować kierunek), nie zostawiać „za chwilę…".
+                    if (!state.ustalenia) { state.reportProposePending = true; maybeProposeAfterReport(); }
                     return;
                 }
                 // Backstop: serwer odmówił generacji bez kontaktu (anonimowa sesja) — pokaż bramkę.
@@ -7739,11 +7785,13 @@
                 }
                 extras.raport = 'fail'; updateSideBadges();
                 if (activeTab === 'rynek') renderPaneRynek();
+                genFailMsg('raport', function () { kickReport(true); });   // #7: nie umieraj cicho
             }).catch(function () {
                 if (state.sessionId !== sid) return;
                 if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.raport) _doReport(sid, force, attempt + 1); }, 3500); return; }
                 extras.raport = 'fail';
                 if (activeTab === 'rynek') renderPaneRynek();
+                genFailMsg('raport', function () { kickReport(true); });   // #7
             });
     }
     // #2 MAKIETY — bud-mockup zwraca 4 style {mockups:[...]} (picker w zakładce Makiety).
@@ -7779,8 +7827,8 @@
                 }
                 if (res.ok && res.d && res.d.pending) { if (attempt === 0) kickLanding(false); /* strona buduje się RÓWNOLEGLE — nie czeka na wolne reklamy Manus (do ~30 min) */ if (attempt < 160) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; }
-                adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy();
-            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); });
+                adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); });   // #7
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, force, attempt + 1); }, 3500); return; } adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); });   // #7
     }
 
     // #4 LANDING HTML (bud-landing-gen, gpt-5.5 z mockupu) — cache per-produkt, w tle.
@@ -7813,8 +7861,8 @@
                 }
                 if (res.ok && res.d && res.d.pending) { if (attempt < 40) setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, false, attempt + 1); }, 12000); else { landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); }); } return; }
                 if ((res.status === 404 || (res.d && res.d.error === 'nieprawidlowa_sesja')) && attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; }
-                landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep();
-            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); });
+                landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); });   // #7
+            }).catch(function () { if (state.sessionId !== sid) return; if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !state.landingHtml) _doLanding(sid, force, attempt + 1); }, 3500); return; } landingGen = false; extras.landingTab = 'fail'; updateBudNav(); if (activeTab === 'sklep') renderPaneSklep(); genFailMsg('sklep', function () { kickLanding(true); }); });   // #7
     }
 
     function showRaportReadyModal() {
@@ -8711,6 +8759,9 @@
     };
 
     function fmtEta(sec) {
+        // #6: po przekroczeniu szacowanego ETA NIE kłam „już kończę…" — bądź uczciwy,
+        // że bywa dłużej, ale robota leci w tle (najgorsze na najdłuższym etapie — reklamach).
+        if (sec <= 0) return 'czasem trwa to dłużej — robię w tle, możesz iść dalej';
         if (sec <= 5) return 'już kończę…';
         if (sec < 90) return 'jeszcze ok. ' + (Math.ceil(sec / 10) * 10) + ' s';
         return 'jeszcze ok. ' + Math.ceil(sec / 60) + ' min';
@@ -10080,11 +10131,11 @@
                     setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, force, attempt + 1); }, 3500);
                     return;
                 }
-                mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety();
+                mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); genFailMsg('makiety', function () { kickMockup(true); });   // #7
             }).catch(function () {
                 if (state.sessionId !== sid) return;
                 if (attempt < 8) { setTimeout(function () { if (state.sessionId === sid && !(state.mockups && state.mockups.length)) _doMockup4(sid, force, attempt + 1); }, 3500); return; }
-                mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety();
+                mockups4Gen = false; extras.mockups = 'fail'; updateBudNav(); if (activeTab === 'makiety') renderPaneMakiety(); genFailMsg('makiety', function () { kickMockup(true); });   // #7
             });
     }
 
@@ -10258,7 +10309,7 @@
             var sk = '';
             for (var i = 0; i < 4; i++) sk += '<div class="mk-card mk-card--skel"><div class="mk-card__img"><span class="share__spin" aria-hidden="true"></span></div><div class="mk-card__b"><div class="mk-skel-line"></div><div class="mk-skel-btn"></div></div></div>';
             body.innerHTML = head + '<div class="mk-grid">' + sk + '</div>' +
-                '<div class="mk-gennote">Tworzę 4 propozycje wyglądu… potrwa około minuty.</div>';
+                '<div class="mk-gennote">Tworzę 4 propozycje wyglądu… to zwykle 1-2 minuty.</div>';
             return;
         }
         var cards = mk.map(function (m) {
@@ -12155,7 +12206,7 @@
                 '<h3 class="sg-title">Jak się nazywasz?</h3>' +
                 '<p class="sg-sub">Imię i nazwisko — Tomek będzie wiedział, z kim buduje.</p>' +
                 '<form id="sg-name-form" class="sg-form" novalidate>' +
-                '<input class="f-input" type="text" id="sg-name" placeholder="Imię i nazwisko" autocomplete="name" maxlength="120" value="' + esc(state.name || authFirstName() || '') + '" required>' +
+                '<input class="f-input" type="text" id="sg-name" placeholder="Imię i nazwisko" autocomplete="name" maxlength="120" value="' + esc((state.name && state.name.trim().split(/\s+/).filter(Boolean).length >= 2) ? state.name.trim() : '') + '" required>' +
                 '<div class="f-error" id="sg-name-error">Podaj imię i nazwisko.</div>' +
                 '<button type="submit" class="btn" id="sg-name-submit">Dalej <span class="btn__arrow">→</span></button>' +
                 '</form></div>';
@@ -12213,9 +12264,12 @@
             if (pendingGen) {
                 sysMsg('Dzięki, ' + first + '. Raport rynku zbieram w tle — a my lecimy dalej.');
                 resumePendingGen();              // raport rusza w tle (bud-raport)
+                showRaportProgressInChat();      // #4: od razu widoczny pasek „raport powstaje" (idempotentny)
                 setComposerEnabled(true);        // NIE blokujemy rozmowy podczas generacji
-                // Proaktywna tura: mózg od razu prowadzi ustalenia, gdy raport leci w tle
-                // (bez tury usera). streamReply sam zarządza composerem podczas tury.
+                // #3: proaktywna tura ustaleń MA się odbyć — flaga przeżyje F5 (resume ją ponowi,
+                // czyści się po pierwszej realnej turze AI lub wiadomości usera).
+                state.reportEngagePending = true; persistSession();
+                // Proaktywna tura: mózg od razu prowadzi ustalenia, gdy raport leci w tle (bez tury usera).
                 if (!streaming) streamReply('', false, { reportEngage: true });
                 return;
             }
@@ -12607,6 +12661,8 @@
         }
         var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
         chipStreak = 0; // własny tekst — zeruj licznik nudge'a
+        // user sam prowadzi → zaczepka/propozycja ustaleń nie jest już potrzebna (#3/#5)
+        state.reportProposePending = false; if (state.reportEngagePending) { state.reportEngagePending = false; persistSession(); }
         messages.push({ role: 'user', content: text });
         saveMessages();
         appendMessage('user', text);
@@ -12625,6 +12681,7 @@
         if (streaming) return;
         freezeProp(); // jw. — zamroź aktywną karuzelę przed nową turą (no-op gdy brak/już zamrożona)
         var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
+        state.reportProposePending = false; if (state.reportEngagePending) { state.reportEngagePending = false; persistSession(); }  // user prowadzi (#3/#5)
         messages.push({ role: 'user', content: text });
         saveMessages();
         appendMessage('user', text);
@@ -13162,6 +13219,7 @@
             // bramka rejestracji blokuje composer — nie odblokowuj pod nią
             if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
             updateSendState();
+            maybeProposeAfterReport();   // #5: raport wskoczył w trakcie tury → po niej mózg sam proponuje kierunek
 
             // Nie porzucaj tury, jeśli przyszły propozycje/brak (przez SSE) — trzeba je utrwalić
             // niżej, inaczej po abort/błędzie streamu kafelki znikają po F5.
@@ -13189,6 +13247,8 @@
                 try { el('sr-status').textContent = vis.slice(0, 400) || 'Odpowiedź gotowa.'; } catch (e) {} // #4 — jedno ogłoszenie dla czytnika
                 messages.push({ role: 'assistant', content: raw, local: khResume ? true : undefined, khNudge: khResume ? true : undefined });
                 saveMessages();
+                // #3: zaczepka ustaleń domknięta (realna tura AI dopłynęła) → flaga nie musi już przeżyć F5
+                if (state.reportEngagePending) { state.reportEngagePending = false; persistSession(); }
                 // Postęp kamieni z tej tury
                 var kam = parseKamien(raw);
                 if (kam > (state.kamien || 0)) { state.kamien = kam; persistSession(); }
@@ -14089,7 +14149,12 @@
         own.type = 'button';
         own.className = 'qr-own kr-own';
         own.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>albo napisz po swojemu';
-        own.addEventListener('click', function () { if (el('inline-gate')) return; el('chat-input').focus(); });
+        // #11: nie zostawiaj pustego pola bez podpowiedzi — daj konkretny przykład, co tu wpisać
+        own.addEventListener('click', function () {
+            if (el('inline-gate')) return;
+            var ci = el('chat-input');
+            if (ci) { ci.placeholder = 'Napisz własny kierunek — np. „bardziej premium, dla firm" albo „celujemy w młodszych, na TikToka"'; ci.focus(); }
+        });
         wrap.appendChild(own);
         return wrap;
     }
