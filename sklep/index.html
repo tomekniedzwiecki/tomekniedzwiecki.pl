@@ -12160,7 +12160,7 @@
         showRaportProgressInChat();   // pasek raportu MIĘDZY potwierdzeniem a pytaniem (idempotentny)
         var d = document.createElement('div');
         d.className = 'msg msg--ai';
-        d.innerHTML = renderRich(q);
+        d.innerHTML = renderRich(visibleText(q));   // czyść ewentualne markery (np. <opcje> wstawione w <dopytanie>)
         el('chat-msgs').appendChild(d);
         scrollToBottom(false);
         return d;
