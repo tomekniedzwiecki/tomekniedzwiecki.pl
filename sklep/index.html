@@ -7599,6 +7599,7 @@
         if (!state.chosenProduct || !state.sessionId) return;
         if (extras.raport === 'gen') return;
         if (!force && state.raport) return;
+        slReset();   // start raportu = produkt definitywnie wybrany → schowaj pasek „Rozważam"
         extras.raport = 'gen'; extrasStart.raport = Date.now();
         _doReport(state.sessionId, !!force, 0);
     }
@@ -10742,6 +10743,8 @@
     // Sticky pasek nad composerem: „Rozważasz: N/3 · [miniaturki] · Porównaj →"
     function renderShortlistBar() {
         var host = el('chat-msgs'); if (!host) return;
+        // Produkt wybrany (dowolną ścieżką: button lub w rozmowie) → pasek „Rozważam" znika i nie wraca.
+        if (state.chosenProduct && state.chosenProduct.id) { var _slb = el('sl-bar'); if (_slb) _slb.remove(); return; }
         var n = slCount();
         var bar = el('sl-bar');
         if (!n && !seenCount()) { if (bar) bar.remove(); return; }
@@ -13010,6 +13013,7 @@
             } else if (sugg) {
                 // chipy o poprawkach sklepu pokazujemy DOPIERO, gdy landing gotowy (inaczej user czeka ~4 min)
                 if (suggIsShopEdit(sugg.opts) && !state.landingHtml) { pendingShopSugg = sugg; }
+                else if (parseDopytanie(raw)) { setTimeout(function () { renderSuggestions(sugg.opts, sugg.multi); }, 720); }   // chipy PO osobnym dymku <dopytanie>
                 else renderSuggestions(sugg.opts, sugg.multi);
             }
             updateStages();
