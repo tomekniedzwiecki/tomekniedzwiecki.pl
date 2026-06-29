@@ -12027,7 +12027,7 @@
                 div.remove();
                 fireLeadConversion();
                 setComposerEnabled(true);
-                sysMsg('Dzięki, ' + first + '. Buduję Twój raport — to potrwa ok. 2 minuty. W tym czasie pogadajmy o Twoim biznesie.');
+                sysMsg('Dzięki, ' + first + '. Zbieram dla Ciebie raport rynku — pojawi się w zakładce „Potencjał rynku”. W międzyczasie pogadajmy o Twoim produkcie.');
                 resumePendingGen();
             };
             var p = syncContactToServer();
@@ -12210,7 +12210,7 @@
             var first = (state.name || 'super').split(' ')[0];
             // Komplet kontaktu → jeśli czekał raport/generowanie, ruszamy je teraz.
             if (pendingGen) {
-                sysMsg('Dzięki, ' + first + '. Buduję Twój raport — to potrwa ok. 2 minuty. W tym czasie pogadajmy o Twoim biznesie.');
+                sysMsg('Dzięki, ' + first + '. Zbieram dla Ciebie raport rynku — pojawi się w zakładce „Potencjał rynku”. W międzyczasie pogadajmy o Twoim produkcie.');
                 resumePendingGen();
                 return;
             }
