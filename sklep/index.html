@@ -8028,9 +8028,32 @@
         if (state.suiteAds && state.suiteAds.length && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
         if (state.landingHtml && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
     }
+    // ── SEKWENCYJNE ODSŁANIANIE (anty-przytłoczenie, decyzja Tomka) ──────────────
+    // W czacie pokazujemy JEDNĄ kartę etapu na raz — najbliższą realizacji. Reszta
+    // generuje się w TLE (kick* lecą normalnie) i czeka w swojej zakładce, aż przyjdzie
+    // jej kolej. Kolejka: marka → makiety → sklep. Reklamy NIGDY w czacie (żyją w zakładce).
+    function chatCardAllowed(id) {
+        if (id === 'ad-chat-card') return false;                  // reklamy: tylko zakładka
+        if (id === 'mk-chat-card') return !!state.brandDone;      // makiety dopiero po domknięciu marki
+        if (id === 'ln-chat-card') return !!state.chosenStyle;    // sklep dopiero po wyborze stylu makiety
+        return true;
+    }
+    // Po domknięciu etapu odsłoń kartę następnego — gotową (artefakt już jest) albo
+    // pasek „powstaje" (artefakt wciąż leci w tle). Wołane po marce i po wyborze stylu.
+    function revealQueuedChatCards() {
+        if (!el('chat-msgs')) return;
+        if (state.brandDone) {
+            if (state.mockups && state.mockups.length) { if (!el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →'); }
+            else if (mockups4Gen && !el('mk-chat-card')) genCardInChat('mk-chat-card', 'mockups', 'Makiety Twojego sklepu', '4 style do wyboru');
+        }
+        if (state.chosenStyle) {
+            if (state.landingHtml) { if (!el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →'); }
+            else if (landingGen && !el('ln-chat-card')) genCardInChat('ln-chat-card', 'landing', 'Twój sklep — strona sprzedażowa', 'składam pełną stronę');
+        }
+    }
     // Generyczny pasek generowania W ROZMOWIE (nie tylko w panelu bocznym) — makiety/reklamy/strona.
     function genCardInChat(id, key, label, sub) {
-        if (!el('chat-msgs') || el(id)) return;
+        if (!el('chat-msgs') || el(id) || !chatCardAllowed(id)) return;   // brama sekwencyjna
         var div = document.createElement('div');
         div.id = id;
         div.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
@@ -8050,6 +8073,9 @@
     }
     function genCardReadyInChat(id, doneLabel, openTab, btnLabel) {
         var card = el(id);
+        // Brama sekwencyjna: jeśli etap jeszcze nie ma kolei (a karty brak) — nie twórz jej w czacie.
+        // Artefakt i tak jest gotowy w swojej zakładce; kartę odsłoni revealQueuedChatCards po domknięciu poprzedniego etapu.
+        if (!card && !chatCardAllowed(id)) return;
         if (!card) {   // etap gotowy bez paska startu (np. ustalenia) → utwórz kartę w locie
             if (!el('chat-msgs')) return;
             card = document.createElement('div'); card.id = id;
@@ -10299,13 +10325,12 @@
             card.querySelectorAll('.brand-name').forEach(function (b) {
                 b.addEventListener('click', function () { pickBrandName(card, names[+b.getAttribute('data-i')]); });
             });
-            // FIX(1): nie czekaj na klik — automatycznie weź pierwszą nazwę z wolną domeną i OD RAZU
-            // generuj logo (rozmowa się nie zacina). Klik w inną nazwę nadal nadpisuje wybór.
-            var autoN = names.filter(function (x) { return x && x.available; })[0] || names[0];
-            if (autoN && !state._brandAuto) { state._brandAuto = true; pickBrandName(card, autoN); }
+            // Decyzja Tomka: NIE auto-wybieramy domeny za usera — pokazujemy 5 nazw z wolnymi
+            // domenami i czekamy, aż wybierze. Po kliknięciu nazwy → pickBrandName generuje logo.
         }).catch(function () {
             // #17: nie zacinaj marki — odblokuj pipeline (logo/markę dokończymy przy budowie sklepu).
             state.brandDone = true; persistSession();
+            revealQueuedChatCards();
             card.innerHTML = '<div class="brand-card__t">Nazwę i logo dokończymy przy budowie sklepu — idziemy dalej. Chcesz konkretną nazwę? Napisz ją w czacie.</div>';
         });
     }
@@ -10313,7 +10338,7 @@
         card.innerHTML = '<div class="brand-card__t"><b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '<div class="brand-card__sub">Tworzę 3 propozycje logo…</div></div><div class="brand-load"><span class="share__spin" aria-hidden="true"></span></div>';
         brandFetch('logos', { name: n.name, domain: n.domain }).then(function (d) {
             var logos = (d && d.logos) || [];
-            if (!logos.length) { card.innerHTML = '<div class="brand-card__t">Logo się nie udało — spróbujemy przy budowie strony. Marka: <b>' + esc(n.name) + '</b>.</div>'; brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () {}); state.brandDone = true; return; }
+            if (!logos.length) { card.innerHTML = '<div class="brand-card__t">Logo się nie udało — spróbujemy przy budowie strony. Marka: <b>' + esc(n.name) + '</b>.</div>'; brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () {}); state.brandDone = true; revealQueuedChatCards(); return; }
             card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub">Kliknij to, które czujesz, a potem potwierdź:</div></div>' +
                 '<div class="brand-logos">' + logos.map(function (u, i) { return '<button type="button" class="brand-logo" data-i="' + i + '"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt="logo ' + (i + 1) + '"></button>'; }).join('') + '</div>' +
                 '<button type="button" class="brand-logo-go" disabled>Najpierw wybierz logo</button>';
@@ -10332,6 +10357,7 @@
         }).catch(function () {
             // #17: timeout/błąd logo — zapisz przynajmniej nazwę i idź dalej (logo przy budowie strony).
             state.brandDone = true; persistSession();
+            revealQueuedChatCards();
             brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () { });
             card.innerHTML = '<div class="brand-card__t">Marka: <b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '. Logo dopracujemy przy budowie sklepu.</div>';
         });
@@ -10340,6 +10366,7 @@
         state.brandDone = true;
         state.brand = { chosen_name: n.name, chosen_domain: n.domain, chosen_logo: url };   // C/D: zapamiętaj markę (resume + sidebar)
         persistSession();
+        revealQueuedChatCards();   // marka domknięta → odsłoń makiety (czekały w tle)
         renderBrandSidebar();
         card.innerHTML = '<div class="brand-card__t"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:4px"></i>Marka gotowa: <b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '</div>' +
             '<div class="brand-chosen"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="logo"></div>' +
