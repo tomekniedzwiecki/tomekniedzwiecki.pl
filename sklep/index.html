@@ -4885,6 +4885,10 @@
         50%      { transform: scale(1.14); opacity: 0.7; }
     }
     @keyframes budSpinT { to { rotate: 360deg; } }
+    /* Shimmer-placeholder (skeleton) — loadery doboru nazw/logo/makiet */
+    @keyframes bskShimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .bsk { background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.10) 50%, rgba(255,255,255,.04) 75%); background-size: 200% 100%; animation: bskShimmer 1.4s linear infinite; border-radius: 8px; }
+    @media (prefers-reduced-motion: reduce) { .bsk { animation: none; } }
 
     /* Dokowanie paska po wyjściu z hero */
     .view--chat:not(.is-hero) .chat-composer { animation: dockIn 0.55s var(--ease) backwards; }
@@ -10475,20 +10479,20 @@
         // Wyraźny loader (dobór nazw + sprawdzanie domen .pl trwa ~20-30s): spinner +
         // pasek postępu (asymptotyczny pełzak) + zmienny status — żeby nie wyglądało, że nic się nie dzieje.
         card.innerHTML =
-            '<div style="display:flex;align-items:center;gap:11px">' +
-            '<span style="flex-shrink:0;width:20px;height:20px;border:2.5px solid rgba(0,217,126,.22);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span>' +
+            '<div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">' +
+            '<span style="flex-shrink:0;width:18px;height:18px;border:2.5px solid rgba(0,217,126,.22);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span>' +
             '<div style="min-width:0"><div class="brand-card__t" style="margin:0"><b>Dobieram nazwę Twojej marki</b></div>' +
             '<div class="brand-card__sub" id="brand-load-sub" style="margin-top:2px">Generuję propozycje nazw…</div></div></div>' +
-            '<div style="height:4px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:12px"><i id="brand-load-bar" style="display:block;height:100%;width:6%;border-radius:3px;background:linear-gradient(90deg,var(--accent,#00d97e),#22c55e);transition:width .5s ease"></i></div>';
+            '<div style="display:flex;flex-direction:column;gap:7px">' +
+            [0, 1, 2, 3, 4].map(function () { return '<div style="border:1px solid var(--glass-border,rgba(255,255,255,.08));border-radius:10px;padding:11px 13px"><span class="bsk" style="display:block;height:14px;width:44%;margin-bottom:7px"></span><span class="bsk" style="display:block;height:11px;width:66%"></span></div>'; }).join('') +
+            '</div>';
         el('chat-msgs').appendChild(card); scrollToBottom(false);
-        var blPct = 6;
+        var blStep = 0, blMsgs = ['Generuję propozycje nazw…', 'Sprawdzam wolne domeny .pl…', 'Już prawie — finalizuję listę…'];
         var blTimer = setInterval(function () {
-            var bar = el('brand-load-bar'); if (!bar) { clearInterval(blTimer); return; }   // loader zniknął (przyszły nazwy) → stop
-            blPct = Math.min(93, blPct + (93 - blPct) * 0.07);
-            bar.style.width = blPct.toFixed(1) + '%';
-            var sub = el('brand-load-sub');
-            if (sub) sub.textContent = blPct < 38 ? 'Generuję propozycje nazw…' : (blPct < 72 ? 'Sprawdzam wolne domeny .pl…' : 'Już prawie — finalizuję listę…');
-        }, 600);
+            var sub = el('brand-load-sub'); if (!sub) { clearInterval(blTimer); return; }   // loader zniknął → stop
+            blStep = Math.min(blMsgs.length - 1, blStep + 1);
+            sub.textContent = blMsgs[blStep];
+        }, 7000);
         brandFetch('names').then(function (d) {
             clearInterval(blTimer);
             var names = (d && d.names) || [];
@@ -10522,8 +10526,20 @@
         });
     }
     function pickBrandName(card, n) {
-        card.innerHTML = '<div class="brand-card__t"><b>' + esc(n.name) + '</b> · ' + esc(n.domain) + '<div class="brand-card__sub">Tworzę 3 propozycje logo…</div></div><div class="brand-load"><span class="share__spin" aria-hidden="true"></span></div>';
+        card.innerHTML =
+            '<div class="brand-card__t"><b>' + esc(n.name) + '</b> · ' + esc(n.domain) +
+            '<div class="brand-card__sub" id="logo-load-sub" style="display:flex;align-items:center;gap:8px"><span style="flex-shrink:0;width:14px;height:14px;border:2px solid rgba(0,217,126,.22);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span>Rysuję 3 propozycje logo…</div></div>' +
+            '<div class="brand-logos">' +
+            [0, 1, 2].map(function () { return '<div class="bsk" style="aspect-ratio:1/1;min-height:88px;border-radius:12px"></div>'; }).join('') +
+            '</div>';
+        var lgStep = 0, lgMsgs = ['Rysuję 3 propozycje logo…', 'Dobieram kolory i kształt…', 'Dopracowuję detale…', 'Już prawie gotowe…'];
+        var lgTimer = setInterval(function () {
+            var sub = el('logo-load-sub'); if (!sub) { clearInterval(lgTimer); return; }
+            lgStep = Math.min(lgMsgs.length - 1, lgStep + 1);
+            sub.innerHTML = '<span style="flex-shrink:0;width:14px;height:14px;border:2px solid rgba(0,217,126,.22);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span>' + lgMsgs[lgStep];
+        }, 9000);
         brandFetch('logos', { name: n.name, domain: n.domain }).then(function (d) {
+            clearInterval(lgTimer);
             var logos = (d && d.logos) || [];
             if (!logos.length) { card.innerHTML = '<div class="brand-card__t">Logo się nie udało — spróbujemy przy budowie strony. Marka: <b>' + esc(n.name) + '</b>.</div>'; brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () {}); state.brandDone = true; revealQueuedChatCards(); return; }
             card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub">Kliknij to, które czujesz, a potem potwierdź:</div></div>' +
@@ -10542,6 +10558,7 @@
             });
             goBtn.addEventListener('click', function () { if (chosenLogoUrl) pickBrandLogo(card, n, chosenLogoUrl); });
         }).catch(function () {
+            clearInterval(lgTimer);
             // #17: timeout/błąd logo — zapisz przynajmniej nazwę i idź dalej (logo przy budowie strony).
             state.brandDone = true; persistSession();
             revealQueuedChatCards();
