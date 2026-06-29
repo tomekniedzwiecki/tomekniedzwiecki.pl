@@ -8410,7 +8410,49 @@
         return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     }
 
+    // WSTĘPNY BIZNESPLAN — horyzonty 3/6/12/24 (bud-plan). Render self-contained (inline
+    // style, bez nowego CSS), osadzony w danych produktu/rynku. Fallback: stary kształt 'kamienie'.
     function bizplanHTML(plan) {
+        if (!plan) return '';
+        var H = Array.isArray(plan.horyzonty) ? plan.horyzonty.filter(function (h) { return h && typeof h.mies === 'number'; }) : null;
+        if ((!H || !H.length)) return (Array.isArray(plan.kamienie) && plan.kamienie.length) ? bizplanLegacyHTML(plan) : '';
+        var maxZ = H.reduce(function (mx, h) { return Math.max(mx, +h.zysk_klienta_mies || 0); }, 1);
+        var cardC = 'background:rgba(255,255,255,.03);border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;padding:14px 15px;margin-bottom:10px';
+        var mono = 'font-family:var(--mono,monospace);letter-spacing:-.02em';
+        var cards = H.map(function (h, i) {
+            var goal = i === H.length - 1;
+            var w = Math.round(18 + ((+h.zysk_klienta_mies || 0) / maxZ) * 82);
+            return '<div style="' + cardC + (goal ? ';border-color:rgba(0,217,126,.45)' : '') + '">' +
+                '<div style="font-size:13px;font-weight:800;color:var(--text,#e7e7ea);margin-bottom:10px">' + esc(h.tytul || ('Miesiąc ' + h.mies)) + '</div>' +
+                '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:9px">' +
+                  '<div style="flex:1;min-width:84px"><div style="' + mono + ';font-size:16px;font-weight:800">' + fmtZl(h.zamowienia_mies) + '</div><div style="font-size:11px;color:var(--text-muted)">zamówień/mies.</div></div>' +
+                  '<div style="flex:1;min-width:84px"><div style="' + mono + ';font-size:16px;font-weight:800">' + fmtZl(h.przychod_mies) + ' zł</div><div style="font-size:11px;color:var(--text-muted)">przychód/mies.</div></div>' +
+                  '<div style="flex:1.2;min-width:104px"><div style="' + mono + ';font-size:18px;font-weight:800;color:#22c55e">' + fmtZl(h.zysk_klienta_mies) + ' zł</div><div style="font-size:11px;color:var(--text-muted)">na czysto dla Ciebie<sup>*</sup></div></div>' +
+                '</div>' +
+                '<div style="height:4px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden' + (h.co_sie_dzieje ? ';margin-bottom:10px' : '') + '"><i style="display:block;height:100%;width:' + w + '%;background:linear-gradient(90deg,var(--accent,#00d97e),#22c55e)"></i></div>' +
+                (h.co_sie_dzieje ? '<div style="font-size:12.5px;line-height:1.5;color:var(--text-muted)">' + esc(h.co_sie_dzieje) + '</div>' : '') +
+                '</div>';
+        }).join('');
+        var li = function (arr) { return '<ul style="list-style:none;margin:0;padding:0">' + (arr || []).map(function (z) { return '<li style="font-size:12.5px;line-height:1.55;color:var(--text-muted);padding-left:14px;position:relative;margin-bottom:3px"><span style="position:absolute;left:0;color:var(--accent,#00d97e)">·</span>' + esc(z) + '</li>'; }).join('') + '</ul>'; };
+        var block = function (t, b) { return '<div style="margin-top:13px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:6px">' + t + '</div>' + b + '</div>'; };
+        var zal = (Array.isArray(plan.zalozenia) && plan.zalozenia.length) ? '<details style="margin-top:13px"><summary style="font-size:12.5px;font-weight:700;cursor:pointer;color:#cfcfd4">Założenia, na których stoją te liczby</summary><div style="margin-top:8px">' + li(plan.zalozenia) + '</div></details>' : '';
+        var ryz = (Array.isArray(plan.ryzyka) && plan.ryzyka.length) ? block('Ryzyka — i jak je adresujemy', li(plan.ryzyka)) : '';
+        return '<div class="pj-plan" style="padding:2px">' +
+            (plan.naglowek ? '<div style="font-size:13.5px;line-height:1.5;color:var(--text,#e7e7ea);margin-bottom:8px"><b>' + esc(plan.naglowek) + '</b></div>' : '') +
+            '<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px">' +
+              '<span style="font-size:12px;font-weight:600;color:var(--accent,#00d97e);background:rgba(0,217,126,.1);border:1px solid rgba(0,217,126,.25);border-radius:8px;padding:3px 9px">' + esc(plan.model_przychodu || 'Sprzedaż produktu') + '</span>' +
+              (plan.cena ? '<span style="' + mono + ';font-size:15px;font-weight:800">' + esc(String(plan.cena)) + ' <small style="font-weight:500;color:var(--text-muted)">' + esc(plan.cena_jednostka || 'zł/szt.') + '</small></span>' : '') +
+            '</div>' +
+            (plan.cena_uzasadnienie ? '<div style="font-size:12px;color:var(--text-muted);margin:-6px 0 12px;line-height:1.5">' + esc(plan.cena_uzasadnienie) + '</div>' : '') +
+            cards +
+            (plan.dlaczego_realne ? '<div style="font-size:12.5px;line-height:1.55;color:var(--text,#e7e7ea);background:rgba(0,217,126,.06);border-left:2px solid var(--accent,#00d97e);border-radius:0 8px 8px 0;padding:10px 13px;margin-top:8px">' + esc(plan.dlaczego_realne) + '</div>' : '') +
+            (plan.rynek ? block('Rynek', '<div style="font-size:12.5px;line-height:1.55;color:var(--text-muted)">' + esc(plan.rynek) + '</div>') : '') +
+            ryz + zal +
+            '<div style="font-size:11px;color:var(--text-muted);margin-top:13px;line-height:1.5"><sup>*</sup> To, co zostaje Tobie miesięcznie po koszcie towaru, wysyłki i reklamy oraz po 20% Tomka. Wstępna prognoza specjalisty osadzona w Twoim produkcie i rynku — szczegółowy plan przedsięwzięcia Tomek domyka osobiście po rezerwacji.</div>' +
+            '</div>';
+    }
+
+    function bizplanLegacyHTML(plan) {
         if (!plan || !Array.isArray(plan.kamienie) || !plan.kamienie.length) return '';
         var kamienie = plan.kamienie.slice(0, 3).filter(function (m) { return m && typeof m.mies === 'number'; });
         var maxMies = kamienie.reduce(function (mx, m) { return Math.max(mx, m.mies); }, 1);
@@ -9403,7 +9445,7 @@
             } else {
                 tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.plan) + '</span>' +
-                    '<span class="pjd-tile__t">Plan przychodu</span>' +
+                    '<span class="pjd-tile__t">Wstępny biznesplan</span>' +
                     (extras.plan === 'fail'
                         ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć planu.</b><button type="button" class="preview-retry" data-retry="plan">Spróbuj ponownie</button></div>'
                         : genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów')) +
@@ -9719,7 +9761,7 @@
         if (pjView === 'plan') {
             if (state.bizplan) html += bizplanHTML(state.bizplan);
             else if (extras.plan === 'fail') html += extrasFailHTML('plan');
-            else html += genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do 50 klientów — na podstawie rozmowy');
+            else html += genProgressHTML('plan', 'Układam wstępny biznesplan…', 'horyzonty 3/6/12/24 mies. — osadzone w Twoim produkcie i rynku');
         }
 
         if (pjView === 'economics') {
@@ -9957,8 +9999,8 @@
             '<div class="cw-stat"><b>20%</b><span>od zysku<br><em>zarabiam, gdy Ty zarabiasz</em></span></div>' +
             '</div>' +
 
-            '<div class="cwc">' + calcInnerHTML() + '</div>' +
-
+            // Kalkulator przeniesiony do osobnej zakładki „Biznesplan" (Pulpit → Wstępny
+            // biznesplan). Współpraca = czysty model partnerstwa, bez przeładowania liczbami.
             '<div class="cw-tl">' +
             tl(done ? '✓' : '1', 'Rozmowa', 'Produkt, raport, makiety i gotowy sklep — masz je w menu obok.', done ? ' is-done' : ' is-now') +
             tl('2', 'Rezerwacja — 500 zł', 'W pełni zwrotna. Tomek osobiście układa plan przedsięwzięcia dla Twojego sklepu i odzywa się do Ciebie.', done ? ' is-now' : '') +
@@ -9990,7 +10032,6 @@
             '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Dokończ projekt w rozmowie') + '</button>' +
             '</div>';
         body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
-        bindCalc(body.querySelector('.cwc'));
     }
 
     /* ── Zakładka POTENCJAŁ RYNKU: raport z realnego web-searchu ───────
