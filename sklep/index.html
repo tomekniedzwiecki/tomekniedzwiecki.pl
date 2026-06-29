@@ -10321,6 +10321,11 @@
         .vp-card--more:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.05)}
         .vp-card--more .vpm-plus{font-size:30px;font-weight:300;line-height:1}
         .vp-card--more.is-loading{opacity:.6;pointer-events:none}
+        /* Karta-zachęta na końcu karuzeli (po limicie „Pokaż więcej") */
+        .vp-card--done{align-items:center;justify-content:center;gap:9px;flex-direction:column;text-align:center;background:rgba(0,217,126,.05);border-style:solid;border-color:rgba(0,217,126,.28);min-height:160px;padding:18px 16px;cursor:default}
+        .vp-card--done .vpd-ico{width:34px;height:34px;border-radius:50%;background:rgba(0,217,126,.14);display:flex;align-items:center;justify-content:center;color:var(--accent);flex:0 0 auto}
+        .vp-card--done .vpd-t{font-size:14.5px;font-weight:700;color:var(--text-strong);line-height:1.2}
+        .vp-card--done .vpd-s{font-size:12px;color:var(--text-muted);line-height:1.45}
         .vp-card:hover{border-color:var(--accent)}
         .vp-vid{position:relative;width:100%;aspect-ratio:9/16;max-height:46vh;background:#000;cursor:pointer}
         .vp-vid.vp-noimg{background:linear-gradient(145deg,#1c1c1f,#0a0a0a)}
@@ -10554,6 +10559,7 @@
     // stronie/kategorii; indeks gubi tożsamość). Dedup po kluczu name+video_id.
     // seen: mapa obejrzanych (klucz → 1) do dyskretnego licznika „Obejrzane N".
     var VP_STATE = { cat: '', page: 0, n: 6, cats: null, hasMore: false, total: 0, shortlist: [], seen: {} };
+    var VP_MAX_MORE = 4;   // maks. liczba kliknięć „Pokaż więcej" — potem zachęcamy do wyboru z tego, co jest
     var SL_MAX = 3;                       // limit shortlisty (rdzeń hybrydy C)
     function slKey(p) { return (p && (p.name || '') + '|' + (p.video_id || p.id || '')) || ''; }
     function slHas(p) { var k = slKey(p); return VP_STATE.shortlist.some(function (x) { return slKey(x) === k; }); }
@@ -10614,8 +10620,20 @@
             '</div>' +
         '</div>';
     }
+    function vpDoneCardHTML() {
+        // Po wyczerpaniu „Pokaż więcej" (limit VP_MAX_MORE) lub końcu katalogu — zachęta do wyboru.
+        return '<div class="vp-card vp-card--done">' +
+            '<span class="vpd-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' +
+            '<span class="vpd-t">To już dobry przegląd</span>' +
+            '<span class="vpd-s">Wybierz produkt, który czujesz — każdy z tych hitów ma realny potencjał. Od niego ruszymy z budową.</span>' +
+            '</div>';
+    }
     function vpMoreCardHTML() {
-        return VP_STATE.hasMore ? '<button type="button" class="vp-card vp-card--more" data-more aria-label="Pokaż więcej produktów"><span class="vpm-plus">+</span><span>Pokaż<br>więcej</span></button>' : '';
+        // „Pokaż więcej" dostępne tylko do VP_MAX_MORE kliknięć; potem karta-zachęta do wyboru.
+        if (VP_STATE.hasMore && (VP_STATE.page || 0) < VP_MAX_MORE) {
+            return '<button type="button" class="vp-card vp-card--more" data-more aria-label="Pokaż więcej produktów"><span class="vpm-plus">+</span><span>Pokaż<br>więcej</span></button>';
+        }
+        return vpDoneCardHTML();
     }
     function renderViralProducts(wrap, products) {
         injectVpStyle();
@@ -10654,7 +10672,7 @@
     var vpMoreBusy = false;
     // „Pokaż więcej" — DOŁĄCZA następną stronę produktów (ciągły scroll), nie resetuje karuzeli.
     function vpLoadMore(wrap) {
-        if (vpMoreBusy || !VP_STATE.hasMore) return;
+        if (vpMoreBusy || !VP_STATE.hasMore || (VP_STATE.page || 0) >= VP_MAX_MORE) return;
         vpMoreBusy = true;
         var track = wrap.querySelector('.vp-track');
         var moreBtn = wrap.querySelector('.vp-card--more');
@@ -10669,7 +10687,8 @@
             VP_STATE.items = (VP_STATE.items || []).concat(ps);
             var html = ps.map(function (p, k) { return vpCardHTML(p, base + k); }).join('');
             if (moreBtn) moreBtn.insertAdjacentHTML('beforebegin', html); else track.insertAdjacentHTML('beforeend', html);
-            if (!VP_STATE.hasMore && moreBtn) moreBtn.remove();
+            var _keepMore = VP_STATE.hasMore && nextPage < VP_MAX_MORE;
+            if (!_keepMore && moreBtn) { moreBtn.insertAdjacentHTML('afterend', vpDoneCardHTML()); moreBtn.remove(); }
             else if (moreBtn) moreBtn.classList.remove('is-loading');
             if (track.__updEdges) track.__updEdges();
         }).catch(function () { vpMoreBusy = false; if (moreBtn) moreBtn.classList.remove('is-loading'); });
