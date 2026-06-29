@@ -13186,7 +13186,10 @@
                 // 1. tura po wyborze produktu: pytania ustaleń w <dopytanie> → OSOBNY dymek
                 // po pasku raportu (krótkie opóźnienie, żeby „doszły" jak druga wiadomość).
                 var dopyt = parseDopytanie(raw);
-                if (dopyt) setTimeout(function () { appendDopytanie(dopyt); }, 650);
+                // Pytanie ustaleń (<dopytanie>) NIE może wisieć pod bramką logowania — gdy
+                // kontakt niekompletny (bramka otwarta, composer wyłączony), pomijamy je.
+                // Wróci naturalnie po domknięciu kontaktu, gdy raport realnie rusza.
+                if (dopyt && !gateContactMissing()) setTimeout(function () { appendDopytanie(dopyt); }, 650);
                 // ETAP 1 — tryb PRZEWODNIK: AI przełącza kategorię (<karuzela cat="X">)
                 // i/lub wskazuje 1 hit (<wskaz idx="N">). Front-only: cat → vpFetch jak klik chipa,
                 // potem podświetl wskazaną kartę zielonym pierścieniem + scroll.
