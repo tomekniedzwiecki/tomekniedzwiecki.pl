@@ -11982,7 +11982,16 @@
     //  • konto (zalogowany), • imię+nazwisko, • telefon.
     // Każdy brak trzyma bramkę otwartą na odpowiednim kroku (stepGateStepNeeded).
     function gateContactMissing() {
-        return !authState.user || !hasFullName() || !state.phone;
+        // Na resume authState ładuje się ASYNC. Zanim wróci, !authState.user dawałoby
+        // fałszywe „brak konta" → bramka migała i gasła (zostawiając martwy composer).
+        // Jeśli auth jeszcze nie gotowe, ale urządzenie MA konto (flaga), traktuj konto
+        // jako znane. Po ustabilizowaniu auth (authState.ready) używamy realnego stanu —
+        // więc gdy user faktycznie wylogowany, bramka i tak wróci. Samokorygujące.
+        var accountKnown = !!authState.user;
+        if (!accountKnown && !authState.ready) {
+            try { accountKnown = localStorage.getItem(LS_HAS_ACCOUNT) === '1'; } catch (e) {}
+        }
+        return !accountKnown || !hasFullName() || !state.phone;
     }
     function gatePending() {
         // Generowanie ma ruszyć bez kontaktu → bramka PRZED generowaniem (Tomek):
@@ -12175,11 +12184,18 @@
     // bramkę i woła renderInlineGate); krok2→krok3 i krok3→koniec robią handlery.
     // Raport (i każde gated generowanie) rusza DOPIERO po komplecie → resumePendingGen.
     function renderInlineGate() {
-        if (el('inline-gate') || !gatePending()) return;
+        if (el('inline-gate')) return;   // bramka już jest
+        if (!gatePending()) {
+            // Bramka NIE jest potrzebna. Jeśli composer wyłączyła chwilowa bramka (wyścig
+            // restore'u auth na F5: gatePending true zanim authState się załaduje → bramka
+            // mignęła i zniknęła w onSignedIn), przywróć composer — inaczej martwy input.
+            if (!streaming && !genScreen && el('composer') && !el('composer').hidden) setComposerEnabled(true);
+            return;
+        }
         removeChips();
         setComposerEnabled(false);
         var step = stepGateStepNeeded();
-        if (!step) return; // komplet — handler kroku 3 już odpalił, co trzeba
+        if (!step) { if (!streaming && !genScreen) setComposerEnabled(true); return; } // komplet kontaktu — nie zostawiaj martwego composera
         var div = document.createElement('div');
         div.className = 'msg msg--ai msg--gate';
         div.id = 'inline-gate';
