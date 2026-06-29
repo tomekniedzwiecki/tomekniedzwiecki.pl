@@ -6998,7 +6998,7 @@
             '<h2 class="auth-modal__title">Zarezerwuj rozmowę z Tomkiem</h2>' +
             '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Tomek osobiście ułoży plan Twojego sklepu i odezwie się do Ciebie. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
             (loggedIn ? blikBody : '<button type="button" class="btn" id="rpw-login" style="width:100%">Zaloguj się, żeby zarezerwować</button>') +
-            '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.</p>' +
+            '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.</p>' +
             '</div>';
         document.body.appendChild(ov);
         pushModalState();   // gest WSTECZ zamyka paywall rezerwacji, nie wyrzuca z lejka
@@ -7331,7 +7331,7 @@
             karta: kartaVersions().length > 0,
             strona: state.verdict === 'zielony',
             plan: state.verdict === 'zielony',
-            economics: state.verdict === 'zielony',
+            economics: false,   // R2: ukryty — relikt forku /aplikacja (model SaaS: churn/LTV/„10% od przychodu" + zepsute liczby 0 zł). Biznesplan e-commerce jest w „Wstępny biznesplan".
             gtm: state.verdict === 'zielony',
             reklamy: state.verdict === 'zielony'
         };
@@ -7681,7 +7681,7 @@
         plan: function () { return !!state.bizplan; },
         // rynek: raport strategiczny generowany po wyborze produktu (picker-first)
         rynek: function () { return !!state.raport; },
-        economics: function () { return !!state.economics; },
+        economics: function () { return false; },   // R2: wyłączony (relikt SaaS /aplikacja)
         gtm: function () { return !!state.gtm; },
         reklamy: function () { return !!(state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy) && state.gtm.pakiet.reklamy.length); },
         strona: function () { return !!state.landingUrl; },
@@ -8443,6 +8443,7 @@
     // Unit economics „czy to się spina" — JSON ze bud-economics (cennik +
     // wejścia do rachunku; arytmetykę liczy panel). Generuje się raz.
     function ensureEconomics(force) {
+        return;   // R2: zakładka „Czy to zarabia" wyłączona (relikt SaaS /aplikacja — model i liczby z innej oferty). NIE generujemy.
         if (extras.economics === 'gen' || (!force && extras.economics === 'fail')) return;
         if (!force && state.economics) return;
         if (!revUnlocked('economics')) return; // odsłona jeszcze nie odblokowana — nie generujemy
@@ -9669,29 +9670,9 @@
                 tiles += lockedTile(PJ_ICONS.raport, 'Raport strategiczny', 'Wybierz produkt, a przygotuję pełną analizę i strategię.');
             }
 
-            // CZY TO SIĘ SPINA — unit economics (klik → detal z suwakami)
-            if (!revUnlocked('economics')) {
-                tiles += lockedTile(PJ_ICONS.economics, REV_TEASER.economics[0], REV_TEASER.economics[1]);
-            } else if (state.economics) {
-                var ec = econCalc(state.economics, null);
-                var ecSeries = (ec && Array.isArray(ec.sim)) ? ec.sim.map(function (s) { return s.aktywni; }) : [];
-                tiles += '<button type="button" class="pjd-tile pjd-tile--w3" data-pjd="economics">' +
-                    pjGoIcon() +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
-                    '<span class="pjd-tile__t">Czy to zarabia</span>' +
-                    (ec ? '<span class="pjd-num">' + (Math.round(ec.ltvCac * 10) / 10).toString().replace('.', ',') + '×<small>&nbsp;tyle wraca z 1 zł na klienta</small></span>' : '') +
-                    '<span class="pjd-tile__sub">cennik, koszt klienta, zwrot — przelicz na suwakach</span>' +
-                    miniLine(ecSeries) +
-                    '</button>';
-            } else {
-                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
-                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.economics) + '</span>' +
-                    '<span class="pjd-tile__t">Czy to zarabia</span>' +
-                    (extras.economics === 'fail'
-                        ? '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się policzyć.</b><button type="button" class="preview-retry" data-retry="economics">Spróbuj ponownie</button></div>'
-                        : genProgressHTML('economics', 'Liczę opłacalność…', 'cennik, koszt i wartość klienta, zwrot budowy — na realnych danych')) +
-                    '</div>';
-            }
+            // R2: kafel „Czy to zarabia" (unit economics) USUNIĘTY — renderował model SaaS
+            // z forku /aplikacja (churn/LTV/„10% od przychodu") z niespójnymi liczbami.
+            // Opłacalność e-commerce pokazuje „Wstępny biznesplan" (bizplanHTML).
 
             // SPRZEDAŻ OD DNIA 1 — go-to-market (klik → detal)
             if (!revUnlocked('gtm')) {
@@ -10611,21 +10592,21 @@
             clearInterval(lgTimer);
             var logos = (d && d.logos) || [];
             if (!logos.length) { card.innerHTML = '<div class="brand-card__t">Logo się nie udało — spróbujemy przy budowie strony. Marka: <b>' + esc(n.name) + '</b>.</div>'; brandFetch('pick', { name: n.name, domain: n.domain }).catch(function () {}); state.brandDone = true; revealQueuedChatCards(); return; }
-            card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub">Kliknij to, które czujesz, a potem potwierdź:</div></div>' +
-                '<div class="brand-logos">' + logos.map(function (u, i) { return '<button type="button" class="brand-logo" data-i="' + i + '"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt="logo ' + (i + 1) + '"></button>'; }).join('') + '</div>' +
-                '<button type="button" class="brand-logo-go" disabled>Najpierw wybierz logo</button>';
-            // FIX(3): klik zaznacza KANDYDATA; dopiero przycisk „Wybieram to logo" finalizuje wybór.
-            var chosenLogoUrl = null;
-            var goBtn = card.querySelector('.brand-logo-go');
+            card.innerHTML = '<div class="brand-card__t"><b>Wybierz logo dla „' + esc(n.name) + '"</b><div class="brand-card__sub" id="logo-pick-sub">Kliknij to, które czujesz — od razu je biorę.</div></div>' +
+                '<div class="brand-logos">' + logos.map(function (u, i) { return '<button type="button" class="brand-logo" data-i="' + i + '"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt="logo ' + (i + 1) + '"></button>'; }).join('') + '</div>';
+            // R16: klik = wybór OD RAZU (usunięto drugi przycisk „Wybieram to logo" — tarcie w wow-momencie).
+            // Krótki beat z „✓ Wybrane", żeby user zobaczył potwierdzenie, zanim karta przejdzie dalej.
+            var logoPicked = false;
             card.querySelectorAll('.brand-logo').forEach(function (b) {
                 b.addEventListener('click', function () {
-                    chosenLogoUrl = logos[+b.getAttribute('data-i')];
-                    card.querySelectorAll('.brand-logo').forEach(function (x) { x.classList.remove('is-sel'); });
+                    if (logoPicked) return; logoPicked = true;
+                    var url = logos[+b.getAttribute('data-i')];
+                    card.querySelectorAll('.brand-logo').forEach(function (x) { x.classList.remove('is-sel'); x.disabled = true; });
                     b.classList.add('is-sel');
-                    goBtn.disabled = false; goBtn.classList.add('is-ready'); goBtn.textContent = 'Wybieram to logo';
+                    var sub = card.querySelector('#logo-pick-sub'); if (sub) sub.innerHTML = '✓ Wybrane — ruszam z Twoim logo.';
+                    setTimeout(function () { pickBrandLogo(card, n, url); }, 360);
                 });
             });
-            goBtn.addEventListener('click', function () { if (chosenLogoUrl) pickBrandLogo(card, n, chosenLogoUrl); });
         }).catch(function () {
             clearInterval(lgTimer);
             // #17: timeout/błąd logo — zapisz przynajmniej nazwę i idź dalej (logo przy budowie strony).
