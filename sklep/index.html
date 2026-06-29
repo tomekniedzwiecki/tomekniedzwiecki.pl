@@ -1678,6 +1678,18 @@
     .pjx-cap { font-family: var(--mono); font-size: 11px; color: var(--text-muted); text-align: center; }
     .pjx-fail { margin-top: auto; font-size: 12.5px; color: #e5484d; }
     .pjx-fail b { font-weight: 600; }
+    /* Loader raportu — lista „co za darmo robimy w tej rozmowie" */
+    .rk-free { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--glass-border, rgba(255,255,255,.09)); }
+    .rk-free__h { font-size: 11.5px; font-weight: 600; color: var(--text-muted, #8a8a8a); margin-bottom: 9px; }
+    .rk-free__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+    .rk-free__list li { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--text, #d8d8d8); line-height: 1.35; }
+    .rk-free__d { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.22); flex: 0 0 auto; }
+    .rk-free__now { color: var(--text-strong, #fff); font-weight: 600; }
+    .rk-free__now .rk-free__d { background: var(--accent, #00d97e); animation: rkFreePulse 1.5s ease-in-out infinite; }
+    .rk-free__now em { font-style: normal; color: var(--accent, #00d97e); font-weight: 600; }
+    .rk-free__f { margin-top: 10px; font-size: 11.5px; color: var(--text-muted, #8a8a8a); }
+    @keyframes rkFreePulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+    @media (prefers-reduced-motion: reduce) { .rk-free__now .rk-free__d { animation: none; } }
     @media (max-width: 920px) {
         .pjx-grid { grid-template-columns: 1fr; }
         .pjx--3, .pjx--2, .pjx--4, .pjx--6 { grid-column: span 1; }
@@ -7758,7 +7770,22 @@
             return '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>Raport potencjału rynku — gotowy</div>' +
                 '<button type="button" id="rk-chat-open" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">Zobacz raport →</button>';
         }
-        return genProgressHTML('raport', 'Raport potencjału rynku', 'konkurencja · ceny · luka rynkowa');
+        // Loader raportu = pasek postępu + lista WSZYSTKIEGO, co powstaje za darmo w tej
+        // rozmowie (żeby cisza w trakcie liczenia raportu była „produktywna" i było widać,
+        // co jeszcze przed nami — aż do rozmowy o współpracy).
+        return genProgressHTML('raport', 'Raport potencjału rynku', 'konkurencja · ceny · luka rynkowa') +
+            '<div class="rk-free">' +
+            '<div class="rk-free__h">Co robimy w tej rozmowie — za darmo, na żywo:</div>' +
+            '<ul class="rk-free__list">' +
+            '<li class="rk-free__now"><span class="rk-free__d"></span>Raport rynku — konkurencja, ceny, luka <em>· powstaje teraz</em></li>' +
+            '<li><span class="rk-free__d"></span>Ustalenia marki — dla kogo i jaki przekaz</li>' +
+            '<li><span class="rk-free__d"></span>Nazwa, domena .pl i logo</li>' +
+            '<li><span class="rk-free__d"></span>4 makiety sklepu do wyboru</li>' +
+            '<li><span class="rk-free__d"></span>4 gotowe reklamy na Facebooka i Instagram</li>' +
+            '<li><span class="rk-free__d"></span>Działający sklep — strona sprzedażowa</li>' +
+            '</ul>' +
+            '<div class="rk-free__f">Wszystko zanim w ogóle zaczniemy rozmawiać o współpracy.</div>' +
+            '</div>';
     }
     function showRaportProgressInChat() {
         if (!el('chat-msgs')) return;
@@ -11837,12 +11864,14 @@
         div.innerHTML =
             '<div class="gate2">' +
             accountDoneHTML() +
-            '<h3 class="gate2__title">' + (needName ? 'Imię i numer telefonu' : 'Zostaw numer telefonu') + '</h3>' +
-            '<p class="gate2__sub">Tomek odezwie się osobiście w sprawie Twojego narzędzia.</p>' +
+            '<h3 class="gate2__title">' + (needName ? 'Imię, nazwisko i numer telefonu' : 'Zostaw numer telefonu') + '</h3>' +
+            '<p class="gate2__sub">Tomek odezwie się osobiście w sprawie Twojego sklepu.</p>' +
             '<form id="gate-form" class="gate2__form" novalidate>' +
             (needName
                 ? '<input class="f-input" type="text" id="gate-name" placeholder="Imię" autocomplete="given-name" maxlength="80" required>' +
-                  '<div class="f-error" id="gate-name-error">Podaj imię.</div>'
+                  '<div class="f-error" id="gate-name-error">Podaj imię.</div>' +
+                  '<input class="f-input" type="text" id="gate-surname" placeholder="Nazwisko" autocomplete="family-name" maxlength="80" required>' +
+                  '<div class="f-error" id="gate-surname-error">Podaj nazwisko.</div>'
                 : '') +
             '<div class="gate2__row">' +
             '<input class="f-input" type="tel" inputmode="tel" id="gate-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20" required>' +
@@ -11866,17 +11895,21 @@
         el('gate-form').addEventListener('submit', function (e) {
             e.preventDefault();
             var name = needName ? el('gate-name').value.trim() : (authFirstName() || '');
+            var surname = needName ? el('gate-surname').value.trim() : '';
             var phone = el('gate-phone').value.trim();
             var ok = true;
             if (needName) {
                 el('gate-name-error').classList.toggle('is-shown', !name);
                 if (!name) ok = false;
+                el('gate-surname-error').classList.toggle('is-shown', !surname);
+                if (!surname) ok = false;
             }
             var phoneOk = phoneValid(phone);
             el('gate-phone-error').classList.toggle('is-shown', !phoneOk);
             if (!phoneOk) ok = false;
             if (!ok) return;
-            state.name = name || state.name;
+            var fullName = needName ? (name + ' ' + surname).trim() : name;
+            state.name = fullName || state.name;
             state.email = (authState.user && authState.user.email) || state.email;
             state.phone = phone;
             persistSession();
@@ -11909,8 +11942,8 @@
                 }
             } catch (e) {}
             // imię wpisane ręcznie → dopisz do konta (OAuth ma je z profilu)
-            if (needName && name && sbAuth) {
-                sbAuth.auth.updateUser({ data: { full_name: name } }).catch(function () { });
+            if (needName && fullName && sbAuth) {
+                sbAuth.auth.updateUser({ data: { full_name: fullName } }).catch(function () { });
             }
             div.remove();
             renderAuthUI();
