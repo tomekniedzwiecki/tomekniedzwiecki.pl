@@ -7957,6 +7957,19 @@
             if (!streaming && !el('inline-gate') && !el('qr-chips') && !state.ustalenia) streamReply('', false, { reportEngage: true });
         }, 600);
     }
+    // req Tomka: gdy po wyborze stylu sklep/reklamy powstają w tle — proaktywne pytanie
+    // kwalifikujące (ankieta) w czacie. Jedna tura; odpowiedź łapie extractSurveyAsync do CRM.
+    function maybeQualifyDuringGen() {
+        if (!state.qualifyPending || !state.chosenStyle) return;
+        // tylko gdy coś jeszcze realnie się generuje (nie po wszystkim)
+        var stillGen = !state.suiteAds || !state.landingHtml || adsGen || landingGen;
+        if (!stillGen) { state.qualifyPending = false; persistSession(); return; }
+        if (streaming || el('inline-gate') || el('qr-chips') || state.verdict === 'zielony') return;
+        state.qualifyPending = false; persistSession();   // jedna proaktywna tura kwalifikująca
+        setTimeout(function () {
+            if (!streaming && !el('inline-gate') && !el('qr-chips') && state.chosenStyle && state.verdict !== 'zielony') streamReply('', false, { qualifyEngage: true });
+        }, 3000);
+    }
     // #3: fetch z twardym timeoutem (AbortController). Na telefonie request bez
     // limitu potrafi wisieć w nieskończoność — tu po `ms` przerywamy go, a odrzut
     // wpada do .catch pollera (który teraz ponawia w ramach capa pending — #2).
@@ -8186,7 +8199,7 @@
     // generuje się w TLE (kick* lecą normalnie) i czeka w swojej zakładce, aż przyjdzie
     // jej kolej. Kolejka: marka → makiety → sklep. Reklamy NIGDY w czacie (żyją w zakładce).
     function chatCardAllowed(id) {
-        if (id === 'ad-chat-card') return false;                  // reklamy: tylko zakładka
+        if (id === 'ad-chat-card') return !!state.chosenStyle;    // reklamy po wyborze stylu (najpierw, przed sklepem) — user chce widzieć, że powstają
         if (id === 'mk-chat-card') return !!state.brandDone;      // makiety dopiero po domknięciu marki
         if (id === 'ln-chat-card') return !!state.chosenStyle;    // sklep dopiero po wyborze stylu makiety
         return true;
@@ -8200,6 +8213,10 @@
             else if (mockups4Gen && !el('mk-chat-card')) genCardInChat('mk-chat-card', 'mockups', 'Makiety Twojego sklepu', '4 style do wyboru');
         }
         if (state.chosenStyle) {
+            // REKLAMY najpierw (user chce je widzieć po wyborze stylu)…
+            if (state.suiteAds && state.suiteAds.length) { if (!el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →'); }
+            else if (adsGen && !el('ad-chat-card')) genCardInChat('ad-chat-card', 'ads', 'Reklamy pod Twój sklep', 'studio AI składa 4 banery — to potrwa kilka–kilkanaście minut');
+            // …potem sklep.
             if (state.landingHtml) { if (!el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →'); }
             else if (landingGen && !el('ln-chat-card')) genCardInChat('ln-chat-card', 'landing', 'Twój sklep — strona sprzedażowa', 'składam pełną stronę');
         }
@@ -10475,6 +10492,9 @@
         budNewTabs.reklamy = true;
         updateBudNav();
         kickAds(false);
+        // req Tomka: w trakcie budowy sklepu/reklam zadaj pytanie kwalifikujące (ankieta) —
+        // flaga odpala proaktywną turę qualifyEngage po potwierdzeniu wyboru stylu.
+        state.qualifyPending = true; persistSession();
         // potwierdzenie do AI (bud-chat zapisze chosen_style + potwierdzi w rozmowie)
         if (streaming) { showToast('Zapisano wybór stylu'); return; }
         switchTab('chat');               // pokaż potwierdzenie AI
@@ -13481,6 +13501,7 @@
     function streamReply(text, isFirst, opts) {
         var khResume = !!(opts && opts.knowhowResume); // zaczepka „wróć do rozmowy" (bez tury usera)
         var rEngage = !!(opts && opts.reportEngage); // zaczepka po bramce: angażuj rozmowę, gdy raport leci w tle (bez tury usera)
+        var qEngage = !!(opts && opts.qualifyEngage); // zaczepka KWALIFIKUJĄCA: pytanie z ankiety, gdy sklep/reklamy lecą w tle
         genScreen = null; // user aktywnie pisze → nie jest „utknięty" na ekranie generowania
         streaming = true;
         setComposerEnabled(false);
@@ -13518,6 +13539,7 @@
             message: text,
             knowhowResume: khResume ? true : undefined,
             reportEngage: rEngage ? true : undefined,
+            qualifyEngage: qEngage ? true : undefined,
             event: switchTrk ? 'switch_track' : undefined,
             track: switchTrk || undefined,
             // Raport wstrzymany na froncie (bramka kontaktu otwarta) → mózg NIE może
@@ -13745,6 +13767,7 @@
             if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
             updateSendState();
             maybeProposeAfterReport();   // #5: raport wskoczył w trakcie tury → po niej mózg sam proponuje kierunek
+            maybeQualifyDuringGen();      // req Tomka: po wyborze stylu, gdy sklep/reklamy lecą — pytanie kwalifikujące
 
             // Nie porzucaj tury, jeśli przyszły propozycje/brak (przez SSE) — trzeba je utrwalić
             // niżej, inaczej po abort/błędzie streamu kafelki znikają po F5.
