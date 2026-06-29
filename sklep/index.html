@@ -7717,7 +7717,7 @@
         if (gateContactMissing()) return;
         // #3 ZACZEPKA USTALEŃ: proaktywna tura po bramce nie domknęła się (F5 ją zjadł) → ponów.
         // reportEngagePending czyści się po pierwszej realnej turze AI (lub wiadomości usera).
-        if (state.reportEngagePending && !state.ustalenia && !streaming && !el('inline-gate')) {
+        if (state.reportEngagePending && !state.ustalenia && !streaming && !el('inline-gate') && !el('qr-chips')) {
             streamReply('', false, { reportEngage: true });
             return;
         }
