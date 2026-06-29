@@ -1977,6 +1977,36 @@
     .mk-set { display: flex; flex-direction: column; gap: 6px; }
     .mk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 620px) { .mk-grid { grid-template-columns: 1fr; } }
+    /* KARUZELA MAKIET — jedna duża makieta centralnie + strzałki + miniatury + CTA */
+    .mkc { margin-top: 6px; }
+    .mkc__stage { position: relative; display: flex; align-items: center; justify-content: center; }
+    .mkc__frame { position: relative; width: 100%; max-width: 470px; aspect-ratio: 4 / 5; border-radius: 18px; overflow: hidden;
+        background: linear-gradient(150deg, #1b1b1f, #0a0a0a); border: 1px solid var(--glass-border, rgba(255,255,255,.1)); box-shadow: 0 26px 64px -26px rgba(0,0,0,.65); }
+    .mkc__img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; cursor: zoom-in; }
+    .mkc__frame.mkc-noimg::after { content: 'Podgląd makiety'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12.5px; }
+    .mkc__fade { animation: mkcFade .34s ease; }
+    @keyframes mkcFade { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: none; } }
+    .mkc__nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 42px; height: 42px; border-radius: 50%;
+        border: 1px solid var(--glass-border, rgba(255,255,255,.16)); background: rgba(10,10,12,.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        color: var(--text-strong, #fff); font-size: 26px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s; }
+    .mkc__nav:hover { background: rgba(22,22,26,.92); border-color: var(--accent); }
+    .mkc__nav--prev { left: 6px; } .mkc__nav--next { right: 6px; }
+    @media (min-width: 760px) { .mkc__nav--prev { left: -16px; } .mkc__nav--next { right: -16px; } }
+    .mkc__zoom { position: absolute; top: 10px; right: 10px; z-index: 2; width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(255,255,255,.16);
+        background: rgba(10,10,12,.6); backdrop-filter: blur(4px); color: #fff; font-size: 15px; cursor: zoom-in; display: flex; align-items: center; justify-content: center; }
+    .mkc__meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 15px auto 0; max-width: 470px; flex-wrap: wrap; }
+    .mkc__lab { font-size: 16px; font-weight: 800; color: var(--text-strong); letter-spacing: -.01em; }
+    .mkc__count { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
+    .mkc__pick { flex-shrink: 0; min-height: 46px; padding: 0 20px; border-radius: 12px; border: 1px solid var(--accent); background: var(--accent);
+        color: var(--accent-ink, #04140d); font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; transition: filter .2s; }
+    .mkc__pick:hover { filter: brightness(1.08); }
+    .mkc__pick.is-chosen { background: rgba(0,217,126,.16); color: var(--accent); border-color: rgba(0,217,126,.4); cursor: default; }
+    .mkc__thumbs { display: flex; gap: 8px; justify-content: center; margin: 14px auto 0; max-width: 470px; }
+    .mkc__thumb { flex: 1; max-width: 96px; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; border: 2px solid transparent; background: #141418; cursor: pointer; padding: 0; opacity: .55; transition: opacity .2s, border-color .2s; }
+    .mkc__thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+    .mkc__thumb:hover { opacity: .85; }
+    .mkc__thumb.is-active { opacity: 1; border-color: var(--accent); }
+    @media (prefers-reduced-motion: reduce) { .mkc__fade { animation: none; } }
     /* Mobile LANDSCAPE (niski viewport): pozwól przewijać panel i ścieśnij karty,
        żeby przyciski wyboru (makiety/reklamy) zawsze były w zasięgu, nie poza ekranem. */
     @media (max-height: 600px) and (orientation: landscape) {
@@ -10647,34 +10677,65 @@
                 var rb = el('mk-retry'); if (rb) rb.addEventListener('click', function () { extras.mockups = 'idle'; mockups4Gen = false; kickMockup(true); });
                 return;
             }
-            // generuje się (lub zaraz odpali) — 4 skeletony
+            // generuje się — DUŻY centralny skeleton-frame + 4 miniatury (spójne z karuzelą)
             if (extras.mockups !== 'gen') kickMockup(false);
-            var sk = '';
-            for (var i = 0; i < 4; i++) sk += '<div class="mk-card mk-card--skel"><div class="mk-card__img"><span class="share__spin" aria-hidden="true"></span></div><div class="mk-card__b"><div class="mk-skel-line"></div><div class="mk-skel-btn"></div></div></div>';
-            body.innerHTML = head + '<div class="mk-grid">' + sk + '</div>' +
+            var skThumbs = '';
+            for (var i = 0; i < 4; i++) skThumbs += '<div class="mkc__thumb bsk" style="opacity:1"></div>';
+            body.innerHTML = head +
+                '<div class="mkc"><div class="mkc__stage"><div class="mkc__frame bsk"></div></div>' +
+                '<div class="mkc__thumbs">' + skThumbs + '</div></div>' +
                 '<div class="mk-gennote">Tworzę 4 propozycje wyglądu… to zwykle 1-2 minuty.</div>';
             return;
         }
-        var cards = mk.map(function (m) {
-            var chosen = state.chosenStyle && m.style === state.chosenStyle;
-            return '<div class="mk-card' + (chosen ? ' is-chosen' : '') + '" data-style="' + esc(m.style || '') + '">' +
-                '<div class="mk-card__img">' +
-                  (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" data-mk-zoom="' + esc(m.url) + '" style="cursor:zoom-in" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mk-noimg\');this.remove();">' : '') +
-                  '<button type="button" class="mk-zoom" data-mk-zoom="' + esc(m.url || '') + '" aria-label="Powiększ">⤢</button>' +
-                  (chosen ? '<span class="mk-badge">✓ Wybrany</span>' : '') +
-                '</div>' +
-                '<div class="mk-card__b">' +
-                  '<div class="mk-card__lab">' + esc(m.label || 'Styl') + '</div>' +
-                  // brief = techniczny prompt obrazu PO ANGIELSKU — NIE pokazujemy klientowi
-                  // (dezorientuje); sam polski label + podgląd wystarczą do wyboru.
-                  '<button type="button" class="mk-pick" data-mk-pick="' + esc(m.style || '') + '">' + (chosen ? 'Wybrany ✓' : 'Wybieram ten styl') + '</button>' +
-                '</div>' +
-                '</div>';
-        }).join('');
+        // KARUZELA (skill UI/UX): jedna DUŻA makieta centralnie + strzałki + miniatury + CTA.
         var pickBanner = state.chosenStyle ? '' : '<div class="mk-pickbanner"><b>Wybierz styl, żeby zbudować resztę.</b> Po Twoim wyborze reklamy i sklep złożą się automatycznie.</div>';
-        body.innerHTML = head + pickBanner + '<div class="mk-grid">' + cards + '</div>' +
+        var startIdx = 0;
+        for (var ci = 0; ci < mk.length; ci++) { if (state.chosenStyle && mk[ci] && mk[ci].style === state.chosenStyle) { startIdx = ci; break; } }
+        body.innerHTML = head + pickBanner +
+            '<div class="mkc">' +
+              '<div class="mkc__stage">' +
+                (mk.length > 1 ? '<button type="button" class="mkc__nav mkc__nav--prev" id="mkc-prev" aria-label="Poprzedni styl">‹</button>' : '') +
+                '<div class="mkc__frame" id="mkc-frame"></div>' +
+                (mk.length > 1 ? '<button type="button" class="mkc__nav mkc__nav--next" id="mkc-next" aria-label="Następny styl">›</button>' : '') +
+              '</div>' +
+              '<div class="mkc__meta"><div><div class="mkc__lab" id="mkc-lab"></div><div class="mkc__count" id="mkc-count"></div></div>' +
+                '<button type="button" class="mkc__pick" id="mkc-pick"></button></div>' +
+              '<div class="mkc__thumbs" id="mkc-thumbs">' +
+                mk.map(function (m, i) { return '<button type="button" class="mkc__thumb" data-i="' + i + '" aria-label="Styl ' + (i + 1) + (m.label ? ': ' + esc(m.label) : '') + '">' + (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(m.url) + '" alt="">' : '') + '</button>'; }).join('') +
+              '</div>' +
+            '</div>' +
             '<div class="pj-plan__note">Masz uwagi do wyglądu? Napisz je w czacie — uwzględnię przy budowie strony.</div>';
-        wireMakietyDelegation();
+        var mkcIdx = startIdx;
+        function mkcShow(i, animate) {
+            mkcIdx = (i + mk.length) % mk.length;
+            var m = mk[mkcIdx] || {};
+            var frame = el('mkc-frame');
+            if (frame) {
+                frame.classList.remove('mkc-noimg');
+                frame.innerHTML = m.url
+                    ? '<img class="mkc__img' + (animate ? ' mkc__fade' : '') + '" referrerpolicy="no-referrer" data-mk-zoom="' + esc(m.url) + '" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mkc-noimg\');this.remove();">' +
+                      '<button type="button" class="mkc__zoom" data-mk-zoom="' + esc(m.url) + '" aria-label="Powiększ">⤢</button>'
+                    : '';
+                if (!m.url) frame.classList.add('mkc-noimg');
+            }
+            var lab = el('mkc-lab'); if (lab) lab.textContent = m.label || ('Styl ' + (mkcIdx + 1));
+            var cnt = el('mkc-count'); if (cnt) cnt.textContent = (mkcIdx + 1) + ' / ' + mk.length;
+            var chosen = state.chosenStyle && m.style === state.chosenStyle;
+            var pick = el('mkc-pick');
+            if (pick) { pick.textContent = chosen ? 'Wybrany ✓' : 'Wybieram ten styl'; pick.classList.toggle('is-chosen', !!chosen); pick.setAttribute('data-mk-pick', m.style || ''); }
+            Array.prototype.forEach.call(body.querySelectorAll('#mkc-thumbs .mkc__thumb'), function (t, ti) { t.classList.toggle('is-active', ti === mkcIdx); });
+        }
+        mkcShow(startIdx, false);
+        var prevB = el('mkc-prev'); if (prevB) prevB.addEventListener('click', function () { mkcShow(mkcIdx - 1, true); });
+        var nextB = el('mkc-next'); if (nextB) nextB.addEventListener('click', function () { mkcShow(mkcIdx + 1, true); });
+        var thumbsEl = el('mkc-thumbs'); if (thumbsEl) thumbsEl.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('.mkc__thumb'); if (t) mkcShow(+t.getAttribute('data-i'), true); });
+        var pickB = el('mkc-pick'); if (pickB) pickB.addEventListener('click', function () { var s = pickB.getAttribute('data-mk-pick'); if (s) pickMockupStyle(s); });
+        var frameEl = el('mkc-frame'); if (frameEl) frameEl.addEventListener('click', function (e) { var z = e.target.closest && e.target.closest('[data-mk-zoom]'); if (z) { var u = z.getAttribute('data-mk-zoom'); if (u) openMockupZoom(u); } });
+        var stage = body.querySelector('.mkc__stage'); var sx = null;
+        if (stage) {
+            stage.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+            stage.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) mkcShow(mkcIdx + (dx < 0 ? 1 : -1), true); sx = null; }, { passive: true });
+        }
     }
     // Delegacja kliknięć w pickerze makiet (IIFE → inline onclick NIE działa).
     // Podpinamy raz na element body (jest statyczny mimo przerysowań innerHTML).
