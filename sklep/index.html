@@ -7712,9 +7712,10 @@
                     updateSideBadges();
                     if (activeTab === 'rynek') renderPaneRynek();
                     if (activeTab === 'projekt') renderPaneProjekt();
-                    markRaportReadyInChat();   // pasek w rozmowie → „Zobacz raport"
+                    markRaportReadyInChat();   // cichy pasek w rozmowie → „Zobacz raport" (no-op, gdy brak paska)
                     if (state._mockPending) { state._mockPending = false; kickMockup(false); }   // L4: ustalenia domknięte przed raportem → makiety teraz
-                    showRaportReadyModal();
+                    // BEZ modala „raport gotowy" (decyzja Tomka): raport żyje w zakładce
+                    // „Potencjał rynku" + mailach, w tle — nie robimy z niego efektu WOW.
                     return;
                 }
                 // Backstop: serwer odmówił generacji bez kontaktu (anonimowa sesja) — pokaż bramkę.
@@ -12210,8 +12211,12 @@
             var first = (state.name || 'super').split(' ')[0];
             // Komplet kontaktu → jeśli czekał raport/generowanie, ruszamy je teraz.
             if (pendingGen) {
-                sysMsg('Dzięki, ' + first + '. Zbieram dla Ciebie raport rynku — pojawi się w zakładce „Potencjał rynku”. W międzyczasie pogadajmy o Twoim produkcie.');
-                resumePendingGen();
+                sysMsg('Dzięki, ' + first + '. Raport rynku zbieram w tle — a my lecimy dalej.');
+                resumePendingGen();              // raport rusza w tle (bud-raport)
+                setComposerEnabled(true);        // NIE blokujemy rozmowy podczas generacji
+                // Proaktywna tura: mózg od razu prowadzi ustalenia, gdy raport leci w tle
+                // (bez tury usera). streamReply sam zarządza composerem podczas tury.
+                if (!streaming) streamReply('', false, { reportEngage: true });
                 return;
             }
             sysMsg('Dzięki, ' + first + '. Wracamy do rozmowy — pisz śmiało.');
@@ -12900,6 +12905,7 @@
 
     function streamReply(text, isFirst, opts) {
         var khResume = !!(opts && opts.knowhowResume); // zaczepka „wróć do rozmowy" (bez tury usera)
+        var rEngage = !!(opts && opts.reportEngage); // zaczepka po bramce: angażuj rozmowę, gdy raport leci w tle (bez tury usera)
         genScreen = null; // user aktywnie pisze → nie jest „utknięty" na ekranie generowania
         streaming = true;
         setComposerEnabled(false);
@@ -12936,6 +12942,7 @@
             phone: state.phone || null,
             message: text,
             knowhowResume: khResume ? true : undefined,
+            reportEngage: rEngage ? true : undefined,
             event: switchTrk ? 'switch_track' : undefined,
             track: switchTrk || undefined,
             // Raport wstrzymany na froncie (bramka kontaktu otwarta) → mózg NIE może
