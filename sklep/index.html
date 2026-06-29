@@ -6271,8 +6271,8 @@
         renderConvoList();
         // nazwa projektu w karcie przeglądarki — łatwiej znaleźć wśród kart
         document.title = (state.lastBrief && state.lastBrief.nazwa)
-            ? state.lastBrief.nazwa + ' — Aplikacja'
-            : 'Aplikacja — sparing pomysłu | Tomek Niedźwiecki';
+            ? state.lastBrief.nazwa + ' — Twój sklep online'
+            : 'Zbuduję Ci sklep online | Tomek Niedźwiecki';
     }
     function renderConvoList() {
         var idx = convoIndex();
@@ -6733,6 +6733,11 @@
                 state.paid = !!p.paid_at;
                 persistSession();
                 changed = true;
+                // potwierdzenie rezerwacji niezależnie od metody (karta/przelew/BLIK):
+                // gdy paid flipnęło na true a modal rezerwacji jest otwarty — domknij i pokaż sukces
+                if (state.paid && el('reserv-paywall') && typeof reservationConfirmed === 'function') {
+                    try { reservationConfirmed(); } catch (e) {}
+                }
             }
             // ── Etap KNOW-HOW (dopracowanie wizji): pełna płatność + niezamknięte ──
             var khWas = state.stage;
@@ -6996,6 +7001,7 @@
             '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.</p>' +
             '</div>';
         document.body.appendChild(ov);
+        pushModalState();   // gest WSTECZ zamyka paywall rezerwacji, nie wyrzuca z lejka
         var close = function () { ov.remove(); };
         el('rpw-x').addEventListener('click', close);
         el('rpw-bd').addEventListener('click', close);
@@ -7043,15 +7049,15 @@
             errEl.classList.add('is-shown');
             payBtn.disabled = false; payBtn.textContent = 'Zapłać BLIK-iem — 500 zł';
         };
-        fetch(SPAR_PROJECT_ENDPOINT, {
+        fetchT(SPAR_PROJECT_ENDPOINT, {
             method: 'POST', headers: authHeaders(),
             body: JSON.stringify({ action: 'buy_reservation', sessionId: state.sessionId, email: state.email || (authState.user && authState.user.email) || '' })
-        }).then(function (r) { return r.json(); }).then(function (d) {
+        }, 20000).then(function (r) { return r.json(); }).then(function (d) {
             if (!d || !d.orderId) throw new Error('order');
-            return fetch(TPAY_CREATE_ENDPOINT, {
+            return fetchT(TPAY_CREATE_ENDPOINT, {
                 method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE },
                 body: JSON.stringify({ orderId: d.orderId, blikCode: code, paymentType: 'blik' })
-            }).then(function (r) { return r.json(); });
+            }, 20000).then(function (r) { return r.json(); });
         }).then(function (tp) {
             if (!tp || !tp.success) throw new Error('tpay');
             statusEl.innerHTML = '<strong>Potwierdź płatność w aplikacji banku.</strong><br>Czekam na potwierdzenie…';
@@ -7283,7 +7289,18 @@
             else history.replaceState(null, '', url);
         } catch (e) { }
     }
+    // Modale (paywall rezerwacji/convo, zoom makiety, logowanie, landing, porównanie) zamykane
+    // gestem WSTECZ. Bez tego back przełączał zakładkę POD overlayem albo wyrzucał z lejka (regresja R4).
+    function closeTopModal() {
+        var ids = ['mk-zoom-modal', 'prod-modal', 'landing-modal', 'sl-cmp', 'reserv-paywall', 'convo-paywall', 'raport-ready'];
+        for (var i = 0; i < ids.length; i++) { var m = el(ids[i]); if (m) { m.remove(); return true; } }
+        var am = el('auth-modal'); if (am && !am.hidden) { try { closeAuthModal(); } catch (e) { am.hidden = true; } return true; }
+        return false;   // owner-lock zostaje (bramka prywatności — NIE zamykamy gestem wstecz)
+    }
+    // Każdy modal dokłada wpis historii przy otwarciu, żeby gest WSTECZ miał co zdjąć (nie wyjść z lejka).
+    function pushModalState() { try { history.pushState({ m: 1 }, '', location.href); } catch (e) { } }
     window.addEventListener('popstate', function () {
+        if (closeTopModal()) return;   // back zamyka otwarty modal, nie przełącza zakładki ani nie wychodzi z lejka
         _navFromPop = true;
         try {
             var m = (location.hash || '').slice(1).match(/^(projekt|rynek|ustalenia|makiety|reklamy|sklep|wspolpraca)/);
@@ -10496,7 +10513,9 @@
         // flaga odpala proaktywną turę qualifyEngage po potwierdzeniu wyboru stylu.
         state.qualifyPending = true; persistSession();
         // potwierdzenie do AI (bud-chat zapisze chosen_style + potwierdzi w rozmowie)
-        if (streaming) { showToast('Zapisano wybór stylu'); return; }
+        // gdy trwa stream — kolejkuj; flush po zakończeniu bieżącej tury (finalizer streamReply),
+        // inaczej chosen_style nie trafia na serwer i bud-landing-gen bierze mocks[0] (zły styl)
+        if (streaming) { showToast('Zapisano wybór stylu'); state._pendingStylePick = (m.label || styleKey); return; }
         switchTab('chat');               // pokaż potwierdzenie AI
         sendOpening('Wybieram styl: ' + (m.label || styleKey));
     }
@@ -10780,6 +10799,7 @@
         ov.innerHTML = '<div class="lpm-bar"><span>Podgląd makiety</span><button type="button" class="lpm-x" id="mkz-x" aria-label="Zamknij">✕</button></div>' +
             '<div class="lpm-body lpm-body--img lpm-body--mk"><img referrerpolicy="no-referrer" src="' + esc(url) + '" alt="Makieta"></div>';
         document.body.appendChild(ov);
+        pushModalState();   // gest WSTECZ zamyka zoom, nie przełącza zakładki
         function close() { var m = el('mk-zoom-modal'); if (m) m.remove(); document.removeEventListener('keydown', onKey); }
         function onKey(e) { if (e.key === 'Escape') close(); }
         el('mkz-x').addEventListener('click', close);
@@ -12335,6 +12355,7 @@
         el('auth-modal-body').innerHTML = authFormHTML('am', 'Dalej');
         bindAuthForm('am', null);
         modal.hidden = false;
+        pushModalState();   // gest WSTECZ zamyka logowanie, nie przełącza zakładki
     }
     function closeAuthModal() {
         var modal = el('auth-modal');
@@ -13766,6 +13787,12 @@
             // bramka rejestracji blokuje composer — nie odblokowuj pod nią
             if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
             updateSendState();
+            // flush odłożonego wyboru stylu (user kliknął styl w trakcie streamu) — tura skończona,
+            // wyślij potwierdzenie, by serwer zapisał chosen_style (inaczej landing bierze zły styl)
+            if (state._pendingStylePick) {
+                var _sp = state._pendingStylePick; state._pendingStylePick = null; persistSession();
+                switchTab('chat'); sendOpening('Wybieram styl: ' + _sp);
+            }
             maybeProposeAfterReport();   // #5: raport wskoczył w trakcie tury → po niej mózg sam proponuje kierunek
             maybeQualifyDuringGen();      // req Tomka: po wyborze stylu, gdy sklep/reklamy lecą — pytanie kwalifikujące
 
@@ -15639,7 +15666,9 @@
             if (!a || a.href.indexOf(CHECKOUT_BASE) < 0 || a.href.indexOf(OFFER_ID) < 0) return;
             e.preventDefault();
             e.stopImmediatePropagation();
-            if (!state.paid) showReservationPaywall();
+            // opłacony klika ponownie CTA → zamiast martwego kliku pokaż potwierdzenie
+            if (state.paid) { if (typeof reservationConfirmed === 'function') reservationConfirmed(); else showToast('Rezerwacja już opłacona ✓'); return; }
+            showReservationPaywall();
         }, true);
         // #8: w in-app webview (TikTok/IG/FB) nowa karta (target=_blank) bywa nie do
         // zamknięcia i gubi powrót — otwórz checkout w TYM oknie (top-level nawigacja
