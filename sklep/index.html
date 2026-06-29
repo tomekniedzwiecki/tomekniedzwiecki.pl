@@ -7603,6 +7603,16 @@
         extras.raport = 'gen'; extrasStart.raport = Date.now();
         _doReport(state.sessionId, !!force, 0);
     }
+    // Po reload/F5: jeśli produkt JEST wybrany, ale raport jeszcze nie powstał i nie
+    // trwa generacja — wznów go. Wcześniej raport wznawiał się tylko przy świeżym
+    // wyborze lub wejściu w zakładkę „Potencjał rynku"; na zakładce czatu po odświeżeniu
+    // wisiał w nieskończoność („raport nie generuje się w ogóle"). kickReport sam pobierze
+    // cache (gdy serwer dokończył w tle), ponowi pending albo poprosi o kontakt.
+    function resumeReportIfNeeded() {
+        if (state.chosenProduct && state.chosenProduct.id && !state.raport && extras.raport !== 'gen') {
+            kickReport(false);
+        }
+    }
     function _doReport(sid, force, attempt) {
         if (activeTab === 'rynek') renderPaneRynek();
         fetch(SPAR_RAPORT_ENDPOINT, {
@@ -14556,6 +14566,7 @@
         syncUrlId();
         updateConvoMeta(); // odśwież listę projektów + tytuł karty przeglądarki
         syncProjectFromServer();
+        resumeReportIfNeeded();   // wznów wiszący raport po reload/F5 (niezależnie od aktywnej zakładki)
         scrollToBottom(true);
         // start z chipa/pola na stronie głównej: jeśli aktywna rozmowa ma już
         // treść albo werdykt, NAJPIERW otwieramy nową — user świadomie zaczyna
