@@ -5703,7 +5703,7 @@
 <div class="bg-aurora" aria-hidden="true"></div>
 
 <noscript>
-    <div class="noscript-box">Sparing to rozmowa na żywo — wymaga włączonego JavaScriptu. Włącz JS i odśwież stronę.</div>
+    <div class="noscript-box">Rozmowa toczy się na żywo — wymaga włączonego JavaScriptu. Włącz JS i odśwież stronę.</div>
 </noscript>
 
 <main class="app">
@@ -5899,9 +5899,9 @@
     var DEMO_PREVIEW_URL = '/sklep/demo-podglad.png'; // ?demo=podglad (statyczny asset w repo)
     // 4 widoki podglądu — kolejność = kolejność kafelków i nawigacji lightboxa
     var VIEW_META = [
-        ['panel', 'Pulpit narzędzia'],
-        ['glowna', 'Główna funkcja'],
-        ['dodatkowa', 'Dodatkowa funkcja'],
+        ['panel', 'Strona główna sklepu'],
+        ['glowna', 'Karta produktu'],
+        ['dodatkowa', 'Koszyk / checkout'],
         ['landing', 'Strona sprzedażowa']
     ];
     // Infografika karty — osobny widok bud-image: nie wchodzi do VIEW_META
@@ -7362,7 +7362,7 @@
             cta.innerHTML =
                 '<div class="side-cta__eyebrow">Etap · Dopracowanie wizji</div>' +
                 '<div class="side-cta__t">Zbieramy szczegóły pod budowę</div>' +
-                '<div class="side-cta__d">Opowiadasz, ja dopytuję i notuję. Z tego powstanie pierwsza wersja Twojej aplikacji.</div>' +
+                '<div class="side-cta__d">Opowiadasz, ja dopytuję i notuję. Z tego powstanie pierwsza wersja Twojego sklepu.</div>' +
                 '<span class="side-cta__btn" data-kh-act="chat">' + (khHasOpener() ? 'Wróć do rozmowy →' : 'Zaczynamy rozmowę →') + '</span>' +
                 '<span class="side-cta__close" data-kh-act="close">To już wszystko — przejdź do budowy</span>';
         } else if (state.stage === 'build') {
@@ -7407,7 +7407,7 @@
         var nazwa = (state.lastBrief && state.lastBrief.nazwa) || 'Mój projekt';
         var url = location.origin + location.pathname + '?projekt=' + encodeURIComponent(state.sessionId);
         function copyIt() {
-            function done() { showToast('Link skopiowany — odbiorca zobaczy kartę i ekrany projektu'); }
+            function done() { showToast('Link skopiowany — odbiorca zobaczy kartę i makiety sklepu'); }
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(done).catch(function () {
                     window.prompt('Skopiuj link do projektu:', url);
@@ -7421,8 +7421,8 @@
         var mobile = window.matchMedia('(max-width: 1023.98px)').matches && 'ontouchstart' in window;
         if (mobile && navigator.share) {
             navigator.share({
-                title: nazwa + ' — projekt narzędzia',
-                text: 'Zobacz „' + nazwa + '” — kartę projektu i pierwsze ekrany narzędzia:',
+                title: nazwa + ' — projekt sklepu',
+                text: 'Zobacz „' + nazwa + '” — kartę projektu i pierwsze makiety sklepu:',
                 url: url
             }).catch(function (err) {
                 // zamknięcie share-sheet to nie błąd — fallback tylko przy realnym
@@ -7437,7 +7437,7 @@
     // czysta wizytówka — ekrany + karta z serwera, zero czatu, na dole CTA
     // „stwórz własny”. Właściciel z tą sesją w LS dostaje link powrotny.
     function renderShareView(sid) {
-        document.title = 'Projekt aplikacji | Tomek Niedźwiecki';
+        document.title = 'Projekt sklepu | Tomek Niedźwiecki';
         var app = document.querySelector('main.app');
         app.className = 'app app--share';
         var isOwner = !!loadJSON(sessionKey(sid));
@@ -7473,15 +7473,15 @@
                 return;
             }
             var pr = res.d.projekt;
-            var nazwa = pr.nazwa || 'Projekt narzędzia';
-            document.title = nazwa + ' — Aplikacja';
+            var nazwa = pr.nazwa || 'Projekt sklepu';
+            document.title = nazwa + ' — Sklep';
             // lightbox czyta state.previews — zasilamy z serwera
             state.previews = pr.preview_images || (pr.preview_image_url ? { panel: pr.preview_image_url } : {});
             var items = lightboxItems();
             var k = pr.karta || null;
 
             var html = topBar() +
-                '<div class="tabpane__head"><div class="tabpane__eyebrow">Projekt narzędzia</div>' +
+                '<div class="tabpane__head"><div class="tabpane__eyebrow">Projekt sklepu</div>' +
                 '<h2 class="tabpane__title">' + esc(nazwa) + '</h2>' +
                 (pr.opis ? '<p class="tabpane__sub">' + esc(pr.opis) + '</p>' : '') +
                 '</div>';
@@ -7497,7 +7497,7 @@
             if (pr.landing_url) {
                 html += '<a class="share-land" href="' + esc(pr.landing_url) + '" target="_blank" rel="noopener">' +
                     pjIco('<circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>') +
-                    '<span><b>Zobacz działającą stronę narzędzia</b><small>prawdziwa strona w przeglądarce — nie grafika</small></span>' +
+                    '<span><b>Zobacz działającą stronę sklepu</b><small>prawdziwa strona w przeglądarce — nie grafika</small></span>' +
                     '<em aria-hidden="true">↗</em></a>';
             }
             if (k) html += kartaGridHTML(k, '');
@@ -7571,7 +7571,7 @@
     // skromny nagłówek nazwy; udostępniony — same kafle (nazwa/opis są nad kartą).
     function kartaGridHTML(k, extraRightHtml, full) {
         var brief = state.lastBrief || {};
-        var nazwa = brief.nazwa || 'Twoje narzędzie';
+        var nazwa = brief.nazwa || 'Twój sklep';
         var opis = brief.opis || '';
         var dlaKogo = k.dla_kogo || k.profesja || '';
         var ploci = k.kto_placi || '';
@@ -7656,7 +7656,7 @@
     }
     // Treść teasera odsłony (kafel + pełny pane detalu)
     var REV_TEASER = {
-        prototyp: ['Klikalny prototyp', 'Najmocniejsze zostawiam na koniec: działające, klikalne narzędzie. Odsłonię je na finał — napiszę do Ciebie mailem.'],
+        prototyp: ['Działający podgląd sklepu', 'Najmocniejsze zostawiam na koniec: działający, klikalny sklep. Odsłonię go na finał — napiszę do Ciebie mailem.'],
         strona: ['Twoja strona', 'Składam działającą stronę sprzedażową. Dostaniesz maila, gdy będzie gotowa do otwarcia.'],
         rynek: ['Potencjał rynku', 'Sprawdzam Twój rynek w internecie — konkurentów, ceny, wielkość niszy. Raport przyślę mailem.'],
         economics: ['Czy to zarabia', 'Liczę opłacalność: cennik, koszt klienta, zwrot budowy. Odkryjesz to, gdy dam znać mailem.'],
@@ -9174,7 +9174,7 @@
     // Fallback dla kafli bez data-pjd (generujące się / „wkrótce") — po tytule.
     var PJ_BG_BY_TITLE = [['plan przychodu', 'plan'], ['potencjał rynku', 'rynek'], ['czy to zarabia', 'economics'],
         ['gdzie szukać', 'gtm'], ['gotowe reklamy', 'reklamy'], ['twoja strona', 'strona'],
-        ['prototyp', 'prototyp'], ['pigułce', 'pigulka'], ['pigułka', 'pigulka'], ['karta projektu', 'karta']];
+        ['podgląd sklepu', 'prototyp'], ['pigułce', 'pigulka'], ['pigułka', 'pigulka'], ['karta projektu', 'karta']];
     function pjDecorateBackgrounds(root) {
         if (!root) return;
         root.querySelectorAll('.pjd-tile').forEach(function (t) {
@@ -9710,7 +9710,7 @@
                         pjGoIcon() +
                         '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.reklamy) + '</span>' +
                         '<span class="pjd-tile__t">Gotowe reklamy</span>' +
-                        '<span class="pjd-tile__sub">' + adCount + ' ' + (adCount === 1 ? 'reklama gotowa' : (adCount < 5 ? 'reklamy gotowe' : 'reklam gotowych')) + ' — kreacja z Twoich ekranów + copy, od ręki do kampanii</span>' +
+                        '<span class="pjd-tile__sub">' + adCount + ' ' + (adCount === 1 ? 'reklama gotowa' : (adCount < 5 ? 'reklamy gotowe' : 'reklam gotowych')) + ' — kreacja z makiet Twojego sklepu + copy, od ręki do kampanii</span>' +
                         '</button>';
                 }
             } else {
@@ -9761,27 +9761,27 @@
                     pjGoIcon() +
                     '<span class="pjd-proto__glow" aria-hidden="true"></span>' +
                     '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Prototyp aplikacji <em class="pjd-live">działa</em></span>' +
-                    '<span class="pjd-tile__sub">to nie zrzut ani makieta — klikalny prototyp Twojego narzędzia. Wejdź, wpisz, sprawdź jak reaguje.</span>' +
+                    '<span class="pjd-tile__t">Podgląd sklepu <em class="pjd-live">działa</em></span>' +
+                    '<span class="pjd-tile__sub">to nie zrzut ani makieta — działający podgląd Twojego sklepu. Wejdź, kliknij, sprawdź jak działa.</span>' +
                     '</button>';
             } else if (extras.prototype === 'limit') {
                 tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
                     '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
-                    '<span class="pjd-tile__sub">pula wersji prototypu wykorzystana — finalną dopracujesz z Tomkiem</span>' +
+                    '<span class="pjd-tile__t">Działający podgląd sklepu</span>' +
+                    '<span class="pjd-tile__sub">pula wersji podglądu wykorzystana — finalny dopracujesz z Tomkiem</span>' +
                     '</div>';
             } else if (extras.prototype === 'fail') {
                 tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
                     '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Klikalny prototyp</span>' +
-                    '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować prototypu.</b>' +
+                    '<span class="pjd-tile__t">Działający podgląd sklepu</span>' +
+                    '<div class="pjd-gen pjd-gen--fail"><b>Nie udało się zbudować podglądu.</b>' +
                     '<button type="button" class="preview-retry" data-retry="prototype">Spróbuj ponownie</button></div>' +
                     '</div>';
             } else {
                 tiles += '<div class="pjd-tile pjd-tile--proto pjd-tile--static">' +
                     '<span class="pjd-tile__ico pjd-proto__ico">' + pjIco(PJ_ICONS.prototyp) + '</span>' +
-                    '<span class="pjd-tile__t">Buduję klikalny prototyp</span>' +
-                    genProgressHTML('prototype', 'Składam działające narzędzie…', 'odtwarzam Twoje ekrany jako apkę, którą da się kliknąć') +
+                    '<span class="pjd-tile__t">Buduję działający podgląd sklepu</span>' +
+                    genProgressHTML('prototype', 'Składam Twój sklep…', 'odtwarzam Twoje makiety jako działający sklep, który da się kliknąć') +
                     '</div>';
             }
 
@@ -9834,9 +9834,9 @@
         var TITLES = {
             ekrany: ['Makieta sklepu', 'kliknij ekran, żeby obejrzeć w powiększeniu'],
             strona: ['Twoja strona', 'działająca strona „' + esc(ctx.nazwa) + '" — prawdziwa, nie grafika'],
-            prototyp: ['Prototyp aplikacji', 'klikalny prototyp „' + esc(ctx.nazwa) + '" — wpisz, kliknij, zobacz jak reaguje'],
+            prototyp: ['Podgląd sklepu', 'działający podgląd „' + esc(ctx.nazwa) + '" — kliknij, przejdź, zobacz jak działa'],
             karta: ['Karta projektu', 'problem, klienci i zakres pierwszej wersji'],
-            plan: ['Wstępny plan przychodu', 'ile to narzędzie może zarabiać — szacunki z rozmowy'],
+            plan: ['Wstępny plan przychodu', 'ile ten sklep może zarabiać — szacunki z rozmowy'],
             economics: ['Czy to zarabia', 'model cenowy, koszt klienta i zwrot — przelicz na suwakach'],
             gtm: ['Gdzie szukać klientów', 'darmowe miejsca, gdzie już są — i płatne kampanie'],
             reklamy: ['Gotowe reklamy', 'koncepty z copy i briefem wizualnym — od ręki do kampanii']
@@ -9876,19 +9876,19 @@
                     '<div class="pj-land__bar"><span class="pj-land__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
                     '<span class="pj-land__addr">' + pjIco('<rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>') + esc(ctx.nazwa.toLowerCase().replace(/[^a-ząćęłńóśźż0-9]+/gi, '')) + '.pl</span>' +
                     '<a class="pj-land__open" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener">Otwórz stronę ↗</a></div>' +
-                    '<a class="pj-land__frame" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener" aria-label="Otwórz stronę narzędzia">' +
-                    '<iframe src="' + esc(state.landingUrl) + '" loading="lazy" tabindex="-1" title="Podgląd strony narzędzia"></iframe></a>' +
-                    '<div class="pj-land__note">To nie jest grafika — to działająca strona Twojego narzędzia. Kliknij, przewiń, pokaż znajomym.</div>' +
+                    '<a class="pj-land__frame" href="' + esc(state.landingUrl) + '" target="_blank" rel="noopener" aria-label="Otwórz stronę sklepu">' +
+                    '<iframe src="' + esc(state.landingUrl) + '" loading="lazy" tabindex="-1" title="Podgląd strony sklepu"></iframe></a>' +
+                    '<div class="pj-land__note">To nie jest grafika — to działająca strona Twojego sklepu. Kliknij, przewiń, pokaż znajomym.</div>' +
                     '</div>';
             } else if (extras.landing === 'fail') {
-                html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować strony narzędzia.</b>' +
+                html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować strony sklepu.</b>' +
                     '<span>Spróbuj jeszcze raz — budowa trwa około 4 minut.</span></div>' +
                     '<button type="button" class="preview-retry" data-retry="landing">Spróbuj ponownie</button></div>';
             } else if (extras.landing === 'limit') {
                 html += '<div class="pj-wait"><div class="pj-wait__txt"><b>Pula wersji strony wykorzystana.</b>' +
                     '<span>Finalną wersję dopracujesz bezpośrednio z Tomkiem po rezerwacji.</span></div></div>';
             } else {
-                html += genProgressHTML('landing', 'Buduję działającą stronę narzędzia…', 'prawdziwa strona w przeglądarce, nie grafika — ok. 4 minuty');
+                html += genProgressHTML('landing', 'Buduję działającą stronę sklepu…', 'prawdziwa strona w przeglądarce, nie grafika — ok. 4 minuty');
             }
         }
 
@@ -9900,8 +9900,8 @@
                     '<div class="pj-proto__bar"><span class="pj-proto__dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
                     '<span class="pj-proto__name">' + pjIco(PJ_ICONS.prototyp) + esc(ctx.nazwa) + '</span>' +
                     '<a class="pj-proto__open" href="' + esc(state.prototypeUrl) + '" target="_blank" rel="noopener">Otwórz na pełnym ekranie ↗</a></div>' +
-                    '<div class="pj-proto__stage"><iframe src="' + esc(state.prototypeUrl + (state.prototypeUrl.indexOf('?') >= 0 ? '&' : '?') + 'embed=1') + '" loading="lazy" title="Klikalny prototyp narzędzia" allow="clipboard-write"></iframe></div>' +
-                    '<div class="pj-proto__note">To działający prototyp — klikaj, wpisuj, przełączaj ekrany. Tak będzie działać Twoje narzędzie. Pełną, dopracowaną wersję budujemy wspólnie z Tomkiem.</div>' +
+                    '<div class="pj-proto__stage"><iframe src="' + esc(state.prototypeUrl + (state.prototypeUrl.indexOf('?') >= 0 ? '&' : '?') + 'embed=1') + '" loading="lazy" title="Działający podgląd sklepu" allow="clipboard-write"></iframe></div>' +
+                    '<div class="pj-proto__note">To działający sklep — klikaj, przeglądaj, przechodź między widokami. Tak będzie działać Twój sklep. Pełną, dopracowaną wersję budujemy wspólnie z Tomkiem.</div>' +
                     '</div>';
             } else if (extras.prototype === 'fail') {
                 html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować prototypu.</b>' +
@@ -9911,7 +9911,7 @@
                 html += '<div class="pj-wait"><div class="pj-wait__txt"><b>Pula wersji prototypu wykorzystana.</b>' +
                     '<span>Finalną, dopracowaną wersję zbudujemy bezpośrednio z Tomkiem po rezerwacji.</span></div></div>';
             } else {
-                html += genProgressHTML('prototype', 'Składam działające narzędzie…', 'odtwarzam Twoje ekrany jako klikalną apkę — ok. 5 minut');
+                html += genProgressHTML('prototype', 'Składam Twój sklep…', 'odtwarzam Twoje makiety jako działający sklep — ok. 5 minut');
             }
         }
 
@@ -9932,7 +9932,7 @@
                 var left = EDIT_ROUNDS_MAX - (state.editsUsed || 0);
                 if (left > 0) {
                     editHtml = '<div class="pj-edit"><div class="pj-edit__t">Chcesz coś zmienić?</div>' +
-                        '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i ekrany.</p>' +
+                        '<p class="pj-edit__d">Masz jeszcze <strong>' + left + ' z ' + EDIT_ROUNDS_MAX + '</strong> ' + (left === 1 ? 'poprawkę' : 'poprawki') + ' projektu — opowiedz w rozmowie, co poprawić, a zaktualizuję kartę i makiety sklepu.</p>' +
                         '<button type="button" class="preview-retry" id="pj-edit-btn">Poprawiam projekt →</button></div>';
                 } else {
                     editHtml = '<div class="pj-edit pj-edit--done"><p class="pj-edit__d">Pula poprawek wykorzystana — resztę doszlifujesz bezpośrednio z Tomkiem po rezerwacji rozmowy.</p></div>';
@@ -9969,7 +9969,7 @@
             var rek = (state.gtm && state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : null;
             if (rek && rek.length) { html += '<div class="gtm-ads">' + adsHtml(rek) + '</div>'; ensureGtmBanners(); }
             else if (extras.reklamy === 'fail') html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się przygotować reklam.</b><span>Spróbuj jeszcze raz — to ok. 1,5 minuty.</span></div><button type="button" class="preview-retry" data-retry="ads">Spróbuj ponownie</button></div>';
-            else html += genProgressHTML('reklamy', 'Przygotowuję reklamy…', 'koncepty z copy i baner z Twoich ekranów');
+            else html += genProgressHTML('reklamy', 'Przygotowuję reklamy…', 'koncepty z copy i baner z makiet Twojego sklepu');
         }
 
         body.innerHTML = html;
@@ -10834,37 +10834,11 @@
             prodMetric(fmtVP(p.comments), 'komentarzy') + prodMetric(fmtVP(p.shares), 'udostępnień') +
             prodMetric(er, 'zaangażowanie') + prodMetric(fmtVP(p.followers), 'obserw. autora') +
             '</div>' + (p.author ? '<div class="prodm-author">Autor: <b>' + esc(p.author) + '</b></div>' : '') + '</div>';
-        var a = p.ali;
-        if (a) {
-            if (a.images && a.images.length) {
-                html += '<div class="prodm-sec"><div class="prodm-sect">Zdjęcia produktu</div><div class="prodm-gallery">' +
-                    a.images.map(function (u) { return '<img class="prodm-gimg" referrerpolicy="no-referrer" loading="lazy" data-zoom="' + esc(u) + '" src="' + esc(u) + '" alt="">'; }).join('') + '</div></div>';
-            }
-            var rs = a.review_stats;
-            var facts = '';
-            if (rs && rs.avg) facts += '<span class="prodm-fact">★ <b>' + String(rs.avg).replace('.', ',') + '</b>/5 · ' + (rs.numRatings || 0) + ' ocen' + (rs.positivePct ? ' · ' + String(rs.positivePct).replace('.', ',') + '% pozytywnych' : '') + '</span>';
-            if (p.price) facts += '<span class="prodm-fact">Cena ref.: <b>' + esc(String(p.price)) + '</b></span>';
-            if (a.variants && a.variants.length) facts += '<span class="prodm-fact"><b>' + a.variants.length + '</b> wariantów</span>';
-            if (facts) html += '<div class="prodm-sec"><div class="prodm-facts">' + facts + '</div>' +
-                ((a.variants && a.variants.length) ? '<div class="prodm-vars">' + a.variants.map(function (v) { var lab = (typeof v === 'string') ? v : ((v && (v.name || v.label || v.value || v.title)) || ''); return lab ? '<span class="prodm-chip">' + esc(String(lab).slice(0, 40)) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
-            var _desc = a.description || a.title || '';
-            if (_desc) html += '<div class="prodm-sec"><div class="prodm-sect">Opis produktu</div><div class="prodm-desc">' + esc(_desc) + '</div></div>';
-            // Link do aukcji źródłowej NIE jest pokazywany klientowi (zasada marki:
-            // nie ujawniamy źródła/ceny zakupu). Aukcja dostępna tylko w panelu admina.
-            if (a.reviews && a.reviews.length) {
-                html += '<div class="prodm-sec"><div class="prodm-sect">Opinie klientów (' + a.reviews.length + ')</div><div class="prodm-reviews">' +
-                    a.reviews.map(function (r) {
-                        var st = Math.max(0, Math.min(5, r.stars || 5));
-                        return '<div class="prodm-rev">' +
-                            '<div class="prodm-revtop"><span class="prodm-stars">' + new Array(st + 1).join('★') + new Array(6 - st).join('☆') + '</span>' + (r.name ? '<span class="prodm-revname">' + esc(r.name) + '</span>' : '') + '</div>' +
-                            (r.text ? '<div class="prodm-revtxt">' + esc(r.text) + '</div>' : '') +
-                            ((r.images && r.images.length) ? '<div class="prodm-revimgs">' + r.images.map(function (u) { return '<img referrerpolicy="no-referrer" loading="lazy" data-zoom="' + esc(u) + '" src="' + esc(u) + '" alt="">'; }).join('') + '</div>' : '') +
-                            '</div>';
-                    }).join('') + '</div></div>';
-            }
-        } else {
-            html += '<div class="prodm-sec"><div class="prodm-note">Dane produktu jeszcze się zaciągają — zajrzyj za chwilę.</div></div>';
-        }
+        // ZASADA MARKI (twarda): NIGDY nie ujawniamy klientowi sourcingu ani ceny zakupu.
+        // Dane z aukcji źródłowej (p.ali: cena referencyjna, galeria, warianty, opinie,
+        // opis) NIE są renderowane w widoku klienta — dropshippingowy „wyjadacz" rozpoznałby
+        // listing i policzył marżę. Klient widzi WYŁĄCZNIE dowód popytu z TikToka (wyżej).
+        // Pełne dane aukcji dostępne tylko w panelu admina.
         html += '</div>';
         return html;
     }
@@ -12997,7 +12971,7 @@
 
     // Co model „robi" w niewidocznej części streamu — etykieta wskaźnika pracy
     var WORK_LABELS = [
-        ['projekt', 'Przygotowuję ekrany narzędzia…'],
+        ['projekt', 'Składam Twój sklep…'],
         ['werdykt', 'Zapisuję kartę projektu…'],
         ['sekcje', 'Układam szczegóły…'],
         ['karuzela', 'Układam porównanie…'],
@@ -13423,7 +13397,7 @@
     }
 
     var STYLE_CARDS = [
-        ['wgs-dark', 'Ciemny premium', 'grafit, elegancki niebieski akcent', 'Ciemny premium — grafitowe tło, elegancki niebieski akcent, klimat nowoczesnej aplikacji'],
+        ['wgs-dark', 'Ciemny premium', 'grafit, elegancki niebieski akcent', 'Ciemny premium — grafitowe tło, elegancki niebieski akcent, klimat nowoczesnego sklepu'],
         ['wgs-light', 'Jasny i przyjazny', 'dużo światła, miękkie pastele', 'Jasny i przyjazny — dużo bieli i światła, miękkie pastelowe akcenty'],
         ['wgs-vivid', 'Żywy i energetyczny', 'odważne kolory, dynamiczny klimat', 'Żywy i energetyczny — odważne kolory, duże zaokrąglenia, dynamiczny klimat'],
         ['wgs-ai', 'Dobierz za mnie', 'AI wybierze najlepszy dla branży', 'Dobierz styl za mnie — zaproponuj najlepszy dla mojej branży i odbiorców']
@@ -13539,7 +13513,7 @@
         var bubble = document.createElement('div');
         bubble.className = 'msg msg--ai';
         bubble.setAttribute('aria-live', 'off'); // #4 — nie ogłaszamy każdego tokenu czytnikowi
-        bubble.innerHTML = '<span class="typing" aria-label="Sparing pisze"><i></i><i></i><i></i></span>';
+        bubble.innerHTML = '<span class="typing" aria-label="Asystent pisze"><i></i><i></i><i></i></span>';
         el('chat-msgs').appendChild(bubble);
         anchorTurnTop();   // FIX: początek tury (pytanie usera) u góry kadru — nie skacz na dół podczas odpowiedzi
 
@@ -13757,7 +13731,7 @@
                 sysMsg('Nie udało się potwierdzić, że nie jesteś botem. Odśwież stronę i spróbuj ponownie — albo zaloguj się, wtedy weryfikacja nie jest potrzebna.', true);
             } else if (err && err.status === 429 && err.code === 'limit_tur') {
                 failedBeforeText = !gotText;
-                sysMsg('Dobiliśmy do limitu 30 tur tej rozmowy. Sparing tyle nie potrzebuje — jeśli werdykt nie padł, zacznij nową rozmowę z węższym problemem.', true);
+                sysMsg('Dobiliśmy do limitu 30 tur tej rozmowy. Tyle wystarczy, żeby ułożyć Twój sklep — jeśli nie domknęliśmy, zacznij nową rozmowę z węższym problemem.', true);
                 lockComposer('Limit 30 tur osiągnięty — rozmowa zamknięta.');
             } else if (err && err.status === 429 && err.code === 'limit_sesji') {
                 failedBeforeText = !gotText;
@@ -13945,7 +13919,7 @@
                 var runProjektGen = function () {
                     genScreen = 'ekrany'; leaveBeaconSent = false; // jest na ekranie generowania ekranów
                     setComposerEnabled(false);
-                    el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
+                    el('chat-input').placeholder = 'Składam Twój sklep — daj mi chwilę…';
                     requestPreviews(null, projektToGen, false, function () {
                         if (el('composer').hidden === false && !el('inline-gate')) setComposerEnabled(true);
                         updateHero(); // przywraca standardowy placeholder
@@ -14776,13 +14750,13 @@
         if (!state.previews) state.previews = {};
 
         function noteText(remaining) {
-            var base = 'Kliknij ekran, aby powiększyć.';
+            var base = 'Kliknij makietę, aby powiększyć.';
             if (typeof remaining === 'number' && remaining > 0) {
                 var forma = remaining === 1 ? 'poprawkę' : (remaining < 5 ? 'poprawki' : 'poprawek');
-                return base + ' Masz jeszcze ' + remaining + ' ' + forma + ' — opisz, co zmienić, a pokażę nowe wersje (każdy nowy ekran to jedna poprawka).';
+                return base + ' Masz jeszcze ' + remaining + ' ' + forma + ' — opisz, co zmienić, a pokażę nowe wersje (każda nowa makieta to jedna poprawka).';
             }
             if (remaining === 0) return base + ' Pula poprawek wyczerpana — kolejne uwagi opisz słowami, trafią do karty projektu.';
-            return base + ' Pierwsza wersja narzędzia powstanie na bazie Twoich uwag.';
+            return base + ' Pierwsza wersja Twojego sklepu powstanie na bazie Twoich uwag.';
         }
 
         function tileSkeletonHTML(view) {
@@ -14850,9 +14824,9 @@
             : [];
         if (!insights.length) {
             insights = [
-                'Dobre narzędzie niszowe wygrywa językiem branży, nie liczbą funkcji.',
-                'Najszybciej płacą ci, którym oszczędzasz czas w czymś, co robią co tydzień.',
-                'Jedna dopracowana funkcja sprzedaje lepiej niż dziesięć obiecanych.'
+                'Dobry sklep niszowy wygrywa językiem branży, nie liczbą produktów.',
+                'Najszybciej kupują ci, którym rozwiązujesz konkretny, powtarzalny problem.',
+                'Jeden dopracowany produkt sprzedaje lepiej niż dziesięć przeciętnych.'
             ];
         }
         var insTimer = null, insIdx = 0, stepTimer = null, barTimer = null;
@@ -14864,7 +14838,7 @@
 
         var GEN_STEPS = [
             'Analizuję problem i odbiorców…',
-            'Układam ekrany narzędzia…',
+            'Składam Twój sklep…',
             'Dobieram polskie dane przykładowe…',
             'Rysuję interfejsy w wysokiej jakości…'
         ];
@@ -14873,7 +14847,7 @@
             stopInsights();
             var headTxt = views.length === 1
                 ? 'Buduję nową wersję: ' + viewLabel(views[0])
-                : 'Buduję podgląd Twojego narzędzia — ' + views.length + ' ekrany';
+                : 'Buduję podgląd Twojego sklepu — ' + views.length + ' widoki';
             var gridHtml = '';
             VIEW_META.forEach(function (vm) {
                 // kafelki: generowane → szkielet; pozostałe z obrazem → istniejący widok
@@ -15076,7 +15050,7 @@
                 '<div class="paybox__eyebrow">Etap · Dopracowanie wizji</div>' +
                 '<h3 class="paybox__title">Pakiet opłacony — dopracujmy wizję przed budową</h3>' +
                 '<ul class="paybox__list">' +
-                '<li><strong>Karta projektu i ekrany</strong> są gotowe — masz je w „Pulpicie projektu" obok.</li>' +
+                '<li><strong>Karta projektu i makiety sklepu</strong> są gotowe — masz je w „Pulpicie projektu" obok.</li>' +
                 '<li>Teraz zbieram od Ciebie <strong>szczegóły, które realnie zmienią pierwszą wersję</strong> — realne sytuacje, przykłady, liczby, materiały.</li>' +
                 '<li>Bez pośpiechu — <strong>możesz wracać przez kilka dni.</strong> Gdy uznasz, że to wszystko, klikasz „przejdź do budowy".</li>' +
                 '</ul>' +
@@ -15201,11 +15175,11 @@
     // kontaktów (to bierze na siebie Tomek — patrz model operatora).
     function buildKnowhowOpener() {
         var nazwa = (state.lastBrief && state.lastBrief.nazwa) ? String(state.lastBrief.nazwa).trim() : '';
-        var tyt = nazwa ? '**' + nazwa + '**' : 'Twojego narzędzia';
+        var tyt = nazwa ? '**' + nazwa + '**' : 'Twojego sklepu';
         return 'Pakiet opłacony — od teraz robimy to razem. 🤝\n\n' +
             'Zanim usiądę do budowy, chcę dopracować z Tobą wizję ' + tyt + ', żeby pierwsza wersja była dokładnie taka, jak ją widzisz. ' +
             'Bez formularzy i odpytywania — po prostu opowiedz mi, jak to ma działać w praktyce: konkretne sytuacje, przykłady, liczby, materiały, na których Ci zależy.\n\n' +
-            'Nie martw się, jeśli czegoś nie wiesz — **research i wiedzę branżową biorę na siebie.** Ty znasz swój pomysł, ja go ułożę w działające narzędzie.\n\n' +
+            'Nie martw się, jeśli czegoś nie wiesz — **research i wiedzę branżową biorę na siebie.** Ty znasz swój pomysł, ja go ułożę w działający sklep.\n\n' +
             'Od czego chcesz zacząć?';
     }
     // Dodaje opener do historii (raz). Sam NIE renderuje — robi to wołający albo
@@ -15377,7 +15351,7 @@
             wrap.innerHTML =
                 '<div class="vbanner vbanner--red">' +
                 '<div class="vbanner__title">Werdykt: <em>czerwony.</em></div>' +
-                '<div class="vbanner__sub">Ten problem nie obroni się jako płatne narzędzie — powody masz powyżej. To nie porażka. <strong>To zaoszczędzone minimum 14 000 zł.</strong> Masz inny problem z praktyki? Sprawdźmy go.</div>' +
+                '<div class="vbanner__sub">Ten problem nie obroni się jako płatny biznes — powody masz powyżej. To nie porażka. <strong>To zaoszczędzone minimum 14 000 zł.</strong> Masz inny problem z praktyki? Sprawdźmy go.</div>' +
                 '<button type="button" class="btn" id="btn-new-problem">Wybieram inny problem <span class="btn__arrow">→</span></button>' +
                 '</div>';
             el('chat-msgs').appendChild(wrap);
@@ -15442,7 +15416,7 @@
             regenerating = !knownPrev;
             if (regenerating) {
                 setComposerEnabled(false);
-                el('chat-input').placeholder = 'Generuję ekrany narzędzia — daj mi chwilę…';
+                el('chat-input').placeholder = 'Składam Twój sklep — daj mi chwilę…';
             }
             var resumedBrief = parseProjektJson(projektContent);
             if (resumedBrief && !state.lastBrief) { state.lastBrief = resumedBrief; persistSession(); }
@@ -15483,7 +15457,7 @@
             // Paybox „Karta gotowa" pod samym openerem wyglądał jak błąd
             // (zgłoszenie Tomka 2026-06-12) — kierujemy do zakładek dyskretnie.
             var resumedName = (state.lastBrief && state.lastBrief.nazwa) ? '„' + state.lastBrief.nazwa + '"' : '';
-            sysMsg('Wróciłeś do projektu ' + resumedName + ' — karta, ekrany i cała reszta czekają w menu obok. Pełna historia rozmowy wróci po zalogowaniu.');
+            sysMsg('Wróciłeś do projektu ' + resumedName + ' — karta, makiety sklepu i cała reszta czekają w menu obok. Pełna historia rozmowy wróci po zalogowaniu.');
             // werdykt padł bez kontaktu (typowo: adopcja linkiem ?id=) → poproś o kontakt
             if (gatePending()) renderInlineGate();
         } else if (userCount === 0) {
@@ -15805,8 +15779,8 @@
             requestPreviews(null, {
                 insighty: [
                     'Pracownie nie płacą za „kolejny program" — płacą za koniec sporów z inwestorem o to, kto co zatwierdził.',
-                    'Decyzję zakupową podejmuje właściciel pracowni, ale narzędzie sprzedaje się przez ulgę jego zespołu.',
-                    'Najtańszy kanał dotarcia to społeczności branżowe — narzędzie poleca się samo, gdy widzi je inwestor.',
+                    'Decyzję zakupową podejmuje właściciel pracowni, ale sklep sprzedaje się przez ulgę jego zespołu.',
+                    'Najtańszy kanał dotarcia to społeczności branżowe — sklep poleca się sam, gdy widzi go inwestor.',
                     'Jedna funkcja używana co tydzień utrzymuje abonament lepiej niż dziesięć „na kiedyś".'
                 ]
             }, true);
