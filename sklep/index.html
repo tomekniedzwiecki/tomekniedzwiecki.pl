@@ -10881,7 +10881,9 @@
             return;
         }
         if (extras.ads !== 'gen') kickAds(false);
-        body.innerHTML = head + genProgressHTML('reklamy', 'Przygotowuję 4 reklamy (grafika + copy)…', 'dopasowane do wybranego stylu i Twojej grupy odbiorców');
+        // R12: reklamy (grafiki) potrafią się liczyć kilka-kilkanaście minut — bez tej informacji
+        // wygląda to na zawis i niecierpliwy odpada. Ustawiamy oczekiwanie + kierujemy uwagę na sklep.
+        body.innerHTML = head + genProgressHTML('reklamy', 'Przygotowuję 4 reklamy (grafika + copy)…', 'grafiki robią się kilka–kilkanaście minut, spokojnie. Twój sklep jest już obok w „Sklep" — zacznij od niego, reklamy dojdą same.');
         startPjTicker();
     }
 
