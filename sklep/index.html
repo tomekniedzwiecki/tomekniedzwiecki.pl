@@ -7027,7 +7027,13 @@
         var body = el('pane-' + tab + '-body') || el('pane-' + tab);
         if (!body) return;
         var old = body.querySelector('.stagebar'); if (old) old.remove();
-        var s = STAGE_INFO[currentStage()] || STAGE_INFO.raport;
+        var _stage = currentStage();
+        var s = STAGE_INFO[_stage] || STAGE_INFO.raport;
+        // Raport zagatowany (brak kompletu kontaktu) — nie pisz „Liczę raport rynku",
+        // bo realnie nie leci. Skieruj do rozmowy z bramką kontaktu.
+        if (_stage === 'raport' && gateContactMissing()) {
+            s = { txt: 'Zostaw w rozmowie kontakt — konto, imię i nazwisko oraz telefon — wtedy od razu ruszam z raportem.', cta: 'Wróć do rozmowy →', tab: 'chat' };
+        }
         var bar = document.createElement('div'); bar.className = 'stagebar';
         bar.innerHTML = '<div class="stagebar__txt"><b>Co dalej:</b> ' + s.txt + '</div>' +
             '<button type="button" class="stagebar__cta">' + s.cta + '</button>';
@@ -9238,6 +9244,14 @@
                     '<span class="pjd-badge pjd-badge--wysoki">gotowy</span>' +
                     (state.raport.lead ? '<span class="pjd-tile__sub pjd-clamp">' + esc(state.raport.lead) + '</span>' : '') +
                     '</button>';
+            } else if (state.chosenProduct && gateContactMissing()) {
+                // Raport zagatowany (brak kompletu kontaktu) — nie udawaj „przygotowuję",
+                // bo realnie nie leci. Statyczny kafel kierujący do rozmowy z bramką.
+                tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
+                    '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
+                    '<span class="pjd-tile__t">Raport strategiczny</span>' +
+                    '<div class="pjd-gen"><b>Czeka na Twój kontakt</b><span>Zostaw w rozmowie konto, imię i nazwisko oraz telefon — od razu ruszam z raportem.</span></div>' +
+                    '</div>';
             } else if (state.chosenProduct) {
                 tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
@@ -9871,6 +9885,14 @@
                     '<span>Spróbuj jeszcze raz — research trwa około 2 minut.</span></div>' +
                     '<button type="button" class="preview-retry" id="rk-retry">Spróbuj ponownie</button></div>';
                 el('rk-retry').addEventListener('click', function () { extras.raport = 'idle'; kickReport(true); });
+            } else if (gateContactMissing()) {
+                // Raport jest ZAGATOWANY (brak kompletu kontaktu: konto+imię+nazwisko+telefon)
+                // i realnie NIE leci — nie pokazuj fałszywego „liczę 3 min". Skieruj do rozmowy,
+                // gdzie czeka stepowa bramka; raport ruszy dopiero po jej domknięciu.
+                body.innerHTML = head +
+                    '<div class="tabpane__empty">Twój raport ruszy, gdy w rozmowie zostawisz kontakt — konto, imię i nazwisko oraz telefon. Zajmę się nim od razu po tym.<br>' +
+                    '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
+                body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
             } else {
                 if (extras.raport !== 'gen') kickReport(false);
                 body.innerHTML = head +
