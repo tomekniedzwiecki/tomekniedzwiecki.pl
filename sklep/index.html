@@ -4997,6 +4997,9 @@
     }
     .f-input:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent) !important; }
     .f-input--lg { min-height: 40px !important; font-size: 14px !important; letter-spacing: normal !important; }
+    /* #7: iOS auto-zoomuje pole z font-size <16px przy fokusie (główny ruch = mobile z reklam).
+       Na telefonie wymuś 16px — desktop zostaje 14px (Geist). */
+    @media (max-width: 600px) { .f-input, .f-input--lg { font-size: 16px !important; } }
     .f-label { letter-spacing: 0.01em; }
 
     /* DYMKI ROZMOWY — solidne powierzchnie, drobne promienie, bez glow */
@@ -6177,6 +6180,7 @@
             seen: state.seen || {},
             seenTabs: budSeenTabs || {},
             brand: state.brand || null,
+            zielone: state.zielone || null,           // #4: personalizacja zielonej karty (mocne/dopracujemy)
             brandDone: !!state.brandDone,             // #2: marka sfinalizowana (przeżywa F5)
             mockPending: !!state._mockPending,        // #1: ustalenia gotowe, makiety czekają na raport
             reportEngagePending: !!state.reportEngagePending  // #3: proaktywna tura ustaleń jeszcze nie domknięta
@@ -6399,6 +6403,7 @@
         state.stage = saved.stage || null;
         state.fullPaid = !!saved.fullPaid;
         state.khClosed = !!saved.khClosed;
+        state.zielone = saved.zielone || null;                // #4 resume personalizacji zielonej karty
         state.brandDone = !!saved.brandDone;                  // #2 resume marki
         state._mockPending = !!saved.mockPending;             // #1 resume makiet
         state.reportEngagePending = !!saved.reportEngagePending;  // #3 resume zaczepki ustaleń
@@ -7009,7 +7014,9 @@
         if (tab === 'reklamy') { renderPaneReklamy(); budSeen('reklamy'); }
         if (tab === 'sklep') { renderPaneSklep(); budSeen('sklep'); }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
-        if (['projekt', 'rynek', 'ustalenia', 'makiety', 'reklamy', 'sklep'].indexOf(tab) >= 0) injectStageBar(tab);   // E: pasek etapu we wszystkich zakładkach panelu
+        // #9: 'rynek' WYKLUCZONY — renderPaneRynek ma własny sticky pasek „Co dalej" (lepszy dla
+        // długiego raportu); injectStageBar dawał DRUGI pasek z inną treścią (szum/„bug").
+        if (['projekt', 'ustalenia', 'makiety', 'reklamy', 'sklep'].indexOf(tab) >= 0) injectStageBar(tab);   // E: pasek etapu w zakładkach panelu
         if (tab === 'chat') scrollToBottom(true);
         setTabHash(tab === 'chat' ? '' : tab);
         closeSide();
@@ -9037,7 +9044,13 @@
     }
     // 01 — Wybrany produkt (hero: okładka + metryki TikToka)
     function pjxTileProduct() {
-        var c = state.chosenProduct; if (!c || !c.id) return '';
+        var c = state.chosenProduct;
+        if (!c || !c.id) {
+            // #11: bez tego kafel „01" znikał → dziura w siatce i numeracja od „02".
+            return '<div class="pjx pjx--3 pjx--hero">' + pjxNo('01') + pjxDot('', 'wkrótce') +
+                '<span class="pjx__t">Produkt</span>' +
+                '<span class="pjx__sub">Wybierz produkt w rozmowie — od niego ruszamy z całym biznesem.</span></div>';
+        }
         function m(v, lab) { return v ? '<span class="pjx-metric"><b>' + fmtVP(v) + '</b><span>' + lab + '</span></span>' : ''; }
         var metrics = m(c.saves, 'zapisów TikTok') + m(c.plays, 'wyświetleń') + m(c.comments, 'komentarzy');
         return '<button type="button" class="pjx pjx--3 pjx--hero" data-prod="' + esc(c.id) + '">' +
@@ -9054,8 +9067,10 @@
         var inner, dot;
         if (b.chosen_logo) {
             inner = '<span class="pjx-swatch"><img referrerpolicy="no-referrer" src="' + esc(b.chosen_logo) + '" alt="' + esc(b.chosen_name || 'logo') + '"></span>' +
-                '<span class="pjx-brandmeta"><b>' + esc(b.chosen_name || '') + '</b>' + (b.chosen_domain ? '<span>' + esc(b.chosen_domain) + '</span>' : '') + '</span>';
-            dot = pjxDot('on', 'marka gotowa');
+                '<span class="pjx-brandmeta"><b>' + esc(b.chosen_name || '') + '</b>' + (b.chosen_domain ? '<span>' + esc(b.chosen_domain) + '</span>' : '') + '</span>' +
+                '<span class="pjx__sub" style="margin-top:6px;opacity:.7">nazwę i logo zmienisz w rozmowie</span>';
+            // #10: kafel marki KLIKALNY → rozmowa (tam żyje picker; user instynktownie klika, by zmienić logo)
+            return '<button type="button" class="pjx pjx--3" data-go-chat>' + pjxNo('02') + pjxDot('on', 'marka gotowa') + '<span class="pjx__t">Marka</span>' + inner + '</button>';
         } else if (ustDone) {
             inner = '<span class="pjx-lockup"><span class="pjx-lockup__sig pjx-sk"></span><span class="pjx-lockup__txt"><i class="pjx-sk"></i><i class="pjx-sk pjx-sk--d2"></i></span></span>' +
                 '<span class="pjx__sub">Dobieram nazwę, domenę .pl i znak — w rozmowie wybierzesz jeden z 3.</span>';
@@ -9084,6 +9099,13 @@
             return '<div class="pjx pjx--3">' + pjxNo('03') + pjxDot('gen', 'analizuję') +
                 '<span class="pjx-chart">' + pjxChartSvg(false) + '</span><span class="pjx__t">Potencjał rynku</span>' +
                 genProgressHTML('raport', 'Analizuję rynek…', 'konkurenci, ceny i wielkość niszy — research na żywo') + '</div>';
+        }
+        // #6: produkt wybrany, ale raport zagatowany (brak kompletu kontaktu) — NIE mów
+        // „wybierz produkt" (jest wybrany). Skieruj po kontakt, który odblokuje research.
+        if (state.chosenProduct && state.chosenProduct.id && gateContactMissing()) {
+            return '<button type="button" class="pjx pjx--3" data-go-chat>' + pjxNo('03') + pjxDot('', 'czeka na kontakt') +
+                '<span class="pjx-chart" style="opacity:.3">' + pjxChartSvg(false) + '</span><span class="pjx__t">Potencjał rynku</span>' +
+                '<span class="pjx__sub">Zostaw w rozmowie konto, imię i nazwisko oraz telefon — od razu ruszam z raportem.</span></button>';
         }
         return '<div class="pjx pjx--3">' + pjxNo('03') + pjxDot('', 'wkrótce') +
             '<span class="pjx-chart" style="opacity:.3">' + pjxChartSvg(false) + '</span><span class="pjx__t">Potencjał rynku</span>' +
@@ -9126,7 +9148,7 @@
         }
         return '<div class="pjx pjx--3">' + pjxNo('05') + pjxDot('', 'wkrótce') +
             '<span class="pjx__t">Makiety</span><span class="pjx-grid2">' + pjxSlots(4, '3/4', true) + '</span>' +
-            '<span class="pjx__sub">Zaprojektuję 4 wyglądy sklepu, gdy ustalimy markę.</span></div>';
+            '<span class="pjx__sub">Zaprojektuję 4 wyglądy sklepu, gdy domkniemy ustalenia — dla kogo jest.</span></div>';
     }
     // 06 — Reklamy (siatka 2×2 czterech kreacji)
     function pjxTileAds() {
@@ -10251,7 +10273,7 @@
     /* ── RENDER: USTALENIA (lustro rozmowy „dla kogo to jest") ── */
     function renderPaneUstalenia() {
         var body = el('pane-ustalenia-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 1 z 4</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 2 z 6</div>' +
             '<h2 class="tabpane__title">Ustalenia — dla kogo to jest</h2>' +
             '<p class="tabpane__sub">Tu zbieram, do kogo mówimy: grupa odbiorców, kąt sprzedaży, ton i kluczowe korzyści. Doprecyzowujemy to w rozmowie.</p></div>';
         var u = state.ustalenia;
@@ -10284,7 +10306,10 @@
             for (var bi = 0; bi < secs.length; bi++) { if (secs[bi] && Array.isArray(secs[bi].nazwy) && secs[bi].nazwy.length) { brandNames = secs[bi].nazwy.slice(0, 6); break; } }
         } catch (e) {}
         html += '<div class="ust-row"><span class="ust-label">Nazwa marki i logo</span>' +
-            '<div class="ust-val">Nazwę marki (z wolną domeną .pl) i logo wybierasz w rozmowie — propozycje pojawiają się na czacie po ustaleniach.</div></div>';
+            '<div class="ust-val">Nazwę marki (z wolną domeną .pl) i logo wybierasz w rozmowie — propozycje pojawiają się na czacie po ustaleniach.' +
+            // #13: chipy nazw z raportu — klik wrzuca wybór do rozmowy (binding niżej był martwy bez tego)
+            (brandNames.length ? '<div class="ust-names">' + brandNames.map(function (n) { return '<button type="button" class="ust-name" data-name="' + esc(String(n)) + '">' + esc(String(n)) + '</button>'; }).join('') + '</div>' : '') +
+            '</div></div>';
         html += '</div><div class="pj-plan__note">Coś dopowiedzieć? Napisz w czacie — zaktualizuję ustalenia.</div>';
         body.innerHTML = html;
         Array.prototype.forEach.call(body.querySelectorAll('.ust-name'), function (b) {
@@ -10299,7 +10324,7 @@
     /* ── RENDER: MAKIETY (4 style + picker) ── */
     function renderPaneMakiety() {
         var body = el('pane-makiety-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 2 z 4</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 4 z 6</div>' +
             '<h2 class="tabpane__title">Makiety — wybierz styl</h2>' +
             '<p class="tabpane__sub">Przygotowałem 4 propozycje wyglądu strony w różnych stylach. Wybierz ten, który najbardziej do Ciebie pasuje — na nim zbuduję resztę.</p></div>';
         var mk = state.mockups;
@@ -10456,7 +10481,7 @@
     /* ── RENDER: REKLAMY (posty FB) — przeniesione z renderPaneRynek ── */
     function renderPaneReklamy() {
         var body = el('pane-reklamy-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 3 z 4</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 5 z 6</div>' +
             '<h2 class="tabpane__title">Reklamy</h2>' +
             '<p class="tabpane__sub">Tak będą wyglądać Twoje reklamy na Facebooku i Instagramie — grafika i tekst gotowe do uruchomienia.</p></div>';
         if (Array.isArray(state.suiteAds) && state.suiteAds.length) {
@@ -10533,16 +10558,18 @@
 
     function renderPaneSklep() {
         var body = el('pane-sklep-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 4 z 4</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 6 z 6</div>' +
             '<h2 class="tabpane__title">Twój sklep</h2>' +
             '<p class="tabpane__sub">Gotowa strona sprzedażowa Twojego produktu — zobacz ją na pełnym ekranie.</p></div>';
         if (state.landingHtml) {
             body.innerHTML = head +
                 '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
                 '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button>' +
-                (state.verdict === 'zielony' ? '<button type="button" class="rkg-landing-btn sk-collab" id="sk-collab">Zobacz, jak budujemy to razem →</button>' : '') +
+                // #5: CTA do współpracy ZAWSZE gdy sklep gotowy (nie tylko po zielonym świetle) —
+                // to peak motywacji; gorący lead nie może utknąć bez ścieżki dalej.
+                '<button type="button" class="rkg-landing-btn sk-collab" id="sk-collab">Zobacz, jak budujemy to razem →</button>' +
                 '</div>' +
-                '<div class="pj-plan__note">' + (state.verdict === 'zielony' ? 'To podgląd Twojego sklepu. Żeby ruszyć z nim naprawdę — zobacz, jak budujemy to razem. Masz uwagi? Napisz w czacie, poprawię.' : 'Masz uwagi do strony? Napisz w czacie — poprawię.') + '</div>';
+                '<div class="pj-plan__note">To wstępny podgląd Twojego sklepu — finalną wersję dopracujemy razem po starcie. Zobacz, jak budujemy to razem. Masz uwagi? Napisz w czacie, poprawię.</div>';
             try { el('sk-frame').srcdoc = landingRevealed ? state.landingHtml : withReveal(state.landingHtml); landingRevealed = true; }
             catch (e) {
                 body.innerHTML = head +
@@ -13343,6 +13370,9 @@
                 // to razem") renderuje blok werdyktu niżej. Bez osobnej zielonej karty z CTA rezerwacji 500 zł.
                 var zg = parseZielone(raw);
                 if (zg && state.verdict !== 'zielony') { state.verdict = 'zielony'; persistSession(); }
+                // #4: zachowaj personalizację (mocne strony + co dopracujemy) — zasili zielony box,
+                // żeby moment przed rezerwacją był pod TEN produkt, nie generyczny „Karta gotowa".
+                if (zg && ((zg.mocne && zg.mocne.length) || (zg.dopracowac && zg.dopracowac.length))) { state.zielone = zg; persistSession(); }
                 if (hasMakieta(raw) && state.verdict === 'zielony' && !zg) anchor.insertAdjacentElement('afterend', mkCardEl());
             } else {
                 bubble.remove();
@@ -14537,13 +14567,24 @@
                 '<p class="paybox__note">Teraz Tomek składa pierwszą wersję Twojego sklepu i <strong>odezwie się do Ciebie z kolejnym krokiem.</strong> Jak coś Ci jeszcze przyjdzie do głowy — po prostu tu napisz, dopiszę to do projektu.</p>' +
                 '</div>';
         }
-        return '<div class="paybox" id="panel-box">' +
-            '<div class="paybox__eyebrow">Projekt zdefiniowany</div>' +
-            '<h3 class="paybox__title">Karta projektu <em>gotowa</em></h3>' +
-            '<ul class="paybox__list">' +
-            '<li><strong>Karta projektu</strong> i <strong>gotowy sklep</strong> czekają w menu obok — wszystko, co ustaliliśmy.</li>' +
-            '<li>Teraz najważniejsze: <strong>jak budujemy to razem z Tomkiem</strong> — on buduje, rozkręca sprzedaż i zarabia dopiero z wyniku (20% od zysku).</li>' +
-            '</ul>' +
+        // #4: jeśli mózg dał personalizację <zielone> (mocne strony + co dopracujemy),
+        // pokaż JĄ zamiast generycznych dwóch punktów — moment przed rezerwacją pod TEN produkt.
+        var zd = state.zielone;
+        var hasZ = !!(zd && ((zd.mocne && zd.mocne.length) || (zd.dopracowac && zd.dopracowac.length)));
+        var liz = function (arr, color) { return (arr || []).slice(0, 4).map(function (x) { return '<li style="margin:3px 0;padding-left:15px;position:relative;line-height:1.45"><span style="position:absolute;left:0;color:' + color + '">•</span>' + esc(String(x)) + '</li>'; }).join(''); };
+        var bodyHtml = hasZ
+            ? '<div style="display:flex;gap:16px;flex-wrap:wrap;margin:6px 0 10px">' +
+                ((zd.mocne && zd.mocne.length) ? '<div style="flex:1;min-width:160px"><div style="font-size:12px;font-weight:700;color:#00d97e;margin-bottom:4px">Dlaczego to ma potencjał</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + liz(zd.mocne, '#00d97e') + '</ul></div>' : '') +
+                ((zd.dopracowac && zd.dopracowac.length) ? '<div style="flex:1;min-width:160px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:4px">Co dopracujemy razem</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + liz(zd.dopracowac, '#a1a1aa') + '</ul></div>' : '') +
+                '</div>'
+            : '<ul class="paybox__list">' +
+                '<li><strong>Karta projektu</strong> i <strong>gotowy sklep</strong> czekają w menu obok — wszystko, co ustaliliśmy.</li>' +
+                '<li>Teraz najważniejsze: <strong>jak budujemy to razem z Tomkiem</strong> — on buduje, rozkręca sprzedaż i zarabia dopiero z wyniku (20% od zysku).</li>' +
+                '</ul>';
+        return '<div class="paybox" id="panel-box"' + (hasZ ? ' style="border-color:rgba(0,217,126,.45)"' : '') + '>' +
+            '<div class="paybox__eyebrow"' + (hasZ ? ' style="color:#00d97e"' : '') + '>' + (hasZ ? 'Zielone światło' : 'Projekt zdefiniowany') + '</div>' +
+            '<h3 class="paybox__title">' + (hasZ ? 'Przeanalizowaliśmy Twój produkt — <em>wchodzimy w to z Tobą</em>' : 'Karta projektu <em>gotowa</em>') + '</h3>' +
+            bodyHtml +
             '<button type="button" class="paybox__btn" id="btn-collab-tab">Zobacz, jak budujemy to razem <span class="btn__arrow">→</span></button>' +
             '<p class="paybox__note">Masz pytania? Pisz śmiało — a projekt możesz dalej dopracowywać, każda zmiana zaktualizuje kartę.</p>' +
             '</div>';
