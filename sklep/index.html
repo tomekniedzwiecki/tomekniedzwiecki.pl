@@ -7858,6 +7858,10 @@
     function showRaportProgressInChat() {
         if (!el('chat-msgs')) return;
         if (state.raport) return;            // już gotowy — bez paska
+        // Nie pokazuj paska „powstaje teraz", gdy raport jest zagatowany (brak kompletu
+        // kontaktu) i jeszcze nie wystartował — inaczej loader liczy ~2 min dla czegoś,
+        // co realnie nie leci (rozjazd z bramką). Pasek wraca, gdy raport faktycznie ruszy.
+        if (extras.raport !== 'gen' && gateContactMissing()) return;
         if (el('rk-chat-card')) return;      // już pokazany
         var div = document.createElement('div');
         div.id = 'rk-chat-card';
@@ -12912,6 +12916,9 @@
             knowhowResume: khResume ? true : undefined,
             event: switchTrk ? 'switch_track' : undefined,
             track: switchTrk || undefined,
+            // Raport wstrzymany na froncie (bramka kontaktu otwarta) → mózg NIE może
+            // udawać, że „zaczyna analizę"/„raport leci 2 min" ani pytać o ustalenia.
+            reportGated: !!(state.chosenProduct && state.chosenProduct.id && !state.raport && gateContactMissing()) || undefined,
             tracking: isFirst ? getTracking() : null
         };
 
