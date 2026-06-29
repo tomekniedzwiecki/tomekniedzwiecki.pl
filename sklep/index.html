@@ -10497,7 +10497,7 @@
         var a = p.ali;
         if (a) {
             if (a.images && a.images.length) {
-                html += '<div class="prodm-sec"><div class="prodm-sect">AliExpress — zdjęcia</div><div class="prodm-gallery">' +
+                html += '<div class="prodm-sec"><div class="prodm-sect">Zdjęcia produktu</div><div class="prodm-gallery">' +
                     a.images.map(function (u) { return '<img class="prodm-gimg" referrerpolicy="no-referrer" loading="lazy" data-zoom="' + esc(u) + '" src="' + esc(u) + '" alt="">'; }).join('') + '</div></div>';
             }
             var rs = a.review_stats;
@@ -10508,8 +10508,9 @@
             if (facts) html += '<div class="prodm-sec"><div class="prodm-facts">' + facts + '</div>' +
                 ((a.variants && a.variants.length) ? '<div class="prodm-vars">' + a.variants.map(function (v) { var lab = (typeof v === 'string') ? v : ((v && (v.name || v.label || v.value || v.title)) || ''); return lab ? '<span class="prodm-chip">' + esc(String(lab).slice(0, 40)) + '</span>' : ''; }).join('') + '</div>' : '') + '</div>';
             var _desc = a.description || a.title || '';
-            if (_desc) html += '<div class="prodm-sec"><div class="prodm-sect">Opis (AliExpress)</div><div class="prodm-desc">' + esc(_desc) + '</div></div>';
-            if (p.product_link) html += '<div class="prodm-sec"><a class="prodm-ali" href="' + esc(p.product_link) + '" target="_blank" rel="noopener">Zobacz produkt na AliExpress ↗</a></div>';
+            if (_desc) html += '<div class="prodm-sec"><div class="prodm-sect">Opis produktu</div><div class="prodm-desc">' + esc(_desc) + '</div></div>';
+            // Link do aukcji źródłowej NIE jest pokazywany klientowi (zasada marki:
+            // nie ujawniamy źródła/ceny zakupu). Aukcja dostępna tylko w panelu admina.
             if (a.reviews && a.reviews.length) {
                 html += '<div class="prodm-sec"><div class="prodm-sect">Opinie klientów (' + a.reviews.length + ')</div><div class="prodm-reviews">' +
                     a.reviews.map(function (r) {
@@ -10522,7 +10523,7 @@
                     }).join('') + '</div></div>';
             }
         } else {
-            html += '<div class="prodm-sec"><div class="prodm-note">Dane z AliExpress jeszcze się zaciągają — zajrzyj za chwilę.</div></div>';
+            html += '<div class="prodm-sec"><div class="prodm-note">Dane produktu jeszcze się zaciągają — zajrzyj za chwilę.</div></div>';
         }
         html += '</div>';
         return html;
@@ -14143,7 +14144,7 @@
             actions.innerHTML =
                 '<button type="button" class="pc-act" data-action="best">Wróćmy do najlepszego z pokazanych</button>' +
                 '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
-                '<button type="button" class="pc-act" data-action="own_link">Mam produkt z AliExpress — wkleję link</button>' +
+                '<button type="button" class="pc-act" data-action="own_link">Mam już swój produkt — podam link</button>' +
                 '<button type="button" class="pc-act" data-action="own_brand">Mam jednak własny produkt</button>' +
                 '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>';
         } else {
@@ -14207,7 +14208,7 @@
             '<div class="pc-brak-opis">Pokazuję tylko produkty z realnym dowodem, że się sprzedają. Wybierz, co dalej:</div>' +
             '<div class="pc-actions">' +
             '<button type="button" class="pc-act" data-action="kategoria">Zmień kategorię</button>' +
-            '<button type="button" class="pc-act" data-action="own_link">Mam produkt z AliExpress — wkleję link</button>' +
+            '<button type="button" class="pc-act" data-action="own_link">Mam już swój produkt — podam link</button>' +
             '<button type="button" class="pc-act" data-action="own_idea">Mam własny pomysł</button>' +
             '</div>';
         wrap.appendChild(box);
@@ -14251,7 +14252,7 @@
         } else if (act === 'best') {
             sendOpening('Wróćmy do najlepszego z pokazanych — dopracujmy go');
         } else if (act === 'own_link') {
-            sendOpening('Mam konkretny produkt z AliExpress — chcę podać link');
+            sendOpening('Mam już swój produkt — chcę podać link');
         } else if (act === 'own_brand') {
             switchTrack('k2', 'Mam jednak własny produkt — chcę zbudować markę i sprzedaż');
         } else if (act === 'own_idea') {
