@@ -6681,6 +6681,7 @@
                 if (activeTab !== 'reklamy' && !budSeenTabs.reklamy) budNewTabs.reklamy = true;
                 persistSession();
                 changed = true;
+                maybeQualifyDuringGen();   // R7: reklamy doszły sync'iem → spokojny moment na pytanie o budżet
             }
             if (typeof p.landing_html === 'string' && p.landing_html && p.landing_html !== state.landingHtml) {
                 state.landingHtml = p.landing_html;
@@ -7978,8 +7979,12 @@
     // kwalifikujące (ankieta) w czacie. Jedna tura; odpowiedź łapie extractSurveyAsync do CRM.
     function maybeQualifyDuringGen() {
         if (!state.qualifyPending || !state.chosenStyle) return;
-        // tylko gdy coś jeszcze realnie się generuje (nie po wszystkim)
-        var stillGen = !state.suiteAds || !state.landingHtml || adsGen || landingGen;
+        // R7 (anty-przytłoczenie): NIE pytamy o budżet w chaosie startu generacji (reklamy+sklep
+        // ruszają, zakładki się zapalają). Czekamy, aż wyląduje PIERWSZY deliverable — reklamy.
+        // Wtedy jest spokojny moment „wow" i pytanie o budżet pada PO dostarczeniu wartości.
+        if (!state.suiteAds) return;
+        // tylko gdy sklep jeszcze realnie się generuje (jest co robić w tle, jest pretekst do rozmowy)
+        var stillGen = !state.landingHtml || landingGen;
         if (!stillGen) { state.qualifyPending = false; persistSession(); return; }
         if (streaming || el('inline-gate') || el('qr-chips') || state.verdict === 'zielony') return;
         state.qualifyPending = false; persistSession();   // jedna proaktywna tura kwalifikująca
@@ -8084,6 +8089,7 @@
                     updateBudNav();
                     if (activeTab === 'reklamy') renderPaneReklamy();
                     kickLanding(false);   // reklamy gotowe → buduj stronę (sklep)
+                    maybeQualifyDuringGen();   // R7: pierwszy deliverable wylądował → teraz spokojny moment na pytanie o budżet
                     return;
                 }
                 if (res.ok && res.d && res.d.pending) { if (attempt === 0) kickLanding(false); /* strona buduje się RÓWNOLEGLE — nie czeka na wolne reklamy Manus (do ~30 min) */ if (attempt < 160) setTimeout(function () { if (state.sessionId === sid && !state.suiteAds) _doAds(sid, false, attempt + 1); }, 12000); else { adsGen = false; extras.ads = 'fail'; updateBudNav(); if (activeTab === 'reklamy') renderPaneReklamy(); genFailMsg('reklamy', function () { kickAds(true); }); } return; }
