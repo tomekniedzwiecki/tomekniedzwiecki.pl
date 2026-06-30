@@ -6013,8 +6013,8 @@
 
     // Otwarcie w DWÓCH wiadomościach: P1 od razu, potem (efekt pisania ~3,5s) P2 + karuzela produktów.
     var OPENER_P1 = 'Cześć, tu AI Tomka Niedźwieckiego 👋 **Zbudujemy teraz Twój sklep online** — i zobaczysz na żywo, jak z produktu powstaje prawdziwy biznes.';
-    var OPENER_P1B = 'Wskażesz produkt, a ja przygotuję dla Ciebie **analizę rynku, gotową markę, stronę sprzedażową i grafiki reklamowe** — za darmo, i wszystko zostaje Twoje.';
-    var OPENER_P2 = 'A jak ruszymy na poważnie — **pełny sklep pod klucz buduje Tomek z zespołem, jako Twój wspólnik: 20% od zysku, czyli zarabia dopiero, gdy Ty zarabiasz.** Wybierz pierwszy produkt na start 👇';
+    var OPENER_P1B = 'Wskażesz produkt, a ja na żywo przygotuję dla Ciebie **analizę rynku, markę, stronę sprzedażową i reklamy** — za darmo. To **pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy biznes**, i Twój grunt pod start.';
+    var OPENER_P2 = 'Bo to nie generator sklepów z automatu — to **wstęp do wspólnego biznesu z Tomkiem.** On buduje go z Tobą na poważnie, doprowadza do **pierwszych 1000 zamówień** i uczy Cię prowadzenia, aż **przejmiesz stery** — zarabiając dopiero, gdy Ty zarabiasz (20% od zysku). Wybierz produkt, od którego zaczniemy 👇';
     var OPENER_GENERIC = OPENER_P1 + '\n\n' + OPENER_P2;
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
@@ -7139,7 +7139,7 @@
             '<button type="button" class="auth-modal__close" id="rpw-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
             '<h2 class="auth-modal__title">Zarezerwuj rozmowę z Tomkiem</h2>' +
             '<div class="rpw-anchor"><span class="rpw-anchor__lead">Już masz w ręku — za darmo:</span>' +
-            '<span class="rpw-anchor__items"><i>✓ Raport rynku</i><i>✓ Marka i logo</i><i>✓ Działający sklep</i><i>✓ Reklamy</i></span>' +
+            '<span class="rpw-anchor__items"><i>✓ Raport rynku</i><i>✓ Marka i logo</i><i>✓ Podgląd sklepu</i><i>✓ Reklamy</i></span>' +
             proofGrid +
             '<span class="rpw-anchor__note">Zrobiliśmy to, zanim poprosiliśmy o złotówkę — żebyś zobaczył, że umiemy.</span></div>' +
             '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Te 500 zł tylko rezerwuje czas Tomka, żeby ułożył plan Twojego sklepu i odezwał się osobiście. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
@@ -8272,7 +8272,7 @@
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && res.d.landing_html) {
                     state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle'; clearGenFail('sklep');
-                    genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
+                    genCardReadyInChat('ln-chat-card', 'Podgląd Twojego sklepu — gotowy', 'sklep', 'Zobacz sklep →');
                     if (pendingShopSugg) { renderSuggestions(pendingShopSugg.opts, pendingShopSugg.multi); pendingShopSugg = null; }   // FIX(5): odroczone „co poprawić" — teraz sklep gotowy
                     if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                     updateBudNav();
@@ -8324,9 +8324,9 @@
             '<li><span class="rk-free__d"></span>Nazwa, domena .pl i logo</li>' +
             '<li><span class="rk-free__d"></span>4 makiety sklepu do wyboru</li>' +
             '<li><span class="rk-free__d"></span>4 gotowe reklamy na Facebooka i Instagram</li>' +
-            '<li><span class="rk-free__d"></span>Działający sklep — strona sprzedażowa</li>' +
+            '<li><span class="rk-free__d"></span>Podgląd Twojego sklepu — strona sprzedażowa</li>' +
             '</ul>' +
-            '<div class="rk-free__f">Wszystko zanim w ogóle zaczniemy rozmawiać o współpracy.</div>' +
+            '<div class="rk-free__f">To pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy projekt — zanim w ogóle zaczniemy rozmawiać o współpracy.</div>' +
             '</div>';
     }
     function showRaportProgressInChat() {
@@ -8369,7 +8369,7 @@
         renderBrandResumeCard();   // marka (logo) — po ustaleniach
         if (state.mockups && state.mockups.length && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', (state.chosenStyle ? 'Makiety — styl wybrany ✓' : 'Makiety gotowe — 4 style'), 'makiety', (state.chosenStyle ? 'Zobacz makiety →' : 'Wybierz makietę →'));
         if (state.suiteAds && state.suiteAds.length && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
-        if (state.landingHtml && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
+        if (state.landingHtml && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Podgląd Twojego sklepu — gotowy', 'sklep', 'Zobacz sklep →');
         // KULMINACJA: na resume ZIELONEJ sesji wróć z kartą zielonego światła + CTA rezerwacji
         // W CZACIE (nie tylko w zakładce Współpraca). Bez tego najgorętszy lead (zakwalifikowany,
         // wraca) widzi 5 kart proof, ale NIE wie, że następny krok = rezerwacja. zl-card guard = idempotentne.
@@ -8398,7 +8398,7 @@
             if (state.suiteAds && state.suiteAds.length) { if (!el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →'); }
             else if (adsGen && !el('ad-chat-card')) genCardInChat('ad-chat-card', 'ads', 'Reklamy pod Twój sklep', 'studio AI składa 4 banery — to potrwa kilka–kilkanaście minut');
             // …potem sklep.
-            if (state.landingHtml) { if (!el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →'); }
+            if (state.landingHtml) { if (!el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Podgląd Twojego sklepu — gotowy', 'sklep', 'Zobacz sklep →'); }
             else if (landingGen && !el('ln-chat-card')) genCardInChat('ln-chat-card', 'landing', 'Twój sklep — strona sprzedażowa', 'składam pełną stronę');
         }
     }
@@ -10066,7 +10066,7 @@
                     '<span class="pj-proto__name">' + pjIco(PJ_ICONS.prototyp) + esc(ctx.nazwa) + '</span>' +
                     '<a class="pj-proto__open" href="' + esc(state.prototypeUrl) + '" target="_blank" rel="noopener">Otwórz na pełnym ekranie ↗</a></div>' +
                     '<div class="pj-proto__stage"><iframe src="' + esc(state.prototypeUrl + (state.prototypeUrl.indexOf('?') >= 0 ? '&' : '?') + 'embed=1') + '" loading="lazy" title="Działający podgląd sklepu" allow="clipboard-write"></iframe></div>' +
-                    '<div class="pj-proto__note">To działający sklep — klikaj, przeglądaj, przechodź między widokami. Tak będzie działać Twój sklep. Pełną, dopracowaną wersję budujemy wspólnie z Tomkiem.</div>' +
+                    '<div class="pj-proto__note">To podgląd Twojego sklepu — klikaj, przeglądaj, przechodź między widokami. Tak będzie działać. Finalną wersję pod klucz (płatności, wdrożenie, dostawca) buduje Tomek z zespołem po wejściu we współpracę.</div>' +
                     '</div>';
             } else if (extras.prototype === 'fail') {
                 html += '<div class="pj-wait pj-wait--fail"><div class="pj-wait__txt"><b>Nie udało się zbudować prototypu.</b>' +
@@ -11235,8 +11235,8 @@
     function renderPaneSklep() {
         var body = el('pane-sklep-body');
         var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój sklep</div>' +
-            '<h2 class="tabpane__title">Twój sklep</h2>' +
-            '<p class="tabpane__sub">Gotowa strona sprzedażowa Twojego produktu — zobacz ją na pełnym ekranie.</p></div>';
+            '<h2 class="tabpane__title">Podgląd Twojego sklepu</h2>' +
+            '<p class="tabpane__sub">Tak będzie wyglądać Twój sklep — to podgląd, pokaz możliwości. Finalną wersję pod klucz (płatności, wdrożenie, dostawca, kampanie) buduje Tomek z zespołem po wejściu we współpracę.</p></div>';
         if (state.landingHtml) {
             body.innerHTML = head +
                 '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
