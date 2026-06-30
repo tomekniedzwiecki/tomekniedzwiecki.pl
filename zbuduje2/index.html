@@ -231,17 +231,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .btn--ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;background:rgba(0,217,126,.05)}
 
 /* ============================================================ ACT 01 HERO */
-.hero{overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(52% 44% at 58% 50%,rgba(0,217,126,.16),transparent 62%);animation:heroGlow 7.5s var(--ease2) infinite alternate}
-@keyframes heroGlow{0%{opacity:.72;transform:scale(1) translateX(0)}100%{opacity:1;transform:scale(1.06) translateX(1.5%)}}
 .hero .scene__in{max-width:1000px;position:relative;z-index:2}
-.hero__life{position:absolute;top:0;right:0;bottom:0;width:46%;z-index:0;pointer-events:none;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 58%);mask:linear-gradient(90deg,transparent,#000 58%)}
-.hero__mock{position:absolute;width:190px;border-radius:14px;border:1px solid var(--border-strong);box-shadow:0 30px 80px -24px rgba(0,0,0,.85);opacity:.42}
-.hero__mock--1{--r:-7deg;top:8%;right:30%;transform:rotate(-7deg);animation:heroFloat 9s var(--ease2) infinite alternate}
-.hero__mock--2{--r:6deg;top:33%;right:1%;width:166px;transform:rotate(6deg);animation:heroFloat 11s var(--ease2) infinite alternate-reverse}
-.hero__mock--3{--r:4deg;bottom:-6%;right:37%;width:150px;opacity:.3;transform:rotate(4deg);animation:heroFloat 13s var(--ease2) infinite alternate}
-@keyframes heroFloat{from{transform:translateY(0) rotate(var(--r,0deg))}to{transform:translateY(-22px) rotate(var(--r,0deg))}}
-@media (max-width:1080px){.hero__life{display:none}}
+.hero__cred{margin-top:32px;display:inline-flex;flex-wrap:wrap;align-items:center}
+.hero__cred b{position:relative;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);font-weight:500;padding:4px 16px}
+.hero__cred b:first-child{padding-left:0}
+.hero__cred b:not(:last-child)::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:1px;height:12px;background:var(--border-strong)}
+.hero__cred .g{color:var(--accent)}
+@media (max-width:560px){.hero__cred b{padding:4px 11px}.hero__cred b:first-child{padding-left:0}}
 .author{display:inline-flex;align-items:center;gap:12px;padding:7px 14px 7px 7px;border:1px solid var(--border-strong);border-radius:999px;background:var(--glass);margin-bottom:30px}
 .author img{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent);object-fit:cover}
 .author b{font-size:14px;font-weight:700;color:var(--text-strong);display:block;line-height:1.15}
@@ -488,7 +484,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 </style>
 </head>
 <body>
-<div class="aurora" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- INTRO -->
@@ -516,11 +511,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
 <!-- ACT 01 — HERO -->
 <section class="scene hero" id="act-1" data-rail="Wstęp">
-    <div class="hero__life" aria-hidden="true">
-        <img src="/img/makiety/bodyrelief-pistolet.webp" class="hero__mock hero__mock--1" alt="" loading="lazy">
-        <img src="/img/makiety/cichopies-opaska.webp" class="hero__mock hero__mock--2" alt="" loading="lazy">
-        <img src="/img/makiety/emastiff-kamera.webp" class="hero__mock hero__mock--3" alt="" loading="lazy">
-    </div>
     <div class="scene__in">
         <div class="author" data-reveal>
             <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="38" height="38">
@@ -528,6 +518,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         </div>
         <h1 data-reveal data-delay="80">Zbuduję <span class="ci">Ci</span> <span class="g">e-sklep.</span><span class="coda">Osobiście.</span></h1>
         <p class="hero__sub" data-reveal data-delay="200">Buduję. Uczę. <span class="g">Oddaję stery, kiedy działa.</span></p>
+        <div class="hero__cred" data-reveal data-delay="320"><b>15 lat w e-biznesie</b><b><span class="g">70 mln zł</span></b><b>3 firmy od zera</b></div>
     </div>
     <div class="hero__scroll"><span>scroll</span><span class="a"></span></div>
 </section>
