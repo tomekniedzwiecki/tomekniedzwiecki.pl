@@ -1593,7 +1593,7 @@
     button.pjx:hover, a.pjx:hover { border-color: rgba(255, 255, 255, .2); }
     button.pjx:focus-visible, a.pjx:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .pjx--3 { grid-column: span 3; } .pjx--2 { grid-column: span 2; } .pjx--4 { grid-column: span 4; } .pjx--6 { grid-column: span 6; }
-    .pjx--hero { min-height: 296px; }
+    .pjx--hero { min-height: 240px; }
     .pjx__no { position: absolute; top: 14px; left: 16px; font-family: var(--mono); font-size: 11px; font-weight: 600; color: #5a5a5a; }
     .pjx__dot { position: absolute; top: 15px; right: 16px; display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--text-muted); }
     .pjx__dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #3a3a3a; }
@@ -1606,7 +1606,7 @@
     .pjx-metric b { display: block; font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 18px; letter-spacing: -.03em; color: var(--text-strong); }
     .pjx-metric span { font-size: 10.5px; color: var(--text-muted); }
     /* okładka produktu (wypełnia hero) */
-    .pjx-cover { width: 100%; flex: 1 1 auto; min-height: 130px; border-radius: 9px; overflow: hidden; border: 1px solid var(--glass-border); background: #111; }
+    .pjx-cover { width: 100%; flex: 1 1 auto; min-height: 130px; max-height: 168px; border-radius: 9px; overflow: hidden; border: 1px solid var(--glass-border); background: #111; }
     .pjx-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
     /* marka: biały swatch + meta */
     .pjx-swatch { display: grid; place-items: center; background: #fff; border-radius: 10px; padding: 16px 18px; min-height: 84px; }
@@ -9563,7 +9563,7 @@
     function pjxTileSklep() {
         var dom = (state.brand && state.brand.chosen_domain) || 'twojadomena.pl';
         if (state.landingHtml) {
-            return '<button type="button" class="pjx pjx--4" data-go-tab="sklep">' + pjxNo('07') + pjxDot('on', 'wersja wstępna') +
+            return '<button type="button" class="pjx pjx--3" data-go-tab="sklep">' + pjxNo('07') + pjxDot('on', 'wersja wstępna') +
                 '<span class="pjx__t">Sklep</span>' +
                 '<span class="pjx-win"><span class="pjx-win__bar"><span class="pjx-win__dots"><i></i><i></i><i></i></span><span class="pjx-win__addr">' + esc(dom) + '</span></span>' +
                 '<span class="pjx-win__view"><iframe sandbox="" loading="lazy" tabindex="-1" srcdoc="' + esc(state.landingHtml) + '"></iframe></span></span>' +
@@ -9571,17 +9571,17 @@
                 '<span class="pjx__sub">Wersja wstępna — dopracujemy ją razem po starcie współpracy.</span></button>';
         }
         if (extras.landing === 'fail') {
-            return '<div class="pjx pjx--4">' + pjxNo('07') + pjxDot('', 'błąd') + '<span class="pjx__t">Sklep</span>' + pjxFail('landing', 'Nie udało się zbudować sklepu.') + '</div>';
+            return '<div class="pjx pjx--3">' + pjxNo('07') + pjxDot('', 'błąd') + '<span class="pjx__t">Sklep</span>' + pjxFail('landing', 'Nie udało się zbudować sklepu.') + '</div>';
         }
         if (extras.landingTab === 'gen' || landingGen) {
-            return '<div class="pjx pjx--4">' + pjxNo('07') + pjxDot('gen', 'buduję') +
+            return '<div class="pjx pjx--3">' + pjxNo('07') + pjxDot('gen', 'buduję') +
                 '<span class="pjx__t">Sklep</span>' +
                 '<span class="pjx-win"><span class="pjx-win__bar"><span class="pjx-win__dots"><i></i><i></i><i></i></span><span class="pjx-win__addr">' + esc(dom) + '<span class="cur">|</span></span></span>' +
                 '<span class="pjx-win__view pjx-win__view--sk"><span class="pjx-sk" style="position:absolute;inset:10px;border-radius:6px"></span></span></span>' +
                 genProgressHTML('landing', 'Buduję działający sklep…', 'prawdziwa strona w przeglądarce, nie grafika — ok. 4 min') + '</div>';
         }
         var limit = extras.landing === 'limit';
-        return '<div class="pjx pjx--4">' + pjxNo('07') + pjxDot('', 'wkrótce') +
+        return '<div class="pjx pjx--3">' + pjxNo('07') + pjxDot('', 'wkrótce') +
             '<span class="pjx__t">Sklep</span>' +
             '<span class="pjx-win"><span class="pjx-win__bar"><span class="pjx-win__dots"><i></i><i></i><i></i></span><span class="pjx-win__addr" style="color:#5a5a5a">twojadomena.pl</span></span>' +
             '<span class="pjx-win__view pjx-win__view--sk"><span class="pjx-slot" style="position:absolute;inset:12px">' + PJX_PH + '</span></span></span>' +
@@ -9598,7 +9598,7 @@
         var cta = full
             ? '<button type="button" class="pjx-cta" data-pjx-resv>Rezerwuję współpracę →</button><span class="pjx-cap">500 zł — zwrotna rezerwacja, nie zadatek</span>'
             : '<button type="button" class="pjx-cta pjx-cta--ghost" data-go-chat>' + (done > 0 ? 'Wróć do rozmowy →' : 'Zacznij rozmowę →') + '</button>';
-        return '<div class="pjx pjx--2">' + pjxNo('08') + pjxDot(full ? 'on' : '', 'co dalej') +
+        return '<div class="pjx pjx--3">' + pjxNo('08') + pjxDot(full ? 'on' : '', 'co dalej') +
             '<span class="pjx__t">Co dalej</span><span class="pjx-bigcount">' + esc(head) + '</span>' +
             '<span class="pjx-steps">' + list + '</span><span class="pjx-resv">' + cta + '</span></div>';
     }
