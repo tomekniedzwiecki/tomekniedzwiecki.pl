@@ -2135,8 +2135,13 @@
     /* Miniaturki wygenerowanej treści w kartach czatu (makiety/reklamy/sklep) */
     .genthumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 2px 0 10px; }
     .genthumbs--one { grid-template-columns: 1fr; max-width: 240px; }
+    /* makiety = pionowe strony sklepu → jak w pulpicie: 2×2, wyższe kafle, kadr od góry
+       (logo/hero widoczne), nie kwadratowy przycięty środek */
+    .genthumbs--mk { grid-template-columns: 1fr 1fr; gap: 8px; max-width: 420px; }
     .genthumb { display: block; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 1px solid var(--glass-border, rgba(255,255,255,.1)); background: #0c0c0e; cursor: pointer; transition: border-color .15s; }
     .genthumbs--one .genthumb { aspect-ratio: 4/3; }
+    .genthumbs--mk .genthumb { aspect-ratio: 4/5; }
+    .genthumbs--mk .genthumb img { object-position: top; }
     .genthumb:hover { border-color: rgba(37,99,235,.6); }
     .genthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
@@ -8313,7 +8318,8 @@
         else if (stage === 'reklamy') urls = (state.suiteAds || []).map(function (a) { return a && a.image_url; }).filter(Boolean).slice(0, 4);
         else if (stage === 'sklep') { var mk = (state.mockups || []).filter(function (m) { return m && m.style === state.chosenStyle; })[0] || (state.mockups || [])[0]; if (mk && mk.url) urls = [mk.url]; }
         if (!urls.length) return '';
-        return '<div class="genthumbs' + (urls.length === 1 ? ' genthumbs--one' : '') + '">' + urls.map(function (u) { return '<span class="genthumb"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '"></span>'; }).join('') + '</div>';
+        var gcls = (urls.length === 1 ? ' genthumbs--one' : (stage === 'makiety' ? ' genthumbs--mk' : ''));
+        return '<div class="genthumbs' + gcls + '">' + urls.map(function (u) { return '<span class="genthumb"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '"></span>'; }).join('') + '</div>';
     }
     function genCardReadyInChat(id, doneLabel, openTab, btnLabel) {
         var card = el(id);
