@@ -3089,6 +3089,10 @@
     .pbar__label { flex: 0 0 auto; font-size: 12.5px; color: var(--text); white-space: nowrap; display: flex; gap: 7px; align-items: baseline; }
     .pbar__label .pbar__cur { font-weight: 600; }
     .pbar__label .pbar__count { color: var(--text-muted); font-family: var(--mono); font-size: 11px; }
+    /* mikro-CTA „Twój ruch" (R9): akcent, gdy aktywny etap czeka na decyzję usera */
+    .pbar__cta { font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; color: #00150c; background: var(--accent); border: 0; border-radius: 999px; padding: 3px 11px; white-space: nowrap; transition: filter .15s; }
+    .pbar__cta:hover { filter: brightness(1.08); }
+    .pbar__cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     @media (max-width: 560px) { .pbar { padding: 8px 13px; gap: 10px; } .pbar__label { font-size: 12px; } .pbar__dot { width: 10px; height: 10px; } }
     @media (prefers-reduced-motion: reduce) { .pbar__dot.is-active { animation: none; } }
 
@@ -10501,15 +10505,17 @@
     // 8 etapów lejka; każdy „zrobiony / w toku / przed nami". Pokazuje się dopiero po
     // wyborze produktu (flow ruszyło) i znika w trybie know-how. Kropka „zrobione" i
     // „w toku" są klikalne → przeskok do tej zakładki (redukuje „nie wiem gdzie to jest").
+    // act/actReady (R9 audyt): gdy AKTYWNY etap czeka na DECYZJĘ usera (a artefakt już gotowy),
+    // pasek dopisuje mikro-CTA „— wybierz styl" itp., żeby user wiedział, że to JEGO ruch.
     var PBAR_STAGES = [
-        { label: 'Produkt', tab: 'chat', done: function () { return !!(state.chosenProduct && state.chosenProduct.id); } },
+        { label: 'Produkt', tab: 'chat', done: function () { return !!(state.chosenProduct && state.chosenProduct.id); }, act: 'wybierz produkt', actReady: function () { return true; } },
         { label: 'Raport', tab: 'rynek', done: function () { return !!state.raport; } },
         { label: 'Ustalenia', tab: 'ustalenia', done: function () { return !!state.ustalenia; } },
-        { label: 'Marka', tab: 'chat', done: function () { return !!state.brandDone; } },   // wybór nazwy/logo jest w czacie (renderBrandPicker)
-        { label: 'Makiety', tab: 'makiety', done: function () { return !!(state.mockups && state.mockups.length); } },
+        { label: 'Marka', tab: 'chat', done: function () { return !!state.brandDone; }, act: 'wybierz nazwę', actReady: function () { return !!state.ustalenia; } },   // wybór nazwy/logo jest w czacie (renderBrandPicker)
+        { label: 'Makiety', tab: 'makiety', done: function () { return !!(state.mockups && state.mockups.length); }, act: 'wybierz styl', actReady: function () { return !!(state.mockups && state.mockups.length); } },
         { label: 'Reklamy', tab: 'reklamy', done: function () { return !!(state.suiteAds && state.suiteAds.length); } },
         { label: 'Sklep', tab: 'sklep', done: function () { return !!state.landingHtml; } },
-        { label: 'Rezerwacja', tab: 'wspolpraca', done: function () { return !!state.paid; } }
+        { label: 'Rezerwacja', tab: 'wspolpraca', done: function () { return !!state.paid; }, act: 'zarezerwuj', actReady: function () { return !!state.landingHtml; } }
     ];
     function updateProgressBar() {
         var bar = el('pbar'); if (!bar) return;
@@ -10526,8 +10532,15 @@
             return '<button type="button" class="pbar__dot ' + cls + '" data-tab="' + s.tab + '" data-i="' + i + '" title="' + esc(s.label) + '" aria-label="' + esc(s.label) + (states[i] ? ' — gotowe' : (i === activeIdx ? ' — w toku' : ' — przed nami')) + '"></button>';
         }).join('');
         bar.hidden = false;
+        // mikro-CTA: tylko gdy aktywny etap czeka na DECYZJĘ usera i artefakt jest gotowy
+        var showAct = activeIdx >= 0 && cur.act && typeof cur.actReady === 'function' && cur.actReady() && !streaming;
+        var labelRight = showAct
+            ? '<button type="button" class="pbar__cta" data-tab="' + cur.tab + '">' + esc(cur.act) + ' →</button>'
+            : '<span class="pbar__count">etap ' + stageNum + '/' + PBAR_STAGES.length + '</span>';
         bar.innerHTML = '<div class="pbar__track">' + dots + '</div>' +
-            '<div class="pbar__label"><span class="pbar__cur">' + esc(cur.label) + '</span><span class="pbar__count">etap ' + stageNum + '/' + PBAR_STAGES.length + '</span></div>';
+            '<div class="pbar__label"><span class="pbar__cur">' + esc(cur.label) + '</span>' + labelRight + '</div>';
+        var ctaBtn = bar.querySelector('.pbar__cta');
+        if (ctaBtn) ctaBtn.addEventListener('click', function () { if (typeof switchTab === 'function') switchTab(ctaBtn.getAttribute('data-tab')); });
         Array.prototype.forEach.call(bar.querySelectorAll('.pbar__dot'), function (b) {
             b.addEventListener('click', function () {
                 var idx = +b.getAttribute('data-i');
