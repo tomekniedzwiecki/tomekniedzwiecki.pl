@@ -10903,7 +10903,7 @@
             return;
         }
         // KARUZELA (skill UI/UX): jedna DUŻA makieta centralnie + strzałki + miniatury + CTA.
-        var pickBanner = state.chosenStyle ? '' : '<div class="mk-pickbanner"><b>Wybierz styl, żeby zbudować resztę.</b> Po Twoim wyborze reklamy i sklep złożą się automatycznie.</div>';
+        var pickBanner = state.chosenStyle ? '' : '<div class="mk-pickbanner"><b>Wybierz styl, żeby zbudować resztę.</b> Po Twoim wyborze reklamy i sklep złożą się automatycznie — poproszę jeszcze tylko o numer telefonu, żeby wysłać Ci SMS, gdy będą gotowe.</div>';
         var startIdx = 0;
         for (var ci = 0; ci < mk.length; ci++) { if (state.chosenStyle && mk[ci] && mk[ci].style === state.chosenStyle) { startIdx = ci; break; } }
         body.innerHTML = head + pickBanner +
