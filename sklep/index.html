@@ -8346,7 +8346,7 @@
         // KULMINACJA: na resume ZIELONEJ sesji wróć z kartą zielonego światła + CTA rezerwacji
         // W CZACIE (nie tylko w zakładce Współpraca). Bez tego najgorętszy lead (zakwalifikowany,
         // wraca) widzi 5 kart proof, ale NIE wie, że następny krok = rezerwacja. zl-card guard = idempotentne.
-        if (state.verdict === 'zielony' && !el('zl-card') && !gateContactMissing()) { try { showGreenLight(state.karta || {}, false); } catch (e) {} }
+        if (state.verdict === 'zielony' && !el('zl-card') && !state.paid) { try { showGreenLight(state.karta || {}, false); } catch (e) {} }
     }
     // ── SEKWENCYJNE ODSŁANIANIE (anty-przytłoczenie, decyzja Tomka) ──────────────
     // W czacie pokazujemy JEDNĄ kartę etapu na raz — najbliższą realizacji. Reszta
