@@ -107,7 +107,7 @@
     <!-- Preconnect: Google Fonts (LCP optymalizacja) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
 
     <!-- Preload hero avatar + logo (LCP) -->
     <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
@@ -311,18 +311,32 @@
            (na czarnym tle) — zero nakładania podpisu na treść hero */
         transition: background 0.7s var(--ease) 0.22s;
     }
-    /* aurora-glow — przesunięta w PRAWO, pod portret (asymetria okładki) */
+    /* aurora-glow — green (pod portret, prawo) + blue (dół-lewo); bez siatki, miękki */
     .hello-intro::before {
         content: '';
         position: absolute;
-        top: 46%; left: 66%;
-        width: clamp(440px, 56vw, 900px);
+        top: 44%; left: 72%;
+        width: clamp(460px, 58vw, 940px);
         aspect-ratio: 1;
         transform: translate(-50%, -50%);
         background: radial-gradient(circle at center,
-            rgba(0, 217, 126, 0.14) 0%,
-            rgba(255, 75, 62, 0.05) 44%,
-            transparent 72%);
+            rgba(0, 217, 126, 0.18) 0%,
+            rgba(0, 217, 126, 0.05) 44%,
+            transparent 70%);
+        filter: blur(100px);
+        pointer-events: none;
+        transition: opacity 0.6s var(--ease) 0.22s;
+    }
+    .hello-intro::after {
+        content: '';
+        position: absolute;
+        top: 82%; left: 14%;
+        width: clamp(340px, 44vw, 700px);
+        aspect-ratio: 1;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle at center,
+            rgba(77, 159, 255, 0.12) 0%,
+            transparent 66%);
         filter: blur(110px);
         pointer-events: none;
         transition: opacity 0.6s var(--ease) 0.22s;
@@ -384,7 +398,7 @@
         letter-spacing: -0.045em;
         color: var(--text-strong);
         margin: 0;
-        font-size: clamp(52px, 8vw, 116px);
+        font-size: clamp(46px, 6.8vw, 98px);
     }
     .hello-intro__line { display: block; overflow: hidden; }
     .hello-intro__line > span { display: inline-block; transform: translateY(110%); will-change: transform; }
@@ -392,10 +406,10 @@
     .hello-intro__line:nth-child(2) > span { animation: helloLineIn 1.0s var(--ease) 0.50s forwards; }
     @keyframes helloLineIn { to { transform: translateY(0); } }
     .hello-intro__line--serif > span {
-        font-family: var(--serif);
-        font-style: italic;
-        font-weight: 400;
-        letter-spacing: -0.02em;
+        font-family: 'Archivo', var(--sans);
+        font-style: normal;
+        font-weight: 900; /* nazwisko: Archivo 900 — mocny, wyrazisty grotesk */
+        letter-spacing: -0.045em;
         color: var(--text);
         padding-bottom: 0.08em; /* zejście dolnych wydłużeń (ż,ę) spod clipu */
     }
@@ -448,20 +462,22 @@
     /* PORTRET — duży, ring + glow, prawa strona okładki */
     .hello-intro__avatar {
         flex-shrink: 0;
-        width: clamp(200px, 28vw, 300px);
-        height: clamp(200px, 28vw, 300px);
+        width: clamp(184px, 24vw, 268px);
+        height: clamp(184px, 24vw, 268px);
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid var(--accent-green);
         box-shadow: 0 0 0 6px var(--accent-green-soft), 0 30px 80px rgba(0, 0, 0, 0.6);
         transform-origin: center center;
         opacity: 0;
-        animation: helloAvatarIn 1.0s var(--ease) 0.2s forwards;
+        animation: helloAvatarIn 1.25s cubic-bezier(0.34, 1.28, 0.5, 1) 0.25s forwards;
         will-change: transform, opacity;
     }
+    /* avatar „wykwita" od punktu i poszerza się do pełnego koła */
     @keyframes helloAvatarIn {
-        from { opacity: 0; transform: scale(0.82); }
-        to   { opacity: 1; transform: scale(1); }
+        0%   { opacity: 0; transform: scale(0); }
+        14%  { opacity: 1; }
+        100% { opacity: 1; transform: scale(1); }
     }
 
     /* wejścia pasków meta (fade-in z lekkim stagger) */
@@ -480,7 +496,7 @@
        fill:forwards (nadpisałyby tu opacity). JS pinuje bieżący stan, zdejmuje
        animację i dopiero wtedy przenika do 0 — patrz settle(). */
     .hello-intro.is-settling { background: transparent; pointer-events: none; }
-    .hello-intro.is-settling::before { opacity: 0; }
+    .hello-intro.is-settling::before, .hello-intro.is-settling::after { opacity: 0; }
     .hello-intro__avatar.is-flying { z-index: 2; }
 
     /* ── MOBILE — osobno (≤820px): portret NAD imieniem, lewa oś (spójnie z
@@ -1844,7 +1860,6 @@
         <div class="hello-intro__bar hello-intro__bar--top">
             <img class="hello-intro__logo hello-fade" src="https://tomekniedzwiecki.pl/img/logo/tn-logo-white-88.png"
                  alt="tomekniedzwiecki.pl" width="244" height="32">
-            <span class="hello-intro__meta hello-intro__meta--est hello-fade">EST. 2010 — 15 lat</span>
         </div>
 
         <!-- kompozycja: imię (lewo) + portret (prawo) -->
