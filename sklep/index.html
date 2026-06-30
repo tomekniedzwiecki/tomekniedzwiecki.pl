@@ -6714,6 +6714,7 @@
                 if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                 persistSession();
                 changed = true;
+                setTimeout(renderPhoneAsk, 1800);   // R1: makiety doszły sync'iem → miękko pytamy o telefon
             }
             var srvAds = Array.isArray(p.session_ads) ? p.session_ads : (Array.isArray(p.ads) ? p.ads : null);
             if (srvAds && srvAds.length && JSON.stringify(srvAds) !== JSON.stringify(state.suiteAds)) {
@@ -10540,6 +10541,7 @@
                 if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
                     state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle'; clearGenFail('makiety');
                     genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
+                    setTimeout(renderPhoneAsk, 1800);   // R1: makiety = PIERWSZY duży proof, PRZED długim gen reklam/sklepu (gdzie niecierpliwi drift'ują) → tu pytamy o telefon (SMS o postępie)
                     if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                     updateBudNav();
                     if (activeTab === 'makiety') renderPaneMakiety();
