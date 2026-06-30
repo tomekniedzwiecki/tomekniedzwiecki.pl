@@ -2036,8 +2036,8 @@
     .mk-card__img.mk-noimg::after { content: 'Podgląd makiety'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12.5px; }
     .mk-zoom { position: absolute; top: 9px; right: 9px; width: 32px; height: 32px; border: 0; border-radius: 8px; background: rgba(0, 0, 0, 0.55); color: #fff; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
     .mk-zoom:hover { background: rgba(0, 0, 0, 0.82); }
-    .mk-pickbanner { margin: 0 0 14px; padding: 11px 14px; border: 1px solid rgba(37, 99, 235, 0.4); background: rgba(37, 99, 235, 0.1); border-radius: 12px; font-size: 13.5px; color: var(--text, #e7e7ea); line-height: 1.5; }
-    .mk-pickbanner b { color: #5b9bff; }
+    .mk-pickbanner { margin: 0 0 14px; padding: 11px 14px; border: 1px solid var(--glass-border, rgba(255,255,255,.1)); background: rgba(255,255,255,.03); border-radius: 12px; font-size: 13.5px; color: var(--text, #e7e7ea); line-height: 1.5; }
+    .mk-pickbanner b { color: var(--text-strong, #fff); }
     /* Karta Ustaleń — czytelne wiersze etykieta/wartość zamiast reużycia stylów raportu */
     .ust-card { display: flex; flex-direction: column; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 16px; background: rgba(255, 255, 255, 0.025); overflow: hidden; }
     .ust-row { padding: 14px 16px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
@@ -2124,8 +2124,8 @@
     .stagebar { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; padding: 11px 14px; border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)); border-radius: 12px; background: rgba(12, 12, 14, 0.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
     .stagebar__txt { flex: 1; min-width: 200px; font-size: 13px; line-height: 1.5; color: var(--text-muted, #a1a1a1); }
     .stagebar__txt b { color: var(--text, #ededed); }
-    .stagebar__cta { flex: 0 0 auto; padding: 8px 14px; border: 1px solid rgba(0, 112, 243, 0.5); border-radius: 8px; background: rgba(0, 112, 243, 0.12); color: #5b9bff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-    .stagebar__cta:hover { background: rgba(0, 112, 243, 0.22); color: #fff; }
+    .stagebar__cta { flex: 0 0 auto; padding: 8px 14px; border: 1px solid rgba(0, 217, 126, 0.45); border-radius: 8px; background: rgba(0, 217, 126, 0.12); color: #00d97e; font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+    .stagebar__cta:hover { background: rgba(0, 217, 126, 0.2); }
     /* Nagłówek marki „Sklep" w panelu bocznym (badge z logo marki usunięty — pokazujemy logo tylko na karcie „Marka gotowa" w czacie) */
     .side__brand { margin: 2px 0 8px; }
     /* „Wybrany produkt" jako zwykła pozycja menu (miniaturka zamiast ikony) */
@@ -2146,7 +2146,7 @@
     .genthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     /* Karty etapów w czacie (raport/ustalenia/makiety/reklamy/sklep) — spójny, on-brand styl */
     .gcard { margin: 12px 0; padding: 14px 15px 15px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; background: rgba(255,255,255,.025); }
-    .gcard--done { border-color: rgba(0,217,126,.20); background: linear-gradient(180deg, rgba(0,217,126,.05), rgba(255,255,255,.012)); }
+    .gcard--done { border-color: rgba(255,255,255,.10); background: rgba(255,255,255,.025); }
     .gcard__head { display: flex; align-items: center; gap: 11px; }
     .gcard__ic { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(0,217,126,.13); color: #00d97e; flex: none; font-size: 18px; }
     .gcard__tt { min-width: 0; flex: 1; }
@@ -2169,7 +2169,14 @@
     .mk-card--skel .mk-card__img { display: flex; align-items: center; justify-content: center; }
     .mk-skel-line { height: 13px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); width: 70%; }
     .mk-skel-btn { height: 40px; border-radius: 11px; background: rgba(255, 255, 255, 0.05); margin-top: auto; }
-    .sk-frame-wrap { border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; background: #fff; height: min(72vh, 760px); }
+    /* Ramka PRZEGLĄDARKI dla podglądu sklepu — jasny sklep czyta się jako „strona www", nie nagłe rozjaśnienie.
+       Spójne z mockupowym traktowaniem reklam; premium kontener z chrome + cieniem (audyt UX 2026-07-01). */
+    .sk-browser { border: 1px solid var(--border-strong, rgba(255,255,255,.12)); border-radius: 14px; overflow: hidden; box-shadow: 0 22px 60px -24px rgba(0,0,0,.75); background: #1a1a1d; }
+    .sk-browser__bar { display: flex; align-items: center; gap: 12px; padding: 9px 14px; background: #202024; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .sk-browser__dots { display: inline-flex; gap: 6px; flex: none; }
+    .sk-browser__dots i { width: 11px; height: 11px; border-radius: 50%; background: #3a3a40; display: block; }
+    .sk-browser__url { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text-muted); font-family: var(--mono, monospace); background: #141418; border-radius: 7px; padding: 5px 12px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sk-frame-wrap { border: 0; border-radius: 0; overflow: hidden; background: #fff; height: min(70vh, 740px); }
     .sk-frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
     .sk-actions { display: flex; justify-content: center; margin-top: 16px; }
 
@@ -8600,7 +8607,7 @@
         div.id = id;
         div.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid rgba(245,158,11,.35);border-radius:14px;background:rgba(245,158,11,.08)';
         div.innerHTML = '<div style="font-size:13px;color:var(--text,#e7e7ea);margin-bottom:8px">Generowanie ' + lab + ' trwa dłużej niż zwykle. Możesz spróbować ponownie — reszta etapów jest niezależna, więc spokojnie idziemy dalej.</div>' +
-            '<button type="button" id="' + id + '-retry" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">Spróbuj ponownie</button>';
+            '<button type="button" id="' + id + '-retry" class="gcard__cta" style="margin-top:0">Spróbuj ponownie</button>';
         el('chat-msgs').appendChild(div);
         scrollToBottom(false);
         var b = el(id + '-retry');
@@ -10848,8 +10855,14 @@
     function renderBudgetSoftExit() {
         if (el('budget-softexit')) return;
         var div = document.createElement('div'); div.className = 'msg msg--ai'; div.id = 'budget-softexit';
-        div.innerHTML = renderRich('Doceniam szczerość. Żeby ruszyć z własnym sklepem na poważnie, warto mieć trochę na start — reklamy i pierwsze zamówienia. **Zostawiam Ci gotowy raport rynku** (masz go w „Potencjał rynku") — wróć, kiedy będziesz gotowy, a wtedy dokończymy resztę: markę, sklep i kreacje reklamowe. Trzymam Twój projekt. A jeśli budżet się znajdzie — po prostu napisz.');
+        div.innerHTML = renderRich('Doceniam szczerość. Żeby ruszyć z własnym sklepem na poważnie, warto mieć trochę na start — reklamy i pierwsze zamówienia. **Zostawiam Ci gotowy raport rynku** — wróć, kiedy będziesz gotowy, a wtedy dokończymy resztę: markę, sklep i kreacje reklamowe. Trzymam Twój projekt. A jeśli budżet się znajdzie — po prostu napisz.') +
+            '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">' +
+              '<button type="button" class="gcard__cta" id="bse-raport" style="margin-top:0">Pokaż mój raport →</button>' +
+              '<button type="button" class="fct-link" id="bse-back">Wróć do rozmowy</button>' +
+            '</div>';
         el('chat-msgs').appendChild(div); scrollToBottom(true);
+        var r = el('bse-raport'); if (r) r.addEventListener('click', function () { switchTab('rynek'); });
+        var bk = el('bse-back'); if (bk) bk.addEventListener('click', function () { var ci = el('chat-input'); if (ci) { try { ci.focus(); } catch (e) {} } });
         try { gaEvent('app_budget_softexit', {}); } catch (e) {}
     }
     function syncBudgetToServer(b) {
@@ -11425,8 +11438,13 @@
             '<h2 class="tabpane__title">Podgląd Twojego sklepu</h2>' +
             '<p class="tabpane__sub">Tak będzie wyglądać Twój sklep — to podgląd, pokaz możliwości. Finalną wersję pod klucz (płatności, wdrożenie, dostawca, kampanie) buduje Tomek z zespołem po wejściu we współpracę.</p></div>';
         if (state.landingHtml) {
+            var _bd = (state.brand && (state.brand.chosen_domain || (state.brand.chosen_name ? state.brand.chosen_name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.pl' : ''))) || 'twojsklep.pl';
             body.innerHTML = head +
-                '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
+                '<div class="sk-browser">' +
+                  '<div class="sk-browser__bar"><span class="sk-browser__dots"><i></i><i></i><i></i></span>' +
+                  '<span class="sk-browser__url">🔒 ' + esc(_bd) + '</span></div>' +
+                  '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
+                '</div>' +
                 '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button>' +
                 // #5: CTA do współpracy ZAWSZE gdy sklep gotowy (nie tylko po zielonym świetle) —
                 // to peak motywacji; gorący lead nie może utknąć bez ścieżki dalej.
