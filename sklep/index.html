@@ -8310,7 +8310,7 @@
         // „nie pokazuj w całości, tylko pasek"). Bez nagłówka „Analizuję rynek dla X"
         // ani akapitu — te treści i tak mówi AI w rozmowie.
         if (done) {
-            return gcardInner('ph-chart-line-up', 'Raport potencjału rynku — gotowy', 'rk-chat-open', 'Zobacz raport →', '', 'gotowe');
+            return gcardInner('rk-chat-card', 'Raport potencjału rynku — gotowy', 'rk-chat-open', 'Zobacz raport →', '', 'gotowe');
         }
         // Loader raportu = pasek postępu + lista WSZYSTKIEGO, co powstaje za darmo w tej
         // rozmowie (żeby cisza w trakcie liczenia raportu była „produktywna" i było widać,
@@ -8423,13 +8423,23 @@
         var gcls = (urls.length === 1 ? ' genthumbs--one' : (stage === 'makiety' ? ' genthumbs--mk' : ''));
         return '<div class="genthumbs' + gcls + '">' + urls.map(function (u) { return '<span class="genthumb"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '"></span>'; }).join('') + '</div>';
     }
-    // Ikona etapu per karta (Phosphor) + spójny render wnętrza karty etapu w czacie.
-    var GCARD_ICONS = { 'rk-chat-card': 'ph-chart-line-up', 'us-chat-card': 'ph-target', 'mk-chat-card': 'ph-squares-four', 'ad-chat-card': 'ph-megaphone', 'ln-chat-card': 'ph-storefront' };
-    function gcardInner(icon, title, btnId, btnLabel, thumbsHTML, badge) {
+    // Ikona etapu per karta (inline SVG — front NIE ładuje fontu Phosphor) + spójny render wnętrza karty.
+    var GCARD_SVG = {
+        'rk-chat-card': '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
+        'us-chat-card': '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+        'mk-chat-card': '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+        'ad-chat-card': '<path d="m3 11 16-6v14L3 13z"/><path d="M11.5 16.7a3 3 0 0 1-5.4-1.2"/>',
+        'ln-chat-card': '<path d="M3.5 9 5 4h14l1.5 5"/><path d="M5 9v11h14V9"/><path d="M9.5 20v-5h5v5"/>'
+    };
+    function gcardSvg(key) {
+        var paths = GCARD_SVG[key] || '<path d="M20 6 9 17l-5-5"/>';
+        return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">' + paths + '</svg>';
+    }
+    function gcardInner(svgKey, title, btnId, btnLabel, thumbsHTML, badge) {
         var lbl = String(btnLabel || 'Zobacz').replace(/\s*→\s*$/, '');
-        return '<div class="gcard__head"><span class="gcard__ic"><i class="ph ' + (icon || 'ph-check-circle') + '"></i></span>' +
+        return '<div class="gcard__head"><span class="gcard__ic">' + gcardSvg(svgKey) + '</span>' +
             '<span class="gcard__tt"><span class="gcard__t">' + title + '</span></span>' +
-            (badge ? '<span class="gcard__badge"><i class="ph ph-check-circle"></i>' + badge + '</span>' : '') + '</div>' +
+            (badge ? '<span class="gcard__badge">' + badge + '</span>' : '') + '</div>' +
             (thumbsHTML || '') +
             '<button type="button" id="' + btnId + '" class="gcard__cta">' + lbl + ' <span class="gcard__arr">→</span></button>';
     }
@@ -8447,7 +8457,7 @@
         var bid = id + '-open';
         var stageMap = { 'mk-chat-card': 'makiety', 'ad-chat-card': 'reklamy', 'ln-chat-card': 'sklep' };
         var content = stageMap[id] ? genThumbs(stageMap[id]) : '';
-        card.innerHTML = gcardInner(GCARD_ICONS[id], doneLabel, bid, btnLabel, content, 'gotowe');
+        card.innerHTML = gcardInner(id, doneLabel, bid, btnLabel, content, 'gotowe');
         var b = el(bid); if (b) b.addEventListener('click', function () { switchTab(openTab); });
         Array.prototype.forEach.call(card.querySelectorAll('.genthumb'), function (t) { t.addEventListener('click', function () { switchTab(openTab); }); });
         // FIX(6): gotowa karta REKLAM = najnowsza wiadomość → na DÓŁ czatu (flip robił to w miejscu starego paska, wyżej).
