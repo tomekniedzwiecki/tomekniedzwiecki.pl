@@ -1805,6 +1805,22 @@
         transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
     }
 
+    /* wariant WYŚRODKOWANY (desktop) — nagłówek, oś czasu i stopka na środku.
+       Na mobile (oś pionowa) zostaje wyrównanie do lewej — patrz media niżej. */
+    @media (min-width: 761px) {
+        .record__head { text-align: center; }
+        .record__eyebrow { justify-content: center; }
+        .record__eyebrow::before { display: none; }
+        .record__num { justify-content: center; }
+        .record__lead { margin-left: auto; margin-right: auto; }
+        .record__foot { text-align: center; margin-left: auto; margin-right: auto; }
+        .record__glow { left: 50%; transform: translateX(-50%); }
+        .record__station { text-align: center; align-items: center; }
+        .record__node { left: 50%; transform: translateX(-50%); }
+        .record__desc { margin-left: auto; margin-right: auto; }
+        .record__badge { align-self: center; }
+    }
+
     /* MOBILE — oś obraca się do pionu (linia po lewej, stacje w stosie) */
     @media (max-width: 760px) {
         .record__spine {
