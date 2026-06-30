@@ -379,11 +379,12 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
 /* ============================================================ ACT 08 PROMISE / FREE LADDER */
 .free{position:relative}
+.free::before{content:'';position:absolute;left:50%;bottom:6%;width:min(60vw,640px);height:340px;transform:translateX(-50%);background:radial-gradient(60% 60% at 50% 50%,rgba(0,217,126,.11),transparent 66%);filter:blur(55px);z-index:-1;pointer-events:none}
 .free .scene__in{max-width:980px}
 .free__grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:40px}
 .free__i{display:flex;gap:15px;padding:20px 22px;border:1px solid var(--border);border-radius:14px;background:var(--glass);transition:.35s var(--ease)}
 .free__i:hover{border-color:rgba(0,217,126,.35);transform:translateY(-3px)}
-.free__ck{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(0,217,126,.3);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800}
+.free__ck{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(0,217,126,.3);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800}
 .free__i b{font-size:15.5px;font-weight:700;color:var(--text-strong);display:block;letter-spacing:-.01em}
 .free__i span{font-size:13.5px;color:var(--text-muted);line-height:1.45}
 .free__cta{margin-top:38px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
@@ -397,8 +398,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 /* ============================================================ ACT 09 OBJECTIONS */
 .obj{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;margin-top:42px}
 .cost{padding:30px 28px;border:1px solid var(--border-strong);border-radius:18px;background:var(--glass)}
+.cost__h{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--text-strong);margin-bottom:18px}
 .cost__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
-.cost__c{text-align:center;padding:16px 8px;border:1px solid var(--border);border-radius:13px;background:var(--bg-elev)}
+.cost__c{text-align:center;padding:16px 8px;border:1px solid var(--border);border-radius:13px;background:var(--bg-elev);transition:.3s var(--ease2)}
+.cost__c:hover{border-color:rgba(0,217,126,.35);transform:translateY(-3px)}
 .cost__c b{display:block;font-size:24px;font-weight:900;letter-spacing:-.03em;color:var(--accent);font-variant-numeric:tabular-nums}
 .cost__c span{display:block;margin-top:5px;font-size:11.5px;color:var(--text-muted);line-height:1.35}
 .cost__note{font-size:13.5px;color:var(--text-faint);line-height:1.55;padding-top:18px;border-top:1px solid var(--border)}
@@ -417,13 +420,15 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .final::before{content:'';position:absolute;top:50%;left:50%;width:min(70vw,720px);height:min(70vw,720px);transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(0,217,126,.14),transparent 62%);filter:blur(90px);z-index:-1}
 .final__eye{font-family:var(--serif);font-style:italic;font-size:clamp(20px,3vw,30px);color:var(--accent);margin-bottom:20px}
 .final h2{font-size:clamp(34px,6.4vw,76px);font-weight:900;letter-spacing:-.045em;line-height:1;color:var(--text-strong)}
-.final h2 .g{color:var(--accent)}
+.final h2 .g{color:var(--accent);text-shadow:0 0 70px rgba(0,217,126,.4)}
 .final__sub{font-size:clamp(16px,2.2vw,20px);color:var(--text-muted);max-width:48ch;margin:22px auto 0;line-height:1.5}
 .final__btn{margin-top:38px}
 .final__risk{margin-top:18px;font-size:14px;color:var(--text-faint)}
-.final__bar{margin-top:40px;display:inline-flex;gap:24px;flex-wrap:wrap;justify-content:center;padding-top:28px;border-top:1px solid var(--border)}
-.final__bar b{font-family:var(--mono);font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.final__bar{margin-top:40px;display:inline-flex;gap:0;flex-wrap:wrap;justify-content:center;padding-top:28px;border-top:1px solid var(--border)}
+.final__bar b{position:relative;padding:0 24px;font-family:var(--mono);font-size:13px;color:var(--text-muted);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.final__bar b:not(:last-child)::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:1px;height:13px;background:var(--border-strong)}
 .final__bar b .g{color:var(--accent)}
+@media (max-width:600px){.final__bar{gap:6px 14px}.final__bar b{padding:0}.final__bar b::after{display:none}}
 
 /* ============================================================ FOOTER */
 .foot{padding:38px 24px calc(38px + env(safe-area-inset-bottom));text-align:center;border-top:1px solid var(--border);background:var(--bg-elev)}
@@ -658,6 +663,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         <h2 class="h-sec" data-reveal data-delay="60">Masz prawo być nieufny.</h2>
         <div class="obj">
             <div class="cost" data-reveal data-delay="140">
+                <div class="cost__h">Koszty — wszystko wprost</div>
                 <div class="cost__grid">
                     <div class="cost__c"><b>500 zł</b><span>Rezerwacja rozmowy — w pełni zwrotna</span></div>
                     <div class="cost__c"><b>9400 zł</b><span>Budowa sklepu pod klucz (500 zł się wlicza)</span></div>
