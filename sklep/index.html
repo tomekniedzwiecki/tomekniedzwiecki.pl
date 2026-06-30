@@ -5862,6 +5862,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"></path><path d="M4 9h16v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M9 13h6"></path></svg>
                 <span class="side__label">Sklep</span><span class="side__status" data-status-for="sklep" hidden></span>
             </button>
+            <button type="button" class="side__item" data-tab="biznesplan" data-view="biznesplan" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M7 14l3-3 3 3 5-6"></path></svg>
+                <span class="side__label">Biznesplan</span><span class="side__status" data-status-for="biznesplan" hidden></span>
+            </button>
             <!-- relikty forku /stworze (economics/gtm/reklamy-dup/strona/prototyp) usunięte 2026-06-27 -->
             <button type="button" class="side__item side__item--ai" data-tab="wspolpraca">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 17a5 5 0 0 1-5 5H3v-3a5 5 0 0 1 5-5"></path><path d="M13 7a5 5 0 0 1 5-5h3v3a5 5 0 0 1-5 5"></path><path d="M8 16l8-8"></path></svg>
@@ -5931,6 +5935,7 @@
         <div class="tabpane" id="pane-makiety"><div class="tabpane__inner" id="pane-makiety-body"></div></div>
         <div class="tabpane" id="pane-reklamy"><div class="tabpane__inner" id="pane-reklamy-body"></div></div>
         <div class="tabpane" id="pane-sklep"><div class="tabpane__inner" id="pane-sklep-body"></div></div>
+        <div class="tabpane" id="pane-biznesplan"><div class="tabpane__inner" id="pane-biznesplan-body"></div></div>
         <div class="tabpane" id="pane-wspolpraca"><div class="tabpane__inner" id="pane-wspolpraca-body"></div></div>
     </section>
 
@@ -7443,6 +7448,7 @@
         if (tab === 'makiety') { renderPaneMakiety(); budSeen('makiety'); }
         if (tab === 'reklamy') { renderPaneReklamy(); budSeen('reklamy'); }
         if (tab === 'sklep') { renderPaneSklep(); budSeen('sklep'); }
+        if (tab === 'biznesplan') { renderPaneBiznesplan(); budSeen('biznesplan'); }
         if (tab === 'wspolpraca') renderPaneWspolpraca();
         // #9: 'rynek' WYKLUCZONY — renderPaneRynek ma własny sticky pasek „Co dalej" (lepszy dla
         // długiego raportu); injectStageBar dawał DRUGI pasek z inną treścią (szum/„bug").
@@ -8100,6 +8106,8 @@
                 persistSession();
                 extras.plan = 'idle';
                 pjNewPlan = true; // kropka na kaflu Plan — zdejmuje wejście w detal
+                updateBudNav();
+                if (activeTab === 'biznesplan') renderPaneBiznesplan();
             } else if (res.ok && res.d && res.d.pending) {
                 // generacja trwa w innej karcie/inwokacji — pasek zostaje,
                 // wynik dociągnie cykliczny sync; po TTL locka ponawiamy claim
@@ -8229,19 +8237,33 @@
     // req Tomka: gdy po wyborze stylu sklep/reklamy powstają w tle — proaktywne pytanie
     // kwalifikujące (ankieta) w czacie. Jedna tura; odpowiedź łapie extractSurveyAsync do CRM.
     function maybeQualifyDuringGen() {
+        // Pierwsza zaczepka kwalifikująca tuż po wyborze stylu — dalej ciągnie ENGAGE TICKER.
         if (!state.qualifyPending || !state.chosenStyle) return;
-        // R7 (anty-przytłoczenie): NIE pytamy o budżet w chaosie startu generacji (reklamy+sklep
-        // ruszają, zakładki się zapalają). Czekamy, aż wyląduje PIERWSZY deliverable — reklamy.
-        // Wtedy jest spokojny moment „wow" i pytanie o budżet pada PO dostarczeniu wartości.
-        if (!state.suiteAds) return;
-        // tylko gdy sklep jeszcze realnie się generuje (jest co robić w tle, jest pretekst do rozmowy)
-        var stillGen = !state.landingHtml || landingGen;
-        if (!stillGen) { state.qualifyPending = false; persistSession(); return; }
-        if (streaming || el('inline-gate') || el('qr-chips') || state.verdict === 'zielony') return;
-        state.qualifyPending = false; persistSession();   // jedna proaktywna tura kwalifikująca
+        if (streaming || el('inline-gate') || el('qr-chips') || el('budget-gate') || state.verdict === 'zielony') return;
+        state.qualifyPending = false; persistSession();
+        markActivity();
         setTimeout(function () {
-            if (!streaming && !el('inline-gate') && !el('qr-chips') && state.chosenStyle && state.verdict !== 'zielony') streamReply('', false, { qualifyEngage: true });
-        }, 3000);
+            if (!streaming && !el('inline-gate') && !el('qr-chips') && state.chosenStyle && state.verdict !== 'zielony') { markActivity(); streamReply('', false, { qualifyEngage: true }); }
+        }, 2500);
+    }
+    // ── ENGAGE TICKER (req Tomka): NIE zostawiaj usera samego w czasie DŁUGIEGO generowania
+    // (reklamy potrafią 9 min, sklep kilka). Gdy w tle coś się robi i user jest BEZCZYNNY,
+    // bot proaktywnie zadaje KOLEJNE pytanie z ankiety (czym się zajmujesz / co już próbował /
+    // ile czasu / budżet) — rozmowa żyje, a odpowiedzi lecą do CRM (extractSurveyAsync). Capped.
+    var _lastActivityAt = 0, engageTicker = null;
+    function markActivity() { _lastActivityAt = Date.now(); }
+    function anyGenActive() { return mockups4Gen || adsGen || landingGen || extras.mockups === 'gen' || extras.ads === 'gen' || extras.landingTab === 'gen'; }
+    function startEngageTicker() { if (engageTicker || typeof setInterval !== 'function') return; engageTicker = setInterval(function () { try { tickEngage(); } catch (e) {} }, 20000); }
+    function stopEngageTicker() { if (engageTicker) { clearInterval(engageTicker); engageTicker = null; } }
+    function tickEngage() {
+        if (!anyGenActive()) { stopEngageTicker(); return; }
+        if ((state.engageRounds || 0) >= 5) return;                 // nie nuż — limit rund
+        if (state.verdict === 'zielony' || state.paid) return;
+        if (streaming || el('inline-gate') || el('qr-chips') || el('phone-ask') || el('budget-gate')) return;
+        if (Date.now() - (_lastActivityAt || 0) < 70000) return;    // tylko gdy user realnie bezczynny ~70s
+        state.engageRounds = (state.engageRounds || 0) + 1; persistSession();
+        markActivity();
+        streamReply('', false, { qualifyEngage: true });            // bot zada KOLEJNE nieznane pytanie z ankiety
     }
     // #3: fetch z twardym timeoutem (AbortController). Na telefonie request bez
     // limitu potrafi wisieć w nieskończoność — tu po `ms` przerywamy go, a odrzut
@@ -8321,7 +8343,7 @@
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && state.suiteAds) return;
         if (adsGen) return;
-        adsGen = true;
+        adsGen = true; markActivity(); startEngageTicker();
         extras.ads = 'gen';
         if (typeof updateBudNav === 'function') updateBudNav();
         if (activeTab === 'reklamy') renderPaneReklamy();
@@ -8356,7 +8378,7 @@
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && state.landingHtml) return;
         if (landingGen) return;
-        landingGen = true;
+        landingGen = true; markActivity(); startEngageTicker();
         extras.landingTab = 'gen';
         if (typeof updateBudNav === 'function') updateBudNav();   // odsłania zakładkę „Sklep"
         if (activeTab === 'sklep') renderPaneSklep();
@@ -10422,6 +10444,7 @@
             .catch(function () { _calcSeedState = 2; });
     }
     // Karta kalkulatora w czacie (po zielonym świetle) — jedna na sesję (guard po .cwc--chat).
+    // (NIEUŻYWANA od 2026-07-01 — kalkulator żyje w zakładce „Biznesplan", nie w czacie; req Tomka.)
     function appendCalcChatCard() {
         var host = el('chat-msgs'); if (!host || host.querySelector('.cwc--chat')) return;
         var div = document.createElement('div');
@@ -10429,6 +10452,26 @@
         div.innerHTML = calcInnerHTML();
         host.appendChild(div);
         bindCalc(div);
+    }
+    // ZAKŁADKA BIZNESPLAN (req Tomka): kalkulator potencjału + wstępny plan przychodu — w osobnej
+    // zakładce, nie w czacie (anty-przytłoczenie na zielonym świetle).
+    function renderPaneBiznesplan() {
+        var body = el('pane-biznesplan-body'); if (!body) return;
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Biznesplan</div>' +
+            '<h2 class="tabpane__title">Twój wstępny biznesplan</h2>' +
+            '<p class="tabpane__sub">Policz potencjał na suwakach i zobacz wstępny plan przychodu. To szkic — pełny plan przedsięwzięcia Tomek dopina osobiście po rezerwacji.</p></div>';
+        var calc = '<div class="cwc">' + calcInnerHTML() + '</div>';
+        var planBlock;
+        if (state.bizplan) planBlock = '<div style="margin-top:18px">' + bizplanHTML(state.bizplan) + '</div>';
+        else if (extras.plan === 'fail') planBlock = '<div class="pj-wait pj-wait--fail" style="margin-top:18px"><div class="pj-wait__txt"><b>Nie udało się policzyć planu.</b></div><button type="button" class="preview-retry" id="bp-retry">Spróbuj ponownie</button></div>';
+        else if (state.verdict === 'zielony') planBlock = '<div style="margin-top:18px">' + genProgressHTML('plan', 'Liczę wstępny plan przychodu…', 'model, cena i droga do pierwszych zamówień') + '</div>';
+        else planBlock = '<div class="pj-plan__note" style="margin-top:18px">Pełny plan przychodu policzymy, gdy projekt dostanie zielone światło.</div>';
+        body.innerHTML = head + calc + planBlock;
+        var calcHost = body.querySelector('.cwc'); if (calcHost) bindCalc(calcHost);
+        if (!state.calcSeed) ensureCalcSeed();
+        if (!state.bizplan && state.verdict === 'zielony') ensureBizplan(false);
+        var rb = el('bp-retry'); if (rb) rb.addEventListener('click', function () { extras.plan = 'idle'; ensureBizplan(true); renderPaneBiznesplan(); });
+        startPjTicker();
     }
 
     function renderPaneWspolpraca() {
@@ -10655,6 +10698,7 @@
         if (tab === 'makiety') return extras.mockups === 'gen' || !!state.mockups || !!state.chosenStyle || (Array.isArray(state.suiteAds) && state.suiteAds.length) || !!state.landingHtml;
         if (tab === 'reklamy') return !!state.chosenStyle || extras.ads === 'gen' || (Array.isArray(state.suiteAds) && state.suiteAds.length) || !!state.landingHtml;
         if (tab === 'sklep') return extras.landingTab === 'gen' || landingGen || !!state.landingHtml;
+        if (tab === 'biznesplan') return !!state.bizplan || extras.plan === 'gen' || state.verdict === 'zielony';
         return false;
     }
     function budSeen(tab) {
@@ -10670,19 +10714,21 @@
         if (tab === 'makiety') return Array.isArray(state.mockups) && state.mockups.length > 0;
         if (tab === 'reklamy') return Array.isArray(state.suiteAds) && state.suiteAds.length > 0;
         if (tab === 'sklep') return !!state.landingHtml;
+        if (tab === 'biznesplan') return !!state.bizplan;
         return false;
     }
     function budTabGenerating(tab) {
         if (tab === 'makiety') return extras.mockups === 'gen' && !budTabReady('makiety');
         if (tab === 'reklamy') return extras.ads === 'gen' && !budTabReady('reklamy');
         if (tab === 'sklep') return (extras.landingTab === 'gen' || landingGen) && !budTabReady('sklep');
+        if (tab === 'biznesplan') return extras.plan === 'gen' && !budTabReady('biznesplan');
         return false;
     }
     // Odsłania zakładki pipeline w nav + ustawia statusy (nowe/gotowe/generuję).
     // Wołane z updateSideBadges (każda tura + enterChat) oraz po zmianach stanu.
     function updateBudNav() {
         var khMode = (state.stage === 'knowhow' || state.stage === 'build');
-        ['ustalenia', 'makiety', 'reklamy', 'sklep'].forEach(function (tab) {
+        ['ustalenia', 'makiety', 'reklamy', 'sklep', 'biznesplan'].forEach(function (tab) {
             var sel = (tab === 'reklamy') ? 'reklamy' : tab;   // data-tab
             var item = document.querySelector('.side__item[data-tab="' + sel + '"][data-view]');
             if (!item) return;
@@ -10831,7 +10877,7 @@
         // Reszta (high/mid/unknown) → generujemy normalnie. Realizuje „odrzuć beznadziejnego leada".
         if (!state.budgetDeclared) { renderBudgetGate(); return; }
         if (state.budgetDeclared === 'none') { renderBudgetSoftExit(); return; }
-        mockups4Gen = true;
+        mockups4Gen = true; markActivity(); startEngageTicker();
         extras.mockups = 'gen';
         budTabVisible('makiety'); // no-op guard
         updateBudNav();
@@ -13737,6 +13783,7 @@
         if (!text || streaming) return;
         if (el('inline-gate')) return; // bramka czeka na imię i mail
         _openerHold = false; // user prowadzi → zwalniamy hold openera
+        markActivity();   // engage ticker: user aktywny → nie nuż go zaraz pytaniami
         freezeProp(); // aktywna karuzela propozycji → zamroź (spójnie: zostaje w historii, kolejna runda pod spodem)
         removeChips();
         if (text.length > MAX_MSG_LEN) {
@@ -13764,6 +13811,7 @@
     function sendOpening(text) {
         if (streaming) return;
         _openerHold = false; // user prowadzi (klik produktu/chip) → zwalniamy hold openera
+        markActivity();   // engage ticker: aktywność
         freezeProp(); // jw. — zamroź aktywną karuzelę przed nową turą (no-op gdy brak/już zamrożona)
         var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
         state.reportProposePending = false; if (state.reportEngagePending) { state.reportEngagePending = false; persistSession(); }  // user prowadzi (#3/#5)
@@ -15873,25 +15921,12 @@
         wrap.className = 'verdict reveal-in';
 
         if (color === 'zielony') {
-            // Rozmowa zostaje OTWARTA — user może dopracowywać projekt dalej.
-            // Karta żyje w zakładce „Karta projektu"; kolejne werdykty tylko ją
-            // aktualizują (bez dublowania boxa).
-            if (el('panel-box')) {
-                wrap.remove();
-                sysMsg('Karta projektu zaktualizowana — zakładka obok ma już nową wersję.');
-            } else {
-                wrap.innerHTML = cardBoxHTML();
-                el('chat-msgs').appendChild(wrap);
-                var tabBtn = wrap.querySelector('#btn-collab-tab');
-                if (tabBtn) tabBtn.addEventListener('click', function () {
-                    switchTab('wspolpraca');
-                });
-                // anty-przytłoczenie (audyt): NIE wal kalkulatora (4 suwaki + 7 liczb) w ten sam
-                // kadr co kartę zielonego światła + CTA rezerwacji. Najpierw niech wybrzmi decyzja
-                // i jedno CTA, kalkulator dochodzi spokojnie po ~1,6s jako „policz potencjał".
-                setTimeout(appendCalcChatCard, 1600);
-            }
-            if (activeTab === 'projekt' || activeTab === 'wspolpraca') switchTab(activeTab); // odśwież otwartą zakładkę
+            // JEDNO zielone światło (req Tomka: „nie mogą być dwa") = karta showGreenLight (zl-card,
+            // „WERDYKT TOMKA"). Bez dublowania starego paybox/cardBoxHTML i BEZ kalkulatora w czacie —
+            // kalkulator/potencjał żyje w osobnej zakładce „Biznesplan" (anty-przytłoczenie).
+            wrap.remove();
+            try { showGreenLight((karta && typeof karta === 'object') ? karta : (state.karta || {}), !el('zl-card')); } catch (e) {}
+            if (activeTab === 'projekt' || activeTab === 'wspolpraca' || activeTab === 'biznesplan') switchTab(activeTab);
             updateSideBadges();
             unlockComposer();
         } else if (color === 'zolty') {
