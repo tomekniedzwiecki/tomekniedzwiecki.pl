@@ -169,7 +169,12 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .nav{position:fixed;top:0;left:0;right:0;z-index:90;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);transition:transform .5s var(--ease),opacity .5s}
 .nav.is-hidden{transform:translateY(-100%);opacity:0}
 .nav__in{max-width:1320px;margin:0 auto;padding:14px clamp(16px,4vw,40px);display:flex;align-items:center;justify-content:space-between;gap:16px}
-.nav__logo img{height:30px;width:auto}
+.nav__brand{display:inline-flex;align-items:center;gap:10px;height:30px;transition:opacity .25s var(--ease)}
+.nav__brand:hover{opacity:.78}
+.nav__logo{height:30px;width:auto;display:block;flex-shrink:0}
+.nav__suffix{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--accent);white-space:nowrap}
+.nav__suffix::before{content:'/ ';color:var(--text-faint);font-weight:500}
+@media (max-width:640px){.nav__suffix{display:none}}
 .nav__cta{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font-size:13.5px;font-weight:700;letter-spacing:-.01em;transition:.25s var(--ease2)}
 .nav__cta:hover{background:var(--accent);color:#00150c;box-shadow:0 8px 26px -8px rgba(0,217,126,.6)}
 @media (max-width:380px){.nav__cta{display:none}}
@@ -248,14 +253,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .walls{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:42px}
 .wall{padding:28px 24px;border:1px solid var(--border);border-radius:16px;background:var(--glass);position:relative;overflow:hidden;transition:.4s var(--ease)}
 .wall:hover{border-color:rgba(255,75,62,.3);transform:translateY(-5px)}
-.wall__n{font-family:var(--mono);font-size:13px;color:var(--text-faint);font-variant-numeric:tabular-nums}
+.wall__n{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;color:var(--text-faint);font-variant-numeric:tabular-nums}
+.wall__n::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);opacity:.85;box-shadow:0 0 9px rgba(255,75,62,.55)}
 .wall__t{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong);margin:14px 0 10px}
 .wall__d{font-size:14.5px;color:var(--text-muted);line-height:1.55;position:relative;z-index:1}
 .wall__ghost{position:absolute;right:2px;bottom:-30px;font-family:var(--mono);font-weight:700;font-size:150px;line-height:1;color:rgba(255,75,62,.055);pointer-events:none;font-variant-numeric:tabular-nums;letter-spacing:-.05em;transition:color .35s var(--ease2)}
 .wall:hover .wall__ghost{color:rgba(255,75,62,.1)}
-.wall::after{content:'';position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,var(--red),transparent);opacity:.55;transition:opacity .35s var(--ease2)}
-.wall:hover::after{opacity:1}
-.punch{margin-top:40px;font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,38px);line-height:1.25;color:var(--text);max-width:24ch}
+.punch{margin:54px auto 0;text-align:center;font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,38px);line-height:1.25;color:var(--text);max-width:26ch}
 .punch .g{color:var(--accent)}
 @media (max-width:760px){.walls{grid-template-columns:1fr}}
 
@@ -278,16 +282,18 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 /* ============================================================ ACT 04 PROOF / LEDGER */
 .proof{text-align:center}
 .proof .scene__in{max-width:1080px}
-.proof__num{font-size:clamp(96px,21vw,260px);font-weight:900;letter-spacing:-.06em;line-height:.84;color:var(--accent);text-shadow:0 0 90px rgba(0,217,126,.4);font-variant-numeric:tabular-nums}
-.proof__num small{font-size:.26em;font-weight:800;color:var(--text-strong);letter-spacing:-.02em;margin-left:.12em}
+.proof__num{display:flex;align-items:baseline;justify-content:center;gap:.08em;font-size:clamp(96px,21vw,250px);font-weight:900;letter-spacing:-.06em;line-height:.92;color:var(--accent);text-shadow:0 0 90px rgba(0,217,126,.4);font-variant-numeric:tabular-nums}
+.proof__num small{font-size:.26em;font-weight:800;color:var(--text-strong);letter-spacing:-.02em;margin-left:0}
 .proof__cap{margin-top:10px;font-size:clamp(16px,2.3vw,22px);color:var(--text-muted)}
 .ledger{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:54px;text-align:left}
-.led{padding:24px 22px;border:1px solid var(--border);border-radius:16px;background:var(--glass);position:relative}
+.led{padding:24px 22px;border:1px solid var(--border);border-radius:16px;background:var(--glass);position:relative;transition:.4s var(--ease)}
+.led:hover{border-color:var(--border-strong);transform:translateY(-4px)}
 .led__yr{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--text-faint);font-variant-numeric:tabular-nums}
 .led__name{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong);margin:8px 0 16px}
-.led__metric{display:flex;align-items:baseline;gap:8px}
-.led__metric b{font-size:30px;font-weight:900;letter-spacing:-.03em;color:var(--text-strong);font-variant-numeric:tabular-nums}
-.led--green .led__metric b{color:var(--accent)}
+.led__metric{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.led__metric b{font-size:34px;font-weight:900;letter-spacing:-.03em;color:var(--text-strong);font-variant-numeric:tabular-nums}
+.led__unit{font-size:18px;font-weight:800;letter-spacing:-.01em;color:var(--text-strong)}
+.led--green .led__metric b,.led--green .led__unit{color:var(--accent)}
 .led__metric .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint)}
 .led__badge{display:inline-block;margin-top:14px;font-size:11.5px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px solid rgba(0,217,126,.3);padding:4px 11px;border-radius:999px}
 .led__d{margin-top:13px;font-size:13.5px;color:var(--text-muted);line-height:1.5}
@@ -438,7 +444,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- NAV -->
 <nav class="nav" id="nav">
     <div class="nav__in">
-        <a class="nav__logo" href="/home/" aria-label="Tomek Niedźwiecki"><img src="/img/logo/tn-logo-white-88.png" alt="Tomek Niedźwiecki" onerror="this.src='/img/logo/tn-logo-icon-88.png'"></a>
+        <a class="nav__brand" href="/home/" aria-label="tomekniedzwiecki.pl — e-sklep">
+            <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" onerror="this.src='/img/logo/tn-logo-icon-88.png'">
+            <span class="nav__suffix">e-sklep.</span>
+        </a>
         <a class="nav__cta" href="/sklep/" data-cta data-loc="nav">Zacznij za darmo <span>→</span></a>
     </div>
 </nav>
@@ -516,20 +525,20 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             <div class="led" data-reveal data-delay="180">
                 <div class="led__yr">2011 — 2021</div>
                 <div class="led__name">Sklep</div>
-                <div class="led__metric"><b>40</b><span class="t">mln zł · przychodu</span></div>
+                <div class="led__metric"><b>40</b><span class="led__unit">mln zł</span><span class="t">przychodu</span></div>
                 <div class="led__d">Własny e-commerce. Pierwsze poważne pieniądze i pierwsza szkoła rynku.</div>
             </div>
             <div class="led" data-reveal data-delay="260">
                 <div class="led__yr">2017 — 2026</div>
                 <div class="led__name">TakeDrop</div>
-                <div class="led__metric"><b>25</b><span class="t">mln zł · wyceny</span></div>
+                <div class="led__metric"><b>25</b><span class="led__unit">mln zł</span><span class="t">wyceny</span></div>
                 <div class="led__badge">↗ Sprzedane w 2026</div>
                 <div class="led__d">Platforma SaaS dla e-commerce, którą zbudowałem od zera.</div>
             </div>
             <div class="led led--green" data-reveal data-delay="340">
                 <div class="led__yr">2024 — 2026</div>
                 <div class="led__name">Inkubator</div>
-                <div class="led__metric"><b>tysiące</b><span class="t">osób · wdrożonych</span></div>
+                <div class="led__metric"><b>tysiące</b><span class="led__unit">osób</span><span class="t">wdrożonych</span></div>
                 <div class="led__badge">↗ Sprzedane w 2026</div>
                 <div class="led__d"><b>Pierwsza w Polsce</b> platforma do legalnej sprzedaży online dla osób bez działalności.</div>
             </div>
@@ -586,7 +595,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <section class="scene scene--wide" id="act-6" data-rail="Kroki">
     <div class="scene__in">
         <span class="eyebrow" data-reveal>Cztery kroki, jedno partnerstwo</span>
-        <h2 class="h-sec" data-reveal data-delay="60">Buduję Ci e-sklep. <span class="g">Ty nim zarabiasz.</span></h2>
+        <h2 class="h-sec" data-reveal data-delay="60">Buduję Ci e-sklep. <span class="g">Ty nim zarządzasz.</span></h2>
         <div class="steps">
             <div class="step" data-reveal data-delay="120"><div class="step__n">01</div><div class="step__chip">Produkt</div><div class="step__d">Będziesz mieć taki, który ludzie chcą kupować.</div></div>
             <div class="step" data-reveal data-delay="190"><div class="step__n">02</div><div class="step__chip">Marka</div><div class="step__d">Będziesz mieć markę, która wygląda jak duża firma.</div></div>
