@@ -10974,6 +10974,7 @@
         // w nieskończoność na słabym łączu. Po timeoucie odrzut wpada do .catch (fallback).
         return fetchT(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action, product: state.chosenProduct || null }, extra || {})) }, 120000).then(function (r) { return r.json(); });
     }
+    var _brandNameRetries = 0;   // cichy auto-retry nazw w tle (req Tomka: bez klikania, bez błędów)
     function renderBrandPicker() {
         if (!el('chat-msgs') || el('brand-card') || !state.sessionId) return;
         if (state.brandDone) return;
@@ -11000,11 +11001,14 @@
             clearInterval(blTimer);
             var names = (d && d.names) || [];
             if (!names.length) {
-                card.innerHTML = '<div class="brand-card__t"><b>Nazwy chwilowo się nie dobrały</b><div class="brand-card__sub">To zwykle przejściowy zryw — spróbujmy jeszcze raz. Albo po prostu napisz w czacie, jaką nazwę chcesz.</div></div>' +
-                    '<button type="button" class="preview-retry" id="brand-retry" style="margin-top:12px">Spróbuj ponownie</button>';
-                var rbN = el('brand-retry'); if (rbN) rbN.addEventListener('click', function () { card.remove(); renderBrandPicker(); });
+                // CICHY auto-retry w tle — user nic nie klika, widzi tylko trwający loader.
+                if (_brandNameRetries < 6) { _brandNameRetries++; card.remove(); setTimeout(renderBrandPicker, 1500 + _brandNameRetries * 500); return; }
+                // skrajny przypadek (OpenAI długo niedostępny) — idź dalej, nie blokuj; logo i tak dochodzi przy budowie
+                state.brandDone = true; persistSession(); revealQueuedChatCards();
+                card.innerHTML = '<div class="brand-card__t">Nazwę i logo dopniemy przy budowie sklepu — idziemy dalej. Chcesz konkretną nazwę? Napisz ją w czacie.</div>';
                 return;
             }
+            _brandNameRetries = 0;
             // Re-roll: raz na sesję user może poprosić o INNE propozycje nazw/domen.
             var rerollHtml = !state._brandReroll
                 ? '<button type="button" id="brand-reroll" style="display:block;width:100%;margin-top:12px;background:none;border:0;color:var(--text-muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline">Pokaż inne propozycje</button>'
@@ -11027,7 +11031,9 @@
             // domenami i czekamy, aż wybierze. Po kliknięciu nazwy → pickBrandName generuje logo.
         }).catch(function () {
             clearInterval(blTimer);
-            // #17: nie zacinaj marki — odblokuj pipeline (logo/markę dokończymy przy budowie sklepu).
+            // CICHY auto-retry w tle (sieć/timeout) — bez przycisku, user widzi tylko loader.
+            if (_brandNameRetries < 6) { _brandNameRetries++; card.remove(); setTimeout(renderBrandPicker, 1800 + _brandNameRetries * 500); return; }
+            // #17: dopiero po wielu próbach nie zacinaj marki — odblokuj pipeline (logo/markę dokończymy przy budowie).
             state.brandDone = true; persistSession();
             revealQueuedChatCards();
             card.innerHTML = '<div class="brand-card__t">Nazwę i logo dokończymy przy budowie sklepu — idziemy dalej. Chcesz konkretną nazwę? Napisz ją w czacie.</div>';
