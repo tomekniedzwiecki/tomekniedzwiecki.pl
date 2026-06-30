@@ -629,11 +629,16 @@
         scrollbar-gutter: stable;
     }
     .tabpane__inner {
-        max-width: 860px;
+        max-width: 900px;
         margin: 0 auto;
-        padding: 28px clamp(14px, 4vw, 26px) 70px;
+        padding: 28px clamp(16px, 4vw, 32px) 70px;
         animation: msgIn 0.35s var(--ease);
     }
+    /* Panele WIZUALNE (pulpit, makiety, reklamy) są gęstsze niż tekstowe — dają więcej
+       oddechu w szerszej kolumnie; tekstowe (raport/ustalenia) zostają wąskie dla czytelności. */
+    #pane-projekt .tabpane__inner,
+    #pane-makiety .tabpane__inner,
+    #pane-reklamy .tabpane__inner { max-width: 1200px; }
     .tabpane__head { margin-bottom: 18px; }
     .tabpane__eyebrow {
         font-size: 11px;
@@ -1233,8 +1238,8 @@
     }
     .pjd-tile {
         position: relative;
-        grid-column: span 2;
-        min-height: 215px;
+        grid-column: span 3;   /* spójność: kafle pół-szerokości (2 na rząd), zamiast mieszanki 2/3/4 */
+        min-height: 226px;
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -1278,8 +1283,8 @@
     .pjd-tile--static:hover::before { opacity: 0; }
     .pjd-tile--dim { opacity: 0.55; cursor: default; }
     .pjd-tile--dim:hover { border-color: var(--glass-border); transform: none; box-shadow: none; }
-    .pjd-tile--hero { grid-column: span 4; min-height: 300px; }
-    .pjd-tile--w3 { grid-column: span 3; min-height: 235px; }
+    .pjd-tile--hero { grid-column: span 6; min-height: 248px; }   /* produkt = pełnowymiarowy banner u góry */
+    .pjd-tile--w3 { grid-column: span 3; min-height: 226px; }
     .pjd-tile--img { background-size: cover; background-position: top center; }
     /* Kafel ze strefą MEDIA: grafika ZAWSZE w całości (object-fit: contain),
        a wolne pola wypełnia rozmyta kopia tej samej grafiki — zero przycinania
@@ -1290,10 +1295,11 @@
         width: 100%;
         flex: 1 1 auto;
         min-height: 130px;
+        max-height: 184px;   /* kafel-obraz nie może górować nad sąsiadami → równe wiersze, spójność */
         overflow: hidden;
         background: rgba(255, 255, 255, 0.03);
     }
-    .pjd-tile--hero .pjd-tile__media { min-height: 190px; }
+    .pjd-tile--hero .pjd-tile__media { min-height: 190px; max-height: 220px; }
     .pjd-tile__media img {
         position: absolute;
         inset: 0;
