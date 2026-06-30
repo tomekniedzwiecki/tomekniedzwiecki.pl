@@ -268,8 +268,8 @@
 
     /* Hero avatar — większa sylwetka, wyśrodkowana (zielony ring jak akcent /zbuduje) */
     .hero__avatar {
-        width: clamp(96px, 13vw, 132px);
-        height: clamp(96px, 13vw, 132px);
+        width: clamp(112px, 15vw, 168px);
+        height: clamp(112px, 15vw, 168px);
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid var(--accent-green);
@@ -448,8 +448,8 @@
     /* PORTRET — duży, ring + glow, prawa strona okładki */
     .hello-intro__avatar {
         flex-shrink: 0;
-        width: clamp(168px, 24vw, 240px);
-        height: clamp(168px, 24vw, 240px);
+        width: clamp(200px, 28vw, 300px);
+        height: clamp(200px, 28vw, 300px);
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid var(--accent-green);
@@ -1417,10 +1417,28 @@
         max-width: 1400px;
         width: 100%;
         margin: 0 auto;
-        padding: clamp(4px, 1.5vh, 20px) 0 clamp(52px, 8vh, 96px);
+        padding: clamp(48px, 7vh, 88px) 0 clamp(52px, 8vh, 96px);
         text-align: center;
         opacity: 0;
         transform: translateY(20px);
+    }
+    /* pełnoszerokościowy pas tła — oddziela galerię od record/side i nadaje jej
+       tożsamość persony aplikacji (lekki accent-blue poblask). */
+    .applab::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 100vw;
+        transform: translateX(-50%);
+        background:
+            radial-gradient(120% 120% at 50% 0%, rgba(77, 159, 255, 0.08), transparent 58%),
+            #08080f;
+        border-top: 1px solid var(--border-strong);
+        border-bottom: 1px solid var(--border-strong);
+        z-index: -1;
+        pointer-events: none;
     }
     .applab.is-visible {
         opacity: 1;
@@ -1497,6 +1515,321 @@
         .applab__strip { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     }
 
+    /* ============================================================
+       RECORD — autorytet jako OŚ CZASU („15 lat · jedna droga")
+       Trzy firmy = trzy stacje na linii, która RYSUJE się przy
+       wejściu w kadr i biegnie dalej w prawo (→ „następny: Ty").
+       Węzły zapalają się po kolei, liczby liczą w górę, węzeł „dziś"
+       pulsuje. DNA hubu: dark editorial, Inter 900 + Instrument Serif,
+       accent-green = wzrost/pieniądz. Pozioma (desktop) / pionowa (mobile).
+       ============================================================ */
+    .record {
+        position: relative;
+        z-index: 2;
+        max-width: 1600px;          /* lico ze split / side */
+        width: 100%;
+        margin: 0 auto;
+        padding: clamp(48px, 9vh, 116px) clamp(20px, 4vw, 64px) clamp(52px, 8vh, 104px);
+        overflow: hidden;
+    }
+    .record::before { /* górna hairline — domyka split nad sekcją */
+        content: '';
+        position: absolute;
+        top: 0;
+        left: clamp(20px, 4vw, 64px);
+        right: clamp(20px, 4vw, 64px);
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border-strong) 16%, var(--border-strong) 84%, transparent);
+    }
+    /* atmosfera — miękki zielony „money glow" za wielką liczbą */
+    .record__glow {
+        position: absolute;
+        top: clamp(36px, 7vh, 96px);
+        left: clamp(20px, 4vw, 64px);
+        width: min(680px, 80%);
+        aspect-ratio: 5 / 2;
+        background: radial-gradient(ellipse at 30% 50%, rgba(0, 217, 126, 0.14), transparent 70%);
+        filter: blur(10px);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.4s var(--ease);
+    }
+    .record.is-lit .record__glow { opacity: 1; }
+
+    /* HEAD — eyebrow + dominująca liczba + lead */
+    .record__head { position: relative; }
+    .record__eyebrow {
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: clamp(18px, 2.6vh, 30px);
+        white-space: nowrap;
+    }
+    .record__eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--accent-green); opacity: 0.75; }
+    .record__eyebrow b { color: var(--accent-green); font-weight: 700; }
+
+    .record__title { margin: 0; }
+    .record__num {
+        display: flex;
+        align-items: baseline;
+        gap: 0.12em;
+        font-family: var(--sans);
+        font-weight: 900;
+        font-size: clamp(78px, 15vw, 198px);
+        line-height: 0.82;
+        letter-spacing: -0.06em;
+        color: var(--text-strong);
+        font-variant-numeric: tabular-nums;
+    }
+    .record__unit {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        font-size: 0.26em;
+        letter-spacing: -0.01em;
+        color: var(--accent-green);
+        white-space: nowrap;
+    }
+    .record__lead {
+        display: block;
+        margin-top: clamp(14px, 2vh, 24px);
+        max-width: 24ch;
+        font-family: var(--sans);
+        font-weight: 700;
+        font-size: clamp(20px, 2.4vw, 32px);
+        line-height: 1.16;
+        letter-spacing: -0.025em;
+        color: var(--text);
+    }
+    .record__lead em {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 400;
+        color: var(--text-strong);
+        letter-spacing: -0.005em;
+    }
+
+    /* SPINE — oś czasu z trzema stacjami */
+    .record__spine {
+        position: relative;
+        list-style: none;
+        margin: clamp(44px, 6.5vh, 80px) 0 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: clamp(24px, 4vw, 56px);
+    }
+    /* szyna (pozioma na desktopie) na wysokości węzłów; wystaje w prawo → „dalej" */
+    .record__rail {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+        border-radius: 2px;
+    }
+    .record__rail-fill {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0, 217, 126, 0.3), var(--accent-green));
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 1.6s var(--ease);
+    }
+    .record.is-lit .record__rail-fill { transform: scaleX(1); }
+    /* grot na końcu szyny — „następny przystanek: Ty" */
+    .record__rail::after {
+        content: '';
+        position: absolute;
+        right: -1px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 8px solid var(--accent-green);
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        opacity: 0;
+        transition: opacity 0.5s var(--ease) 1.5s;
+    }
+    .record.is-lit .record__rail::after { opacity: 1; }
+
+    .record__station {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        padding-top: clamp(28px, 3.6vh, 40px);
+    }
+    .record__node {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--bg);
+        border: 2px solid var(--border-hover);
+        transition: border-color 0.6s var(--ease), background 0.6s var(--ease), box-shadow 0.6s var(--ease);
+    }
+    /* rail jest 1. dzieckiem spine → stacje to nth-child 2..4 */
+    .record.is-lit .record__station:nth-child(2) .record__node { transition-delay: 0.30s; }
+    .record.is-lit .record__station:nth-child(3) .record__node { transition-delay: 0.65s; }
+    .record.is-lit .record__station:nth-child(4) .record__node { transition-delay: 1.00s; }
+    .record.is-lit .record__node {
+        border-color: var(--accent-green);
+        background: var(--accent-green);
+        box-shadow: 0 0 0 5px rgba(0, 217, 126, 0.14);
+    }
+
+    .record__year {
+        font-family: var(--sans);
+        font-size: 12.5px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        color: var(--text-faint);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+    .record__name {
+        font-family: var(--sans);
+        font-weight: 800;
+        font-size: clamp(25px, 3vw, 38px);
+        letter-spacing: -0.035em;
+        line-height: 1;
+        color: var(--text-strong);
+        margin: clamp(9px, 1.3vh, 13px) 0 clamp(11px, 1.4vh, 16px);
+    }
+    .record__metric {
+        font-family: var(--sans);
+        font-weight: 800;
+        font-size: clamp(22px, 2.6vw, 33px);
+        letter-spacing: -0.03em;
+        line-height: 1;
+        color: var(--accent-green);
+        font-variant-numeric: tabular-nums;
+    }
+    /* etykieta typu liczby — rozróżnia przychód / wycenę / „osoby" */
+    .record__cap {
+        display: block;
+        margin-top: 7px;
+        font-family: var(--sans);
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+    }
+    /* badge „exit" — eksponuje udaną sprzedaż TakeDropu */
+    .record__badge {
+        align-self: flex-start;
+        margin-top: clamp(13px, 1.9vh, 18px);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 13px;
+        font-family: var(--sans);
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--accent-green);
+        background: var(--accent-green-soft);
+        border: 1px solid rgba(0, 217, 126, 0.34);
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+    .record__badge .arr {
+        font-size: 1.1em;
+        font-weight: 700;
+        line-height: 0;
+        transform: translateY(0.05em);
+    }
+    .record__desc {
+        margin-top: clamp(13px, 1.9vh, 19px);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(15px, 1.5vw, 18px);
+        line-height: 1.42;
+        color: var(--text-muted);
+        max-width: 28ch;
+    }
+    .record__desc strong { color: var(--text-strong); font-weight: 600; } /* mocny claim, np. „Pierwsza w Polsce" */
+    /* stacja „teraz" — pulsujący węzeł */
+    .record.is-lit .record__station--now .record__node {
+        animation: recordPulse 2.2s ease-in-out infinite 1.5s;
+    }
+    @keyframes recordPulse {
+        0%, 100% { box-shadow: 0 0 0 5px rgba(0, 217, 126, 0.16); }
+        50%      { box-shadow: 0 0 0 10px rgba(0, 217, 126, 0.04); }
+    }
+
+    .record__foot {
+        margin-top: clamp(38px, 5.5vh, 64px);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: clamp(18px, 2vw, 27px);
+        line-height: 1.4;
+        color: var(--text-muted);
+        max-width: 60ch;
+    }
+    .record__foot strong { color: var(--text-strong); font-weight: 500; font-style: normal; }
+
+    /* reveal (eyebrow / title / foot) — spójne z [data-reveal] */
+    .record [data-reveal] { opacity: 0; transform: translateY(22px); }
+    .record [data-reveal].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    }
+
+    /* MOBILE — oś obraca się do pionu (linia po lewej, stacje w stosie) */
+    @media (max-width: 760px) {
+        .record__spine {
+            grid-template-columns: 1fr;
+            gap: 0;
+            margin-top: clamp(34px, 5vh, 52px);
+        }
+        .record__rail {
+            top: 8px;
+            bottom: 6px;
+            left: 8px;
+            right: auto;
+            width: 2px;
+            height: auto;
+        }
+        .record__rail-fill { transform: scaleY(0); transform-origin: top center; }
+        .record.is-lit .record__rail-fill { transform: scaleY(1); }
+        .record__rail::after { display: none; }
+        .record__station {
+            padding-top: 0;
+            padding-left: clamp(30px, 9vw, 44px);
+            padding-bottom: clamp(28px, 5vh, 44px);
+        }
+        .record__station:last-child { padding-bottom: 2px; }
+        .record__node { top: 1px; left: 0; }
+        .record__name { margin-top: 4px; }
+        .record__desc { max-width: none; }
+    }
+    @media (max-width: 380px) {
+        .record__num { font-size: clamp(64px, 17vw, 96px); }
+        .record__lead { font-size: clamp(18px, 5.4vw, 22px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .record__glow { opacity: 1; transition: none; }
+        .record__rail-fill { transform: none !important; transition: none; }
+        .record__rail::after { opacity: 1; transition: none; }
+        .record__node { transition: none !important; }
+        .record__station--now .record__node { animation: none; }
+        .record [data-reveal] { opacity: 1; transform: none; transition: none; }
+    }
+
     </style>
 </head>
 <body>
@@ -1525,9 +1858,12 @@
                 <p class="hello-intro__sign hello-fade">Buduję i&nbsp;automatyzuję biznesy <strong>— od 15 lat</strong></p>
             </div>
 
-            <img class="hello-intro__avatar" id="hello-avatar"
-                 src="https://tomekniedzwiecki.pl/img/tn_kwadrat.webp"
-                 alt="Tomek Niedźwiecki" width="240" height="240">
+            <video class="hello-intro__avatar" id="hello-avatar"
+                   src="img/tn_twarz.mp4"
+                   poster="img/tn_kwadrat.webp"
+                   width="300" height="300"
+                   autoplay muted loop playsinline preload="auto"
+                   aria-label="Tomek Niedźwiecki"></video>
         </div>
 
         <!-- pasek meta (dół) -->
@@ -1561,7 +1897,7 @@
         <!-- masthead: na desktopie zwykły blok (avatar + H1 wyśrodkowane jak dotąd),
              na mobile staje się flex-rzędem (avatar | "Cześć.") — masthead rozkładówki -->
         <div class="hero__masthead">
-            <img class="hero__avatar" src="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="132" height="132">
+            <video class="hero__avatar" src="img/tn_twarz.mp4" poster="img/tn_kwadrat_small.webp" width="168" height="168" autoplay muted loop playsinline preload="auto" aria-label="Tomek Niedźwiecki"></video>
 
             <h1 class="hero__h1">
                 <span class="hero__h1-line" data-reveal data-delay="0"><span class="hero__h1-line__inner">Cześć<span class="hero__h1-dot">.</span></span></span>
@@ -1623,6 +1959,56 @@
 
     </section>
 
+    <!-- RECORD — autorytet jako oś czasu: 15 lat, trzy firmy, 70 mln zł (dowód pod oba wybory) -->
+    <section class="record" aria-label="Dorobek: 15 lat, trzy firmy, 70 mln zł">
+        <div class="record__glow" aria-hidden="true"></div>
+
+        <header class="record__head">
+            <p class="record__eyebrow" data-reveal><b>15 lat</b><span>·</span>jedna droga</p>
+            <h2 class="record__title" data-reveal data-delay="120">
+                <span class="record__num"><span data-count-to="70">70</span><span class="record__unit">mln zł</span></span>
+                <span class="record__lead">w&nbsp;<em>trzech firmach</em>, które zbudowałem od&nbsp;zera.</span>
+            </h2>
+        </header>
+
+        <ol class="record__spine">
+            <span class="record__rail" aria-hidden="true"><span class="record__rail-fill"></span></span>
+
+            <li class="record__station">
+                <span class="record__node" aria-hidden="true"></span>
+                <span class="record__year">2011 — 2021</span>
+                <span class="record__name">Sklep</span>
+                <span class="record__metric"><span data-count-to="40">40</span>&nbsp;mln zł</span>
+                <span class="record__cap">przychodu</span>
+                <span class="record__desc">Własny e-commerce. Od&nbsp;pierwszej sprzedaży do&nbsp;ośmiu cyfr.</span>
+            </li>
+
+            <li class="record__station record__station--exit">
+                <span class="record__node" aria-hidden="true"></span>
+                <span class="record__year">2017 — 2026</span>
+                <span class="record__name">TakeDrop</span>
+                <span class="record__metric"><span data-count-to="25">25</span>&nbsp;mln zł</span>
+                <span class="record__cap">wyceny</span>
+                <span class="record__badge"><span class="arr" aria-hidden="true">↗</span>&nbsp;Sprzedane w&nbsp;2026</span>
+                <span class="record__desc">Platforma SaaS dla&nbsp;e-commerce, którą zbudowałem od&nbsp;zera.</span>
+            </li>
+
+            <li class="record__station record__station--exit">
+                <span class="record__node" aria-hidden="true"></span>
+                <span class="record__year">2024 — 2026</span>
+                <span class="record__name">Inkubator</span>
+                <span class="record__metric">tysiące osób</span>
+                <span class="record__cap">wdrożonych</span>
+                <span class="record__badge"><span class="arr" aria-hidden="true">↗</span>&nbsp;Sprzedane w&nbsp;2026</span>
+                <span class="record__desc"><strong>Pierwsza w&nbsp;Polsce</strong> platforma do&nbsp;legalnej sprzedaży online dla&nbsp;osób bez&nbsp;działalności.</span>
+            </li>
+        </ol>
+
+        <p class="record__foot" data-reveal data-delay="200">
+            Każda firma czegoś mnie nauczyła. <strong>To wszystko wnoszę do&nbsp;Twojego biznesu.</strong>
+        </p>
+    </section>
+
     <!-- GALERIA „na żywo" — aplikacje, które właśnie powstają (feed publiczny) -->
     <section class="applab" id="applab" aria-label="Aplikacje, które właśnie powstają" data-reveal data-delay="100">
         <h2 class="applab__title">
@@ -1636,26 +2022,6 @@
         </a>
     </section>
 
-    <!-- SIDE — ZWOLNIĘ (poboczny kierunek: dla prowadzących firmę) -->
-    <section class="side" aria-label="Prowadzisz już firmę?" data-reveal data-delay="100">
-        <div class="side__label" aria-hidden="true">albo — prowadzisz już firmę?</div>
-        <a class="side__card" href="https://tomekniedzwiecki.pl/zwolnie/">
-            <div class="side__lead">
-                <div class="side__chapter"><span>03 / Optymalizacja</span></div>
-                <h2 class="side__verb"><b>Zwolnię</b> <em>Twoich</em> ludzi</h2>
-                <p class="side__sub">
-                    ...z roboty, której <span class="side__sub-red">nie powinni robić</span>. Automatyzacje, które tną koszty.
-                </p>
-            </div>
-            <div class="side__meta">
-                <span class="side__proof">
-                    <span class="side__proof-num">do 67%</span>
-                    <span class="side__proof-cap">niższe koszty osobowe</span>
-                </span>
-                <span class="side__arrow" aria-hidden="true">→</span>
-            </div>
-        </a>
-    </section>
 </main>
 
 <!-- ============================================== -->
@@ -1694,9 +2060,11 @@
     if (!intro || !fly || !dest) return;
     var texts = intro.querySelectorAll('.hello-fade');
 
-    // reduced-motion: bez sceny, hero od razu w finalnej formie
+    // reduced-motion: bez sceny, hero od razu w finalnej formie; wideo nie odtwarza
+    // się automatycznie (zostaje poster/pierwsza klatka — szanujemy preferencję ruchu)
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         if (intro.parentNode) intro.parentNode.removeChild(intro);
+        if (dest && dest.tagName === 'VIDEO') { dest.removeAttribute('autoplay'); try { dest.pause(); } catch (e) {} }
         return;
     }
 
@@ -1843,7 +2211,6 @@
     }
     wire('.path--a', 'build');     // AWE — Zbuduję sklep online → /zbuduje/
     wire('.path--b', 'stworze');   // Stworzę — Zbuduję aplikację → /aplikacja/
-    wire('.side__card', 'optimize'); // Prezesi — Zwolnię → /zwolnie/
 })();
 </script>
 
@@ -1895,6 +2262,50 @@
     fetch(FEED_URL).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
         build((d && d.projekty) || []);
     }).catch(function () { });
+})();
+</script>
+
+<!-- RECORD — oś czasu: zapal sekcję (rysowanie linii + węzły) i policz liczby w górę przy wejściu w kadr -->
+<script>
+(function () {
+    'use strict';
+    var sec = document.querySelector('.record');
+    if (!sec) return;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var counters = [].slice.call(sec.querySelectorAll('[data-count-to]'));
+
+    function runCounter(el) {
+        var to = parseInt(el.getAttribute('data-count-to') || '0', 10);
+        if (reduce) { el.textContent = to; return; }
+        var dur = 1400, start = null;
+        function step(ts) {
+            if (start === null) start = ts;
+            var p = Math.min((ts - start) / dur, 1);
+            var eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+            el.textContent = Math.round(eased * to);
+            if (p < 1) requestAnimationFrame(step);
+            else el.textContent = to;
+        }
+        requestAnimationFrame(step);
+    }
+
+    function lightUp() {
+        sec.classList.add('is-lit');
+        counters.forEach(function (el, i) {
+            if (reduce) { runCounter(el); return; }
+            window.setTimeout(function () { runCounter(el); }, 250 + i * 200);
+        });
+    }
+
+    if (reduce || !('IntersectionObserver' in window)) { lightUp(); return; }
+
+    counters.forEach(function (el) { el.textContent = '0'; }); // wyzeruj przed animacją
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (e.isIntersecting) { lightUp(); io.disconnect(); }
+        });
+    }, { threshold: 0.12 });
+    io.observe(sec);
 })();
 </script>
 
