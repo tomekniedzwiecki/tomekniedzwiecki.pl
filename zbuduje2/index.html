@@ -138,7 +138,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @media (prefers-reduced-motion:reduce){
     html{scroll-snap-type:none;scroll-behavior:auto}
     .aurora,.grain{display:none!important}
-    .hero::before,.btn--xl,.mq__row{animation:none!important}
+    .hero::before,.btn--xl,.mq__row,.lmq__row{animation:none!important}
     [data-reveal]{opacity:1!important;transform:none!important}
 }
 
@@ -444,12 +444,16 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .ad img{width:100%;height:100%;object-fit:cover;display:block}
 @media (max-width:640px){.ad{width:132px;height:164px}}
 
-/* ============================================================ ACT MARKI (logo wall) */
-.brands{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:46px;margin-bottom:26px}
-.brand{flex:0 0 auto;width:152px;aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:1px solid var(--border-strong);background:#fff;transition:.35s var(--ease)}
-.brand:hover{transform:translateY(-3px);box-shadow:0 18px 44px -20px rgba(0,0,0,.55)}
-.brand img{width:100%;height:100%;object-fit:cover;display:block}
-@media (max-width:520px){.brand{width:calc(50% - 7px)}}
+/* ============================================================ ACT MARKI (pas przewijajacych sie logo) */
+.marki{padding-left:0;padding-right:0;overflow:hidden}
+.marki .scene__in{padding:0 clamp(20px,5vw,48px)}
+.marki .scene__in:last-child{margin-top:30px}
+.lmq{width:100%;overflow:hidden;margin-top:44px;-webkit-mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.lmq__row{display:flex;gap:18px;width:max-content;animation:mqScroll 46s linear infinite;will-change:transform}
+.marki .lmq:hover .lmq__row{animation-play-state:paused}
+.lchip{flex:0 0 auto;width:174px;height:118px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;padding:14px 20px;box-shadow:0 14px 34px -16px rgba(0,0,0,.65)}
+.lchip img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+@media (max-width:640px){.lchip{width:142px;height:98px;padding:12px 16px}}
 
 /* ============================================================ ACT 10 FINAL CTA */
 .final{text-align:center}
@@ -734,9 +738,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div class="scene__in">
         <span class="eyebrow" data-reveal>Marki, które tworzymy</span>
         <h2 class="h-sec" data-reveal data-delay="60">Twoja marka — <span class="g">gotowa do pokazania.</span></h2>
-        <div class="brands" id="brands-grid" data-reveal data-delay="120"></div>
-        <p class="mk-foot" data-reveal>Nazwa, logo i charakter — <span class="g">zanim wydasz złotówkę.</span></p>
     </div>
+    <div class="lmq">
+        <div class="lmq__row" id="logos-row"></div>
+    </div>
+    <div class="scene__in"><p class="mk-foot" data-reveal>Nazwa, logo i charakter — <span class="g">zanim wydasz złotówkę.</span></p></div>
 </section>
 
 <!-- ACT 08 — FREE / 10 MIN -->
@@ -948,8 +954,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             var a=REKLAMY.slice(0,half).map(ad).join(''); var b=REKLAMY.slice(half).map(ad).join('');
             r1.innerHTML=a+a; r2.innerHTML=b+b;   // duplikat = bezszwowa pętla translateX(-50%)
         }
-        var bg=$('#brands-grid');
-        if(bg){ bg.innerHTML=MARKI.map(function(src){ return '<div class="brand"><img src="'+src+'" alt="Logo marki" loading="lazy"></div>'; }).join(''); }
+        var bg=$('#logos-row');
+        if(bg){ var lh=MARKI.map(function(src){ return '<div class="lchip"><img src="'+src+'" alt="Logo marki"></div>'; }).join(''); bg.innerHTML=lh+lh; }
     })();
 
     /* ---------- CTA HANDOFF ---------- */
