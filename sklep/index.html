@@ -6115,6 +6115,7 @@
     var streamAbort = null; // AbortController bieżącego streamu (przycisk „Zatrzymaj")
     var stickBottom = true;
     var turnAnchored = false;   // nowa tura zakotwiczona na GÓRZE (pytanie usera) — blokuje auto-follow na dół, aż user dojedzie do dołu
+    var _openerHold = false;    // feedback Tomka: trzymaj widok na openerze (góra), NIE zjeżdżaj do produktów, dopóki user sam nie zescrolluje
     var genScreen = null;        // 'badanie' | 'ekrany' | null — ekran generowania, na którym user teraz jest
     var leaveBeaconSent = false; // beacon „wyszedłem" wysyłany raz na dany ekran
     // Kontakt PRZED generowaniem (decyzja Tomka): żadnych ekranów/raportu, dopóki
@@ -11177,12 +11178,18 @@
         }
         bubble(OPENER_P1B, 1100, function () {
             bubble(OPENER_P2, 1100, function () {
-                ensureCarousel();   // produkty (przypięte do dołu)
                 // feedback Tomka: NIE zjeżdżaj do produktów — zostaw opener widoczny u góry,
                 // a o produktach poniżej informuje przycisk „przewiń w dół" (jump). User czyta wstęp,
-                // potem scrolluje sam, gdy zechce.
+                // potem scrolluje sam, gdy zechce. _openerHold blokuje auto-scroll z asynchronicznego
+                // renderu produktów (ensureCarousel ładuje karty z opóźnieniem i sam by ściągnął na dół).
+                _openerHold = true;
+                stickBottom = false;
+                ensureCarousel();   // produkty (przypięte do dołu)
                 var sc = el('chat-scroll'); if (sc) sc.scrollTop = 0;
                 setJumpVisible(true);
+                // dobicie po asynchronicznym renderze kart (gdyby coś jednak ruszyło scroll)
+                setTimeout(function () { var s = el('chat-scroll'); if (_openerHold && s && s.scrollTop > 20) s.scrollTop = 0; }, 350);
+                setTimeout(function () { var s = el('chat-scroll'); if (_openerHold && s && s.scrollTop > 20) s.scrollTop = 0; }, 900);
             });
         });
     }
@@ -11805,8 +11812,9 @@
             VP_STATE.total = (j && j.total) || 0;
             VP_STATE.items = (j && j.products) || [];   // lista bieżącej strony — używa jej lightbox (nawigacja ‹ ›)
             renderViralProducts(wrap, VP_STATE.items);
-            // pokaż GÓRĘ karuzeli (chipy kategorii + kadr), nie stopkę
-            var w = el('vp-picker'); if (w) w.scrollIntoView({ block: 'start', behavior: 'auto' });
+            // pokaż GÓRĘ karuzeli (chipy kategorii + kadr), nie stopkę.
+            // _openerHold: podczas openera NIE przewijaj do karuzeli — opener ma zostać u góry (feedback Tomka).
+            var w = el('vp-picker'); if (w && !_openerHold) w.scrollIntoView({ block: 'start', behavior: 'auto' });
         }).catch(function () {
             if (el('vp-picker')) wrap.innerHTML = '<div class="vp-load">Nie udało się załadować — napisz, a poszukamy razem.</div>';
         });
@@ -13336,6 +13344,8 @@
 
     function scrollToBottom(force) {
         var sc = el('chat-scroll');
+        // _openerHold: trzymaj widok na openerze (góra) — async render produktów NIE może ściągnąć na dół.
+        if (_openerHold && !force) return;
         // turnAnchored: w czasie tury NIE ciągnij na dół (user czyta od początku odpowiedzi).
         if (force || (stickBottom && !turnAnchored)) sc.scrollTop = sc.scrollHeight;
     }
@@ -13427,6 +13437,7 @@
         var text = ta.value.trim();
         if (!text || streaming) return;
         if (el('inline-gate')) return; // bramka czeka na imię i mail
+        _openerHold = false; // user prowadzi → zwalniamy hold openera
         freezeProp(); // aktywna karuzela propozycji → zamroź (spójnie: zostaje w historii, kolejna runda pod spodem)
         removeChips();
         if (text.length > MAX_MSG_LEN) {
@@ -13453,6 +13464,7 @@
     // Wysyłka programowa (chip profesji / dymek odpowiedzi) — jak sendMessage, bez composera
     function sendOpening(text) {
         if (streaming) return;
+        _openerHold = false; // user prowadzi (klik produktu/chip) → zwalniamy hold openera
         freezeProp(); // jw. — zamroź aktywną karuzelę przed nową turą (no-op gdy brak/już zamrożona)
         var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
         state.reportProposePending = false; if (state.reportEngagePending) { state.reportEngagePending = false; persistSession(); }  // user prowadzi (#3/#5)
@@ -15817,6 +15829,8 @@
         el('chat-scroll').addEventListener('scroll', function () {
             var sc = el('chat-scroll');
             var dist = sc.scrollHeight - sc.scrollTop - sc.clientHeight;
+            // User sam zscrollował w dół (do produktów) → zwalniamy hold openera, by re-asserty go nie szarpały z powrotem.
+            if (_openerHold && sc.scrollTop > lastScrollTop + 4 && sc.scrollTop > 40) _openerHold = false;
             // Przewinięcie W GÓRĘ = user czyta → odczepiamy auto-scroll (nie szarpiemy go
             // na dół podczas streamingu). Powrót blisko dołu (<60px) ponownie doczepia.
             if (sc.scrollTop < lastScrollTop - 4) stickBottom = false;
@@ -15826,7 +15840,7 @@
         }, { passive: true });
         el('btn-restart').addEventListener('click', newConvo);
         el('jump-btn').addEventListener('click', function () { // #2 — skok do najnowszej
-            stickBottom = true; turnAnchored = false; scrollToBottom(true); setJumpVisible(false);
+            _openerHold = false; stickBottom = true; turnAnchored = false; scrollToBottom(true); setJumpVisible(false);
         });
         updateSendState();
 
