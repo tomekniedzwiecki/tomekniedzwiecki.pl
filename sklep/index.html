@@ -5203,7 +5203,7 @@
         .gate2__row { flex-direction: column; }
         .gate2 .btn { width: 100%; }
     }
-    /* ── Stepowa bramka kontaktu: konto → imię+nazwisko → telefon ─────────────── */
+    /* ── Stepowa bramka kontaktu: imię+nazwisko → konto (telefon osobno, później) ── */
     .sg { animation: sg-in .28s cubic-bezier(.22,.61,.36,1); }
     @keyframes sg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     .sg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
@@ -12573,9 +12573,18 @@
     }
     function onSignedIn() {
         closeAuthModal();
-        // otwarta bramka rejestracji → przeskocz na tryb „konto połączone"
+        // Bramka kontaktu otwarta → po zalogowaniu domknij ją (imię już było — nowa kolejność
+        // imię→konto) i ruszaj raport; gdy jeszcze brak imienia (ktoś wszedł przez login zamiast
+        // bramki) → pokaż brakujący krok.
         var gateBox = el('inline-gate');
-        if (gateBox) { gateBox.remove(); renderInlineGate(); }
+        if (gateBox) {
+            gateBox.remove();
+            if (!completeContactGateIfReady()) renderInlineGate();
+        } else if (!stepGateStepNeeded() && state.chosenProduct && !state.raport) {
+            // Powrót z OAuth (reload zdjął bramkę): komplet kontaktu, a raport jeszcze nie ruszył →
+            // policz Lead. Sam raport startuje resumeReportIfNeeded; tu domykamy tylko analitykę.
+            fireLeadConversion();
+        }
         // Dopnij konto/mail do bieżącej sesji od razu (nie czekaj na kolejną turę
         // — po werdykcie może jej nie być, a sesja zostałaby anonimowa).
         syncContactToServer();
@@ -13262,13 +13271,28 @@
     function hasFullName() {
         return (state.name || '').trim().split(/\s+/).filter(Boolean).length >= 2;
     }
-    // Krok bramki jeszcze do uzupełnienia: 1=konto, 2=imię+nazwisko, 0=komplet.
+    // Krok bramki jeszcze do uzupełnienia: 1=imię+nazwisko, 2=konto, 0=komplet.
+    // req Tomka: NAJPIERW imię (naturalniej — przedstawiasz się), POTEM konto.
     // R1: telefon NIE jest już krokiem bramki przed raportem — pytamy o niego osobno
     // (renderPhoneAsk) PO dostarczeniu raportu, opcjonalnie.
     function stepGateStepNeeded() {
-        if (!authState.user) return 1;
-        if (!hasFullName()) return 2;
+        if (!hasFullName()) return 1;
+        if (!authState.user) return 2;
         return 0;
+    }
+    // Domknięcie bramki kontaktu, gdy komplet (imię + konto) już zebrany — niezależnie
+    // od kolejności kroków i drogi logowania (formularz / OAuth / resume). Idempotentne
+    // (fireLeadConversion samo-bramkuje po sessionStorage). Zwraca true, gdy domknięto.
+    function completeContactGateIfReady(first) {
+        if (stepGateStepNeeded()) return false;            // brak imienia lub konta
+        state.email = (authState.user && authState.user.email) || state.email || null;
+        persistSession();
+        if (sbAuth && state.name) { try { sbAuth.auth.updateUser({ data: { full_name: state.name } }); } catch (e) {} }
+        syncContactToServer();
+        fireLeadConversion();
+        var g = el('inline-gate'); if (g) g.remove();
+        finishContactGate(first || (state.name || '').trim().split(/\s+/)[0]);
+        return true;
     }
     // Event LEAD — pełny kontakt (konto + imię+nazwisko + telefon). Raz na sesję
     // (sessionStorage); piksel + server-side CAPI z tym samym event_id = dedup.
@@ -13316,10 +13340,10 @@
         if (window.matchMedia('(hover: hover)').matches) el('chat-input').focus();
     }
 
-    // ── STEPOWA BRAMKA KONTAKTU: konto → imię+nazwisko (telefon dopytujemy później) ──
+    // ── STEPOWA BRAMKA KONTAKTU: imię+nazwisko → konto (telefon dopytujemy później) ──
     // Jeden komponent, który PRZEŁADOWUJE się między krokami (nigdy dwa pola naraz).
-    // Przejścia: konto→krok2 robi setAuthSession/onSignedIn (po loginie/OAuth usuwa
-    // bramkę i woła renderInlineGate); krok2→krok3 i krok3→koniec robią handlery.
+    // Przejścia: krok1(imię)→krok2 robi handler formularza imienia (renderInlineGate);
+    // krok2(konto)→koniec robi setAuthSession/onSignedIn → completeContactGateIfReady.
     // Raport (i każde gated generowanie) rusza DOPIERO po komplecie → resumePendingGen.
     function renderInlineGate() {
         if (el('inline-gate')) return;   // bramka już jest
@@ -13352,27 +13376,14 @@
         var head = '<div class="sg-head"><span class="sg-step">Krok ' + step + ' z 2</span><span class="sg-dots" aria-hidden="true">' + dots + '</span></div>';
 
         if (step === 1) {
+            // req Tomka: NAJPIERW imię — naturalniej (najpierw się przedstawiasz, potem konto).
             div.innerHTML = '<div class="sg">' + head +
-                '<h3 class="sg-title">Załóż konto albo zaloguj się</h3>' +
-                '<p class="sg-sub">Żeby ten projekt był Twój — wrócisz do niego z każdego urządzenia, a Tomek wie, z kim buduje.</p>' +
-                authFormHTML('sg', 'Dalej') +
-                '<p class="sg-note">Bez spamu i bez nachalnej sprzedaży. Konto służy tej rozmowie i projektowi.</p>' +
-                '</div>';
-            el('chat-msgs').appendChild(div);
-            scrollToBottom(true);
-            bindAuthForm('sg', null); // po loginie onSignedIn re-renderuje bramkę → krok 2
-            setTimeout(function () { var f = el('sg-email'); if (f && f.scrollIntoView) f.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 300);
-            return;
-        }
-
-        if (step === 2) {
-            div.innerHTML = '<div class="sg">' + head + accountDoneHTML() +
                 '<h3 class="sg-title">Jak się nazywasz?</h3>' +
                 '<p class="sg-sub">Imię i nazwisko — Tomek będzie wiedział, z kim buduje.</p>' +
                 '<form id="sg-name-form" class="sg-form" novalidate>' +
                 '<input class="f-input" type="text" id="sg-name" placeholder="Imię i nazwisko" autocomplete="name" maxlength="120" value="' + esc((state.name && state.name.trim().split(/\s+/).filter(Boolean).length >= 2) ? state.name.trim() : '') + '" required>' +
                 '<div class="f-error" id="sg-name-error">Podaj imię i nazwisko.</div>' +
-                '<button type="submit" class="btn" id="sg-name-submit">Generuj mój raport <span class="btn__arrow">→</span></button>' +
+                '<button type="submit" class="btn" id="sg-name-submit">Dalej <span class="btn__arrow">→</span></button>' +
                 '</form></div>';
             el('chat-msgs').appendChild(div);
             scrollToBottom(true);
@@ -13384,14 +13395,28 @@
                 el('sg-name-error').classList.toggle('is-shown', !okN);
                 if (!okN) return;
                 state.name = v;
-                state.email = (authState.user && authState.user.email) || state.email;
                 persistSession();
-                if (sbAuth) sbAuth.auth.updateUser({ data: { full_name: v } }).catch(function () { });
-                syncContactToServer();
-                fireLeadConversion();   // R1: Lead liczony na e-mailu (konto+imię); telefon dochodzi później
+                if (sbAuth && authState.user) { try { sbAuth.auth.updateUser({ data: { full_name: v } }); } catch (e2) {} }
+                syncContactToServer();   // zapisz imię przy sesji (e-mail dojdzie po koncie)
                 div.remove();
-                finishContactGate(v.split(' ')[0]);   // R1: raport rusza PO koncie+imieniu — bez telefonu (proof-first)
+                // imię gotowe → konto już jest (resume)? domknij i ruszaj raport; inaczej pokaż krok konta.
+                if (!completeContactGateIfReady(v.split(' ')[0])) renderInlineGate();
             });
+            return;
+        }
+
+        if (step === 2) {
+            var hi = (state.name && state.name.trim()) ? ('Cześć ' + esc(state.name.trim().split(/\s+/)[0]) + ' — ') : '';
+            div.innerHTML = '<div class="sg">' + head +
+                '<h3 class="sg-title">' + hi + 'załóż konto albo zaloguj się</h3>' +
+                '<p class="sg-sub">Żeby ten projekt był Twój — wrócisz do niego z każdego urządzenia, a raport zapiszemy na Twoim koncie.</p>' +
+                authFormHTML('sg', 'Generuj mój raport') +
+                '<p class="sg-note">Bez spamu i bez nachalnej sprzedaży. Konto służy tej rozmowie i projektowi.</p>' +
+                '</div>';
+            el('chat-msgs').appendChild(div);
+            scrollToBottom(true);
+            bindAuthForm('sg', null); // po loginie onSignedIn → completeContactGateIfReady (raport rusza)
+            setTimeout(function () { var f = el('sg-email'); if (f && f.scrollIntoView) f.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 300);
             return;
         }
 
