@@ -138,6 +138,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @media (prefers-reduced-motion:reduce){
     html{scroll-snap-type:none;scroll-behavior:auto}
     .aurora,.grain{display:none!important}
+    .hero::before,.btn--xl{animation:none!important}
     [data-reveal]{opacity:1!important;transform:none!important}
 }
 
@@ -224,13 +225,16 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .btn--ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;background:rgba(0,217,126,.05)}
 
 /* ============================================================ ACT 01 HERO */
+.hero{overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(52% 44% at 58% 50%,rgba(0,217,126,.16),transparent 62%);animation:heroGlow 7.5s var(--ease2) infinite alternate}
+@keyframes heroGlow{0%{opacity:.72;transform:scale(1) translateX(0)}100%{opacity:1;transform:scale(1.06) translateX(1.5%)}}
 .hero .scene__in{max-width:1000px}
 .author{display:inline-flex;align-items:center;gap:12px;padding:7px 14px 7px 7px;border:1px solid var(--border-strong);border-radius:999px;background:var(--glass);margin-bottom:30px}
 .author img{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent);object-fit:cover}
 .author b{font-size:14px;font-weight:700;color:var(--text-strong);display:block;line-height:1.15}
 .author span{font-size:12px;color:var(--text-muted)}
 .hero h1{font-size:clamp(44px,8.4vw,108px);font-weight:900;letter-spacing:-.05em;line-height:.95;color:var(--text-strong)}
-.hero h1 .ci{font-style:italic;font-weight:400;color:var(--text-muted)}
+.hero h1 .ci{font-style:italic;font-weight:400;color:var(--text-muted);margin-right:.1em}
 .hero h1 .g{color:var(--accent);text-shadow:0 0 70px rgba(0,217,126,.35)}
 .hero h1 .coda{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:.46em;color:var(--text-muted);letter-spacing:-.02em;margin-top:.12em}
 .hero__sub{margin-top:26px;font-family:var(--serif);font-style:italic;font-size:clamp(20px,3.2vw,32px);color:var(--text-muted);line-height:1.3}
@@ -428,7 +432,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="38" height="38">
             <div><b>Tomek Niedźwiecki</b><span>Buduję e-biznesy od 15 lat</span></div>
         </div>
-        <h1 data-reveal data-delay="80">Zbuduję <span class="ci">Ci</span> <span class="g">biznes.</span><span class="coda">Osobiście.</span></h1>
+        <h1 data-reveal data-delay="80">Zbuduję <span class="ci">Ci</span> <span class="g">e-sklep.</span><span class="coda">Osobiście.</span></h1>
         <p class="hero__sub" data-reveal data-delay="200">Buduję. Uczę. <span class="g">Oddaję stery, kiedy działa.</span></p>
     </div>
     <div class="hero__scroll"><span>scroll</span><span class="a"></span></div>
