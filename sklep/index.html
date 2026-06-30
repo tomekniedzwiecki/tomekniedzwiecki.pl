@@ -10841,7 +10841,7 @@
               '<button type="button" data-b="high"><b>Jestem gotów zainwestować w porządny start</b><span>mam środki na budowę + reklamy</span></button>' +
               '<button type="button" data-b="mid"><b>Mam część — chcę poznać pełny plan</b><span>policzmy to wspólnie</span></button>' +
               '<button type="button" data-b="unknown"><b>Najpierw chcę zobaczyć całość</b><span>budżet docepnimy później</span></button>' +
-              '<button type="button" data-b="none"><b>Szczerze — teraz nie mam budżetu</b><span>buduję bez nakładu</span></button>' +
+              '<button type="button" data-b="none"><b>Szczerze — teraz nie mam budżetu</b><span>wrócę w przyszłości</span></button>' +
             '</div></div>';
         el('chat-msgs').appendChild(div); scrollToBottom(true);
         Array.prototype.forEach.call(div.querySelectorAll('.bgt-opts button'), function (b) {
@@ -11005,6 +11005,35 @@
         return fetchT(SB_URL + '/functions/v1/bud-brand', { method: 'POST', headers: authHeaders(), body: JSON.stringify(Object.assign({ sessionId: state.sessionId, action: action, product: state.chosenProduct || null }, extra || {})) }, 120000).then(function (r) { return r.json(); });
     }
     var _brandNameRetries = 0;   // cichy auto-retry nazw w tle (req Tomka: bez klikania, bez błędów)
+    function brandSlug(s) {
+        return String(s).toLowerCase()
+            .replace(/ą/g, 'a').replace(/ć/g, 'c').replace(/ę/g, 'e').replace(/ł/g, 'l').replace(/ń/g, 'n')
+            .replace(/ó/g, 'o').replace(/ś/g, 's').replace(/ź/g, 'z').replace(/ż/g, 'z')
+            .replace(/[^a-z0-9]+/g, '');
+    }
+    // Wpisana własna nazwa/domena marki → ta sama ścieżka co klik karty (logo → makiety).
+    // Używane przez pole „własna nazwa" w karcie ORAZ marker <marka_nazwa> z czatu (gdy user
+    // wpisze nazwę w kompozytorze zamiast kliknąć). Zwraca true, gdy obsłużono.
+    function applyTypedBrandName(raw) {
+        var card = el('brand-card');
+        if (!card || state.brandDone) return false;
+        raw = String(raw || '').trim();
+        if (!raw) return false;
+        var nm, dom;
+        if (raw.indexOf('.') >= 0) {                         // wpisał DOMENĘ → nazwa = część przed kropką
+            dom = raw.toLowerCase().replace(/^https?:\/\//, '').replace(/\s+/g, '').replace(/\/.*$/, '');
+            if (!/\.[a-z]{2,}$/.test(dom)) dom += '.pl';
+            nm = brandSlug(dom.split('.')[0]);
+            nm = nm ? nm.charAt(0).toUpperCase() + nm.slice(1) : raw;
+        } else {                                              // wpisał NAZWĘ → domena = slug.pl
+            nm = raw;
+            var sl = brandSlug(raw);
+            if (!sl) return false;
+            dom = sl + '.pl';
+        }
+        pickBrandName(card, { name: nm, domain: dom, available: false });
+        return true;
+    }
     function renderBrandPicker() {
         if (!el('chat-msgs') || el('brand-card') || !state.sessionId) return;
         if (state.brandDone) return;
@@ -11051,10 +11080,26 @@
                 '<div class="brand-names">' + names.map(function (n, i) {
                     return '<button type="button" class="brand-name" data-i="' + i + '"><span class="brand-name__n">' + esc(n.name) + '</span>' +
                         '<span class="brand-name__d">' + esc(n.domain) + (n.available ? ' <i class="brand-free">✓ wolna</i>' : '') + '</span></button>';
-                }).join('') + '</div>' + rerollHtml;
+                }).join('') + '</div>' +
+                // Własna nazwa/domena — DZIAŁAJĄCA ścieżka do logo (req Tomka: wpisanie własnej
+                // domeny zostawiało dead-end bez logo i makiet). Akceptuje nazwę albo domenę.
+                '<div class="brand-own" style="margin-top:11px">' +
+                  '<div class="brand-card__sub" style="margin-bottom:6px">Masz już swoją nazwę albo domenę? Wpisz ją tutaj:</div>' +
+                  '<div style="display:flex;gap:7px">' +
+                    '<input type="text" id="brand-own-input" maxlength="40" placeholder="np. KarkLuz albo karkluz.pl" style="flex:1;min-width:0;background:rgba(255,255,255,.04);border:1px solid var(--glass-border,rgba(255,255,255,.14));border-radius:10px;padding:10px 12px;color:var(--text-strong,#fff);font:inherit;font-size:13.5px">' +
+                    '<button type="button" id="brand-own-go" style="flex-shrink:0;background:rgba(0,217,126,.10);border:1px solid rgba(0,217,126,.42);color:#00d97e;border-radius:10px;padding:10px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Twórz logo →</button>' +
+                  '</div>' +
+                '</div>' + rerollHtml;
             card.querySelectorAll('.brand-name').forEach(function (b) {
                 b.addEventListener('click', function () { pickBrandName(card, names[+b.getAttribute('data-i')]); });
             });
+            // ── Własna nazwa/domena → ta sama ścieżka co klik karty (logo → makiety) ──
+            var ownGo = el('brand-own-go'), ownInp = el('brand-own-input');
+            var submitOwn = function () {
+                if (!applyTypedBrandName(ownInp ? ownInp.value : '') && ownInp) ownInp.focus();
+            };
+            if (ownGo) ownGo.addEventListener('click', submitOwn);
+            if (ownInp) ownInp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); submitOwn(); } });
             var rerollBtn = el('brand-reroll');
             if (rerollBtn) rerollBtn.addEventListener('click', function () {
                 state._brandReroll = true; persistSession();   // tylko jeden raz na sesję
@@ -13513,7 +13558,7 @@
     /* ============================================================
        CZAT — render
        ============================================================ */
-    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia', '<zielone', '<dopytanie']; // bloki techniczne ukrywane przed użytkownikiem
+    var HIDDEN_MARKS = ['<werdykt', '<ocena', '<projekt', '<opcje', '<blysk', '<sekcje', '<karuzela', '<wskaz', '<wybor', '<kierunki', '<propozycje_zadaj', '<propozycje', '<propbrak', '<kamien', '<makieta', '<suwak', '<ranking', '<styl_wybor', '<bierny', '<rezygnacja', '<ustalenia', '<marka_nazwa', '<zielone', '<dopytanie']; // bloki techniczne ukrywane przed użytkownikiem
 
     function visibleText(raw) {
         var t = raw
@@ -13543,6 +13588,7 @@
             .replace(/<bierny>[\s\S]*?<\/bierny>/g, '').replace(/<bierny\s*\/?>/g, '')
             .replace(/<rezygnacja>[\s\S]*?<\/rezygnacja>/g, '').replace(/<rezygnacja\s*\/?>/g, '')
             .replace(/<ustalenia\b[^>]*>[\s\S]*?<\/ustalenia>/g, '').replace(/<ustalenia\b[^>]*\/?>/g, '')
+            .replace(/<marka_nazwa>[\s\S]*?<\/marka_nazwa>/g, '')   // własna nazwa marki z czatu → front ruszy logo (marker techniczny)
             .replace(/<dopytanie>[\s\S]*?<\/dopytanie>/g, '');   // 2. wiadomość (pytania) — renderowana osobno po pasku raportu
         // otwarty, niedomknięty blok w trakcie streamu — utnij od markera
         for (var m = 0; m < HIDDEN_MARKS.length; m++) {
@@ -14565,6 +14611,13 @@
                 renderInlineGate();
             }
 
+            // Marker <marka_nazwa> → user podał własną nazwę/domenę marki W CZACIE (zamiast
+            // kliknąć kartę). Ruszamy logo tą samą ścieżką (req Tomka: wpisanie własnej domeny
+            // zostawiało dead-end). Robimy to ZANIM rozważymy chipy — karta przejmuje turę.
+            var markaTyped = (raw.match(/<marka_nazwa>([\s\S]*?)<\/marka_nazwa>/) || [])[1];
+            if (markaTyped && el('brand-card') && !state.brandDone && applyTypedBrandName(markaTyped)) {
+                updateStages(); scrollToBottom(false); return;
+            }
             // Marker <projekt> → generowanie BLOKUJE rozmowę do pokazania efektu
             // (inaczej user klika dalej i nigdy nie widzi podglądu); dymki tej
             // tury renderują się dopiero POD obrazkiem.
