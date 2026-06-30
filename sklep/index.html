@@ -3042,6 +3042,46 @@
     .stage.is-done .stage__label { color: var(--text-muted); }
 
     /* ============================================================
+       PASEK POSTĘPU PROJEKTU (Genius#2) — „gdzie jestem i ile zostało"
+       Jeden element zamiast rozproszonych loaderów; anty-zagubienie/przytłoczenie.
+       Mieści się na mobile (8 kropek + nazwa etapu) — bez horizontal scrolla.
+       ============================================================ */
+    .pbar {
+        display: flex; align-items: center; gap: 12px;
+        padding: 9px 18px; border-bottom: 1px solid var(--border);
+        background: var(--bg); flex: 0 0 auto;
+    }
+    .pbar__track {
+        position: relative; flex: 1 1 auto; min-width: 0;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .pbar__track::before {
+        content: ''; position: absolute; left: 5px; right: 5px; top: 50%;
+        height: 2px; background: var(--border-strong); transform: translateY(-50%);
+    }
+    .pbar__dot {
+        position: relative; z-index: 1; width: 11px; height: 11px; padding: 0;
+        border-radius: 50%; border: 2px solid var(--border-strong); background: var(--bg);
+        flex: 0 0 auto; cursor: default; transition: background .2s, border-color .2s, box-shadow .2s;
+    }
+    .pbar__dot.is-done { background: var(--accent); border-color: var(--accent); cursor: pointer; }
+    .pbar__dot.is-done::after {
+        content: ''; position: absolute; left: 2px; top: 0px; width: 3px; height: 6px;
+        border: solid #00150c; border-width: 0 2px 2px 0; transform: rotate(45deg);
+    }
+    .pbar__dot.is-active {
+        border-color: var(--accent); background: var(--bg); cursor: pointer;
+        box-shadow: 0 0 0 3px var(--accent-soft); animation: pbarPulse 1.7s ease-in-out infinite;
+    }
+    .pbar__dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @keyframes pbarPulse { 0%,100% { box-shadow: 0 0 0 2px var(--accent-soft); } 50% { box-shadow: 0 0 0 5px transparent; } }
+    .pbar__label { flex: 0 0 auto; font-size: 12.5px; color: var(--text); white-space: nowrap; display: flex; gap: 7px; align-items: baseline; }
+    .pbar__label .pbar__cur { font-weight: 600; }
+    .pbar__label .pbar__count { color: var(--text-muted); font-family: var(--mono); font-size: 11px; }
+    @media (max-width: 560px) { .pbar { padding: 8px 13px; gap: 10px; } .pbar__label { font-size: 12px; } .pbar__dot { width: 10px; height: 10px; } }
+    @media (prefers-reduced-motion: reduce) { .pbar__dot.is-active { animation: none; } }
+
+    /* ============================================================
        STRUMIEŃ WIADOMOŚCI
        ============================================================ */
     .chat-scroll {
@@ -5793,6 +5833,8 @@
             <span class="chat-top__spacer" aria-hidden="true"></span>
             <div class="auth-top" id="auth-top"></div>
         </header>
+
+        <div class="pbar" id="pbar" hidden aria-label="Postęp projektu"></div>
 
         <div class="chat-scroll" id="chat-scroll">
             <div class="chat-msgs" id="chat-msgs" aria-live="polite"></div>
@@ -10428,6 +10470,46 @@
             stEl.textContent = st.label;
             if (st.cls === 'gen') { item.classList.add('is-generating'); startSideGen(); }
             else item.classList.remove('is-generating');
+        });
+        updateProgressBar();
+    }
+
+    // ── PASEK POSTĘPU PROJEKTU (Genius#2) ──────────────────────────────────────
+    // 8 etapów lejka; każdy „zrobiony / w toku / przed nami". Pokazuje się dopiero po
+    // wyborze produktu (flow ruszyło) i znika w trybie know-how. Kropka „zrobione" i
+    // „w toku" są klikalne → przeskok do tej zakładki (redukuje „nie wiem gdzie to jest").
+    var PBAR_STAGES = [
+        { label: 'Produkt', tab: 'chat', done: function () { return !!(state.chosenProduct && state.chosenProduct.id); } },
+        { label: 'Raport', tab: 'rynek', done: function () { return !!state.raport; } },
+        { label: 'Ustalenia', tab: 'ustalenia', done: function () { return !!state.ustalenia; } },
+        { label: 'Marka', tab: 'makiety', done: function () { return !!state.brandDone; } },
+        { label: 'Makiety', tab: 'makiety', done: function () { return !!(state.mockups && state.mockups.length); } },
+        { label: 'Reklamy', tab: 'reklamy', done: function () { return !!(state.suiteAds && state.suiteAds.length); } },
+        { label: 'Sklep', tab: 'sklep', done: function () { return !!state.landingHtml; } },
+        { label: 'Rezerwacja', tab: 'wspolpraca', done: function () { return !!state.paid; } }
+    ];
+    function updateProgressBar() {
+        var bar = el('pbar'); if (!bar) return;
+        var started = !!(state.chosenProduct && state.chosenProduct.id);
+        if (!started || state.stage === 'knowhow' || state.stage === 'build') { bar.hidden = true; return; }
+        var states = PBAR_STAGES.map(function (s) { return !!s.done(); });
+        var doneCount = 0, activeIdx = -1;
+        for (var i = 0; i < states.length; i++) { if (states[i]) doneCount++; }
+        for (var j = 0; j < states.length; j++) { if (!states[j]) { activeIdx = j; break; } }
+        var cur = activeIdx >= 0 ? PBAR_STAGES[activeIdx] : PBAR_STAGES[PBAR_STAGES.length - 1];
+        var stageNum = activeIdx >= 0 ? activeIdx + 1 : PBAR_STAGES.length;
+        var dots = PBAR_STAGES.map(function (s, i) {
+            var cls = states[i] ? 'is-done' : (i === activeIdx ? 'is-active' : 'is-pending');
+            return '<button type="button" class="pbar__dot ' + cls + '" data-tab="' + s.tab + '" data-i="' + i + '" title="' + esc(s.label) + '" aria-label="' + esc(s.label) + (states[i] ? ' — gotowe' : (i === activeIdx ? ' — w toku' : ' — przed nami')) + '"></button>';
+        }).join('');
+        bar.hidden = false;
+        bar.innerHTML = '<div class="pbar__track">' + dots + '</div>' +
+            '<div class="pbar__label"><span class="pbar__cur">' + esc(cur.label) + '</span><span class="pbar__count">etap ' + stageNum + '/' + PBAR_STAGES.length + '</span></div>';
+        Array.prototype.forEach.call(bar.querySelectorAll('.pbar__dot'), function (b) {
+            b.addEventListener('click', function () {
+                var idx = +b.getAttribute('data-i');
+                if (states[idx] || idx === activeIdx) { var t = b.getAttribute('data-tab'); if (typeof switchTab === 'function') switchTab(t); }
+            });
         });
     }
 
