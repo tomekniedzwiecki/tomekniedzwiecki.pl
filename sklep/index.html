@@ -8478,10 +8478,21 @@
         scrollToBottom(false);
     }
     function markRaportReadyInChat() {
-        var card = el('rk-chat-card'); if (!card) return;
+        if (!el('chat-msgs')) return;
+        if (el('rk-chat-open')) return;            // już ogłoszony (przycisk „Zobacz raport" istnieje)
+        var card = el('rk-chat-card');
+        if (!card) {
+            // Brak paska „raport powstaje" (raport doliczył się w tle, zanim go pokazaliśmy) —
+            // i tak OGŁOŚ gotowość w czacie. Bez tego user nie widzi, że raport jest (req Tomka:
+            // „nawet jak się wygeneruje, to tego nie widać"). Tworzymy kartę-gotowca na dole rozmowy.
+            card = document.createElement('div');
+            card.id = 'rk-chat-card';
+            el('chat-msgs').appendChild(card);
+        }
         card.className = 'gcard gcard--done'; card.removeAttribute('style');
         card.innerHTML = rkChatCardInner(true);
         var b = el('rk-chat-open'); if (b) b.addEventListener('click', function () { switchTab('rynek'); });
+        scrollToBottom(false);
     }
     // FIX: karty generowania w czacie flipują na „gotowe", gdy dane są już w stanie —
     // niezależnie czy zrobił to poller, czy sync sesji (poller bywa zatrzymany guardem !state.x).
@@ -13882,6 +13893,18 @@
         var s = parseOpcje(content);
         return s ? { opts: s, multi: false } : null;
     }
+    // SIATKA BEZPIECZEŃSTWA (req Tomka): mózg POWINIEN podawać <opcje> w każdej turze,
+    // ale gdy zapomni — i tak dajemy kontekstowe podpowiedzi „co/jak odpowiedzieć", żeby
+    // user NIGDY nie został przed pustym polem, nie wiedząc, co dalej. Dobierane po etapie.
+    function defaultSuggestions() {
+        if (!state.chosenProduct || !state.chosenProduct.id) return ['Pokaż mi jakiś produkt', 'Mam własny pomysł', 'Jak to w ogóle działa?'];
+        if (state.verdict === 'zielony') return ['Co teraz robimy?', 'Mam pytanie o współpracę'];
+        if (!state.raport) return ['Jasne, czekam na raport', 'Mam pytanie', 'Co będzie dalej?'];
+        if (!state.ustalenia) return ['Brzmi dobrze', 'Wolałbym inaczej', 'Co robimy dalej?'];
+        if (!state.brandDone) return ['Pasuje', 'Zaproponuj coś innego', 'Co dalej?'];
+        if (!state.landingHtml) return ['Dobra, dalej', 'Mam pytanie', 'Pokaż, co już mamy'];
+        return ['Jasne, co teraz?', 'Mam pytanie', 'Chcę pogadać o współpracy'];
+    }
     // FIX(5): podpowiedzi „co poprawić w sklepie" mają sens DOPIERO gdy sklep (landing) gotowy.
     var pendingShopSugg = null;
     function suggIsShopEdit(opts) {
@@ -14572,6 +14595,12 @@
                 if (suggIsShopEdit(sugg.opts) && !state.landingHtml && state.mockups && state.mockups.length) { pendingShopSugg = sugg; }
                 else if (parseDopytanie(raw)) { setTimeout(function () { renderSuggestions(sugg.opts, sugg.multi); }, 720); }   // chipy PO osobnym dymku <dopytanie>
                 else renderSuggestions(sugg.opts, sugg.multi);
+            } else if (!el('inline-gate') && !el('qr-chips') && !el('budget-gate') && !el('phone-ask') && !el('brand-card') && verdict !== 'zielony' && !gatePending()) {
+                // SIATKA BEZPIECZEŃSTWA: tura skończona, mózg nie dał ani <opcje>, ani widżetu/kierunków,
+                // nie ma otwartej bramki ani werdyktu → user zostałby bez podpowiedzi. Dajemy domyślne,
+                // żeby zawsze wiedział, co i jak odpowiedzieć (req Tomka). Idempotentne — renderSuggestions
+                // sam czyści poprzednie chipy, a guard !qr-chips chroni przed dublem.
+                renderSuggestions(defaultSuggestions(), false);
             }
             updateStages();
             scrollToBottom(false);
