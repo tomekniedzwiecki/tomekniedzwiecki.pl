@@ -5988,8 +5988,9 @@
     var OPENER_PROMISE = 'Który bierzemy?';
 
     // Otwarcie w DWÓCH wiadomościach: P1 od razu, potem (efekt pisania ~3,5s) P2 + karuzela produktów.
-    var OPENER_P1 = 'Cześć, tu AI Tomka Niedźwieckiego. **Zbudujemy teraz Twój sklep online.** Wskaż produkt, a zobaczysz na żywo, jak powstaje z niego biznes: **analiza rynku, gotowa marka, strona sprzedażowa i grafiki reklamowe** — to robimy za darmo i zostaje Twoje.';
-    var OPENER_P2 = 'A jak ruszymy na poważnie: **pełny sklep pod klucz buduje Tomek z zespołem — jako Twój wspólnik, który bierze 20% od zysku, czyli zarabia dopiero, gdy Ty zarabiasz.** Wybierz pierwszy produkt na start 👇';
+    var OPENER_P1 = 'Cześć, tu AI Tomka Niedźwieckiego 👋 **Zbudujemy teraz Twój sklep online** — i zobaczysz na żywo, jak z produktu powstaje prawdziwy biznes.';
+    var OPENER_P1B = 'Wskażesz produkt, a ja przygotuję dla Ciebie **analizę rynku, gotową markę, stronę sprzedażową i grafiki reklamowe** — za darmo, i wszystko zostaje Twoje.';
+    var OPENER_P2 = 'A jak ruszymy na poważnie — **pełny sklep pod klucz buduje Tomek z zespołem, jako Twój wspólnik: 20% od zysku, czyli zarabia dopiero, gdy Ty zarabiasz.** Wybierz pierwszy produkt na start 👇';
     var OPENER_GENERIC = OPENER_P1 + '\n\n' + OPENER_P2;
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
@@ -6258,6 +6259,7 @@
             leadId: state.leadId,
             kamien: state.kamien || 0,
             emailKnown: !!state.emailKnown,
+            phoneKnown: !!state.phoneKnown,
             lastBrief: state.lastBrief || null,
             chosenProduct: state.chosenProduct || null,
             mockupUrl: state.mockupUrl || null,
@@ -6482,6 +6484,7 @@
         state.leadId = saved.leadId || null;
         state.kamien = saved.kamien || 0;
         state.emailKnown = !!saved.emailKnown;
+        state.phoneKnown = !!saved.phoneKnown;
         state.lastBrief = saved.lastBrief || null;
         state.chosenProduct = saved.chosenProduct || null;
         state.mockupUrl = saved.mockupUrl || null;
@@ -6686,6 +6689,18 @@
                 changed = true;
                 try { renderChosenProduct(); } catch (e) { }
             }
+            // R1/resume (feedback Tomka): odtwórz KOMPLET KONTAKTU z serwera (?id= na świeżym
+            // urządzeniu albo gdy LS się rozjechał), żeby bramka NIE pytała drugi raz o imię.
+            // Owner-gate już przeszedł (mamy treść projektu), więc to bezpieczne.
+            var srvName = (typeof p.name === 'string') ? p.name.trim() : '';
+            if (srvName && srvName.split(/\s+/).filter(Boolean).length >= 2 &&
+                (!state.name || state.name.trim().split(/\s+/).filter(Boolean).length < 2)) {
+                state.name = srvName;
+                state.emailKnown = true;
+                changed = true;
+                if (el('inline-gate')) { try { renderInlineGate(); } catch (e) {} }   // bramka znika, gdy kontakt już kompletny
+            }
+            if (p.ma_telefon && !state.phone && !state.phoneKnown) { state.phoneKnown = true; changed = true; }   // serwer ma numer → nie pytaj o telefon ponownie
             if (changed) persistSession();
             function archive(view, u) {
                 if (!u) return;
@@ -6753,6 +6768,19 @@
                 clearGenFail('sklep');
                 if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                 persistSession();
+                changed = true;
+            }
+            // MARKA z serwera (feedback Tomka: na ?id=-resume brand/brandDone NIE były hydratowane,
+            // przez co karta makiet — bramkowana brandDone — znikała i rozmowa „stała").
+            if (p.brand && typeof p.brand === 'object' && !Array.isArray(p.brand)
+                && JSON.stringify(p.brand) !== JSON.stringify(state.brand)) {
+                state.brand = p.brand;
+                changed = true;
+            }
+            // brandDone (derived): marka domknięta, gdy wybrano nazwę/logo ALBO makiety już są
+            // (makiety powstają PO marce). Odblokowuje kartę makiet i prowadzi rozmowę dalej.
+            if (!state.brandDone && ((p.brand && (p.brand.chosen_name || p.brand.chosen_logo)) || (Array.isArray(p.mockups) && p.mockups.length))) {
+                state.brandDone = true;
                 changed = true;
             }
             if (typeof p.landing_url === 'string' && p.landing_url && p.landing_url !== state.landingUrl) {
@@ -6851,6 +6879,11 @@
                 if (activeTab === 'makiety') renderPaneMakiety();
                 if (activeTab === 'reklamy') renderPaneReklamy();
                 if (activeTab === 'sklep') renderPaneSklep();
+                // STRAŻNIK ROZMOWY (feedback Tomka): po KAŻDYM sync zmieniającym stan re-prowadź
+                // rozmowę — wznów wiszącą generację, domknij granice pipeline, odsłoń karty etapów.
+                // Na ?id=-resume init() odpala to PRZED hydracją (stan pusty); tu robimy to PO
+                // hydracji, więc makiety/marka/sklep nie „stoją" bez następnego kroku.
+                try { resumeReportIfNeeded(); } catch (e) {}
             }
         }).catch(function () { });
     }
@@ -10512,7 +10545,7 @@
         { label: 'Raport', tab: 'rynek', done: function () { return !!state.raport; } },
         { label: 'Ustalenia', tab: 'ustalenia', done: function () { return !!state.ustalenia; } },
         { label: 'Marka', tab: 'chat', done: function () { return !!state.brandDone; }, act: 'wybierz nazwę', actReady: function () { return !!state.ustalenia; } },   // wybór nazwy/logo jest w czacie (renderBrandPicker)
-        { label: 'Makiety', tab: 'makiety', done: function () { return !!(state.mockups && state.mockups.length); }, act: 'wybierz styl', actReady: function () { return !!(state.mockups && state.mockups.length); } },
+        { label: 'Makiety', tab: 'makiety', done: function () { return !!state.chosenStyle; }, act: 'wybierz styl', actReady: function () { return !!(state.mockups && state.mockups.length); } },   // „done" = STYL WYBRANY (nie samo wygenerowanie)
         { label: 'Reklamy', tab: 'reklamy', done: function () { return !!(state.suiteAds && state.suiteAds.length); } },
         { label: 'Sklep', tab: 'sklep', done: function () { return !!state.landingHtml; } },
         { label: 'Rezerwacja', tab: 'wspolpraca', done: function () { return !!state.paid; }, act: 'zarezerwuj', actReady: function () { return !!state.landingHtml; } }
@@ -11126,18 +11159,32 @@
     // Otwarcie cz.2: po ~3,5s efektu pisania dochodzi DRUGA wiadomość, a zaraz po niej — od razu produkty.
     function stageOpener2() {
         if (state.chosenProduct || el('vp-picker')) { ensureCarousel(); return; }
-        var typing = document.createElement('div');
-        typing.className = 'msg msg--ai';
-        typing.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
-        el('chat-msgs').appendChild(typing); scrollToBottom(false);
-        setTimeout(function () {
-            if (!el('chat-msgs') || state.chosenProduct) { if (typing) typing.remove(); return; }
-            typing.remove();
-            messages.push({ role: 'assistant', content: OPENER_P2, local: true });
-            appendMessage('assistant', OPENER_P2);
-            saveMessages();
-            ensureCarousel();   // od razu pokaż produkty
-        }, 1400);   // R18: skrócone z 3,5s — mobilny (uwaga ~8s) i gorący kupiec nie tracą połowy okna uwagi na „teatr pisania"
+        // Sekwencja „oddechu" (feedback Tomka): P1 jest już w czacie; dochodzi P1B, potem P2 —
+        // krótkimi bąbelkami z efektem pisania, żeby treść nie była jedną ścianą.
+        function bubble(txt, ms, then) {
+            var typing = document.createElement('div');
+            typing.className = 'msg msg--ai';
+            typing.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+            el('chat-msgs').appendChild(typing);
+            setTimeout(function () {
+                if (!el('chat-msgs') || state.chosenProduct) { if (typing) typing.remove(); return; }
+                typing.remove();
+                messages.push({ role: 'assistant', content: txt, local: true });
+                appendMessage('assistant', txt);
+                saveMessages();
+                if (then) then();
+            }, ms);
+        }
+        bubble(OPENER_P1B, 1100, function () {
+            bubble(OPENER_P2, 1100, function () {
+                ensureCarousel();   // produkty (przypięte do dołu)
+                // feedback Tomka: NIE zjeżdżaj do produktów — zostaw opener widoczny u góry,
+                // a o produktach poniżej informuje przycisk „przewiń w dół" (jump). User czyta wstęp,
+                // potem scrolluje sam, gdy zechce.
+                var sc = el('chat-scroll'); if (sc) sc.scrollTop = 0;
+                setJumpVisible(true);
+            });
+        });
     }
 
     // EKRAN WYBORU 3 KIERUNKÓW (start świeżej rozmowy). Karty reużywają stylu
@@ -12981,7 +13028,7 @@
     function renderPhoneGate(onDone) {
         _phoneGateOnDone = (typeof onDone === 'function') ? onDone : null;
         var run = function () { var fn = _phoneGateOnDone; _phoneGateOnDone = null; if (fn) fn(); };
-        if (state.phone) { run(); return; }                       // mamy numer → leć dalej
+        if (state.phone || state.phoneKnown) { run(); return; }    // mamy numer (lub serwer go ma) → leć dalej
         if (!authState.user || !hasFullName()) { run(); return; } // brak konta/imienia (edge) → nie blokuj
         if (activeTab !== 'chat') switchTab('chat');              // bramka jest w czacie — pokaż ją (user kliknął styl na zakładce Makiety)
         if (el('phone-ask')) return;                              // bramka już jest; onDone zaktualizowany wyżej
