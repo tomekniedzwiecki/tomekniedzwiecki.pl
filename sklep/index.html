@@ -7434,12 +7434,12 @@
         });
     }
     function switchTab(tab) {
-        if (tab === 'rynek' || tab === 'wspolpraca' || tab === 'ustalenia' || tab === 'makiety' || tab === 'reklamy' || tab === 'sklep') gaEvent('app_tab_view', { tab: tab });
+        if (tab === 'rynek' || tab === 'wspolpraca' || tab === 'ustalenia' || tab === 'makiety' || tab === 'reklamy' || tab === 'sklep' || tab === 'biznesplan') gaEvent('app_tab_view', { tab: tab });
         activeTab = tab;
         updateSideNav();
         var isPane = tab !== 'chat';
         el('view-chat').classList.toggle('is-pane', isPane);
-        ['projekt', 'rynek', 'ustalenia', 'makiety', 'reklamy', 'sklep', 'wspolpraca'].forEach(function (t) {
+        ['projekt', 'rynek', 'ustalenia', 'makiety', 'reklamy', 'sklep', 'biznesplan', 'wspolpraca'].forEach(function (t) {
             el('pane-' + t).classList.toggle('is-active', tab === t);
         });
         if (tab === 'projekt') { renderPaneProjekt(); }
