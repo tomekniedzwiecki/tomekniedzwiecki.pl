@@ -204,6 +204,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .scene{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:96px clamp(20px,5vw,48px) 84px}
 .scene__in{width:100%;max-width:1080px;margin:0 auto}
 .scene--wide .scene__in{max-width:1240px}
+@media (min-width:861px){.scene--wide{padding-left:clamp(48px,12vw,186px)}}
 @media (max-width:860px){.scene{min-height:auto;padding:84px 20px 72px}}
 
 /* reveal */
@@ -518,7 +519,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 </section>
 
 <!-- ACT 04 — PROOF / LEDGER -->
-<section class="scene proof scene--wide" id="act-4" data-rail="Liczby">
+<section class="scene proof" id="act-4" data-rail="Liczby">
     <div class="scene__in">
         <span class="eyebrow eyebrow--serif" data-reveal>policzmy.</span>
         <div class="proof__num" data-reveal data-delay="60"><span id="counter">0</span><small>mln zł</small></div>
