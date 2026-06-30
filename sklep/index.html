@@ -3941,6 +3941,11 @@
     .rpw-anchor__items { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 6px; }
     .rpw-anchor__items i { font-style: normal; font-size: 13px; font-weight: 600; color: var(--text-strong); }
     .rpw-anchor__note { display: block; font-size: 12px; line-height: 1.45; color: var(--text-muted); }
+    .rpw-proof { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; margin: 4px 0 10px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; }
+    .rpw-proof__cell { aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,217,126,.22); background: #000; }
+    .rpw-proof__cell img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+    .rpw-proof__see { grid-column: 1 / -1; font-size: 12px; font-weight: 700; color: var(--accent); text-align: center; padding: 2px 0; }
+    .rpw-proof:hover .rpw-proof__see { text-decoration: underline; }
     .auth-modal__note { margin: 16px 0 0; font-size: 11.5px; opacity: .5; line-height: 1.5; }
     .auth-modal .gate-oauth-row { margin-top: 0; grid-template-columns: 1fr; }
     .auth-otp-sent { font-size: 13px; line-height: 1.5; opacity: .85; margin: 0 0 10px; }
@@ -7090,6 +7095,18 @@
             '<div id="rpw-status" style="display:none;margin-top:12px;font-size:13px;line-height:1.5;color:var(--text)"></div>' +
             '<button type="button" id="rpw-other" style="' + cpwLink + '">Inne metody (karta / przelew) →</button>' +
             '<button type="button" id="rpw-paid" style="' + cpwLink + ';margin-top:4px">Już zapłaciłem — odśwież</button>';
+        // WIZUALNY PROOF (reciprocity w momencie decyzji): miniatury tego, co user JUŻ dostał za darmo —
+        // wybrana makieta + kreacje reklamowe. Namacalny dowód tuż przed polem BLIK podbija konwersję.
+        var proofUrls = [];
+        var chosenMk = (state.mockups || []).filter(function (m) { return m && m.style === state.chosenStyle; })[0] || (state.mockups || [])[0];
+        if (chosenMk && chosenMk.url) proofUrls.push(chosenMk.url);
+        (state.suiteAds || []).forEach(function (a) { if (a && a.image_url && proofUrls.indexOf(a.image_url) < 0 && proofUrls.length < 4) proofUrls.push(a.image_url); });
+        (state.mockups || []).forEach(function (m) { if (m && m.url && proofUrls.indexOf(m.url) < 0 && proofUrls.length < 4) proofUrls.push(m.url); });
+        var proofGrid = (proofUrls.length >= 2)
+            ? '<button type="button" class="rpw-proof" id="rpw-proof" aria-label="Zobacz makiety, reklamy i sklep">' +
+              proofUrls.slice(0, 4).map(function (u) { return '<span class="rpw-proof__cell"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '" alt=""></span>'; }).join('') +
+              '<span class="rpw-proof__see">Podgląd makiet, reklam i sklepu →</span></button>'
+            : '';
         ov.innerHTML =
             '<div class="auth-modal__backdrop" id="rpw-bd"></div>' +
             '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Rezerwacja rozmowy z Tomkiem">' +
@@ -7097,9 +7114,11 @@
             '<h2 class="auth-modal__title">Zarezerwuj rozmowę z Tomkiem</h2>' +
             '<div class="rpw-anchor"><span class="rpw-anchor__lead">Już masz w ręku — za darmo:</span>' +
             '<span class="rpw-anchor__items"><i>✓ Raport rynku</i><i>✓ Marka i logo</i><i>✓ Działający sklep</i><i>✓ Reklamy</i></span>' +
+            proofGrid +
             '<span class="rpw-anchor__note">Zrobiliśmy to, zanim poprosiliśmy o złotówkę — żebyś zobaczył, że umiemy.</span></div>' +
             '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Te 500 zł tylko rezerwuje czas Tomka, żeby ułożył plan Twojego sklepu i odezwał się osobiście. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
             (loggedIn ? blikBody : '<button type="button" class="btn" id="rpw-login" style="width:100%">Zaloguj się, żeby zarezerwować</button>') +
+            '<button type="button" id="rpw-questions" style="' + cpwLink + ';margin-top:8px">Mam jeszcze pytania — wróć do rozmowy</button>' +
             '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.</p>' +
             '</div>';
         document.body.appendChild(ov);
@@ -7107,6 +7126,10 @@
         var close = function () { ov.remove(); };
         el('rpw-x').addEventListener('click', close);
         el('rpw-bd').addEventListener('click', close);
+        // genius #3: klik miniatur → podgląd makiet (proof bez utraty kontekstu)
+        var _proof = el('rpw-proof'); if (_proof) _proof.addEventListener('click', function () { close(); switchTab('makiety'); });
+        // #8: ścieżka niskiego oporu dla wahających się — wróć do czatu z pytaniami zamiast zamykać i odpływać
+        var _q = el('rpw-questions'); if (_q) _q.addEventListener('click', function () { close(); switchTab('chat'); try { unlockComposer(); } catch (e) {} var ci = el('chat-input'); if (ci) { try { ci.focus(); } catch (e) {} } });
         if (loggedIn) {
             var digits = ov.querySelectorAll('.cpw-digit');
             var syncDigits = function () { for (var k = 0; k < digits.length; k++) digits[k].classList.toggle('filled', !!digits[k].value); };
@@ -8317,9 +8340,13 @@
         }
         if (state.ustalenia && !el('us-chat-card-open')) genCardReadyInChat('us-chat-card', 'Ustalenia gotowe — wiemy, dla kogo to i jak', 'ustalenia', 'Zobacz ustalenia →');
         renderBrandResumeCard();   // marka (logo) — po ustaleniach
-        if (state.mockups && state.mockups.length && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
+        if (state.mockups && state.mockups.length && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', (state.chosenStyle ? 'Makiety — styl wybrany ✓' : 'Makiety gotowe — 4 style'), 'makiety', (state.chosenStyle ? 'Zobacz makiety →' : 'Wybierz makietę →'));
         if (state.suiteAds && state.suiteAds.length && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
         if (state.landingHtml && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
+        // KULMINACJA: na resume ZIELONEJ sesji wróć z kartą zielonego światła + CTA rezerwacji
+        // W CZACIE (nie tylko w zakładce Współpraca). Bez tego najgorętszy lead (zakwalifikowany,
+        // wraca) widzi 5 kart proof, ale NIE wie, że następny krok = rezerwacja. zl-card guard = idempotentne.
+        if (state.verdict === 'zielony' && !el('zl-card') && !gateContactMissing()) { try { showGreenLight(state.karta || {}, false); } catch (e) {} }
     }
     // ── SEKWENCYJNE ODSŁANIANIE (anty-przytłoczenie, decyzja Tomka) ──────────────
     // W czacie pokazujemy JEDNĄ kartę etapu na raz — najbliższą realizacji. Reszta
