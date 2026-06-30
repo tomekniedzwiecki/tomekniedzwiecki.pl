@@ -8465,7 +8465,7 @@
         }
         if (state.ustalenia && !el('us-chat-card-open')) genCardReadyInChat('us-chat-card', 'Ustalenia gotowe — wiemy, dla kogo to i jak', 'ustalenia', 'Zobacz ustalenia →');
         renderBrandResumeCard();   // marka (logo) — po ustaleniach
-        if (state.mockups && state.mockups.length && !el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', (state.chosenStyle ? 'Makiety — styl wybrany ✓' : 'Makiety gotowe — 4 style'), 'makiety', (state.chosenStyle ? 'Zobacz makiety →' : 'Wybierz makietę →'));
+        if (state.mockups && state.mockups.length) renderMkChatCard();
         if (state.suiteAds && state.suiteAds.length && !el('ad-chat-card-open')) genCardReadyInChat('ad-chat-card', 'Reklamy gotowe — ' + state.suiteAds.length + ' kreacje', 'reklamy', 'Zobacz reklamy →');
         if (state.landingHtml && !el('ln-chat-card-open')) genCardReadyInChat('ln-chat-card', 'Podgląd Twojego sklepu — gotowy', 'sklep', 'Zobacz sklep →');
         // KULMINACJA: na resume ZIELONEJ sesji wróć z kartą zielonego światła + CTA rezerwacji
@@ -8488,7 +8488,7 @@
     function revealQueuedChatCards() {
         if (!el('chat-msgs')) return;
         if (state.brandDone) {
-            if (state.mockups && state.mockups.length) { if (!el('mk-chat-card-open')) genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →'); }
+            if (state.mockups && state.mockups.length) { renderMkChatCard(); }
             else if (mockups4Gen && !el('mk-chat-card')) genCardInChat('mk-chat-card', 'mockups', 'Makiety Twojego sklepu', '4 style do wyboru');
         }
         if (state.chosenStyle) {
@@ -10848,7 +10848,7 @@
                 if (state.sessionId !== sid) return;
                 if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
                     state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle'; clearGenFail('makiety');
-                    genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
+                    renderMkChatCard();
                     if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                     updateBudNav();
                     if (activeTab === 'makiety') renderPaneMakiety();
@@ -10953,7 +10953,12 @@
         brandFetch('names').then(function (d) {
             clearInterval(blTimer);
             var names = (d && d.names) || [];
-            if (!names.length) { card.innerHTML = '<div class="brand-card__t">Nie udało się dobrać nazw — napisz w czacie, jaką nazwę chcesz.</div>'; return; }
+            if (!names.length) {
+                card.innerHTML = '<div class="brand-card__t"><b>Nazwy chwilowo się nie dobrały</b><div class="brand-card__sub">To zwykle przejściowy zryw — spróbujmy jeszcze raz. Albo po prostu napisz w czacie, jaką nazwę chcesz.</div></div>' +
+                    '<button type="button" class="preview-retry" id="brand-retry" style="margin-top:12px">Spróbuj ponownie</button>';
+                var rbN = el('brand-retry'); if (rbN) rbN.addEventListener('click', function () { card.remove(); renderBrandPicker(); });
+                return;
+            }
             // Re-roll: raz na sesję user może poprosić o INNE propozycje nazw/domen.
             var rerollHtml = !state._brandReroll
                 ? '<button type="button" id="brand-reroll" style="display:block;width:100%;margin-top:12px;background:none;border:0;color:var(--text-muted);font:inherit;font-size:13px;cursor:pointer;text-decoration:underline">Pokaż inne propozycje</button>'
@@ -11089,6 +11094,82 @@
     }
 
     /* ── RENDER: MAKIETY (4 style + picker) ── */
+    // REUŻYWALNA KARUZELA MAKIET: 1 duża + strzałki + miniatury + „Wybieram ten styl".
+    // pfx = prefiks ID (różny dla pulpitu 'mkc' i czatu 'cmkc', by uniknąć kolizji gdy oba widoczne).
+    // Wybór działa z każdego miejsca (pickMockupStyle → bramka telefonu → commit).
+    function renderMkCarousel(host, pfx) {
+        var mk = state.mockups;
+        if (!host || !Array.isArray(mk) || !mk.length) return;
+        var pickBanner = state.chosenStyle ? '' : '<div class="mk-pickbanner"><b>Wybierz styl, żeby zbudować resztę.</b> Po Twoim wyborze reklamy i sklep złożą się automatycznie — poproszę jeszcze tylko o numer telefonu, żeby wysłać Ci SMS, gdy będą gotowe.</div>';
+        var startIdx = 0;
+        for (var ci = 0; ci < mk.length; ci++) { if (state.chosenStyle && mk[ci] && mk[ci].style === state.chosenStyle) { startIdx = ci; break; } }
+        host.innerHTML = pickBanner +
+            '<div class="mkc">' +
+              '<div class="mkc__stage">' +
+                (mk.length > 1 ? '<button type="button" class="mkc__nav mkc__nav--prev" id="' + pfx + '-prev" aria-label="Poprzedni styl">‹</button>' : '') +
+                '<div class="mkc__frame" id="' + pfx + '-frame"></div>' +
+                (mk.length > 1 ? '<button type="button" class="mkc__nav mkc__nav--next" id="' + pfx + '-next" aria-label="Następny styl">›</button>' : '') +
+              '</div>' +
+              '<div class="mkc__meta"><div><div class="mkc__lab" id="' + pfx + '-lab"></div><div class="mkc__count" id="' + pfx + '-count"></div></div>' +
+                '<button type="button" class="mkc__pick" id="' + pfx + '-pick"></button></div>' +
+              '<div class="mkc__thumbs" id="' + pfx + '-thumbs">' +
+                mk.map(function (m, i) { return '<button type="button" class="mkc__thumb" data-i="' + i + '" aria-label="Styl ' + (i + 1) + (m.label ? ': ' + esc(m.label) : '') + '">' + (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(m.url) + '" alt="">' : '') + '</button>'; }).join('') +
+              '</div>' +
+            '</div>' +
+            '<div class="pj-plan__note">Masz uwagi do wyglądu? Napisz je w czacie — uwzględnię przy budowie strony.</div>';
+        var mkcIdx = startIdx;
+        function mkcShow(i, animate) {
+            mkcIdx = (i + mk.length) % mk.length;
+            var m = mk[mkcIdx] || {};
+            var frame = el(pfx + '-frame');
+            if (frame) {
+                frame.classList.remove('mkc-noimg');
+                frame.innerHTML = m.url
+                    ? '<img class="mkc__img' + (animate ? ' mkc__fade' : '') + '" referrerpolicy="no-referrer" data-mk-zoom="' + esc(m.url) + '" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mkc-noimg\');this.remove();">' +
+                      '<button type="button" class="mkc__zoom" data-mk-zoom="' + esc(m.url) + '" aria-label="Powiększ">⤢</button>'
+                    : '';
+                if (!m.url) frame.classList.add('mkc-noimg');
+            }
+            var lab = el(pfx + '-lab'); if (lab) lab.textContent = m.label || ('Styl ' + (mkcIdx + 1));
+            var cnt = el(pfx + '-count'); if (cnt) cnt.textContent = (mkcIdx + 1) + ' / ' + mk.length;
+            var chosen = state.chosenStyle && m.style === state.chosenStyle;
+            var pick = el(pfx + '-pick');
+            if (pick) { pick.textContent = chosen ? 'Wybrany ✓' : 'Wybieram ten styl'; pick.classList.toggle('is-chosen', !!chosen); pick.setAttribute('data-mk-pick', m.style || ''); }
+            Array.prototype.forEach.call(host.querySelectorAll('.mkc__thumb'), function (t, ti) { t.classList.toggle('is-active', ti === mkcIdx); });
+        }
+        mkcShow(startIdx, false);
+        var prevB = el(pfx + '-prev'); if (prevB) prevB.addEventListener('click', function () { mkcShow(mkcIdx - 1, true); });
+        var nextB = el(pfx + '-next'); if (nextB) nextB.addEventListener('click', function () { mkcShow(mkcIdx + 1, true); });
+        var thumbsEl = el(pfx + '-thumbs'); if (thumbsEl) thumbsEl.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('.mkc__thumb'); if (t) mkcShow(+t.getAttribute('data-i'), true); });
+        var pickB = el(pfx + '-pick'); if (pickB) pickB.addEventListener('click', function () { var s = pickB.getAttribute('data-mk-pick'); if (s) pickMockupStyle(s); });
+        var frameEl = el(pfx + '-frame'); if (frameEl) frameEl.addEventListener('click', function (e) { var z = e.target.closest && e.target.closest('[data-mk-zoom]'); if (z) { var u = z.getAttribute('data-mk-zoom'); if (u) openMockupZoom(u); } });
+        var stage = host.querySelector('.mkc__stage'); var sx = null;
+        if (stage) {
+            stage.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+            stage.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) mkcShow(mkcIdx + (dx < 0 ? 1 : -1), true); sx = null; }, { passive: true });
+        }
+    }
+    // KARTA MAKIET W CZACIE (req Tomka): pełna karuzela do WYBORU stylu wprost w rozmowie —
+    // bez przechodzenia do osobnej zakładki. Duże zdjęcie + miniatury + strzałki + „Wybieram".
+    function renderMkChatCard() {
+        if (!el('chat-msgs') || !chatCardAllowed('mk-chat-card')) return;
+        if (!(state.mockups && state.mockups.length)) return;
+        var card = el('mk-chat-card');
+        var stateKey = (state.chosenStyle || 'pick') + ':' + state.mockups.length;
+        if (card && card.getAttribute('data-mk-state') === stateKey) return;   // już aktualne → nie resetuj karuzeli przy sync
+        if (!card) { card = document.createElement('div'); card.id = 'mk-chat-card'; el('chat-msgs').appendChild(card); }
+        card.className = 'gcard gcard--done';
+        card.setAttribute('data-mk-state', stateKey);
+        var done = !!state.chosenStyle;
+        card.innerHTML = '<div class="gcard__head"><span class="gcard__ic">' + gcardSvg('mk-chat-card') + '</span>' +
+            '<span class="gcard__tt"><span class="gcard__t">' + (done ? 'Makiety — styl wybrany ✓' : 'Wybierz makietę swojego sklepu') + '</span></span>' +
+            '<span class="gcard__badge">gotowe</span></div>' +
+            '<div class="mkc-chathost" id="cmkc-host"></div>';
+        renderMkCarousel(el('cmkc-host'), 'cmkc');
+        if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
+        updateBudNav();
+        scrollToBottom(false);
+    }
     function renderPaneMakiety() {
         var body = el('pane-makiety-body');
         var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Makiety sklepu</div>' +
@@ -11114,55 +11195,9 @@
                 '<div class="mk-gennote">Tworzę 4 propozycje wyglądu… to zwykle 1-2 minuty.</div>';
             return;
         }
-        // KARUZELA (skill UI/UX): jedna DUŻA makieta centralnie + strzałki + miniatury + CTA.
-        var pickBanner = state.chosenStyle ? '' : '<div class="mk-pickbanner"><b>Wybierz styl, żeby zbudować resztę.</b> Po Twoim wyborze reklamy i sklep złożą się automatycznie — poproszę jeszcze tylko o numer telefonu, żeby wysłać Ci SMS, gdy będą gotowe.</div>';
-        var startIdx = 0;
-        for (var ci = 0; ci < mk.length; ci++) { if (state.chosenStyle && mk[ci] && mk[ci].style === state.chosenStyle) { startIdx = ci; break; } }
-        body.innerHTML = head + pickBanner +
-            '<div class="mkc">' +
-              '<div class="mkc__stage">' +
-                (mk.length > 1 ? '<button type="button" class="mkc__nav mkc__nav--prev" id="mkc-prev" aria-label="Poprzedni styl">‹</button>' : '') +
-                '<div class="mkc__frame" id="mkc-frame"></div>' +
-                (mk.length > 1 ? '<button type="button" class="mkc__nav mkc__nav--next" id="mkc-next" aria-label="Następny styl">›</button>' : '') +
-              '</div>' +
-              '<div class="mkc__meta"><div><div class="mkc__lab" id="mkc-lab"></div><div class="mkc__count" id="mkc-count"></div></div>' +
-                '<button type="button" class="mkc__pick" id="mkc-pick"></button></div>' +
-              '<div class="mkc__thumbs" id="mkc-thumbs">' +
-                mk.map(function (m, i) { return '<button type="button" class="mkc__thumb" data-i="' + i + '" aria-label="Styl ' + (i + 1) + (m.label ? ': ' + esc(m.label) : '') + '">' + (m.url ? '<img loading="lazy" referrerpolicy="no-referrer" src="' + esc(m.url) + '" alt="">' : '') + '</button>'; }).join('') +
-              '</div>' +
-            '</div>' +
-            '<div class="pj-plan__note">Masz uwagi do wyglądu? Napisz je w czacie — uwzględnię przy budowie strony.</div>';
-        var mkcIdx = startIdx;
-        function mkcShow(i, animate) {
-            mkcIdx = (i + mk.length) % mk.length;
-            var m = mk[mkcIdx] || {};
-            var frame = el('mkc-frame');
-            if (frame) {
-                frame.classList.remove('mkc-noimg');
-                frame.innerHTML = m.url
-                    ? '<img class="mkc__img' + (animate ? ' mkc__fade' : '') + '" referrerpolicy="no-referrer" data-mk-zoom="' + esc(m.url) + '" src="' + esc(m.url) + '" alt="' + esc(m.label || 'Makieta') + '" onerror="this.parentNode.classList.add(\'mkc-noimg\');this.remove();">' +
-                      '<button type="button" class="mkc__zoom" data-mk-zoom="' + esc(m.url) + '" aria-label="Powiększ">⤢</button>'
-                    : '';
-                if (!m.url) frame.classList.add('mkc-noimg');
-            }
-            var lab = el('mkc-lab'); if (lab) lab.textContent = m.label || ('Styl ' + (mkcIdx + 1));
-            var cnt = el('mkc-count'); if (cnt) cnt.textContent = (mkcIdx + 1) + ' / ' + mk.length;
-            var chosen = state.chosenStyle && m.style === state.chosenStyle;
-            var pick = el('mkc-pick');
-            if (pick) { pick.textContent = chosen ? 'Wybrany ✓' : 'Wybieram ten styl'; pick.classList.toggle('is-chosen', !!chosen); pick.setAttribute('data-mk-pick', m.style || ''); }
-            Array.prototype.forEach.call(body.querySelectorAll('#mkc-thumbs .mkc__thumb'), function (t, ti) { t.classList.toggle('is-active', ti === mkcIdx); });
-        }
-        mkcShow(startIdx, false);
-        var prevB = el('mkc-prev'); if (prevB) prevB.addEventListener('click', function () { mkcShow(mkcIdx - 1, true); });
-        var nextB = el('mkc-next'); if (nextB) nextB.addEventListener('click', function () { mkcShow(mkcIdx + 1, true); });
-        var thumbsEl = el('mkc-thumbs'); if (thumbsEl) thumbsEl.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('.mkc__thumb'); if (t) mkcShow(+t.getAttribute('data-i'), true); });
-        var pickB = el('mkc-pick'); if (pickB) pickB.addEventListener('click', function () { var s = pickB.getAttribute('data-mk-pick'); if (s) pickMockupStyle(s); });
-        var frameEl = el('mkc-frame'); if (frameEl) frameEl.addEventListener('click', function (e) { var z = e.target.closest && e.target.closest('[data-mk-zoom]'); if (z) { var u = z.getAttribute('data-mk-zoom'); if (u) openMockupZoom(u); } });
-        var stage = body.querySelector('.mkc__stage'); var sx = null;
-        if (stage) {
-            stage.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
-            stage.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) mkcShow(mkcIdx + (dx < 0 ? 1 : -1), true); sx = null; }, { passive: true });
-        }
+        // KARUZELA (reużywalna — ta sama w pulpicie i w czacie): 1 DUŻA + strzałki + miniatury + „Wybieram".
+        body.innerHTML = head + '<div id="mkpane-host"></div>';
+        renderMkCarousel(el('mkpane-host'), 'mkc');
     }
     // Delegacja kliknięć w pickerze makiet (IIFE → inline onclick NIE działa).
     // Podpinamy raz na element body (jest statyczny mimo przerysowań innerHTML).
