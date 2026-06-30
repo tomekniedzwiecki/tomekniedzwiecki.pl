@@ -10637,9 +10637,7 @@
     function pickMockupStyle(styleKey) {
         var m = (state.mockups || []).filter(function (x) { return x && x.style === styleKey; })[0];
         if (!m) return;
-        state.chosenStyle = styleKey;
-        persistSession();
-        // podświetl wybraną kartę (tani feedback od razu)
+        // podświetl wybraną kartę (tani feedback od razu) — BEZ commitu stylu (ten dopiero po bramce)
         var body = el('pane-makiety-body');
         if (body) {
             Array.prototype.forEach.call(body.querySelectorAll('.mk-card'), function (c) {
@@ -10648,10 +10646,14 @@
         }
         // req Tomka: telefon WYMAGANY przed budową sklepu/reklam. Bramka tu = po pełnym
         // proofie (4 makiety) i w momencie commitmentu. Gwarantuje numer i NIE pali drogich
-        // generacji (reklamy/sklep) na leadach bez kontaktu. Po podaniu → _commitStylePick.
+        // generacji (reklamy/sklep) na leadach bez kontaktu. chosenStyle utrwalamy DOPIERO
+        // w _commitStylePick (po bramce) — porzucenie bramki NIE zapisuje stylu, więc resume
+        // nie odpali kickAds/kickLanding bez numeru.
         renderPhoneGate(function () { _commitStylePick(m, styleKey); });
     }
     function _commitStylePick(m, styleKey) {
+        state.chosenStyle = styleKey;    // commit DOPIERO po bramce telefonu
+        persistSession();
         // odsłoń reklamy + start budowy (reklamy → równolegle sklep)
         budNewTabs.reklamy = true;
         updateBudNav();
