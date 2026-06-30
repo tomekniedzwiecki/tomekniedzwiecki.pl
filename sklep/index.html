@@ -3958,6 +3958,20 @@
     .rpw-proof__cell { aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,217,126,.22); background: #000; }
     .rpw-proof__cell img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
     .rpw-proof__see { grid-column: 1 / -1; font-size: 12px; font-weight: 700; color: var(--accent); text-align: center; padding: 2px 0; }
+    .rpw-steps { margin: 0 0 14px; padding: 0 0 0 22px; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; line-height: 1.4; color: var(--text-muted); }
+    .rpw-steps li { padding-left: 4px; }
+    .rpw-steps li::marker { color: var(--accent, #00d97e); font-weight: 700; }
+    .rpw-steps strong { color: var(--text-strong, #fff); font-weight: 700; }
+    .fct-grp { margin: 14px 0 0; }
+    .fct-h { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--accent, #00d97e); margin-bottom: 7px; }
+    .fct-row { display: flex; justify-content: space-between; gap: 14px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; line-height: 1.4; }
+    .fct-row:last-child { border-bottom: 0; }
+    .fct-k { color: var(--text-muted); flex: none; }
+    .fct-v { color: var(--text-strong, #fff); text-align: right; }
+    .fct-v b, .fct-p b { color: var(--accent, #00d97e); }
+    .fct-p { font-size: 13px; line-height: 1.5; color: var(--text-muted); margin: 0; }
+    .fct-link { display: inline-flex; align-items: center; gap: 5px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; }
+    .fct-link:hover { color: var(--accent, #00d97e); }
     .rpw-proof:hover .rpw-proof__see { text-decoration: underline; }
     .auth-modal__note { margin: 16px 0 0; font-size: 11.5px; opacity: .5; line-height: 1.5; }
     .auth-modal .gate-oauth-row { margin-top: 0; grid-template-columns: 1fr; }
@@ -7098,6 +7112,47 @@
         if (typeof isInAppWebView === 'function' && isInAppWebView()) { try { window.location.assign(u); } catch (e) { window.location.href = u; } }
         else window.open(u, '_blank', 'noopener');
     }
+    // „POKAŻ KONKRETY — koszty i zasady" (audyt OpenAI, genius #1): twarda, jawna karta dla sceptyka/
+    // analityka/haglera. Odwraca dynamikę — bierzemy obiekcje na klatę. Wzmacnia reframe (realne partnerstwo,
+    // nie chowający się generator). Dostępna z openera/sidebaru i z paywallu.
+    function showFactsModal() {
+        if (el('facts-modal')) return;
+        var ov = document.createElement('div'); ov.className = 'auth-modal'; ov.id = 'facts-modal'; ov.hidden = false;
+        var row = function (k, v) { return '<div class="fct-row"><span class="fct-k">' + k + '</span><span class="fct-v">' + v + '</span></div>'; };
+        ov.innerHTML =
+            '<div class="auth-modal__backdrop" id="fct-bd"></div>' +
+            '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Koszty i zasady" style="max-width:560px">' +
+            '<button type="button" class="auth-modal__close" id="fct-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
+            '<h2 class="auth-modal__title">Konkrety — koszty i zasady, bez marketingu</h2>' +
+            '<p class="auth-modal__sub" style="margin-top:2px">Masz prawo być nieufny. Tu jest wszystko wprost.</p>' +
+            '<div class="fct-grp"><div class="fct-h">Ile to kosztuje</div>' +
+            row('Rezerwacja rozmowy', '<b>500 zł</b> — w pełni zwrotna') +
+            row('Budowa sklepu pod klucz', '<b>9400 zł</b> — jednorazowo (500 zł się wlicza)') +
+            row('Budżet na reklamy/towar', 'osobno, po Twojej stronie — sam decydujesz ile') +
+            row('Udział Tomka', '<b>20% od ZYSKU netto</b> — zarabia tylko, gdy Ty zarabiasz') +
+            '</div>' +
+            '<div class="fct-grp"><div class="fct-h">Jak działa rezerwacja 500 zł</div>' +
+            '<ol class="rpw-steps" style="margin-bottom:0">' +
+              '<li>Rezerwujesz <b>czas Tomka</b> na osobistą analizę projektu — nie kupujesz sklepu.</li>' +
+              '<li>Tomek przygotowuje plan wejścia i odzywa się online.</li>' +
+              '<li><b>Nie wchodzicie we współpracę → 500 zł wraca w całości</b> (do 5 dni roboczych, na to samo źródło).</li>' +
+              '<li>Wchodzicie → 500 zł wlicza się w budowę.</li>' +
+            '</ol></div>' +
+            '<div class="fct-grp"><div class="fct-h">Co obejmuje budowa 9400 zł</div>' +
+            '<p class="fct-p">Produkt, marka, strona pod klucz, płatności i wdrożenie, formalności i RODO, kreacje reklamowe, uruchomienie i optymalizacja kampanii Meta/Google — aż do pierwszych zamówień. Sklep jest Twój od pierwszego dnia.</p></div>' +
+            '<div class="fct-grp"><div class="fct-h">Czego NIE obiecujemy</div>' +
+            '<p class="fct-p">Nie gwarantujemy przychodu ani „pewnych" wyników. „1000 zamówień" to <b>cel operacyjny wspólnego etapu</b>, nie obietnica. Nie ma magii — jest robota, doświadczenie (15 lat, 70 mln zł) i skóra w grze (20% od zysku).</p></div>' +
+            '<div class="fct-grp"><div class="fct-h">Kto i kiedy przejmuje stery</div>' +
+            '<p class="fct-p">Tomek buduje i prowadzi sprzedaż, przez ~pół roku skaluje i uczy Cię operacji, a potem <b>przejmujesz prowadzenie biznesu</b>. Tomek zostaje wspólnikiem i doradcą.</p></div>' +
+            '<p class="auth-modal__note">Płatność przez Tpay. Faktura na życzenie. Umowa współpracy podpisywana przed budową.</p>' +
+            '</div>';
+        document.body.appendChild(ov);
+        if (typeof pushModalState === 'function') pushModalState();
+        var close = function () { ov.remove(); };
+        el('fct-x').addEventListener('click', close);
+        el('fct-bd').addEventListener('click', close);
+        try { gaEvent('app_facts_open', {}); } catch (e) {}
+    }
     function showReservationPaywall() {
         if (state.paid) { reservationConfirmed(); return; }
         if (activeTab !== 'chat') switchTab('chat');
@@ -7137,14 +7192,24 @@
             '<div class="auth-modal__backdrop" id="rpw-bd"></div>' +
             '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Rezerwacja rozmowy z Tomkiem">' +
             '<button type="button" class="auth-modal__close" id="rpw-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
-            '<h2 class="auth-modal__title">Zarezerwuj rozmowę z Tomkiem</h2>' +
-            '<div class="rpw-anchor"><span class="rpw-anchor__lead">Już masz w ręku — za darmo:</span>' +
+            '<h2 class="auth-modal__title">Zarezerwuj wejście we współpracę z Tomkiem</h2>' +
+            '<div class="rpw-anchor"><span class="rpw-anchor__lead">Pokaz, co już przygotowaliśmy — za darmo:</span>' +
             '<span class="rpw-anchor__items"><i>✓ Raport rynku</i><i>✓ Marka i logo</i><i>✓ Podgląd sklepu</i><i>✓ Reklamy</i></span>' +
             proofGrid +
-            '<span class="rpw-anchor__note">Zrobiliśmy to, zanim poprosiliśmy o złotówkę — żebyś zobaczył, że umiemy.</span></div>' +
-            '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Te 500 zł tylko rezerwuje czas Tomka, żeby ułożył plan Twojego sklepu i odezwał się osobiście. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
+            '<span class="rpw-anchor__note">To pokaz, z jaką jakością Tomek z zespołem wchodzą w projekt — zrobione, zanim poprosiliśmy o złotówkę.</span></div>' +
+            '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Nie kupujesz dziś sklepu — <strong>rezerwujesz czas Tomka</strong>, żeby osobiście przeanalizował Twój projekt i ułożył plan wejścia. To pierwszy krok wspólnego biznesu.</p>' +
+            '<ol class="rpw-steps">' +
+              '<li>Wpłacasz <strong>500 zł</strong> zwrotnej rezerwacji.</li>' +
+              '<li>Tomek osobiście analizuje Twój projekt i odzywa się z planem.</li>' +
+              '<li>Decydujecie, czy wchodzicie w pełną budowę (9400 zł pod klucz).</li>' +
+              '<li><strong>Nie wchodzicie → 500 zł wraca w całości.</strong> Wchodzicie → wlicza się w budowę.</li>' +
+              '<li>Tomek buduje, odpala sprzedaż, prowadzi do 1000 zamówień, uczy — potem przejmujesz stery.</li>' +
+            '</ol>' +
             (loggedIn ? blikBody : '<button type="button" class="btn" id="rpw-login" style="width:100%">Zaloguj się, żeby zarezerwować</button>') +
-            '<button type="button" id="rpw-questions" style="' + cpwLink + ';margin-top:8px">Mam jeszcze pytania — wróć do rozmowy</button>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;justify-content:center">' +
+              '<button type="button" id="rpw-facts" class="fct-link">Pokaż wszystkie koszty i zasady</button>' +
+              '<button type="button" id="rpw-questions" class="fct-link">Mam jeszcze pytania — wróć do rozmowy</button>' +
+            '</div>' +
             '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.</p>' +
             '</div>';
         document.body.appendChild(ov);
@@ -7156,6 +7221,7 @@
         var _proof = el('rpw-proof'); if (_proof) _proof.addEventListener('click', function () { close(); switchTab('makiety'); });
         // #8: ścieżka niskiego oporu dla wahających się — wróć do czatu z pytaniami zamiast zamykać i odpływać
         var _q = el('rpw-questions'); if (_q) _q.addEventListener('click', function () { close(); switchTab('chat'); try { unlockComposer(); } catch (e) {} var ci = el('chat-input'); if (ci) { try { ci.focus(); } catch (e) {} } });
+        var _f = el('rpw-facts'); if (_f) _f.addEventListener('click', function () { showFactsModal(); });
         if (loggedIn) {
             var digits = ov.querySelectorAll('.cpw-digit');
             var syncDigits = function () { for (var k = 0; k < digits.length; k++) digits[k].classList.toggle('filled', !!digits[k].value); };
@@ -10382,8 +10448,10 @@
                 ? '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener" style="flex:1;min-width:220px;">Rezerwuję rozmowę → 500 zł</a>'
                 : '<span style="flex:1 0 100%;font-size:13px;line-height:1.5;color:var(--text-muted);margin-bottom:8px;">Rezerwacja (500 zł, zwrotna) odblokuje się, gdy w rozmowie damy „zielone światło" Twojemu projektowi — to ostatni krok tuż przed nią.</span>') +
             '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Wróć do rozmowy — domknijmy zielone światło') + '</button>' +
-            '</div>';
+            '</div>' +
+            '<div style="margin-top:12px;text-align:center"><button type="button" class="fct-link" id="cw-facts">Pokaż wszystkie koszty i zasady — bez marketingu</button></div>';
         body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
+        var _cwf = el('cw-facts'); if (_cwf) _cwf.addEventListener('click', function () { showFactsModal(); });
     }
 
     /* ── Zakładka POTENCJAŁ RYNKU: raport z realnego web-searchu ───────
@@ -13205,8 +13273,8 @@
         div.className = 'msg msg--ai msg--gate';
         div.id = 'phone-ask';
         div.innerHTML = '<div class="sg">' +
-            '<h3 class="sg-title">Zostaw numer — ruszam z budową</h3>' +
-            '<p class="sg-sub">Świetny wybór. Teraz składam Twój sklep i reklamy. Zostaw numer, a wyślę Ci SMS, gdy będą gotowe — i przekażę projekt Tomkowi. My do Ciebie nie dzwonimy.</p>' +
+            '<h3 class="sg-title">Zostaw numer — składam podgląd sklepu i reklamy</h3>' +
+            '<p class="sg-sub">Świetny wybór. Teraz przygotowuję podgląd Twojego sklepu i reklamy. Numer służy tylko do <strong>SMS-a, gdy będą gotowe</strong> (żebyś nie zgubił postępu) — żadnych zimnych telefonów. Właściwa rozmowa z Tomkiem jest dopiero po rezerwacji, online.</p>' +
             '<form id="pa-form" class="sg-form" novalidate>' +
             '<input class="f-input" type="tel" inputmode="tel" id="pa-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20" required>' +
             '<div class="f-error" id="pa-error">Podaj numer telefonu (min. 9 cyfr).</div>' +
@@ -13417,22 +13485,24 @@
     // więc to ona jest momentem rezerwacji w głównym flow.
     function greenCardEl(data) {
         data = data || {};
-        var mocne = (data.mocne && data.mocne.length) ? data.mocne : ['Realny popyt — produkt już viraluje na TikToku', 'Przestrzeń na markę i wyższą marżę niż anonimowy odpowiednik', 'Gotowy lejek: raport, makiety, reklamy i strona już są'];
-        var dopr = (data.dopracowac && data.dopracowac.length) ? data.dopracowac : ['Dopięcie oferty i ceny pod Twój rynek', 'Pierwsze kreacje reklamowe', 'Plan startu sprzedaży'];
+        var mocne = (data.mocne && data.mocne.length) ? data.mocne : ['Realny popyt — produkt już viraluje na TikToku', 'Przestrzeń na markę i wyższą marżę niż anonimowy odpowiednik', 'Gotowy fundament: raport, makiety, reklamy i podgląd sklepu już są'];
+        var dopr = (data.dopracowac && data.dopracowac.length) ? data.dopracowac : ['Dopięcie oferty i ceny pod Twój rynek', 'Pierwsze kreacje reklamowe', 'Plan dojścia do pierwszych zamówień'];
+        var ryzyko = (data.ryzyko && String(data.ryzyko).trim()) ? String(data.ryzyko).trim() : 'Nie wygramy samą ceną — przewagę budujemy marką, ofertą i zaufaniem. To akurat jest robota dla mnie i Tomka, nie dla Ciebie samego.';
         var li = function (arr, color) { return arr.slice(0, 4).map(function (x) { return '<li style="margin:4px 0;padding-left:16px;position:relative;line-height:1.45"><span style="position:absolute;left:0;color:' + color + '">•</span>' + esc(String(x)) + '</li>'; }).join(''); };
         var div = document.createElement('div');
         div.className = 'mk-card';
         div.style.cssText = 'border:1px solid rgba(0,217,126,.5);box-shadow:0 0 40px -16px rgba(0,217,126,.5)';
         div.innerHTML =
-            '<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.05em;color:#00d97e;background:rgba(0,217,126,.12);border:1px solid rgba(0,217,126,.4);padding:5px 11px;border-radius:999px;margin-bottom:10px"><i class="ph ph-check-circle" style="font-size:15px"></i> ZIELONE ŚWIATŁO</div>' +
+            '<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.05em;color:#00d97e;background:rgba(0,217,126,.12);border:1px solid rgba(0,217,126,.4);padding:5px 11px;border-radius:999px;margin-bottom:10px"><span style="font-size:14px">✓</span> ZIELONE ŚWIATŁO — WERDYKT TOMKA</div>' +
             '<div class="mk-card__title">Przeanalizowaliśmy Twój produkt i rynek — wchodzimy w to z Tobą.</div>' +
             '<div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 4px">' +
-            '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#00d97e;margin-bottom:5px">Dlaczego to ma potencjał</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(mocne, '#00d97e') + '</ul></div>' +
+            '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#00d97e;margin-bottom:5px">Dlaczego mówimy „tak"</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(mocne, '#00d97e') + '</ul></div>' +
             '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:5px">Co dopracujemy razem</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(dopr, '#a1a1aa') + '</ul></div>' +
             '</div>' +
-            '<p class="mk-card__d">Żeby doprowadzić to do gotowości i finalnie dopracować resztę — robimy to <strong>razem</strong>. Pierwszy krok to zwrotna rezerwacja wspólnej rozmowy z Tomkiem.</p>' +
-            '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję rozmowę → 500 zł</a>' +
-            '<p class="mk-card__note">BLIK, karta lub przelew · w pełni zwrotne · 500 zł wraca, jeśli nie wejdziemy we współpracę</p>';
+            '<div style="margin:10px 0 4px;padding:9px 12px;border:1px solid rgba(245,200,80,.3);background:rgba(245,200,80,.07);border-radius:10px;font-size:12.5px;line-height:1.45;color:var(--text)"><strong style="color:#f5c850">Realne ryzyko:</strong> ' + esc(ryzyko) + '</div>' +
+            '<p class="mk-card__d">To <strong>nie koniec — to wejście we wspólny biznes z Tomkiem.</strong> Rezerwacja = Tomek osobiście układa plan → buduje sklep pod klucz → wspólnie dochodzicie do pierwszych 1000 zamówień → uczy Cię prowadzenia → <strong>przejmujesz stery</strong> (Tomek zostaje wspólnikiem, 20% od zysku).</p>' +
+            '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję wejście we współpracę → 500 zł</a>' +
+            '<p class="mk-card__note">w pełni zwrotne · 500 zł wlicza się w budowę, a wraca w całości, jeśli nie wejdziemy we współpracę · rezerwujesz czas Tomka, nie kupujesz sklepu</p>';
         return div;
     }
     // Pokaż zielone światło. animate=true → krótki beat „oceniamy potencjał…" (poczucie
