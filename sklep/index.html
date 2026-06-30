@@ -2142,8 +2142,21 @@
     .genthumbs--one .genthumb { aspect-ratio: 4/3; }
     .genthumbs--mk .genthumb { aspect-ratio: 4/5; }
     .genthumbs--mk .genthumb img { object-position: top; }
-    .genthumb:hover { border-color: rgba(37,99,235,.6); }
+    .genthumb:hover { border-color: rgba(0,217,126,.6); }
     .genthumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Karty etapów w czacie (raport/ustalenia/makiety/reklamy/sklep) — spójny, on-brand styl */
+    .gcard { margin: 12px 0; padding: 14px 15px 15px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; background: rgba(255,255,255,.025); }
+    .gcard--done { border-color: rgba(0,217,126,.20); background: linear-gradient(180deg, rgba(0,217,126,.05), rgba(255,255,255,.012)); }
+    .gcard__head { display: flex; align-items: center; gap: 11px; }
+    .gcard__ic { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(0,217,126,.13); color: #00d97e; flex: none; font-size: 18px; }
+    .gcard__tt { min-width: 0; flex: 1; }
+    .gcard__t { display: block; font-size: 14px; font-weight: 700; color: var(--text-strong, #fff); line-height: 1.25; letter-spacing: -.01em; }
+    .gcard__badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #00d97e; flex: none; }
+    .gcard__cta { display: inline-flex; align-items: center; gap: 7px; margin-top: 13px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid rgba(0,217,126,.42); background: rgba(0,217,126,.10); color: #00d97e; padding: 8px 15px; border-radius: 10px; transition: background .15s, transform .1s; }
+    .gcard__cta:hover { background: rgba(0,217,126,.18); }
+    .gcard__cta:active { transform: scale(.985); }
+    .gcard__arr { display: inline-block; transition: transform .15s; }
+    .gcard__cta:hover .gcard__arr { transform: translateX(3px); }
     .mk-badge { position: absolute; top: 9px; left: 9px; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; background: var(--accent); color: var(--accent-ink); padding: 4px 10px; border-radius: 999px; }
     .mk-card__b { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .mk-card__lab { font-size: 15px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.01em; }
@@ -8297,8 +8310,7 @@
         // „nie pokazuj w całości, tylko pasek"). Bez nagłówka „Analizuję rynek dla X"
         // ani akapitu — te treści i tak mówi AI w rozmowie.
         if (done) {
-            return '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>Raport potencjału rynku — gotowy</div>' +
-                '<button type="button" id="rk-chat-open" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">Zobacz raport →</button>';
+            return gcardInner('ph-chart-line-up', 'Raport potencjału rynku — gotowy', 'rk-chat-open', 'Zobacz raport →', '', 'gotowe');
         }
         // Loader raportu = pasek postępu + lista WSZYSTKIEGO, co powstaje za darmo w tej
         // rozmowie (żeby cisza w trakcie liczenia raportu była „produktywna" i było widać,
@@ -8335,6 +8347,7 @@
     }
     function markRaportReadyInChat() {
         var card = el('rk-chat-card'); if (!card) return;
+        card.className = 'gcard gcard--done'; card.removeAttribute('style');
         card.innerHTML = rkChatCardInner(true);
         var b = el('rk-chat-open'); if (b) b.addEventListener('click', function () { switchTab('rynek'); });
     }
@@ -8347,7 +8360,8 @@
         // albo FLIP gdy karta-pasek istnieje a danych dopiero co przybyło. genCardReadyInChat robi oba.
         if (state.raport && !el('rk-chat-open')) {
             var rc = el('rk-chat-card');
-            if (!rc) { rc = document.createElement('div'); rc.id = 'rk-chat-card'; rc.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)'; el('chat-msgs').appendChild(rc); }
+            if (!rc) { rc = document.createElement('div'); rc.id = 'rk-chat-card'; rc.className = 'gcard gcard--done'; el('chat-msgs').appendChild(rc); }
+            else { rc.className = 'gcard gcard--done'; }
             rc.innerHTML = rkChatCardInner(true);
             var rb = el('rk-chat-open'); if (rb) rb.addEventListener('click', function () { switchTab('rynek'); });
         }
@@ -8393,7 +8407,7 @@
         if (!el('chat-msgs') || el(id) || !chatCardAllowed(id)) return;   // brama sekwencyjna
         var div = document.createElement('div');
         div.id = id;
-        div.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
+        div.className = 'gcard';
         div.innerHTML = genProgressHTML(key, label, sub);
         el('chat-msgs').appendChild(div);
         startPjTicker();
@@ -8409,6 +8423,16 @@
         var gcls = (urls.length === 1 ? ' genthumbs--one' : (stage === 'makiety' ? ' genthumbs--mk' : ''));
         return '<div class="genthumbs' + gcls + '">' + urls.map(function (u) { return '<span class="genthumb"><img referrerpolicy="no-referrer" loading="lazy" src="' + esc(u) + '"></span>'; }).join('') + '</div>';
     }
+    // Ikona etapu per karta (Phosphor) + spójny render wnętrza karty etapu w czacie.
+    var GCARD_ICONS = { 'rk-chat-card': 'ph-chart-line-up', 'us-chat-card': 'ph-target', 'mk-chat-card': 'ph-squares-four', 'ad-chat-card': 'ph-megaphone', 'ln-chat-card': 'ph-storefront' };
+    function gcardInner(icon, title, btnId, btnLabel, thumbsHTML, badge) {
+        var lbl = String(btnLabel || 'Zobacz').replace(/\s*→\s*$/, '');
+        return '<div class="gcard__head"><span class="gcard__ic"><i class="ph ' + (icon || 'ph-check-circle') + '"></i></span>' +
+            '<span class="gcard__tt"><span class="gcard__t">' + title + '</span></span>' +
+            (badge ? '<span class="gcard__badge"><i class="ph ph-check-circle"></i>' + badge + '</span>' : '') + '</div>' +
+            (thumbsHTML || '') +
+            '<button type="button" id="' + btnId + '" class="gcard__cta">' + lbl + ' <span class="gcard__arr">→</span></button>';
+    }
     function genCardReadyInChat(id, doneLabel, openTab, btnLabel) {
         var card = el(id);
         // Brama sekwencyjna: jeśli etap jeszcze nie ma kolei (a karty brak) — nie twórz jej w czacie.
@@ -8417,14 +8441,13 @@
         if (!card) {   // etap gotowy bez paska startu (np. ustalenia) → utwórz kartę w locie
             if (!el('chat-msgs')) return;
             card = document.createElement('div'); card.id = id;
-            card.style.cssText = 'margin:10px 0;padding:12px 14px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
             el('chat-msgs').appendChild(card); scrollToBottom(false);
         }
+        card.className = 'gcard gcard--done';
         var bid = id + '-open';
         var stageMap = { 'mk-chat-card': 'makiety', 'ad-chat-card': 'reklamy', 'ln-chat-card': 'sklep' };
         var content = stageMap[id] ? genThumbs(stageMap[id]) : '';
-        card.innerHTML = '<div style="font-size:13px;font-weight:600;color:var(--text,#e7e7ea);margin-bottom:8px"><i class="ph ph-check-circle" style="color:#22c55e;margin-right:5px"></i>' + doneLabel + '</div>' + content +
-            '<button type="button" id="' + bid + '" style="font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(37,99,235,.5);background:rgba(37,99,235,.14);color:#5b9bff;padding:7px 14px;border-radius:10px">' + (btnLabel || 'Zobacz →') + '</button>';
+        card.innerHTML = gcardInner(GCARD_ICONS[id], doneLabel, bid, btnLabel, content, 'gotowe');
         var b = el(bid); if (b) b.addEventListener('click', function () { switchTab(openTab); });
         Array.prototype.forEach.call(card.querySelectorAll('.genthumb'), function (t) { t.addEventListener('click', function () { switchTab(openTab); }); });
         // FIX(6): gotowa karta REKLAM = najnowsza wiadomość → na DÓŁ czatu (flip robił to w miejscu starego paska, wyżej).
