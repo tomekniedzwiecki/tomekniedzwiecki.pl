@@ -6714,7 +6714,6 @@
                 if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                 persistSession();
                 changed = true;
-                setTimeout(renderPhoneAsk, 1800);   // R1: makiety doszły sync'iem → miękko pytamy o telefon
             }
             var srvAds = Array.isArray(p.session_ads) ? p.session_ads : (Array.isArray(p.ads) ? p.ads : null);
             if (srvAds && srvAds.length && JSON.stringify(srvAds) !== JSON.stringify(state.suiteAds)) {
@@ -6733,7 +6732,6 @@
                 if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                 persistSession();
                 changed = true;
-                setTimeout(renderPhoneAsk, 1800);   // R1: sklep doszedł sync'iem → miękko pytamy o telefon
             }
             if (typeof p.landing_url === 'string' && p.landing_url && p.landing_url !== state.landingUrl) {
                 state.landingUrl = p.landing_url;
@@ -8164,7 +8162,6 @@
                 if (res.ok && res.d && res.d.landing_html) {
                     state.landingHtml = res.d.landing_html; persistSession(); landingGen = false; extras.landingTab = 'idle'; clearGenFail('sklep');
                     genCardReadyInChat('ln-chat-card', 'Twój sklep gotowy', 'sklep', 'Zobacz sklep →');
-                    setTimeout(renderPhoneAsk, 1800);   // R1: sklep gotowy (proof) → dopiero TERAZ miękko pytamy o telefon (SMS o postępie)
                     if (pendingShopSugg) { renderSuggestions(pendingShopSugg.opts, pendingShopSugg.multi); pendingShopSugg = null; }   // FIX(5): odroczone „co poprawić" — teraz sklep gotowy
                     if (activeTab !== 'sklep' && !budSeenTabs.sklep) budNewTabs.sklep = true;
                     updateBudNav();
@@ -10541,7 +10538,6 @@
                 if (res.ok && res.d && Array.isArray(res.d.mockups) && res.d.mockups.length) {
                     state.mockups = res.d.mockups; persistSession(); mockups4Gen = false; extras.mockups = 'idle'; clearGenFail('makiety');
                     genCardReadyInChat('mk-chat-card', 'Makiety gotowe — 4 style', 'makiety', 'Wybierz makietę →');
-                    setTimeout(renderPhoneAsk, 1800);   // R1: makiety = PIERWSZY duży proof, PRZED długim gen reklam/sklepu (gdzie niecierpliwi drift'ują) → tu pytamy o telefon (SMS o postępie)
                     if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
                     updateBudNav();
                     if (activeTab === 'makiety') renderPaneMakiety();
@@ -10571,19 +10567,25 @@
         if (!m) return;
         state.chosenStyle = styleKey;
         persistSession();
-        // podświetl wybraną kartę
+        // podświetl wybraną kartę (tani feedback od razu)
         var body = el('pane-makiety-body');
         if (body) {
             Array.prototype.forEach.call(body.querySelectorAll('.mk-card'), function (c) {
                 c.classList.toggle('is-chosen', c.getAttribute('data-style') === styleKey);
             });
         }
-        // odsłoń reklamy + start
+        // req Tomka: telefon WYMAGANY przed budową sklepu/reklam. Bramka tu = po pełnym
+        // proofie (4 makiety) i w momencie commitmentu. Gwarantuje numer i NIE pali drogich
+        // generacji (reklamy/sklep) na leadach bez kontaktu. Po podaniu → _commitStylePick.
+        renderPhoneGate(function () { _commitStylePick(m, styleKey); });
+    }
+    function _commitStylePick(m, styleKey) {
+        // odsłoń reklamy + start budowy (reklamy → równolegle sklep)
         budNewTabs.reklamy = true;
         updateBudNav();
         kickAds(false);
         // req Tomka: w trakcie budowy sklepu/reklam zadaj pytanie kwalifikujące (ankieta) —
-        // flaga odpala proaktywną turę qualifyEngage po potwierdzeniu wyboru stylu.
+        // flaga odpala proaktywną turę qualifyEngage po wylądowaniu reklam (R7).
         state.qualifyPending = true; persistSession();
         // potwierdzenie do AI (bud-chat zapisze chosen_style + potwierdzi w rozmowie)
         // gdy trwa stream — kolejkuj; flush po zakończeniu bieżącej tury (finalizer streamReply),
@@ -12570,8 +12572,8 @@
             try { accountKnown = localStorage.getItem(LS_HAS_ACCOUNT) === '1'; } catch (e) {}
         }
         // R1 (proof-first): bramka PRZED raportem wymaga TYLKO konta + imienia (e-mail z konta).
-        // Telefon NIE blokuje już proofu — pytamy o niego DOPIERO po dostarczeniu raportu
-        // (renderPhoneAsk), opcjonalnie i z miękką ramką (SMS o postępie, bez dzwonienia).
+        // Telefon NIE blokuje proofu — jest WYMAGANY dopiero przy WYBORZE MAKIETY (renderPhoneGate,
+        // po pełnym proofie + w momencie commitmentu „buduj mi ten sklep"; bez „Pomiń", req Tomka).
         // 7/10 person odpadało, gdy telefon był żądany przed jakimkolwiek dowodem (scam vibe).
         return !accountKnown || !hasFullName();
     }
@@ -12932,29 +12934,34 @@
 
     // R1: OPCJONALNY, pomijalny ask o telefon — pokazywany PO dostarczeniu raportu (proof #1),
     // nie przed. Miękka ramka: SMS o postępie, bez dzwonienia. NIE blokuje niczego, raz na sesję.
-    function renderPhoneAsk() {
-        if (state.phone) return;                          // już mamy numer
-        if (el('phone-ask') || el('inline-gate')) return; // nie nakładaj na bramkę/duplikat
-        if (!authState.user || !hasFullName()) return;    // tylko po domknięciu kontaktu (konto+imię)
-        try { if (sessionStorage.getItem('bud_phoneask_' + state.sessionId)) return; } catch (e) {}
-        try { sessionStorage.setItem('bud_phoneask_' + state.sessionId, '1'); } catch (e) {}
+    // R1 + req Tomka: telefon WYMAGANY (bez „Pomiń") — bramka przy wyborze makiety, czyli
+    // PO pełnym proofie (4 makiety) i w momencie commitmentu („buduj mi ten sklep"). Numer
+    // potrzebny, żeby wysłać gotowy sklep SMS-em i ruszyć budowę. onDone uruchamia dalszy krok
+    // (budowę reklam/sklepu) — gdy numer już mamy, leci od razu; przy ponownym wyborze stylu
+    // _phoneGateOnDone aktualizuje się na najnowszy.
+    var _phoneGateOnDone = null;
+    function renderPhoneGate(onDone) {
+        _phoneGateOnDone = (typeof onDone === 'function') ? onDone : null;
+        var run = function () { var fn = _phoneGateOnDone; _phoneGateOnDone = null; if (fn) fn(); };
+        if (state.phone) { run(); return; }                       // mamy numer → leć dalej
+        if (!authState.user || !hasFullName()) { run(); return; } // brak konta/imienia (edge) → nie blokuj
+        if (el('phone-ask')) return;                              // bramka już jest; onDone zaktualizowany wyżej
         var div = document.createElement('div');
         div.className = 'msg msg--ai msg--gate';
         div.id = 'phone-ask';
         div.innerHTML = '<div class="sg">' +
-            '<h3 class="sg-title">Zostawisz numer?</h3>' +
-            '<p class="sg-sub">Wyślę Ci SMS, gdy kolejne elementy sklepu będą gotowe — i gdy Tomek przygotuje Twój plan. Bez dzwonienia, sam decydujesz.</p>' +
+            '<h3 class="sg-title">Zostaw numer — ruszam z budową</h3>' +
+            '<p class="sg-sub">Świetny wybór. Teraz składam Twój sklep i reklamy. Zostaw numer, a wyślę Ci SMS, gdy będą gotowe — i przekażę projekt Tomkowi. My do Ciebie nie dzwonimy.</p>' +
             '<form id="pa-form" class="sg-form" novalidate>' +
-            '<input class="f-input" type="tel" inputmode="tel" id="pa-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20">' +
-            '<div class="f-error" id="pa-error">Podaj numer (min. 9 cyfr).</div>' +
-            '<button type="submit" class="btn" id="pa-submit">Zapisz numer <span class="btn__arrow">→</span></button>' +
+            '<input class="f-input" type="tel" inputmode="tel" id="pa-phone" placeholder="+48 600 000 000" autocomplete="tel" maxlength="20" required>' +
+            '<div class="f-error" id="pa-error">Podaj numer telefonu (min. 9 cyfr).</div>' +
+            '<button type="submit" class="btn" id="pa-submit">Buduj mój sklep <span class="btn__arrow">→</span></button>' +
             '</form>' +
-            '<button type="button" id="pa-skip" style="' + cpwLink + ';margin-top:6px">Pomiń — może później</button>' +
-            '<p class="sg-note">Bez spamu. Odpiszesz STOP, żeby wyłączyć.</p>' +
+            '<p class="sg-note">Numer jest potrzebny, żeby wysłać Ci gotowy sklep i ważne kroki SMS-em. Bez spamu — STOP wypisuje.</p>' +
             '</div>';
         el('chat-msgs').appendChild(div);
         scrollToBottom(true);
-        el('pa-skip').addEventListener('click', function () { div.remove(); });
+        setTimeout(function () { var f = el('pa-phone'); if (f) { try { f.focus(); } catch (e) {} if (f.scrollIntoView) f.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 200);
         el('pa-form').addEventListener('submit', function (e) {
             e.preventDefault();
             var phone = el('pa-phone').value.trim();
@@ -12965,7 +12972,7 @@
             syncContactToServer();
             fireContactLeadEvents();
             div.remove();
-            sysMsg('Dzięki — dam znać SMS-em przy ważnych krokach.');
+            run();
         });
     }
 
