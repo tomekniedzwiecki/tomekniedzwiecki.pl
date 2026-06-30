@@ -334,6 +334,28 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     .journey__sub{display:none}
 }
 
+/* ============================================================ ACT DROGA / OŚ CZASU (przekazanie sterów) */
+.journey-sec .scene__in{max-width:940px}
+.jt{list-style:none;position:relative;margin-top:48px}
+.jt::before{content:'';position:absolute;left:23px;top:18px;bottom:30px;width:2px;background:linear-gradient(180deg,var(--border-strong) 0%,var(--border-strong) 28%,var(--accent) 60%,var(--accent) 100%)}
+.jt__s{position:relative;display:grid;grid-template-columns:48px 1fr;gap:30px;padding:0 0 42px}
+.jt__s:last-child{padding-bottom:0}
+.jt__node{position:relative;z-index:1;width:48px;height:48px;border-radius:50%;background:#000;border:1.5px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text-muted);font-variant-numeric:tabular-nums;transition:.4s var(--ease)}
+.jt__s--key .jt__node{width:58px;height:58px;margin-left:-5px;background:var(--accent);border-color:var(--accent);color:#00150c;font-size:18px;box-shadow:0 0 0 6px rgba(0,217,126,.13),0 0 60px rgba(0,217,126,.45)}
+.jt__body{padding-top:3px}
+.jt__time{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--text-faint)}
+.jt__pov{display:inline-block;margin:11px 0 13px;font-size:11.5px;font-weight:700;letter-spacing:.01em;padding:5px 13px;border-radius:999px;border:1px solid var(--border-strong);color:var(--text-muted)}
+.jt__pov--you{color:var(--accent);border-color:rgba(0,217,126,.42);background:var(--accent-soft)}
+.jt__t{font-size:clamp(22px,2.8vw,33px);font-weight:800;letter-spacing:-.025em;color:var(--text-strong);margin-bottom:9px;line-height:1.08}
+.jt__s--key .jt__t{color:var(--accent)}
+.jt__d{font-size:15.5px;color:var(--text-muted);line-height:1.55;max-width:56ch}
+@media (max-width:600px){
+    .jt__s{grid-template-columns:40px 1fr;gap:18px;padding-bottom:34px}
+    .jt::before{left:19px}
+    .jt__node{width:40px;height:40px;font-size:13px}
+    .jt__s--key .jt__node{width:48px;height:48px;margin-left:-4px;font-size:15px}
+}
+
 /* ============================================================ ACT 05 MOTTO */
 .motto{text-align:center}
 .motto::before{content:'';position:absolute;inset:0;z-index:-1;background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);background-size:26px 26px;-webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,#000,transparent);mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,#000,transparent);opacity:.7}
@@ -600,11 +622,44 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div class="scene__in">
         <span class="eyebrow" data-reveal>Wspólny biznes w czasie</span>
         <h2 class="h-sec" data-reveal data-delay="60">Od startu <span class="g">do Twoich sterów.</span></h2>
-        <ol class="journey" data-reveal data-delay="140">
-            <li><span class="journey__n">01</span><span class="journey__t">Rozkręcam biznes</span><span class="journey__sub">Buduję sklep i uruchamiam sprzedaż.</span></li>
-            <li><span class="journey__n">02</span><span class="journey__t">Wdrażam Cię w prowadzenie</span><span class="journey__sub">Uczę Cię wszystkiego po drodze.</span></li>
-            <li class="journey--key"><span class="journey__n">03</span><span class="journey__t">Przekazuję Ci stery</span><span class="journey__sub">Biznes staje się Twój.</span></li>
-            <li><span class="journey__n">04</span><span class="journey__t">Doradzam strategicznie</span><span class="journey__sub">Zostaję wspólnikiem-doradcą.</span></li>
+        <p class="lead" data-reveal data-delay="110">Stery przechodzą z moich rąk do Twoich — krok po kroku, aż biznes jest w pełni Twój.</p>
+        <ol class="jt" data-reveal data-delay="160">
+            <li class="jt__s">
+                <div class="jt__node">01</div>
+                <div class="jt__body">
+                    <span class="jt__time">Start</span>
+                    <span class="jt__pov jt__pov--me">Ja prowadzę</span>
+                    <h3 class="jt__t">Rozkręcam biznes</h3>
+                    <p class="jt__d">Buduję sklep pod klucz, odpalam reklamy i sprzedaż. Ty patrzysz, jak robi się to od środka.</p>
+                </div>
+            </li>
+            <li class="jt__s">
+                <div class="jt__node">02</div>
+                <div class="jt__body">
+                    <span class="jt__time">Pierwsze miesiące</span>
+                    <span class="jt__pov jt__pov--me">Ja prowadzę · Ty się uczysz</span>
+                    <h3 class="jt__t">Wdrażam Cię w prowadzenie</h3>
+                    <p class="jt__d">Pokazuję Ci każdy element — produkt, kampanie, liczby. Zadajesz pytania, jesteśmy w stałym kontakcie.</p>
+                </div>
+            </li>
+            <li class="jt__s jt__s--key">
+                <div class="jt__node">03</div>
+                <div class="jt__body">
+                    <span class="jt__time">~6 miesiąc</span>
+                    <span class="jt__pov jt__pov--you">Ty przejmujesz</span>
+                    <h3 class="jt__t">Przekazuję Ci stery</h3>
+                    <p class="jt__d">Biznes działa i jest Twój. Od teraz prowadzisz go sam — z moim wsparciem za plecami.</p>
+                </div>
+            </li>
+            <li class="jt__s">
+                <div class="jt__node">04</div>
+                <div class="jt__body">
+                    <span class="jt__time">Potem — bezterminowo</span>
+                    <span class="jt__pov jt__pov--you">Ty prowadzisz · Ja doradzam</span>
+                    <h3 class="jt__t">Zostaję Twoim wspólnikiem</h3>
+                    <p class="jt__d">Doradzam strategicznie i zarabiam tylko wtedy, gdy Ty zarabiasz. Dlatego naprawdę gram o Twój wynik.</p>
+                </div>
+            </li>
         </ol>
     </div>
 </section>
