@@ -445,11 +445,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @media (max-width:640px){.ad{width:132px;height:164px}}
 
 /* ============================================================ ACT MARKI (logo wall) */
-.brands{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px;margin-top:46px;margin-bottom:26px}
-.brand{aspect-ratio:3/2;border-radius:12px;overflow:hidden;border:1px solid var(--border-strong);transition:.35s var(--ease)}
-.brand:hover{transform:translateY(-3px);box-shadow:0 18px 44px -20px rgba(0,0,0,.7)}
+.brands{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:46px;margin-bottom:26px}
+.brand{flex:0 0 auto;width:152px;aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:1px solid var(--border-strong);background:#fff;transition:.35s var(--ease)}
+.brand:hover{transform:translateY(-3px);box-shadow:0 18px 44px -20px rgba(0,0,0,.55)}
 .brand img{width:100%;height:100%;object-fit:cover;display:block}
-@media (max-width:520px){.brands{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.brand{width:calc(50% - 7px)}}
 
 /* ============================================================ ACT 10 FINAL CTA */
 .final{text-align:center}
@@ -939,8 +939,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     /* ---------- REKLAMY (marquee) + MARKI (ściana logo) ---------- */
     (function(){
         var REKLAMY=[]; for(var i=1;i<=20;i++) REKLAMY.push('/img/reklamy/reklama-'+('0'+i).slice(-2)+'.webp');
-        var MARKI=[]; for(var j=1;j<=22;j++) MARKI.push('/img/marki/marka-'+('0'+j).slice(-2)+'.webp');
-        function ad(src){ return '<div class="ad"><img src="'+src+'" alt="Reklama" loading="lazy" referrerpolicy="no-referrer"></div>'; }
+        var MARKI=[]; for(var j=1;j<=13;j++) MARKI.push('/img/marki/marka-'+('0'+j).slice(-2)+'.webp');
+        function ad(src){ return '<div class="ad"><img src="'+src+'" alt="Reklama" decoding="async"></div>'; }
         var r1=$('#mq-row1'), r2=$('#mq-row2');
         if(r1&&r2){
             var half=Math.ceil(REKLAMY.length/2);
