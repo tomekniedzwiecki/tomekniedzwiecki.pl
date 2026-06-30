@@ -7282,7 +7282,7 @@
         // Raport zagatowany (brak kompletu kontaktu) — nie pisz „Liczę raport rynku",
         // bo realnie nie leci. Skieruj do rozmowy z bramką kontaktu.
         if (_stage === 'raport' && gateContactMissing()) {
-            s = { txt: 'Zostaw w rozmowie kontakt — konto, imię i nazwisko oraz telefon — wtedy od razu ruszam z raportem.', cta: 'Wróć do rozmowy →', tab: 'chat' };
+            s = { txt: 'Zostaw w rozmowie kontakt — konto oraz imię i nazwisko — wtedy od razu ruszam z raportem.', cta: 'Wróć do rozmowy →', tab: 'chat' };
         }
         var bar = document.createElement('div'); bar.className = 'stagebar';
         bar.innerHTML = '<div class="stagebar__txt"><b>Co dalej:</b> ' + s.txt + '</div>' +
@@ -7354,7 +7354,10 @@
         _navFromPop = false;
     });
     function applyHashTab() {
-        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|ustalenia|makiety|reklamy|sklep|wspolpraca)(?:-(ekrany|strona|prototyp|marka|karta|plan|economics|gtm))?$/);
+        // R7 (audyt): usunięto martwe sub-widoki forku /stworze (strona|prototyp|plan|economics|gtm) —
+        // stary hash #projekt-prototyp itp. renderował „Składam… 5 min", co NIGDY się nie kończyło.
+        // Teraz nie pasują do regexu → spadają na czysty pulpit. Zostają realnie używane: ekrany|marka|karta.
+        var m = (location.hash || '').slice(1).match(/^(projekt|rynek|ustalenia|makiety|reklamy|sklep|wspolpraca)(?:-(ekrany|marka|karta))?$/);
         if (!m) return;
         // nowe zakładki pipeline dostępne tylko gdy ich etap aktywny — inaczej hash ignorujemy
         if ((m[1] === 'ustalenia' || m[1] === 'makiety' || m[1] === 'reklamy' || m[1] === 'sklep') && !budTabVisible(m[1])) return;
@@ -9477,7 +9480,7 @@
         if (state.chosenProduct && state.chosenProduct.id && gateContactMissing()) {
             return '<button type="button" class="pjx pjx--3" data-go-chat>' + pjxNo('03') + pjxDot('', 'czeka na kontakt') +
                 '<span class="pjx-chart" style="opacity:.3">' + pjxChartSvg(false) + '</span><span class="pjx__t">Potencjał rynku</span>' +
-                '<span class="pjx__sub">Zostaw w rozmowie konto, imię i nazwisko oraz telefon — od razu ruszam z raportem.</span></button>';
+                '<span class="pjx__sub">Zostaw w rozmowie konto oraz imię i nazwisko — od razu ruszam z raportem.</span></button>';
         }
         return '<div class="pjx pjx--3">' + pjxNo('03') + pjxDot('', 'wkrótce') +
             '<span class="pjx-chart" style="opacity:.3">' + pjxChartSvg(false) + '</span><span class="pjx__t">Potencjał rynku</span>' +
@@ -9704,7 +9707,7 @@
                 tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
                     '<span class="pjd-tile__ico">' + pjIco(PJ_ICONS.raport) + '</span>' +
                     '<span class="pjd-tile__t">Raport strategiczny</span>' +
-                    '<div class="pjd-gen"><b>Czeka na Twój kontakt</b><span>Zostaw w rozmowie konto, imię i nazwisko oraz telefon — od razu ruszam z raportem.</span></div>' +
+                    '<div class="pjd-gen"><b>Czeka na Twój kontakt</b><span>Zostaw w rozmowie konto oraz imię i nazwisko — od razu ruszam z raportem.</span></div>' +
                     '</div>';
             } else if (state.chosenProduct) {
                 tiles += '<div class="pjd-tile pjd-tile--w3 pjd-tile--static">' +
@@ -10244,8 +10247,8 @@
             '<div class="collab-cta">' +
             (done
                 ? '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener" style="flex:1;min-width:220px;">Rezerwuję rozmowę → 500 zł</a>'
-                : '') +
-            '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Dokończ projekt w rozmowie') + '</button>' +
+                : '<span style="flex:1 0 100%;font-size:13px;line-height:1.5;color:var(--text-muted);margin-bottom:8px;">Rezerwacja (500 zł, zwrotna) odblokuje się, gdy w rozmowie damy „zielone światło" Twojemu projektowi — to ostatni krok tuż przed nią.</span>') +
+            '<button type="button" class="preview-retry" data-go-chat style="flex:1;min-width:200px;">' + (done ? 'Mam pytanie — wracam do rozmowy' : 'Wróć do rozmowy — domknijmy zielone światło') + '</button>' +
             '</div>';
         body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
     }
@@ -10323,7 +10326,7 @@
                 // i realnie NIE leci — nie pokazuj fałszywego „liczę 3 min". Skieruj do rozmowy,
                 // gdzie czeka stepowa bramka; raport ruszy dopiero po jej domknięciu.
                 body.innerHTML = head +
-                    '<div class="tabpane__empty">Twój raport ruszy, gdy w rozmowie zostawisz kontakt — konto, imię i nazwisko oraz telefon. Zajmę się nim od razu po tym.<br>' +
+                    '<div class="tabpane__empty">Twój raport ruszy, gdy w rozmowie zostawisz kontakt — konto oraz imię i nazwisko. Zajmę się nim od razu po tym.<br>' +
                     '<button type="button" class="preview-retry" data-go-chat>Wracam do rozmowy</button></div>';
                 body.querySelector('[data-go-chat]').addEventListener('click', function () { switchTab('chat'); });
             } else {
@@ -10480,7 +10483,7 @@
         { label: 'Produkt', tab: 'chat', done: function () { return !!(state.chosenProduct && state.chosenProduct.id); } },
         { label: 'Raport', tab: 'rynek', done: function () { return !!state.raport; } },
         { label: 'Ustalenia', tab: 'ustalenia', done: function () { return !!state.ustalenia; } },
-        { label: 'Marka', tab: 'makiety', done: function () { return !!state.brandDone; } },
+        { label: 'Marka', tab: 'chat', done: function () { return !!state.brandDone; } },   // wybór nazwy/logo jest w czacie (renderBrandPicker)
         { label: 'Makiety', tab: 'makiety', done: function () { return !!(state.mockups && state.mockups.length); } },
         { label: 'Reklamy', tab: 'reklamy', done: function () { return !!(state.suiteAds && state.suiteAds.length); } },
         { label: 'Sklep', tab: 'sklep', done: function () { return !!state.landingHtml; } },
@@ -10727,7 +10730,7 @@
     /* ── RENDER: USTALENIA (lustro rozmowy „dla kogo to jest") ── */
     function renderPaneUstalenia() {
         var body = el('pane-ustalenia-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 2 z 6</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Ustalenia</div>' +
             '<h2 class="tabpane__title">Ustalenia — dla kogo to jest</h2>' +
             '<p class="tabpane__sub">Tu zbieram, do kogo mówimy: grupa odbiorców, kąt sprzedaży, ton i kluczowe korzyści. Doprecyzowujemy to w rozmowie.</p></div>';
         var u = state.ustalenia;
@@ -10778,7 +10781,7 @@
     /* ── RENDER: MAKIETY (4 style + picker) ── */
     function renderPaneMakiety() {
         var body = el('pane-makiety-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 4 z 6</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Makiety sklepu</div>' +
             '<h2 class="tabpane__title">Makiety — wybierz styl</h2>' +
             '<p class="tabpane__sub">Przygotowałem 4 propozycje wyglądu strony w różnych stylach. Wybierz ten, który najbardziej do Ciebie pasuje — na nim zbuduję resztę.</p></div>';
         var mk = state.mockups;
@@ -10942,7 +10945,7 @@
     /* ── RENDER: REKLAMY (posty FB) — przeniesione z renderPaneRynek ── */
     function renderPaneReklamy() {
         var body = el('pane-reklamy-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 5 z 6</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Reklamy</div>' +
             '<h2 class="tabpane__title">Reklamy</h2>' +
             '<p class="tabpane__sub">Tak będą wyglądać Twoje reklamy na Facebooku i Instagramie — grafika i tekst gotowe do uruchomienia.</p></div>';
         if (Array.isArray(state.suiteAds) && state.suiteAds.length) {
@@ -11021,7 +11024,7 @@
 
     function renderPaneSklep() {
         var body = el('pane-sklep-body');
-        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Etap 6 z 6</div>' +
+        var head = '<div class="tabpane__head"><div class="tabpane__eyebrow">Twój sklep</div>' +
             '<h2 class="tabpane__title">Twój sklep</h2>' +
             '<p class="tabpane__sub">Gotowa strona sprzedażowa Twojego produktu — zobacz ją na pełnym ekranie.</p></div>';
         if (state.landingHtml) {
@@ -15489,7 +15492,10 @@
                 if (tabBtn) tabBtn.addEventListener('click', function () {
                     switchTab('wspolpraca');
                 });
-                appendCalcChatCard();   // „wow" — kalkulator potencjału tuż po zielonym świetle
+                // anty-przytłoczenie (audyt): NIE wal kalkulatora (4 suwaki + 7 liczb) w ten sam
+                // kadr co kartę zielonego światła + CTA rezerwacji. Najpierw niech wybrzmi decyzja
+                // i jedno CTA, kalkulator dochodzi spokojnie po ~1,6s jako „policz potencjał".
+                setTimeout(appendCalcChatCard, 1600);
             }
             if (activeTab === 'projekt' || activeTab === 'wspolpraca') switchTab(activeTab); // odśwież otwartą zakładkę
             updateSideBadges();
