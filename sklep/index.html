@@ -7153,6 +7153,36 @@
         el('fct-bd').addEventListener('click', close);
         try { gaEvent('app_facts_open', {}); } catch (e) {}
     }
+    // „BOJĘ SIĘ, ŻE NIE DAM RADY" (audyt OpenAI, persona marzyciel = rdzeń AWE): usuwa GŁÓWNĄ blokadę
+    // psychologiczną etatowca. Nie osłabia sprzedaży — zdejmuje lęk „nie ogarnę / zostanę sam".
+    function showFearModal() {
+        if (el('fear-modal')) return;
+        var ov = document.createElement('div'); ov.className = 'auth-modal'; ov.id = 'fear-modal'; ov.hidden = false;
+        ov.innerHTML =
+            '<div class="auth-modal__backdrop" id="fear-bd"></div>' +
+            '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Boję się, że nie dam rady" style="max-width:540px">' +
+            '<button type="button" class="auth-modal__close" id="fear-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
+            '<h2 class="auth-modal__title">„Boję się, że nie dam rady"</h2>' +
+            '<p class="auth-modal__sub" style="margin-top:2px">To najczęstsza obawa — i dobrze, bo znaczy, że bierzesz to na poważnie. Oto jak to wygląda naprawdę.</p>' +
+            '<div class="fct-grp"><div class="fct-h">Czego NIE musisz umieć na start</div>' +
+            '<p class="fct-p">Reklam, obsługi sklepu, kodu, dostawców, formalności i RODO — <b>to wszystko prowadzi Tomek z zespołem</b>. Nie zaczynasz od nauki, tylko od gotowego, działającego sklepu.</p></div>' +
+            '<div class="fct-grp"><div class="fct-h">Co robi Tomek</div>' +
+            '<p class="fct-p">Buduje sklep pod klucz, odpala i codziennie optymalizuje kampanie Meta i Google, <b>prowadzi sprzedaż do pierwszych ~1000 zamówień</b> i uczy Cię po drodze. Nie zostawia Cię z tym samego.</p></div>' +
+            '<div class="fct-grp"><div class="fct-h">Twoja rola — bez koloryzowania</div>' +
+            '<p class="fct-p">Uczysz się decyzji właściciela przy <b>gotowym, działającym sklepie</b>: obsługa zapytań, realizacja i wysyłka zamówień, podglądanie liczb. Proste czynności, realne przy kilku godzinach tygodniowo. To nie pasywny dochód — ale też nie wymaga, żebyś był ekspertem.</p></div>' +
+            '<div class="fct-grp"><div class="fct-h">Kiedy przejmujesz stery</div>' +
+            '<p class="fct-p">Po ~pół roku <b>wspólnego prowadzenia i nauki</b>, gdy sprzedaż już działa — stopniowo, nie z dnia na dzień i nie sam. Tomek zostaje wspólnikiem i doradza.</p></div>' +
+            '<div class="fct-grp"><div class="fct-h">A jeśli uznasz, że to nie dla Ciebie?</div>' +
+            '<p class="fct-p">Po rozmowie z Tomkiem Ty decydujesz. Nie wchodzicie we współpracę — <b>500 zł wraca w całości</b>. Nie ryzykujesz „w ciemno".</p></div>' +
+            '<p class="auth-modal__note">Pamiętaj: to model dla osób, które mają etat i nigdy nie prowadziły biznesu online. Dokładnie pod Ciebie.</p>' +
+            '</div>';
+        document.body.appendChild(ov);
+        if (typeof pushModalState === 'function') pushModalState();
+        var close = function () { ov.remove(); };
+        el('fear-x').addEventListener('click', close);
+        el('fear-bd').addEventListener('click', close);
+        try { gaEvent('app_fear_open', {}); } catch (e) {}
+    }
     function showReservationPaywall() {
         if (state.paid) { reservationConfirmed(); return; }
         if (activeTab !== 'chat') switchTab('chat');
@@ -7207,8 +7237,9 @@
             '</ol>' +
             (loggedIn ? blikBody : '<button type="button" class="btn" id="rpw-login" style="width:100%">Zaloguj się, żeby zarezerwować</button>') +
             '<div style="display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;justify-content:center">' +
-              '<button type="button" id="rpw-facts" class="fct-link">Pokaż wszystkie koszty i zasady</button>' +
-              '<button type="button" id="rpw-questions" class="fct-link">Mam jeszcze pytania — wróć do rozmowy</button>' +
+              '<button type="button" id="rpw-fear" class="fct-link">Boję się, że nie dam rady</button>' +
+              '<button type="button" id="rpw-facts" class="fct-link">Koszty i zasady</button>' +
+              '<button type="button" id="rpw-questions" class="fct-link">Mam pytania — wróć do rozmowy</button>' +
             '</div>' +
             '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.</p>' +
             '</div>';
@@ -7222,6 +7253,7 @@
         // #8: ścieżka niskiego oporu dla wahających się — wróć do czatu z pytaniami zamiast zamykać i odpływać
         var _q = el('rpw-questions'); if (_q) _q.addEventListener('click', function () { close(); switchTab('chat'); try { unlockComposer(); } catch (e) {} var ci = el('chat-input'); if (ci) { try { ci.focus(); } catch (e) {} } });
         var _f = el('rpw-facts'); if (_f) _f.addEventListener('click', function () { showFactsModal(); });
+        var _fear = el('rpw-fear'); if (_fear) _fear.addEventListener('click', function () { showFearModal(); });
         if (loggedIn) {
             var digits = ov.querySelectorAll('.cpw-digit');
             var syncDigits = function () { for (var k = 0; k < digits.length; k++) digits[k].classList.toggle('filled', !!digits[k].value); };
@@ -13499,10 +13531,11 @@
             '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#00d97e;margin-bottom:5px">Dlaczego mówimy „tak"</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(mocne, '#00d97e') + '</ul></div>' +
             '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:5px">Co dopracujemy razem</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(dopr, '#a1a1aa') + '</ul></div>' +
             '</div>' +
-            '<div style="margin:10px 0 4px;padding:9px 12px;border:1px solid rgba(245,200,80,.3);background:rgba(245,200,80,.07);border-radius:10px;font-size:12.5px;line-height:1.45;color:var(--text)"><strong style="color:#f5c850">Realne ryzyko:</strong> ' + esc(ryzyko) + '</div>' +
+            '<div style="margin:10px 0 4px;padding:9px 12px;border:1px solid rgba(245,200,80,.3);background:rgba(245,200,80,.07);border-radius:10px;font-size:12.5px;line-height:1.45;color:var(--text)"><strong style="color:#f5c850">Realne ryzyko:</strong> ' + esc(ryzyko) + '<br><span style="opacity:.85">Nie każdy projekt przechodzi — odpuszczamy, gdy nie ma marży, budżetu albo Twojego zaangażowania. Dlatego „zielone" coś znaczy.</span></div>' +
             '<p class="mk-card__d">To <strong>nie koniec — to wejście we wspólny biznes z Tomkiem.</strong> Rezerwacja = Tomek osobiście układa plan → buduje sklep pod klucz → wspólnie dochodzicie do pierwszych 1000 zamówień → uczy Cię prowadzenia → <strong>przejmujesz stery</strong> (Tomek zostaje wspólnikiem, 20% od zysku).</p>' +
             '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję wejście we współpracę → 500 zł</a>' +
-            '<p class="mk-card__note">w pełni zwrotne · 500 zł wlicza się w budowę, a wraca w całości, jeśli nie wejdziemy we współpracę · rezerwujesz czas Tomka, nie kupujesz sklepu</p>';
+            '<p class="mk-card__note">w pełni zwrotne · 500 zł wlicza się w budowę, a wraca w całości, jeśli nie wejdziemy we współpracę · rezerwujesz czas Tomka, nie kupujesz sklepu</p>' +
+            '<div style="text-align:center;margin-top:8px"><button type="button" class="fct-link" data-fear>Boję się, że nie dam rady</button></div>';
         return div;
     }
     // Pokaż zielone światło. animate=true → krótki beat „oceniamy potencjał…" (poczucie
@@ -16072,6 +16105,11 @@
         el('btn-restart').addEventListener('click', newConvo);
         el('jump-btn').addEventListener('click', function () { // #2 — skok do najnowszej
             _openerHold = false; stickBottom = true; turnAnchored = false; scrollToBottom(true); setJumpVisible(false);
+        });
+        // delegacja: „Boję się, że nie dam rady" (zielone światło i inne karty) → modal usuwający lęk
+        document.addEventListener('click', function (e) {
+            var fb = e.target && e.target.closest ? e.target.closest('[data-fear]') : null;
+            if (fb) { e.preventDefault(); showFearModal(); }
         });
         updateSendState();
 
