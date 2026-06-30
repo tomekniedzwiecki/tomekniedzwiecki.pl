@@ -12948,6 +12948,7 @@
         var run = function () { var fn = _phoneGateOnDone; _phoneGateOnDone = null; if (fn) fn(); };
         if (state.phone) { run(); return; }                       // mamy numer → leć dalej
         if (!authState.user || !hasFullName()) { run(); return; } // brak konta/imienia (edge) → nie blokuj
+        if (activeTab !== 'chat') switchTab('chat');              // bramka jest w czacie — pokaż ją (user kliknął styl na zakładce Makiety)
         if (el('phone-ask')) return;                              // bramka już jest; onDone zaktualizowany wyżej
         var div = document.createElement('div');
         div.className = 'msg msg--ai msg--gate';
