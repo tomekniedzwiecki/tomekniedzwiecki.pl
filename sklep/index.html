@@ -1951,9 +1951,14 @@
     .rkg-mockup__lab { font-size: 13px; font-weight: 700; color: var(--text-strong); margin-bottom: 12px; }
     .rkg-mockup img { max-width: 340px; width: 100%; border-radius: 14px; border: 1px solid var(--glass-border); box-shadow: 0 16px 44px -14px rgba(0, 0, 0, 0.65); }
     .rkg-gen { font-size: 13px; color: var(--text-muted); padding: 8px 0; }
-    .rkg-landing-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 11px; padding: 13px 20px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s; }
-    .rkg-landing-btn:hover { background: var(--accent-2); }
+    /* Akcje pod podglądem sklepu — hierarchia: fullscreen = neutralny ghost, collab = subtelny zielony akcent
+       (nie dwie krzykliwe solidne pigułki; dyscyplina zieleni, audyt UX). */
+    .rkg-landing-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.04); color: var(--text-strong, #fff); border: 1px solid rgba(255,255,255,.14); border-radius: 11px; padding: 11px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: background .15s, border-color .15s; }
+    .rkg-landing-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); }
     .rkg-landing-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .rkg-landing-btn svg { width: 16px; height: 16px; opacity: .8; }
+    .rkg-landing-btn.sk-collab { background: rgba(0,217,126,.10); border-color: rgba(0,217,126,.42); color: #00d97e; font-weight: 700; }
+    .rkg-landing-btn.sk-collab:hover { background: rgba(0,217,126,.18); border-color: rgba(0,217,126,.55); }
     .fbposts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     @media (max-width: 640px) { .fbposts { grid-template-columns: 1fr; } }
     .fbpost { background: #fff; color: #1c1e21; border: 1px solid #dadde1; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
@@ -2178,7 +2183,7 @@
     .sk-browser__url { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text-muted); font-family: var(--mono, monospace); background: #141418; border-radius: 7px; padding: 5px 12px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .sk-frame-wrap { border: 0; border-radius: 0; overflow: hidden; background: #fff; height: min(70vh, 740px); }
     .sk-frame { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
-    .sk-actions { display: flex; justify-content: center; margin-top: 16px; }
+    .sk-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
 
     /* Werdykt: teza serifem + zegar potencjału */
     .rk-hero {
@@ -11445,7 +11450,7 @@
                   '<span class="sk-browser__url">🔒 ' + esc(_bd) + '</span></div>' +
                   '<div class="sk-frame-wrap"><iframe id="sk-frame" class="sk-frame" sandbox="" title="Podgląd Twojego sklepu"></iframe></div>' +
                 '</div>' +
-                '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs">🖥️ Otwórz na pełnym ekranie</button>' +
+                '<div class="sk-actions"><button type="button" class="rkg-landing-btn" id="sk-fs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>Otwórz na pełnym ekranie</button>' +
                 // #5: CTA do współpracy ZAWSZE gdy sklep gotowy (nie tylko po zielonym świetle) —
                 // to peak motywacji; gorący lead nie może utknąć bez ścieżki dalej.
                 '<button type="button" class="rkg-landing-btn sk-collab" id="sk-collab">Zobacz, jak budujemy to razem →</button>' +
