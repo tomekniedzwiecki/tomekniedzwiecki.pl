@@ -3930,6 +3930,13 @@
     .auth-modal__close svg { width: 15px; height: 15px; }
     .auth-modal__title { margin: 0 0 6px; font-size: 21px; font-weight: 800; letter-spacing: -0.01em; }
     .auth-modal__sub { margin: 0 0 18px; font-size: 13.5px; opacity: .75; line-height: 1.5; }
+    /* Kotwica wartości (reciprocity): pokazuje, że klient już dostał realną pracę ZA DARMO,
+       zanim poproszono o złotówkę → 500 zł czuje się małe, a zaufanie do możliwości rośnie. */
+    .rpw-anchor { margin: 2px 0 14px; padding: 12px 14px; border: 1px solid rgba(0,217,126,.28); border-radius: 12px; background: rgba(0,217,126,.06); }
+    .rpw-anchor__lead { display: block; font-size: 12px; font-weight: 700; letter-spacing: .02em; color: var(--accent); text-transform: uppercase; }
+    .rpw-anchor__items { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 6px; }
+    .rpw-anchor__items i { font-style: normal; font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .rpw-anchor__note { display: block; font-size: 12px; line-height: 1.45; color: var(--text-muted); }
     .auth-modal__note { margin: 16px 0 0; font-size: 11.5px; opacity: .5; line-height: 1.5; }
     .auth-modal .gate-oauth-row { margin-top: 0; grid-template-columns: 1fr; }
     .auth-otp-sent { font-size: 13px; line-height: 1.5; opacity: .85; margin: 0 0 10px; }
@@ -7050,7 +7057,10 @@
             '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Rezerwacja rozmowy z Tomkiem">' +
             '<button type="button" class="auth-modal__close" id="rpw-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
             '<h2 class="auth-modal__title">Zarezerwuj rozmowę z Tomkiem</h2>' +
-            '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Tomek osobiście ułoży plan Twojego sklepu i odezwie się do Ciebie. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
+            '<div class="rpw-anchor"><span class="rpw-anchor__lead">Już masz w ręku — za darmo:</span>' +
+            '<span class="rpw-anchor__items"><i>✓ Raport rynku</i><i>✓ Marka i logo</i><i>✓ Działający sklep</i><i>✓ Reklamy</i></span>' +
+            '<span class="rpw-anchor__note">Zrobiliśmy to, zanim poprosiliśmy o złotówkę — żebyś zobaczył, że umiemy.</span></div>' +
+            '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Te 500 zł tylko rezerwuje czas Tomka, żeby ułożył plan Twojego sklepu i odezwał się osobiście. Nie wejdziecie we współpracę? Pełny zwrot. Wchodzicie — 500 zł wliczone w budowę.</p>' +
             (loggedIn ? blikBody : '<button type="button" class="btn" id="rpw-login" style="width:100%">Zaloguj się, żeby zarezerwować</button>') +
             '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.</p>' +
             '</div>';
