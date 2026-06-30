@@ -5177,6 +5177,12 @@
     .sg-sub { margin-top: 5px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
     .sg-form { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
     .sg-form .btn { width: 100%; margin-top: 4px; justify-content: center; }
+    .bgt-opts { margin-top: 14px; display: grid; gap: 8px; }
+    .bgt-opts button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; padding: 11px 14px; border: 1px solid var(--border-strong, rgba(255,255,255,.14)); border-radius: 12px; background: rgba(255,255,255,.03); color: var(--text-strong); cursor: pointer; font: inherit; transition: border-color .15s, background .15s, transform .1s; }
+    .bgt-opts button:hover { border-color: var(--accent, #00d97e); background: rgba(0,217,126,.07); }
+    .bgt-opts button:active { transform: scale(.99); }
+    .bgt-opts button b { font-size: 14px; font-weight: 700; }
+    .bgt-opts button span { font-size: 12.5px; color: var(--text-muted); font-family: var(--mono); }
     .sg-note { margin-top: 12px; font-size: 12px; line-height: 1.5; color: var(--text-faint); }
     .sg .gate-oauth-row { margin-top: 12px; }
     @media (prefers-reduced-motion: reduce) { .sg { animation: none; } }
@@ -6266,6 +6272,7 @@
             kamien: state.kamien || 0,
             emailKnown: !!state.emailKnown,
             phoneKnown: !!state.phoneKnown,
+            budgetDeclared: state.budgetDeclared || null,
             lastBrief: state.lastBrief || null,
             chosenProduct: state.chosenProduct || null,
             mockupUrl: state.mockupUrl || null,
@@ -6491,6 +6498,7 @@
         state.kamien = saved.kamien || 0;
         state.emailKnown = !!saved.emailKnown;
         state.phoneKnown = !!saved.phoneKnown;
+        state.budgetDeclared = saved.budgetDeclared || null;
         state.lastBrief = saved.lastBrief || null;
         state.chosenProduct = saved.chosenProduct || null;
         state.mockupUrl = saved.mockupUrl || null;
@@ -6746,6 +6754,11 @@
             }
             if (typeof p.chosen_style === 'string' && p.chosen_style && p.chosen_style !== state.chosenStyle) {
                 state.chosenStyle = p.chosen_style;
+                persistSession();
+                changed = true;
+            }
+            if (typeof p.budget_declared === 'string' && p.budget_declared && p.budget_declared !== state.budgetDeclared) {
+                state.budgetDeclared = p.budget_declared;
                 persistSession();
                 changed = true;
             }
@@ -10610,6 +10623,66 @@
         });
     }
 
+    // ── EARLY BUDGET GATE (req Tomka 2026-07-01) ────────────────────────────────
+    // Po raporcie (tani proof dostarczony), PRZED drogą generacją makiet/reklam/sklepu —
+    // jedno pytanie o budżet startowy. Cel: (a) odrzucić beznadziejnego leada zanim spalimy
+    // compute, (b) ujawnić realia kosztowe wcześnie (anti bait-and-switch), (c) sygnał lead-scoringu.
+    function renderBudgetGate() {
+        if (el('budget-gate') || state.budgetDeclared) return;   // idempotentne
+        if (activeTab !== 'chat') switchTab('chat');
+        var div = document.createElement('div');
+        div.className = 'msg msg--ai msg--gate'; div.id = 'budget-gate';
+        div.innerHTML = '<div class="sg">' +
+            '<h3 class="sg-title">Ostatnie pytanie, zanim zbuduję resztę</h3>' +
+            '<p class="sg-sub">Złożę Ci jeszcze markę, sklep i reklamy — ale żeby dobrać tempo i realny plan startu sprzedaży, powiedz wprost: jaki budżet na rozkręcenie biznesu rozważasz? Bez zobowiązań, 500 zł rezerwacji i tak jest zwrotne.</p>' +
+            '<div class="bgt-opts">' +
+              '<button type="button" data-b="high"><b>Mam odłożone na start</b><span>3 000 zł i więcej</span></button>' +
+              '<button type="button" data-b="mid"><b>Coś uzbieram / dopiero zbieram</b><span>1 000–3 000 zł</span></button>' +
+              '<button type="button" data-b="unknown"><b>Jeszcze nie wiem</b><span>najpierw chcę zobaczyć całość</span></button>' +
+              '<button type="button" data-b="none"><b>Szczerze — teraz nie mam budżetu</b><span>buduję bez nakładu</span></button>' +
+            '</div></div>';
+        el('chat-msgs').appendChild(div); scrollToBottom(true);
+        Array.prototype.forEach.call(div.querySelectorAll('.bgt-opts button'), function (b) {
+            b.addEventListener('click', function () { pickBudget(b.getAttribute('data-b')); });
+        });
+        try { gaEvent('app_budget_gate_shown', {}); } catch (e) {}
+    }
+    var BUDGET_LABELS = { high: 'Mam budżet na start (3 000 zł+)', mid: 'Coś uzbieram (1 000–3 000 zł)', unknown: 'Jeszcze nie wiem', none: 'Na razie bez budżetu' };
+    function pickBudget(b) {
+        if (!b) return;
+        state.budgetDeclared = b; persistSession();
+        syncBudgetToServer(b);
+        var g = el('budget-gate'); if (g) g.remove();
+        // echo wyboru jako wiadomość usera (spójność rozmowy + utrwalenie w historii)
+        messages.push({ role: 'user', content: BUDGET_LABELS[b] || 'Budżet: ' + b }); saveMessages();
+        appendMessage('user', BUDGET_LABELS[b] || ('Budżet: ' + b));
+        try { gaEvent('app_budget_pick', { budget: b }); } catch (e) {}
+        if (b === 'none') { renderBudgetSoftExit(); return; }
+        // budżet OK → krótkie potwierdzenie + ruszamy z resztą (makiety→reklamy→sklep)
+        var ok = document.createElement('div'); ok.className = 'msg msg--ai';
+        ok.innerHTML = renderRich(b === 'unknown'
+            ? 'Jasne — pokażę Ci całość, a budżet docepniemy na spokojnie. **Składam markę, sklep i reklamy** — chwilę to zajmie.'
+            : 'Super — to realny plan. **Składam teraz markę, sklep i reklamy** pod Twój sklep, chwilę to zajmie. Wszystko zostaje Twoje.');
+        el('chat-msgs').appendChild(ok); scrollToBottom(true);
+        kickMockup(false);
+    }
+    function renderBudgetSoftExit() {
+        if (el('budget-softexit')) return;
+        var div = document.createElement('div'); div.className = 'msg msg--ai'; div.id = 'budget-softexit';
+        div.innerHTML = renderRich('Doceniam szczerość. Żeby ruszyć z własnym sklepem na poważnie, warto mieć trochę na start — reklamy i pierwsze zamówienia. **Zostawiam Ci gotowy raport rynku** (masz go w „Potencjał rynku") — wróć, kiedy będziesz gotowy, a wtedy dokończymy resztę: markę, sklep i kreacje reklamowe. Trzymam Twój projekt. A jeśli budżet się znajdzie — po prostu napisz.');
+        el('chat-msgs').appendChild(div); scrollToBottom(true);
+        try { gaEvent('app_budget_softexit', {}); } catch (e) {}
+    }
+    function syncBudgetToServer(b) {
+        if (!state.sessionId) return;
+        try {
+            fetch(SPAR_PROJECT_ENDPOINT, {
+                method: 'POST', headers: authHeaders(),
+                body: JSON.stringify({ action: 'set_budget', sessionId: state.sessionId, budget: b })
+            }).catch(function () { });
+        } catch (e) { }
+    }
+
     // ── MAKIETY: 4 style (bud-mockup zwraca {mockups:[{style,label,brief,url}]}) ──
     // Osobny poller od starego _doMockup (single mockup_url do raportu — wyłączony).
     var mockups4Gen = false;
@@ -10619,6 +10692,12 @@
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && Array.isArray(state.mockups) && state.mockups.length) return;
         if (mockups4Gen) return;
+        // EARLY BUDGET GATE (req Tomka): zanim ruszy DROGA generacja (makiety→reklamy→sklep),
+        // po dostarczeniu raportu (tani proof) — jedno pytanie o budżet startowy. Niezadeklarowany
+        // → karta budżetu; „none" (brak budżetu) → soft-exit (raport zostaje, NIE palimy compute).
+        // Reszta (high/mid/unknown) → generujemy normalnie. Realizuje „odrzuć beznadziejnego leada".
+        if (!state.budgetDeclared) { renderBudgetGate(); return; }
+        if (state.budgetDeclared === 'none') { renderBudgetSoftExit(); return; }
         mockups4Gen = true;
         extras.mockups = 'gen';
         budTabVisible('makiety'); // no-op guard
@@ -11515,6 +11594,22 @@
         var k = slStoreKey(); if (!k) return;
         saveJSON(k, { shortlist: VP_STATE.shortlist, seen: VP_STATE.seen });
     }
+    // Shortlist → CRM (req Tomka): „Rozważam" to najcichszy sygnał intencji/wahania. Wysyłamy lekką
+    // wersję (nazwa + metryki) na serwer, żeby sprzedaż/followupy widziały, co lead rozważał.
+    // Best-effort: jeśli sesja jeszcze nie istnieje na serwerze (shortlist bywa przed 1. wiadomością),
+    // 404 jest OK — i tak dosyłamy przy ustaleniu kontaktu (syncContactToServer).
+    function syncShortlistToServer() {
+        if (!state.sessionId) return;
+        try {
+            var light = (VP_STATE.shortlist || []).slice(0, 6).map(function (p) {
+                return { name: p.name || '', saves: p.saves || null, plays: p.plays || null, comments: p.comments || null, id: p.id || null };
+            });
+            fetch(SPAR_PROJECT_ENDPOINT, {
+                method: 'POST', headers: authHeaders(),
+                body: JSON.stringify({ action: 'set_shortlist', sessionId: state.sessionId, shortlist: light })
+            }).catch(function () { });
+        } catch (e) { }
+    }
     function slRestore() {
         var k = slStoreKey(); if (!k) return;
         var d = loadJSON(k);
@@ -11651,6 +11746,7 @@
         VP_STATE.shortlist.push(JSON.parse(JSON.stringify(p)));
         gaEvent('shortlist_add', { name: p.name || '', n: slCount() });
         slPersist();
+        syncShortlistToServer();
         renderShortlistBar();
         refreshVpAddButtons();
         // po 1. dodaniu — lekka zachęta jako TOAST (nie fałszywy dymek usera w czacie)
@@ -11662,7 +11758,7 @@
     function removeFromShortlist(key) {
         var before = slCount();
         VP_STATE.shortlist = VP_STATE.shortlist.filter(function (x) { return slKey(x) !== key; });
-        if (slCount() !== before) { slPersist(); renderShortlistBar(); refreshVpAddButtons(); }
+        if (slCount() !== before) { slPersist(); syncShortlistToServer(); renderShortlistBar(); refreshVpAddButtons(); }
     }
     function slShake() {
         var b = el('sl-bar'); if (!b) return;
@@ -12190,6 +12286,9 @@
     function syncContactToServer() {
         if (!sbAuth || !state.sessionId) return null;
         try {
+            // Shortlist → CRM: dosyłamy „Rozważam" w momencie ustalenia kontaktu (powstaje lead) —
+            // sygnał wahania/intencji ląduje przy leadzie nawet jeśli wcześniejsze syncy 404'owały.
+            if (VP_STATE.shortlist && VP_STATE.shortlist.length) syncShortlistToServer();
             // Zwraca promise — bramka lead czeka na zapis kontaktu, zanim odpali raport
             // (bud-raport bramkuje generację na obecności session.email).
             return fetch(SPAR_ENDPOINT, {
