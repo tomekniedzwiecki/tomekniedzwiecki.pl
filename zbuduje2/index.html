@@ -251,18 +251,17 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @media (max-width:860px){.hero__scroll{display:none}}
 
 /* ============================================================ ACT 02 PROBLEM */
-.walls{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:42px}
-.wall{padding:28px 24px;border:1px solid var(--border);border-radius:16px;background:var(--glass);position:relative;overflow:hidden;transition:.4s var(--ease)}
-.wall:hover{border-color:rgba(255,75,62,.3);transform:translateY(-5px)}
-.wall__n{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;color:var(--text-faint);font-variant-numeric:tabular-nums}
-.wall__n::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--red);opacity:.85;box-shadow:0 0 9px rgba(255,75,62,.55)}
-.wall__t{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong);margin:14px 0 10px}
-.wall__d{font-size:14.5px;color:var(--text-muted);line-height:1.55;position:relative;z-index:1}
-.wall__ghost{position:absolute;right:2px;bottom:-30px;font-family:var(--mono);font-weight:700;font-size:150px;line-height:1;color:rgba(255,75,62,.055);pointer-events:none;font-variant-numeric:tabular-nums;letter-spacing:-.05em;transition:color .35s var(--ease2)}
-.wall:hover .wall__ghost{color:rgba(255,75,62,.1)}
+.walls2{margin-top:46px;border-top:1px solid var(--border)}
+.wrow{display:grid;grid-template-columns:150px 1fr;gap:32px;align-items:center;padding:26px 4px;border-bottom:1px solid var(--border);transition:.4s var(--ease)}
+.wrow:hover{background:linear-gradient(90deg,rgba(255,75,62,.05),transparent 60%)}
+.wrow__n{font-family:var(--mono);font-weight:700;font-size:clamp(60px,7vw,108px);line-height:.8;color:transparent;-webkit-text-stroke:1.5px rgba(255,75,62,.42);letter-spacing:-.04em;font-variant-numeric:tabular-nums;transition:.4s var(--ease)}
+.wrow:hover .wrow__n{-webkit-text-stroke-color:var(--red);color:rgba(255,75,62,.08)}
+.wrow__t{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.025em;color:var(--text-strong);margin-bottom:7px}
+.wrow__d{font-size:15.5px;color:var(--text-muted);line-height:1.55;max-width:56ch}
+.wrow__d b{color:var(--text)}
 .punch{margin:54px auto 0;text-align:center;font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,38px);line-height:1.25;color:var(--text);max-width:26ch}
 .punch .g{color:var(--accent)}
-@media (max-width:760px){.walls{grid-template-columns:1fr}}
+@media (max-width:700px){.wrow{grid-template-columns:60px 1fr;gap:18px;padding:20px 0}.wrow__n{font-size:44px;-webkit-text-stroke-width:1px}}
 
 /* ============================================================ ACT 03 MODEL */
 .roles{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:42px;position:relative}
@@ -346,19 +345,20 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .motto__by img{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--accent);object-fit:cover}
 
 /* ============================================================ ACT 06 STEPS */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
-.step{padding:28px 22px;border:1px solid var(--border);border-radius:16px;background:var(--glass);position:relative;overflow:hidden;transition:.4s var(--ease)}
-.step:hover{transform:translateY(-5px);border-color:var(--border-strong)}
-.step__n{font-family:var(--mono);font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
-.step__chip{display:inline-block;margin:14px 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.02em;color:var(--text-strong);background:var(--glass-strong);border:1px solid var(--border-strong);padding:5px 12px;border-radius:999px}
-.step__d{font-size:14.5px;color:var(--text-muted);line-height:1.5}
-.step--final{border-color:transparent;background:var(--glass)}
-.step--final::before{content:'';position:absolute;inset:0;padding:1px;border-radius:16px;background:conic-gradient(from var(--a,0deg),var(--accent),transparent 30%,transparent 70%,var(--accent));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:beam 4s linear infinite}
-@property --a{syntax:'<angle>';inherits:false;initial-value:0deg}
-@keyframes beam{to{--a:360deg}}
-.step--final .step__chip{color:var(--accent);border-color:rgba(0,217,126,.4);background:var(--accent-soft)}
-@media (max-width:900px){.steps{grid-template-columns:1fr 1fr}}
-@media (max-width:520px){.steps{grid-template-columns:1fr}}
+.build{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:46px;align-items:stretch}
+.build__list{display:flex;flex-direction:column;gap:14px}
+.brow{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;padding:20px 22px;border:1px solid var(--border);border-radius:14px;background:var(--glass);transition:.35s var(--ease)}
+.brow:hover{border-color:var(--border-strong);transform:translateX(5px)}
+.brow__n{font-family:var(--mono);font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums;padding-top:3px}
+.brow__t{font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--text-strong);margin-bottom:4px}
+.brow__d{font-size:14px;color:var(--text-muted);line-height:1.45}
+.bclimax{display:flex;flex-direction:column;padding:32px;border-radius:18px;background:linear-gradient(155deg,rgba(0,217,126,.16),rgba(0,217,126,.03));border:1px solid rgba(0,217,126,.5);box-shadow:0 30px 80px -30px rgba(0,217,126,.5);position:relative;overflow:hidden}
+.bclimax::after{content:'';position:absolute;right:-30%;bottom:-40%;width:80%;height:90%;background:radial-gradient(circle,rgba(0,217,126,.18),transparent 65%);pointer-events:none}
+.bclimax__n{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:auto}
+.bclimax__t{font-size:clamp(30px,3.6vw,46px);font-weight:900;letter-spacing:-.03em;color:var(--text-strong);margin:22px 0 12px;line-height:1.02}
+.bclimax__t .g{color:var(--accent)}
+.bclimax__d{font-size:15.5px;color:var(--text-muted);line-height:1.5;max-width:36ch;position:relative;z-index:1}
+@media(max-width:760px){.build{grid-template-columns:1fr}}
 
 /* ============================================================ ACT 07 MAKIETY SLIDER */
 .mk-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
@@ -493,10 +493,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div class="scene__in">
         <span class="eyebrow" data-reveal>Pomysł na sklep to dopiero początek</span>
         <h2 class="h-sec" data-reveal data-delay="60">Sam pomysł nie wystarczy.</h2>
-        <div class="walls">
-            <div class="wall" data-reveal data-delay="120"><div class="wall__n">01</div><div class="wall__t">Produkt</div><div class="wall__d">Nie wiesz, <b>co</b> sprzedawać, żeby ludzie naprawdę to kupowali. Zły produkt = spalony budżet.</div><span class="wall__ghost" aria-hidden="true">01</span></div>
-            <div class="wall" data-reveal data-delay="200"><div class="wall__n">02</div><div class="wall__t">Sprzedaż</div><div class="wall__d">Pierwsze zamówienia są najtrudniejsze. Tu zatrzymuje się większość — sklep stoi, reklama nie dowozi.</div><span class="wall__ghost" aria-hidden="true">02</span></div>
-            <div class="wall" data-reveal data-delay="280"><div class="wall__n">03</div><div class="wall__t">Prowadzenie</div><div class="wall__d">Strona, płatności, reklamy, formalności. Łatwo się pogubić i odpuścić po miesiącu.</div><span class="wall__ghost" aria-hidden="true">03</span></div>
+        <div class="walls2" data-reveal data-delay="120">
+            <div class="wrow"><div class="wrow__n">01</div><div><div class="wrow__t">Produkt</div><div class="wrow__d">Nie wiesz, <b>co</b> sprzedawać, żeby ludzie naprawdę to kupowali. Zły produkt = spalony budżet.</div></div></div>
+            <div class="wrow"><div class="wrow__n">02</div><div><div class="wrow__t">Sprzedaż</div><div class="wrow__d">Pierwsze zamówienia są najtrudniejsze. Tu zatrzymuje się większość — sklep stoi, reklama nie dowozi.</div></div></div>
+            <div class="wrow"><div class="wrow__n">03</div><div><div class="wrow__t">Prowadzenie</div><div class="wrow__d">Strona, płatności, reklamy, formalności. Łatwo się pogubić i odpuścić po miesiącu.</div></div></div>
         </div>
         <p class="punch" data-reveal data-delay="340">Biznesy nie umierają dlatego, że pomysł był zły. Umierają, bo <span class="g">nie miał ich kto dowieźć.</span></p>
     </div>
@@ -620,11 +620,17 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div class="scene__in">
         <span class="eyebrow" data-reveal>Cztery kroki, jedno partnerstwo</span>
         <h2 class="h-sec" data-reveal data-delay="60">Buduję Ci e-sklep. <span class="g">Ty nim zarządzasz.</span></h2>
-        <div class="steps">
-            <div class="step" data-reveal data-delay="120"><div class="step__n">01</div><div class="step__chip">Produkt</div><div class="step__d">Będziesz mieć taki, który ludzie chcą kupować.</div></div>
-            <div class="step" data-reveal data-delay="190"><div class="step__n">02</div><div class="step__chip">Marka</div><div class="step__d">Będziesz mieć markę, która wygląda jak duża firma.</div></div>
-            <div class="step" data-reveal data-delay="260"><div class="step__n">03</div><div class="step__chip">Wiedza</div><div class="step__d">Będziesz wiedzieć, jak sprzedawać, promować i skalować.</div></div>
-            <div class="step step--final" data-reveal data-delay="330"><div class="step__n">04</div><div class="step__chip">Stery</div><div class="step__d">Przejmiesz stery — a ja zostanę Twoim wspólnikiem.</div></div>
+        <div class="build">
+            <div class="build__list">
+                <div class="brow" data-reveal data-delay="120"><div class="brow__n">01</div><div><div class="brow__t">Produkt</div><div class="brow__d">Będziesz mieć taki, który ludzie chcą kupować.</div></div></div>
+                <div class="brow" data-reveal data-delay="180"><div class="brow__n">02</div><div><div class="brow__t">Marka</div><div class="brow__d">Będziesz mieć markę, która wygląda jak duża firma.</div></div></div>
+                <div class="brow" data-reveal data-delay="240"><div class="brow__n">03</div><div><div class="brow__t">Wiedza</div><div class="brow__d">Będziesz wiedzieć, jak sprzedawać, promować i skalować.</div></div></div>
+            </div>
+            <div class="bclimax" data-reveal data-delay="300">
+                <div class="bclimax__n">04 — Twój moment</div>
+                <div class="bclimax__t">Przejmujesz <span class="g">stery.</span></div>
+                <div class="bclimax__d">A ja zostaję Twoim wspólnikiem. Biznes jest Twój — doradzam i zarabiam tylko wtedy, gdy Ty zarabiasz.</div>
+            </div>
         </div>
     </div>
 </section>
