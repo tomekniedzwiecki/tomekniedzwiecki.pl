@@ -10863,10 +10863,11 @@
         // budżet OK → krótkie potwierdzenie + ruszamy z resztą (makiety→reklamy→sklep)
         var ok = document.createElement('div'); ok.className = 'msg msg--ai';
         ok.innerHTML = renderRich(b === 'unknown'
-            ? 'Jasne — pokażę Ci całość, a budżet docepniemy na spokojnie. **Składam markę, sklep i reklamy** — chwilę to zajmie.'
-            : 'Super — to realny plan. **Składam teraz markę, sklep i reklamy** pod Twój sklep, chwilę to zajmie. Wszystko zostaje Twoje.');
+            ? 'Jasne — pokażę Ci całość, a budżet dopniemy na spokojnie. **Zacznijmy od marki** — zaraz dobiorę kilka nazw z wolnymi domenami, a sklep i reklamy składam w tle.'
+            : 'Super — to realny plan. **Zacznijmy od marki** — zaraz dobiorę kilka nazw z wolnymi domenami, a sklep i reklamy składam w tle. Wszystko zostaje Twoje.');
         el('chat-msgs').appendChild(ok); scrollToBottom(true);
-        kickMockup(false);
+        kickMockup(false);                       // makiety generują się w tle (budżet już zadeklarowany)
+        setTimeout(renderBrandPicker, 650);      // marka (nazwa+logo) DOPIERO po odpowiedzi o budżet — nie równolegle (req Tomka)
     }
     function renderBudgetSoftExit() {
         if (el('budget-softexit')) return;
@@ -11007,6 +11008,10 @@
     function renderBrandPicker() {
         if (!el('chat-msgs') || el('brand-card') || !state.sessionId) return;
         if (state.brandDone) return;
+        // SEKWENCJA (req Tomka): NIE pokazuj wyboru nazwy marki, dopóki wisi lub jest
+        // nieodpowiedziana bramka budżetu — inaczej dwa pytania naraz i budżet ginie
+        // (do tego inny styl zaznaczania). Marka wraca z pickBudget, gdy budżet ustalony.
+        if (!state.budgetDeclared || el('budget-gate')) return;
         var card = document.createElement('div'); card.id = 'brand-card';
         card.style.cssText = 'margin:10px 0;padding:14px 16px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.03)';
         // Wyraźny loader (dobór nazw + sprawdzanie domen .pl trwa ~20-30s): spinner +
