@@ -1997,26 +1997,26 @@
     .mkc__frame.mkc-noimg::after { content: 'Podgląd makiety'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12.5px; }
     .mkc__fade { animation: mkcFade .34s ease; }
     @keyframes mkcFade { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: none; } }
-    .mkc__nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 42px; height: 42px; border-radius: 50%;
-        border: 1px solid var(--glass-border, rgba(255,255,255,.16)); background: rgba(10,10,12,.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-        color: var(--text-strong, #fff); font-size: 26px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s; }
-    .mkc__nav:hover { background: rgba(22,22,26,.92); border-color: var(--accent); }
-    .mkc__nav--prev { left: 6px; } .mkc__nav--next { right: 6px; }
-    @media (min-width: 760px) { .mkc__nav--prev { left: -16px; } .mkc__nav--next { right: -16px; } }
+    .mkc__nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2; width: 40px; height: 40px; border-radius: 50%;
+        border: 1px solid rgba(255,255,255,.20); background: rgba(10,10,12,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        color: #fff; font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s, transform .2s; box-shadow: 0 6px 18px -4px rgba(0,0,0,.5); }
+    .mkc__nav:hover { background: rgba(0,217,126,.9); border-color: var(--accent); color: var(--accent-ink,#04140d); }
+    .mkc__nav--prev { left: 12px; } .mkc__nav--next { right: 12px; }
     .mkc__zoom { position: absolute; top: 10px; right: 10px; z-index: 2; width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(255,255,255,.16);
         background: rgba(10,10,12,.6); backdrop-filter: blur(4px); color: #fff; font-size: 15px; cursor: zoom-in; display: flex; align-items: center; justify-content: center; }
-    .mkc__meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 15px auto 0; max-width: 470px; flex-wrap: wrap; }
-    .mkc__lab { font-size: 16px; font-weight: 800; color: var(--text-strong); letter-spacing: -.01em; }
-    .mkc__count { font-size: 12px; color: var(--text-muted); font-family: var(--mono); }
-    .mkc__pick { flex-shrink: 0; min-height: 46px; padding: 0 20px; border-radius: 12px; border: 1px solid var(--accent); background: var(--accent);
-        color: var(--accent-ink, #04140d); font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; transition: filter .2s; }
-    .mkc__pick:hover { filter: brightness(1.08); }
+    .mkc__meta { display: flex; flex-direction: column; align-items: stretch; gap: 13px; margin: 16px auto 0; max-width: 470px; }
+    .mkc__meta > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .mkc__lab { font-size: 16.5px; font-weight: 800; color: var(--text-strong); letter-spacing: -.01em; }
+    .mkc__count { flex-shrink: 0; font-size: 11.5px; color: var(--text-muted); font-family: var(--mono); background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09); padding: 3px 10px; border-radius: 999px; }
+    .mkc__pick { width: 100%; min-height: 52px; padding: 0 20px; border-radius: 13px; border: 1px solid var(--accent); background: var(--accent);
+        color: var(--accent-ink, #04140d); font: inherit; font-size: 15px; font-weight: 800; letter-spacing: .01em; cursor: pointer; transition: filter .2s, transform .15s; box-shadow: 0 10px 26px -10px rgba(0,217,126,.55); }
+    .mkc__pick:hover { filter: brightness(1.06); transform: translateY(-1px); }
     .mkc__pick.is-chosen { background: rgba(0,217,126,.16); color: var(--accent); border-color: rgba(0,217,126,.4); cursor: default; }
     .mkc__thumbs { display: flex; gap: 8px; justify-content: center; margin: 14px auto 0; max-width: 470px; }
-    .mkc__thumb { flex: 1; max-width: 96px; aspect-ratio: 4 / 5; border-radius: 10px; overflow: hidden; border: 2px solid transparent; background: #141418; cursor: pointer; padding: 0; opacity: .55; transition: opacity .2s, border-color .2s; }
+    .mkc__thumb { flex: 1; max-width: 100px; aspect-ratio: 4 / 5; border-radius: 11px; overflow: hidden; border: 1.5px solid rgba(255,255,255,.08); background: #141418; cursor: pointer; padding: 0; opacity: .5; transition: opacity .2s, border-color .2s, transform .2s, box-shadow .2s; }
     .mkc__thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
-    .mkc__thumb:hover { opacity: .85; }
-    .mkc__thumb.is-active { opacity: 1; border-color: var(--accent); }
+    .mkc__thumb:hover { opacity: .82; border-color: rgba(255,255,255,.2); }
+    .mkc__thumb.is-active { opacity: 1; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 0 0 1px var(--accent), 0 8px 18px -7px rgba(0,217,126,.5); }
     @media (prefers-reduced-motion: reduce) { .mkc__fade { animation: none; } }
     /* Mobile LANDSCAPE (niski viewport): pozwól przewijać panel i ścieśnij karty,
        żeby przyciski wyboru (makiety/reklamy) zawsze były w zasięgu, nie poza ekranem. */
