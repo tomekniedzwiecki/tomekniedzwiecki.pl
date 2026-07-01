@@ -14737,7 +14737,10 @@
     // żeby po dygresji user od razu widział, co ma zrobić, i pipeline nie „stał" niewidocznie.
     function keepPendingStepAtBottom() {
         var host = el('chat-msgs'); if (!host) return;
-        ['bud-widget', 'budget-gate', 'budget-softexit', 'brand-card', 'mk-chat-card'].forEach(function (id) {
+        // WSZYSTKIE akcje blokujące/wyboru w całym lejku (nie tylko budżet) — po każdej turze
+        // trzymamy bieżącą na dole, żeby dygresja nigdy nie zgubiła następnego kroku.
+        // inline-gate (imię/konto) NIE jest tu — ono blokuje kompozytor, więc pisania nie ma.
+        ['bud-widget', 'kr-card', 'budget-gate', 'budget-softexit', 'phone-ask', 'brand-card', 'mk-chat-card', 'zl-card'].forEach(function (id) {
             var e = el(id);
             if (e && e.parentNode === host) host.appendChild(e);   // appendChild przenosi na koniec
         });
@@ -15428,6 +15431,7 @@
 
         var wrap = document.createElement('div');
         wrap.className = 'kr';
+        wrap.id = 'kr-card';   // żeby keepPendingStepAtBottom trzymał wybór kierunku na dole
         function pick(nazwa) {
             return function () {
                 if (streaming || el('inline-gate')) return;
