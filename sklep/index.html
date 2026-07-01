@@ -6045,7 +6045,7 @@
     // Otwarcie w DWÓCH wiadomościach: P1 od razu, potem (efekt pisania ~3,5s) P2 + karuzela produktów.
     var OPENER_P1 = 'Cześć, tu AI Tomka Niedźwieckiego 👋 **Zbudujemy teraz Twój sklep online** — i zobaczysz na żywo, jak z produktu powstaje prawdziwy biznes.';
     var OPENER_P1B = 'Wskażesz produkt, a ja na żywo przygotuję dla Ciebie **analizę rynku, markę, stronę sprzedażową i reklamy** — za darmo. To **pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy biznes**, i Twój grunt pod start.';
-    var OPENER_P2 = 'Bo to nie generator sklepów z automatu — to **wstęp do wspólnego biznesu z Tomkiem.** On buduje go z Tobą na poważnie, doprowadza do **pierwszych 1000 zamówień** i uczy Cię prowadzenia, aż **przejmiesz stery** — zarabiając dopiero, gdy Ty zarabiasz (20% od zysku). Wybierz produkt, od którego zaczniemy 👇';
+    var OPENER_P2 = 'Bo to nie generator sklepów z automatu — to **wstęp do wspólnego biznesu z Tomkiem.** On buduje go z Tobą na poważnie, doprowadza do **pierwszych 1000 zamówień** i uczy Cię prowadzenia, aż **przejmiesz stery** — a Tomek zostaje wspólnikiem z udziałem w obrocie (10% od przychodu). Wybierz produkt, od którego zaczniemy 👇';
     var OPENER_GENERIC = OPENER_P1 + '\n\n' + OPENER_P2;
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
@@ -7152,7 +7152,7 @@
             row('Rezerwacja rozmowy', '<b>500 zł</b> — w pełni zwrotna') +
             row('Budowa sklepu pod klucz', '<b>9400 zł brutto</b> — jednorazowo (500 zł się wlicza)') +
             row('Budżet na reklamy/towar', 'osobno, po Twojej stronie — sam decydujesz ile') +
-            row('Udział Tomka', '<b>20% od ZYSKU netto</b> — zarabia tylko, gdy Ty zarabiasz') +
+            row('Udział Tomka', '<b>10% od PRZYCHODU</b> (obrotu ze sprzedaży) — ma udział w każdej Twojej sprzedaży') +
             '</div>' +
             '<div class="fct-grp"><div class="fct-h">Jak działa rezerwacja 500 zł</div>' +
             '<ol class="rpw-steps" style="margin-bottom:0">' +
@@ -7164,7 +7164,7 @@
             '<div class="fct-grp"><div class="fct-h">Co obejmuje budowa 9400 zł brutto</div>' +
             '<p class="fct-p">Produkt, marka, strona pod klucz, płatności i wdrożenie, formalności i RODO, kreacje reklamowe, uruchomienie i optymalizacja kampanii Meta/Google — aż do pierwszych zamówień. Sklep jest Twój od pierwszego dnia.</p></div>' +
             '<div class="fct-grp"><div class="fct-h">Czego NIE obiecujemy</div>' +
-            '<p class="fct-p">Nie gwarantujemy przychodu ani „pewnych" wyników. „1000 zamówień" to <b>cel operacyjny wspólnego etapu</b>, nie obietnica. Nie ma magii — jest robota, doświadczenie (15 lat, 70 mln zł) i skóra w grze (20% od zysku).</p></div>' +
+            '<p class="fct-p">Nie gwarantujemy przychodu ani „pewnych" wyników. „1000 zamówień" to <b>cel operacyjny wspólnego etapu</b>, nie obietnica. Nie ma magii — jest robota, doświadczenie (15 lat, 70 mln zł) i skóra w grze (10% od przychodu).</p></div>' +
             '<div class="fct-grp"><div class="fct-h">Kto i kiedy przejmuje stery</div>' +
             '<p class="fct-p">Tomek buduje i prowadzi sprzedaż, przez ~pół roku skaluje i uczy Cię operacji, a potem <b>przejmujesz prowadzenie biznesu</b>. Tomek zostaje wspólnikiem i doradcą.</p></div>' +
             '<p class="auth-modal__note">Płatność przez Tpay. Faktura na życzenie. Umowa współpracy podpisywana przed budową.</p>' +
@@ -8969,7 +8969,7 @@
             (plan.dlaczego_realne ? '<div style="font-size:12.5px;line-height:1.55;color:var(--text,#e7e7ea);background:rgba(0,217,126,.06);border-left:2px solid var(--accent,#00d97e);border-radius:0 8px 8px 0;padding:10px 13px;margin-top:8px">' + esc(plan.dlaczego_realne) + '</div>' : '') +
             (plan.rynek ? block('Rynek', '<div style="font-size:12.5px;line-height:1.55;color:var(--text-muted)">' + esc(plan.rynek) + '</div>') : '') +
             ryz + zal +
-            '<div style="font-size:11px;color:var(--text-muted);margin-top:13px;line-height:1.5"><sup>*</sup> To, co zostaje Tobie miesięcznie po koszcie towaru, wysyłki i reklamy oraz po 20% Tomka. Wstępna prognoza specjalisty osadzona w Twoim produkcie i rynku — szczegółowy plan przedsięwzięcia Tomek domyka osobiście po rezerwacji.</div>' +
+            '<div style="font-size:11px;color:var(--text-muted);margin-top:13px;line-height:1.5"><sup>*</sup> To, co zostaje Tobie miesięcznie po koszcie towaru, wysyłki i reklamy oraz po 10% Tomka (od przychodu). Wstępna prognoza specjalisty osadzona w Twoim produkcie i rynku — szczegółowy plan przedsięwzięcia Tomek domyka osobiście po rezerwacji.</div>' +
             '</div>';
     }
 
@@ -10406,7 +10406,7 @@
                 cwcMetric('1000', 'Pierwsze 1000 zamówień', 'rozkręca Tomek') +
                 cwcMetric('zwrot', 'Zwrot budowy 9400 zł brutto', 'aż się spina') +
             '</div>' +
-            '<div class="cwc-note">Tomek bierze <b>20% od zysku</b> (≈ <span class="cwc-o-tomek">—</span>) jako wspólnik-doradca — zarabia tylko, gdy Ty zarabiasz. To prognoza przy Twoich założeniach, nie gwarancja — realną cenę i marżę pod Twój produkt domykasz z Tomkiem.</div>';
+            '<div class="cwc-note">Tomek bierze <b>10% od przychodu</b> (≈ <span class="cwc-o-tomek">—</span>) jako wspólnik-doradca — ma udział w Twoim obrocie. To prognoza przy Twoich założeniach, nie gwarancja — realną cenę i marżę pod Twój produkt domykasz z Tomkiem.</div>';
     }
     function bindCalc(root) {
         if (!root) return;
@@ -10418,7 +10418,7 @@
             var zam = +z.value, aov = +a.value, marza = (+m.value) / 100, cac = +c.value;
             var przychod = zam * aov, zyskProd = przychod * marza, reklama = zam * cac;
             var netto = Math.max(0, zyskProd - reklama);
-            var tomek = netto * 0.20, twoj = netto - tomek, rocznie = twoj * 12;
+            var tomek = przychod * 0.10, twoj = Math.max(0, netto - tomek), rocznie = twoj * 12;
             var do1000 = zam > 0 ? Math.ceil(1000 / zam) : 0;
             var zwrot = twoj > 0 ? Math.ceil(9400 / twoj) : 0;
             q('.cwc-v-zam').textContent = zam + ' zam.';
@@ -10429,7 +10429,7 @@
             q('.cwc-o-rok').textContent = '≈ ' + fmtZl(Math.round(rocznie)) + ' zł rocznie';
             q('.cwc-o-obrot').textContent = fmtZl(Math.round(przychod)) + ' zł';
             q('.cwc-o-1000').textContent = do1000 <= 1 ? '~1 mies.' : ('~' + do1000 + ' mies.');
-            q('.cwc-o-zwrot').textContent = zwrot <= 1 ? '< 1 mies.' : ('~' + zwrot + ' mies.');
+            q('.cwc-o-zwrot').textContent = twoj <= 0 ? '—' : (zwrot <= 1 ? '< 1 mies.' : ('~' + zwrot + ' mies.'));
             q('.cwc-o-tomek').textContent = fmtZl(Math.round(tomek)) + ' zł/mies';
         }
         root._cwcPaint = paint;
@@ -10518,7 +10518,7 @@
             '<div class="cw-stats">' +
             '<div class="cw-stat"><b>500 zł</b><span>rezerwacja rozmowy<br><em>w pełni zwrotna</em></span></div>' +
             '<div class="cw-stat"><b>9400 zł brutto</b><span>budowa sklepu<br><em>pod klucz, jednorazowo</em></span></div>' +
-            '<div class="cw-stat"><b>20%</b><span>od zysku<br><em>zarabiam, gdy Ty zarabiasz</em></span></div>' +
+            '<div class="cw-stat"><b>10%</b><span>od przychodu<br><em>udział w Twoim obrocie</em></span></div>' +
             '</div>' +
 
             // Kalkulator przeniesiony do osobnej zakładki „Biznesplan" (Pulpit → Wstępny
@@ -10534,17 +10534,17 @@
 
             '<div class="cw-roles">' +
             '<div class="cw-role"><div class="cw-role__t">Ty wnosisz</div><ul><li>pomysł (lub szukamy go razem)</li><li>chęć prowadzenia biznesu po przejęciu sterów</li><li>gotowość, by uczyć się sprzedaży od środka</li></ul></div>' +
-            '<div class="cw-role cw-role--tomek"><div class="cw-role__t">Tomek wnosi</div><ul><li>budowę całego sklepu z zespołem (9400 zł brutto)</li><li>kampanie i sprzedaż do pierwszych 1000 zamówień</li><li>pół roku skalowania i szkolenia</li><li>skórę w grze: 20% od zysku, nie fakturę</li></ul></div>' +
+            '<div class="cw-role cw-role--tomek"><div class="cw-role__t">Tomek wnosi</div><ul><li>budowę całego sklepu z zespołem (9400 zł brutto)</li><li>kampanie i sprzedaż do pierwszych 1000 zamówień</li><li>pół roku skalowania i szkolenia</li><li>skórę w grze: 10% od przychodu, nie fakturę</li></ul></div>' +
             '</div>' +
 
-            '<div class="cw-fin">Bez ukrytych haczyków po stronie Tomka — bierze <strong>20% od zysku netto</strong> (dopiero po odjęciu reklam, towaru i wysyłki), który wspólnie wygenerujecie. Zarabia dopiero wtedy, gdy Ty zarabiasz.</div>' +
+            '<div class="cw-fin">Bez ukrytych haczyków po stronie Tomka — bierze <strong>10% od przychodu</strong> (obrotu ze sprzedaży, który wspólnie wygenerujecie). Prosty, przejrzysty udział — Tomek ma udział w każdej sprzedaży, którą wspólnie rozkręcicie.</div>' +
 
             '<div class="cw-role cw-role--tomek" style="margin:18px 0 0">' +
             '<div class="cw-role__t">A jeśli się nie uda?</div>' +
             '<ul>' +
             '<li>Uczciwie: budowa to realny wydatek i żaden biznes nie jest pewny. Dlatego Tomek ułożył to tak, żebyś nie wchodził w ciemno ani sam.</li>' +
             '<li><strong>Najpierw plan, potem budowa.</strong> Za w pełni zwrotne 500 zł Tomek układa plan przedsięwzięcia — produkt, model przychodu, drogę do pierwszych zamówień. Nie przekona Cię? Nie budujecie, a 500 zł wraca w całości.</li>' +
-            '<li><strong>Tomek ryzykuje razem z Tobą.</strong> Bierze 20% od zysku, nie fakturę za usługę — i przez pół roku sam prowadzi sprzedaż do Twoich pierwszych zamówień. Jeśli się nie sprzeda, on też nic nie zarobi. Dlatego nie wchodzi w produkty, w które nie wierzy.</li>' +
+            '<li><strong>Tomek ryzykuje razem z Tobą.</strong> Bierze 10% od przychodu, nie fakturę za usługę — i przez pół roku sam prowadzi sprzedaż do Twoich pierwszych zamówień. Jeśli się nie sprzeda, on też nic nie zarobi. Dlatego nie wchodzi w produkty, w które nie wierzy.</li>' +
             '</ul></div>' +
 
             '<div class="collab-cta">' +
@@ -13753,7 +13753,7 @@
             '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:5px">Co dopracujemy razem</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(dopr, '#a1a1aa') + '</ul></div>' +
             '</div>' +
             '<div style="margin:10px 0 4px;padding:9px 12px;border:1px solid rgba(245,200,80,.3);background:rgba(245,200,80,.07);border-radius:10px;font-size:12.5px;line-height:1.45;color:var(--text)"><strong style="color:#f5c850">Realne ryzyko:</strong> ' + esc(ryzyko) + '<br><span style="opacity:.85">Nie każdy projekt przechodzi — odpuszczamy, gdy nie ma marży, budżetu albo Twojego zaangażowania. Dlatego „zielone" coś znaczy.</span></div>' +
-            '<p class="mk-card__d">To <strong>nie koniec — to wejście we wspólny biznes z Tomkiem.</strong> Rezerwacja = Tomek osobiście układa plan → buduje sklep pod klucz → wspólnie dochodzicie do pierwszych 1000 zamówień → uczy Cię prowadzenia → <strong>przejmujesz stery</strong> (Tomek zostaje wspólnikiem, 20% od zysku).</p>' +
+            '<p class="mk-card__d">To <strong>nie koniec — to wejście we wspólny biznes z Tomkiem.</strong> Rezerwacja = Tomek osobiście układa plan → buduje sklep pod klucz → wspólnie dochodzicie do pierwszych 1000 zamówień → uczy Cię prowadzenia → <strong>przejmujesz stery</strong> (Tomek zostaje wspólnikiem, 10% od przychodu).</p>' +
             '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję wejście we współpracę → 500 zł</a>' +
             '<p class="mk-card__note">w pełni zwrotne · 500 zł wlicza się w budowę, a wraca w całości, jeśli nie wejdziemy we współpracę · rezerwujesz czas Tomka, nie kupujesz sklepu</p>' +
             '<div style="text-align:center;margin-top:8px"><button type="button" class="fct-link" data-fear>Boję się, że nie dam rady</button></div>';
@@ -15878,7 +15878,7 @@
                 '</div>'
             : '<ul class="paybox__list">' +
                 '<li><strong>Karta projektu</strong> i <strong>gotowy sklep</strong> czekają w menu obok — wszystko, co ustaliliśmy.</li>' +
-                '<li>Teraz najważniejsze: <strong>jak budujemy to razem z Tomkiem</strong> — on buduje, rozkręca sprzedaż i zarabia dopiero z wyniku (20% od zysku).</li>' +
+                '<li>Teraz najważniejsze: <strong>jak budujemy to razem z Tomkiem</strong> — on buduje, rozkręca sprzedaż i ma udział w Twoim obrocie (10% od przychodu).</li>' +
                 '</ul>';
         return '<div class="paybox" id="panel-box"' + (hasZ ? ' style="border-color:rgba(0,217,126,.45)"' : '') + '>' +
             '<div class="paybox__eyebrow"' + (hasZ ? ' style="color:#00d97e"' : '') + '>' + (hasZ ? 'Zielone światło' : 'Projekt zdefiniowany') + '</div>' +
