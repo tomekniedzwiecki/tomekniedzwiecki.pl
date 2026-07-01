@@ -476,107 +476,37 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .mk-cap .cat{flex:0 0 auto;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid rgba(0,217,126,.25);padding:4px 10px;border-radius:999px}
 .mk-foot{margin-top:18px;font-size:14.5px;color:var(--text-faint)}
 .mk-foot .g{color:var(--accent)}
+.mk-cta{margin-top:26px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.mk-cta__t{font-family:var(--serif);font-style:italic;font-size:clamp(18px,2.4vw,26px);color:var(--text-muted);letter-spacing:-.01em}
+.mk-cta__t .g{color:var(--accent);font-style:italic}
+@media (max-width:600px){.mk-cta{gap:14px}.mk-cta .btn{width:100%;justify-content:center}}
 /* lightbox */
 .lb{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.92);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
 .lb.is-on{display:flex}
 .lb img{max-width:min(440px,92vw);width:100%;border-radius:14px;border:1px solid var(--border-strong)}
 .lb__x{position:fixed;top:18px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--glass);border:1px solid var(--border-strong);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
 
-/* ===== ACT 08 — ZA DARMO / PARAGON 0 ZŁ (prefiks .freeR / .rcpt) ===== */
-.freeR{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.94fr);gap:clamp(32px,5vw,64px);align-items:center}
-.freeR__copy{align-self:center}
-.freeR .eyebrow{margin-bottom:18px}
-.freeR__h{margin-bottom:18px}
-.freeR__lead{font-size:15px;line-height:1.5;color:var(--text-muted);max-width:46ch;margin-bottom:26px}
-.freeR__cta .btn{width:100%;max-width:360px}
-.freeR__note{margin-top:14px;font-size:13px;color:var(--text-faint);line-height:1.5;max-width:42ch}
-.freeR__note b{color:var(--text-muted);font-weight:700}
-.freeR__chips{margin-top:24px;max-width:400px}
-.freeR__chipsLab{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px}
-.freeR__chipsRow{display:flex;flex-wrap:wrap;gap:9px}
-.freeR__chipsRow .chip{text-align:left}
-
-/* --- paragon --- */
-.rcpt{position:relative;width:100%;max-width:420px;margin:0 auto;background:var(--glass-strong);color:var(--text);
-  font-family:var(--mono);border-radius:4px;padding:30px 30px 12px;
-  box-shadow:0 40px 80px -30px rgba(0,0,0,.9), 0 0 0 1px var(--border);
-  --notch:10px;
-  -webkit-mask:
-    radial-gradient(var(--notch) at 0 0, #0000 98%, #000) -1px -1px,
-    radial-gradient(var(--notch) at 100% 0, #0000 98%, #000) calc(100% + 1px) -1px;
-  -webkit-mask-repeat:no-repeat}
-.rcpt::before,.rcpt::after{content:'';position:absolute;left:0;right:0;height:8px;
-  background:radial-gradient(circle at 6px 8px, transparent 6px, var(--glass-strong) 6.5px);
-  background-size:12px 8px;background-repeat:repeat-x}
-.rcpt::before{top:-1px;transform:rotate(180deg)}
-.rcpt::after{bottom:-7px}
-.rcpt__head{text-align:center;padding-bottom:16px;border-bottom:1px dashed var(--border-strong)}
-.rcpt__brand{font-family:var(--sans);font-weight:800;font-size:14px;letter-spacing:-.01em;color:var(--text-strong);text-transform:uppercase}
-.rcpt__tag{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);margin-top:6px}
-.rcpt__meta{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.06em;color:var(--text-faint);margin:12px 0 4px}
-.rcpt__cols{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);padding-bottom:8px;border-bottom:1px dashed var(--border)}
-.rcpt__items{list-style:none;margin:0;padding:0}
-.rli{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dotted var(--border)}
-.rli__l{display:flex;align-items:flex-start;gap:9px;min-width:0}
-.rli__n{color:var(--text-faint);font-size:11px;font-variant-numeric:tabular-nums;flex:0 0 auto;padding-top:1px}
-.rli__tx{display:flex;flex-direction:column;gap:2px;min-width:0}
-.rli__t{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2}
-.rli__d{font-family:var(--sans);font-size:10.5px;font-weight:400;color:var(--text-faint);line-height:1.25;letter-spacing:0}
-.rli__p{flex:0 0 auto;position:relative;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;letter-spacing:.02em;padding-top:1px;transition:color .4s var(--ease2)}
-.rli__p::after{content:'';position:absolute;left:-2px;right:-2px;top:52%;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
-.rcpt.is-paid .rli__p{color:var(--text-faint)}
-.rcpt.is-paid .rli__p::after{transform:scaleX(1)}
-.rcpt.is-paid .rli:nth-child(1) .rli__p::after{transition-delay:.02s}
-.rcpt.is-paid .rli:nth-child(2) .rli__p::after{transition-delay:.10s}
-.rcpt.is-paid .rli:nth-child(3) .rli__p::after{transition-delay:.18s}
-.rcpt.is-paid .rli:nth-child(4) .rli__p::after{transition-delay:.26s}
-.rcpt.is-paid .rli:nth-child(5) .rli__p::after{transition-delay:.34s}
-.rcpt.is-paid .rli:nth-child(6) .rli__p::after{transition-delay:.42s}
-.rcpt__sum{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:14px 0 6px;margin-top:2px;border-top:1px dashed var(--border-strong)}
-.rcpt__sumL{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--text-strong);letter-spacing:-.01em}
-.rcpt__sumR{display:flex;align-items:baseline;gap:10px;font-variant-numeric:tabular-nums}
-.rcpt__old{position:relative;font-size:13px;color:var(--text-faint)}
-.rcpt__old::after{content:'';position:absolute;left:-2px;right:-2px;top:52%;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease) .5s}
-.rcpt.is-paid .rcpt__old::after{transform:scaleX(1)}
-.rcpt__new{font-family:var(--sans);font-weight:800;font-size:22px;color:var(--accent);letter-spacing:-.02em;opacity:0;transform:translateY(6px);transition:opacity .5s var(--ease) .66s,transform .5s var(--ease) .66s}
-.rcpt.is-paid .rcpt__new{opacity:1;transform:none}
-.rcpt__foot{text-align:center;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);padding:12px 0 4px}
-.rcpt__barcode{height:30px;margin:6px 0 4px;opacity:.5;
-  background:repeating-linear-gradient(90deg,var(--text-faint) 0 1px,transparent 1px 3px,var(--text-faint) 3px 5px,transparent 5px 6px,var(--text-faint) 6px 8px,transparent 8px 11px)}
-.rcpt__code{text-align:center;font-size:9.5px;letter-spacing:.3em;color:var(--text-faint)}
-.rcpt__stamp{position:absolute;right:22px;top:33%;bottom:auto;width:118px;height:118px;pointer-events:none;
-  transform:rotate(-14deg) scale(1.35);opacity:0;
-  transition:transform .5s var(--ease) .84s,opacity .18s ease .84s}
-.rcpt.is-paid .rcpt__stamp{opacity:.96;transform:rotate(-14deg) scale(1)}
-.rcpt__stampIn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;
-  border:2.5px solid var(--accent);border-radius:50%;color:var(--accent);box-shadow:inset 0 0 0 4px rgba(0,217,126,.14)}
-.rcpt__stampT{font-family:var(--sans);font-weight:900;font-size:16px;letter-spacing:.01em}
-.rcpt__stampP{font-size:8px;letter-spacing:.2em;text-transform:uppercase;margin:4px 0 2px}
-.rcpt__stampV{font-family:var(--sans);font-weight:900;font-size:23px;letter-spacing:-.02em;line-height:1}
+/* ===== ACT 08 — ZA DARMO / lista minimalistyczna (freeL) ===== */
+.freeL{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:12px 34px;margin-top:clamp(26px,3.2vw,40px);max-width:820px}
+.freeL li{position:relative;padding-left:32px;font-size:clamp(15px,1.8vw,17.5px);color:var(--text);line-height:1.4}
+.freeL li::before{content:'';position:absolute;left:0;top:.05em;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(0,217,126,.4)}
+.freeL li::after{content:'✓';position:absolute;left:4.5px;top:-.02em;font-size:12px;font-weight:800;color:var(--accent)}
+.freeL__val{margin-top:clamp(24px,2.8vw,34px);font-family:var(--serif);font-style:italic;font-size:clamp(19px,2.6vw,30px);color:var(--text-muted);letter-spacing:-.01em}
+.freeL__val s{opacity:.55}
+.freeL__val .g{color:var(--accent);font-style:italic}
+.freeL__cta{margin-top:clamp(26px,3vw,36px);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.freeL__note{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--text-faint)}
+.freeL__note b{color:var(--text-muted);font-weight:600}
+.freeL__chips{margin-top:22px;display:flex;flex-wrap:wrap;gap:9px}
 
 /* chipsy — bazowy styl (współdzielony) */
 .chip{padding:11px 18px;border-radius:999px;border:1px solid var(--border-strong);background:var(--glass);font-size:13.5px;font-weight:600;color:var(--text-muted);transition:.25s var(--ease2)}
 .chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,217,126,.05)}
 
-@media (prefers-reduced-motion:reduce){
-  .rli__p::after,.rcpt__old::after,.rcpt__new,.rcpt__stamp{transition:none!important}
-}
-@media (max-width:860px){
-  .freeR{grid-template-columns:1fr;gap:38px}
-  .freeR__copy{order:1;text-align:center}
-  .freeR__receipt{order:2}
-  .freeR__lead,.freeR__note,.freeR__chips{margin-left:auto;margin-right:auto}
-  .freeR__cta .btn{margin:0 auto}
-  .freeR__chipsRow{justify-content:center}
-  .freeR__chipsRow .chip{text-align:center}
-}
-@media (max-width:560px){
-  .rcpt{padding:26px 22px 12px}
-  .rli__t{font-size:12.5px}
-  .rli__d{font-size:10px}
-  .rcpt__stamp{right:12px;top:auto;bottom:16px;width:98px;height:98px}
-  .rcpt__stampT{font-size:14px}.rcpt__stampV{font-size:20px}
-  .freeR__lead{font-size:14px}
+@media (max-width:640px){
+  .freeL{grid-template-columns:1fr;gap:11px}
+  .freeL__cta .btn{width:100%;justify-content:center}
+  .freeL__note{width:100%}
 }
 
 /* ============================================================ ACT REKLAMY (marquee) */
@@ -706,10 +636,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   <div class="drw__step">
     <div class="drw__rail"><span class="drw__node">01</span></div>
     <div class="drw__body">
-      <div class="drw__metaRow">
-        <span class="drw__meta">Ja · miesiące 1–2</span>
-        <span class="drw__ster"><i>Stery</i> Tomek 100%</span>
-      </div>
       <h3 class="drw__t">Rozkręcam biznes</h3>
       <p class="drw__d">Buduję sklep pod klucz, dobieram produkt i uruchamiam sprzedaż. Ty patrzysz, jak to się robi.</p>
     </div>
@@ -718,10 +644,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   <div class="drw__step">
     <div class="drw__rail"><span class="drw__node">02</span></div>
     <div class="drw__body">
-      <div class="drw__metaRow">
-        <span class="drw__meta">My · miesiące 2–5</span>
-        <span class="drw__ster"><i>Stery</i> 65 / 35</span>
-      </div>
       <h3 class="drw__t">Wdrażam Cię w prowadzenie</h3>
       <p class="drw__d">Uczę Cię reklam, obsługi i decyzji na żywym biznesie — stały kontakt, realne liczby.</p>
     </div>
@@ -731,31 +653,18 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div class="drw__rail"><span class="drw__node">03</span></div>
     <div class="drw__body">
       <span class="drw__tag">Kulminacja</span>
-      <div class="drw__metaRow">
-        <span class="drw__meta">Ty · około 6. miesiąc</span>
-        <span class="drw__ster drw__ster--you"><i>Stery</i> Ty 80%</span>
-      </div>
       <h3 class="drw__t">Przekazuję Ci stery</h3>
       <p class="drw__d">Bierzesz prowadzenie działającego, zarabiającego sklepu. Od teraz to Twój biznes i Twoje decyzje.</p>
-      <span class="drw__note">To był cel od pierwszego dnia</span>
     </div>
   </div>
 
   <div class="drw__step">
     <div class="drw__rail"><span class="drw__node">04</span></div>
     <div class="drw__body">
-      <div class="drw__metaRow">
-        <span class="drw__meta">Ja · bezterminowo</span>
-        <span class="drw__ster drw__ster--you"><i>Stery</i> Ty 90%</span>
-      </div>
       <h3 class="drw__t">Zostaję wspólnikiem</h3>
       <p class="drw__d">Nie znikam po przekazaniu. Zostaję na pokładzie i mam udział w wynikach — dalej gramy do jednej bramki.</p>
     </div>
   </div>
-</div>
-
-<div class="drw__foot" data-reveal data-delay="240">
-  <p class="drw__q">Zarabiam dopiero, gdy Ty zarabiasz — dlatego gram o <span class="g">Twój wynik</span>, nie o fakturę.</p>
 </div>
     </div>
 </section>
@@ -796,12 +705,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <section class="scene marki2" id="act-marki" data-rail="Marki">
     <div class="scene__in">
         <span class="eyebrow" data-reveal>Dowód, nie deklaracja</span>
-        <h2 class="h-sec" data-reveal data-delay="60">Marki stworzone <span class="g">w jednej rozmowie.</span></h2>
+        <h2 class="h-sec" data-reveal data-delay="60">Marki, które <span class="g">właśnie powstają.</span></h2>
     </div>
     <div class="marki2__mq" aria-label="Loga marek stworzonych w rozmowach">
         <div class="marki2__row" id="marki2-row"></div>
     </div>
-    <div class="scene__in"><p class="marki2__foot" data-reveal>Każde z tych logo zobaczysz u siebie w <span class="g">10 minut</span> — zanim cokolwiek zdecydujesz.</p></div>
 </section>
 
 <!-- ACT 07 — MAKIETY (sklepy — dowód zaraz po liczbie 70 mln) -->
@@ -810,7 +718,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         <div class="mk-head">
             <div>
                 <span class="eyebrow" data-reveal>To nie są przykłady z internetu</span>
-                <h2 class="h-sec" data-reveal data-delay="60">Tak wygląda Twój sklep<br><span class="g">— zanim zapłacisz złotówkę.</span></h2>
+                <h2 class="h-sec" data-reveal data-delay="60">Tak może wyglądać <span class="g">Twój sklep.</span></h2>
             </div>
             <div class="mk-nav" data-reveal data-delay="120">
                 <button class="mk-arrow" id="mk-prev" aria-label="Poprzedni">‹</button>
@@ -818,7 +726,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             </div>
         </div>
         <div class="mk-track" id="mk-track" data-reveal data-delay="160"></div>
-        <p class="mk-foot" data-reveal>Każdy sklep dostaje <span class="g">własny produkt, markę i wygląd</span> — powstają w kilka minut rozmowy.</p>
+        <div class="mk-cta" data-reveal>
+            <p class="mk-cta__t">Za <span class="g">10 minut</span> możesz mieć swój.</p>
+            <a class="btn btn--xl" href="/sklep/" data-cta data-loc="makiety">Zobacz swój sklep <span class="ar">→</span></a>
+        </div>
     </div>
 </section>
 
@@ -851,8 +762,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- ACT — REKLAMY (marquee) -->
 <section class="scene reklamy" id="act-reklamy" data-rail="Reklamy">
     <div class="scene__in">
-        <span class="eyebrow" data-reveal>Reklamy, które sprzedają</span>
-        <h2 class="h-sec" data-reveal data-delay="60">I gotowe reklamy. <span class="g">Tyle, ile trzeba.</span></h2>
+        <span class="eyebrow" data-reveal>Reklama, która dowozi</span>
+        <h2 class="h-sec" data-reveal data-delay="60">Do tego gotowe reklamy, <span class="g">które sprzedają.</span></h2>
     </div>
     <div class="mq">
         <div class="mq__row" id="mq-row1"></div>
@@ -878,70 +789,26 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- ACT 08 — ZA DARMO (+ logo marek) -->
 <section class="scene free" id="act-8" data-rail="Za darmo">
     <div class="scene__in">
-<div class="freeR">
-  <div class="freeR__copy">
-    <span class="eyebrow" data-reveal>Zanim cokolwiek zdecydujesz</span>
-    <h2 class="h-sec freeR__h" data-reveal data-delay="60">Wszystko, co widziałeś<br><span class="g">— w 10 minut, za darmo.</span></h2>
-    <p class="freeR__lead" data-reveal data-delay="140">To, co zwykle wyceniają na kilka tysięcy, dostajesz na start bez złotówki — żebyś zobaczył jakość, zanim cokolwiek zapłacisz.</p>
-    <div class="freeR__cta" data-reveal data-delay="220">
-      <a class="btn btn--xl" href="/sklep/" data-cta data-loc="free">Zacznij za darmo <span class="ar">→</span></a>
-      <p class="freeR__note"><b>Bez karty. Bez zobowiązań.</b> Płacisz dopiero, gdy zarabiasz.</p>
-    </div>
-    <div class="freeR__chips" data-reveal data-delay="300">
-      <span class="freeR__chipsLab">Od czego zaczynamy?</span>
-      <div class="freeR__chipsRow">
-        <button class="chip" data-choice="Mam już produkt do sprzedania">Mam już produkt</button>
-        <button class="chip" data-choice="Mam pomysł na produkt">Mam pomysł</button>
-        <button class="chip" data-choice="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="freeR__receipt" data-reveal data-delay="160">
-    <div class="rcpt" id="freeRcpt" aria-label="Pakiet startowy — wycena rynkowa vs 0 zł">
-      <div class="rcpt__head">
-        <div class="rcpt__brand">Tomek Niedźwiecki</div>
-        <div class="rcpt__tag">Zbuduję Ci e-sklep · osobiście</div>
-      </div>
-      <div class="rcpt__meta"><span>PAKIET STARTOWY</span><span>NR 0000/DARMO</span></div>
-      <div class="rcpt__cols"><span>Pozycja</span><span>Wycena</span></div>
-      <ul class="rcpt__items">
-        <li class="rli">
-          <span class="rli__l"><span class="rli__n">01</span><span class="rli__tx"><span class="rli__t">Analiza rynku Twojego produktu</span><span class="rli__d">Czy jest popyt i za ile realnie sprzedasz.</span></span></span>
-          <span class="rli__p">890 zł</span>
-        </li>
-        <li class="rli">
-          <span class="rli__l"><span class="rli__n">02</span><span class="rli__tx"><span class="rli__t">Marka i logo</span><span class="rli__d">Nazwa, logo, kolory — gotowa tożsamość.</span></span></span>
-          <span class="rli__p">690 zł</span>
-        </li>
-        <li class="rli">
-          <span class="rli__l"><span class="rli__n">03</span><span class="rli__tx"><span class="rli__t">Makiety Twojego sklepu</span><span class="rli__d">Jak sklep wygląda — strona po stronie.</span></span></span>
-          <span class="rli__p">1&nbsp;200 zł</span>
-        </li>
-        <li class="rli">
-          <span class="rli__l"><span class="rli__n">04</span><span class="rli__tx"><span class="rli__t">Gotowe reklamy pod kampanię</span><span class="rli__d">Grafiki i teksty gotowe do startu.</span></span></span>
-          <span class="rli__p">790 zł</span>
-        </li>
-        <li class="rli">
-          <span class="rli__l"><span class="rli__n">05</span><span class="rli__tx"><span class="rli__t">Podgląd działającego sklepu</span><span class="rli__d">Klikalny sklep na żywo, nie obrazek.</span></span></span>
-          <span class="rli__p">1&nbsp;500 zł</span>
-        </li>
-        <li class="rli">
-          <span class="rli__l"><span class="rli__n">06</span><span class="rli__tx"><span class="rli__t">Wstępny biznesplan</span><span class="rli__d">Koszt startu, marża, próg zysku.</span></span></span>
-          <span class="rli__p">490 zł</span>
-        </li>
-      </ul>
-      <div class="rcpt__sum">
-        <span class="rcpt__sumL">Razem, na start</span>
-        <span class="rcpt__sumR"><span class="rcpt__old">kilka tys. zł</span><span class="rcpt__new">0 zł</span></span>
-      </div>
-      <div class="rcpt__foot">Dziękuję. Płacisz dopiero, gdy zarabiasz.</div>
-      <div class="rcpt__barcode" aria-hidden="true"></div>
-      <div class="rcpt__code">* 0 0 0 0 · D A R M O *</div>
-      <div class="rcpt__stamp" aria-hidden="true"><span class="rcpt__stampIn"><span class="rcpt__stampT">ZA DARMO</span><span class="rcpt__stampP">do zapłaty</span><span class="rcpt__stampV">0 zł</span></span></div>
-    </div>
-  </div>
-</div>
+<span class="eyebrow" data-reveal>Zanim cokolwiek zdecydujesz</span>
+        <h2 class="h-sec" data-reveal data-delay="60">Wszystko, co widziałeś —<br><span class="g">w 10 minut, za darmo.</span></h2>
+        <ul class="freeL" data-reveal data-delay="140">
+            <li>Analiza rynku Twojego produktu</li>
+            <li>Marka i logo</li>
+            <li>Makiety Twojego sklepu</li>
+            <li>Gotowe reklamy pod kampanię</li>
+            <li>Podgląd działającego sklepu</li>
+            <li>Wstępny biznesplan</li>
+        </ul>
+        <p class="freeL__val" data-reveal data-delay="200">Wartość <s>kilka tysięcy zł</s> <span class="g">— dziś 0 zł.</span></p>
+        <div class="freeL__cta" data-reveal data-delay="260">
+            <a class="btn btn--xl" href="/sklep/" data-cta data-loc="free">Zacznij za darmo <span class="ar">→</span></a>
+            <span class="freeL__note"><b>Bez karty. Bez zobowiązań.</b></span>
+        </div>
+        <div class="freeL__chips" data-reveal data-delay="320">
+            <button class="chip" data-choice="Mam już produkt do sprzedania">Mam już produkt</button>
+            <button class="chip" data-choice="Mam pomysł na produkt">Mam pomysł</button>
+            <button class="chip" data-choice="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
+        </div>
     </div>
 </section>
 
@@ -1183,22 +1050,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             });
         }, {threshold:.3});
         obs.observe(track);
-    })();
-
-    /* ---------- ZA DARMO — paragon: „ostemplowanie" (freeR) ---------- */
-    (function(){
-        var freeRcpt = document.getElementById('freeRcpt');
-        if(!freeRcpt) return;
-        if(RM){ freeRcpt.classList.add('is-paid'); return; }
-        var rcptObs = new IntersectionObserver(function(ents){
-            ents.forEach(function(e){
-                if(e.isIntersecting){
-                    setTimeout(function(){ freeRcpt.classList.add('is-paid'); }, 520);
-                    rcptObs.unobserve(e.target);
-                }
-            });
-        }, {threshold:.4});
-        rcptObs.observe(freeRcpt);
     })();
 
     /* ---------- CTA HANDOFF ---------- */
