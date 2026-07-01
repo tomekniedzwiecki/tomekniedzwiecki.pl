@@ -1069,7 +1069,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
         function load(){
             if(loaded) return; loaded = true;
-            fetch(EP + '?n=10&seed=zbuduje')
+            // świeży losowy seed co wejście = inny zestaw z żyjącej puli (112+ produktów), jak /sklep;
+            // endpoint robi ważone losowanie (heat + hash(seed:id)), więc topy wracają częściej, ale lista rotuje
+            var seed = Math.floor(Math.random() * 1e9) + 1;
+            fetch(EP + '?n=10&seed=' + seed)
                 .then(function(r){ return r.json(); })
                 .then(function(j){
                     ITEMS = (j && j.products) || [];
