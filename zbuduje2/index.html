@@ -236,59 +236,47 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .btn--ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text)}
 .btn--ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;background:rgba(0,217,126,.05)}
 
-/* ============================================================ ACT 01 HERO — lekki, kinetyczny tekst */
+/* ============================================================ ACT 01 HERO — lewa, wielki tekst (styl /aplikacja) */
 .hero.heroX,.heroX{overflow:hidden}
-.heroX .scene__in{max-width:1200px;position:relative;z-index:2;text-align:center}
+.heroX .scene__in{max-width:1400px;position:relative;z-index:2;text-align:left}
 
-/* autor — lekki badge */
-.author.heroX__author{display:inline-flex;align-items:center;gap:12px;padding:7px 15px 7px 7px;
-    border:1px solid var(--border-strong);border-radius:999px;background:var(--glass);margin-bottom:clamp(30px,4vw,46px)}
-.heroX__author img{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent);object-fit:cover}
-.heroX__author b{font-size:14px;font-weight:700;color:var(--text-strong);display:block;line-height:1.15;letter-spacing:-.01em}
-.heroX__author span{font-size:12px;color:var(--text-muted)}
+/* autor — subtelny badge (pojawia się po nagłówku) */
+.author.heroX__author{display:inline-flex;align-items:center;gap:12px;padding:6px 18px 6px 6px;
+    border:1px solid var(--border-strong);border-radius:999px;background:var(--glass);margin-bottom:clamp(28px,5vh,56px);max-width:max-content}
+.heroX__author img{width:44px;height:44px;border-radius:50%;border:2px solid var(--accent);box-shadow:0 0 0 3px var(--accent-soft);object-fit:cover;flex-shrink:0}
+.heroX__author b{font-size:14px;font-weight:600;color:var(--text-strong);display:block;line-height:1.25;letter-spacing:-.005em}
+.heroX__author span{font-size:12.5px;color:var(--text-muted);line-height:1.25;margin-top:2px}
 
-/* H1 — duży, wyśrodkowany, ze spokojnym wjazdem słów (bez hairline, bez karetu) */
-.heroX__h1{font-weight:900;letter-spacing:-.05em;line-height:.98;color:var(--text-strong)}
-.heroX__line{display:block;font-size:clamp(44px,8.6vw,108px)}
-.heroX__line + .heroX__line{margin-top:.06em}
-.heroX__mask{display:inline-block;overflow:hidden;padding-bottom:.14em;margin-bottom:-.1em;padding-right:.16em;margin-right:-.16em;vertical-align:bottom;max-width:100%}
-.heroX__word{display:inline-block;transform:translateY(115%);transition:transform 1s var(--ease)}
+/* H1 — wielki, wypełnia szerokość; drugorzędne słowa mniejsze serif italic */
+.heroX__h1{font-family:var(--sans);font-size:clamp(48px,10.2vw,150px);line-height:.86;letter-spacing:-.05em;font-weight:900;color:var(--text-strong);margin:0;max-width:1300px}
+.heroX__line{display:block;line-height:.92;margin-bottom:-.05em}
+.heroX__line[data-reveal]{opacity:1;transform:none}
+.heroX__mask{display:inline-block;overflow:hidden;padding-bottom:.14em;padding-right:.16em;margin-right:-.16em;vertical-align:bottom;max-width:100%}
+.heroX__word{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease)}
 .heroX__line.in .heroX__word{transform:translateY(0)}
-.heroX__ci{font-style:italic;font-weight:400;color:var(--text-muted);letter-spacing:-.01em}
-.heroX__line--accent .g{color:var(--accent)}
-.heroX__line--coda{font-family:var(--serif);font-style:italic;font-weight:400;
-    font-size:clamp(28px,4.6vw,54px);color:var(--text-muted);letter-spacing:-.02em;margin-top:.06em}
+.heroX__ci{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--text-muted);font-size:.6em;line-height:1;letter-spacing:-.015em;padding:0 .1em;vertical-align:.04em}
+.heroX__key{color:var(--accent);text-shadow:0 0 70px rgba(0,217,126,.28)}
+.heroX__coda{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.4em;color:var(--text);line-height:1;letter-spacing:-.015em;vertical-align:.12em}
 
 /* podtytuł */
-.heroX__sub{margin:clamp(28px,3.4vw,40px) auto 0;font-family:var(--serif);font-style:italic;
-    font-size:clamp(20px,3.2vw,32px);color:var(--text-muted);line-height:1.35;max-width:36ch}
-.heroX__sub .g{color:var(--accent);font-style:italic}
+.heroX__sub{font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,44px);color:var(--text);letter-spacing:-.01em;line-height:1.25;margin-top:clamp(18px,3vh,34px);max-width:900px}
+.heroX__sub em{font-style:italic}
+.heroX__sub .g{color:var(--accent);font-weight:500;font-style:italic}
 
-/* dorobek — lekki pasek inline */
-.heroX__cred{margin-top:clamp(32px,3.6vw,44px);display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center}
-.heroX__cred b{position:relative;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);font-weight:500;padding:4px 16px}
-.heroX__cred b:first-child{padding-left:0}
-.heroX__cred b:not(:last-child)::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:1px;height:12px;background:var(--border-strong)}
-.heroX__cred .g{color:var(--accent)}
-
-/* scroll cue */
-.heroX__scroll{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-family:var(--mono);
-    font-size:11px;letter-spacing:.16em;color:var(--text-faint);text-transform:uppercase;
-    display:flex;flex-direction:column;align-items:center;gap:7px;z-index:3}
-.heroX__scroll .a{width:1px;height:26px;background:linear-gradient(var(--text-faint),transparent);animation:heroXscroll 2s var(--ease2) infinite}
-@keyframes heroXscroll{0%{opacity:0;transform:translateY(-8px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+/* meta scroll */
+.heroX__meta{margin-top:clamp(26px,5vh,50px);display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
+.heroX__arrow{display:inline-block;animation:heroXbob 2.4s ease-in-out infinite}
+@keyframes heroXbob{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(4px);opacity:1}}
 
 /* ---------- responsywność ---------- */
-@media (max-width:860px){.heroX__scroll{display:none}}
-@media (max-width:560px){
-    .heroX__line{font-size:clamp(42px,13vw,72px)}
-    .heroX__sub{max-width:100%}
-    .heroX__cred b{padding:4px 11px}
-    .heroX__cred b:first-child{padding-left:0}
+@media (max-width:640px){
+    .heroX__h1{font-size:clamp(42px,13vw,92px)}
+    .heroX__sub{font-size:clamp(21px,6vw,32px);max-width:100%}
+    .heroX__author img{width:40px;height:40px}
 }
 @media (prefers-reduced-motion:reduce){
     .heroX__word{transform:none!important;transition:none!important}
-    .heroX__scroll .a{animation:none!important}
+    .heroX__arrow{animation:none!important}
 }
 
 /* ============================================================ ACT 02 PROBLEM */
@@ -675,22 +663,20 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
 <main id="main">
 
-<!-- ACT 01 — HERO / kinetyczny masthead -->
+<!-- ACT 01 — HERO / lewa, wielki tekst (styl /aplikacja) -->
 <section class="scene hero heroX" id="act-1" data-rail="Wstęp">
     <div class="scene__in">
-        <div class="author heroX__author" data-reveal>
-            <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="38" height="38" loading="eager" decoding="async">
+        <div class="author heroX__author" data-reveal data-delay="900">
+            <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="44" height="44" loading="eager" decoding="async">
             <div><b>Tomek Niedźwiecki</b><span>Twój wspólnik, nie wykonawca</span></div>
         </div>
         <h1 class="heroX__h1">
-            <span class="heroX__line" data-reveal data-delay="100"><span class="heroX__mask"><span class="heroX__word">Zbuduję</span> <span class="heroX__word heroX__ci">Ci</span></span></span>
-            <span class="heroX__line heroX__line--accent" data-reveal data-delay="200"><span class="heroX__mask"><span class="heroX__word g">e&#8209;sklep.</span></span></span>
-            <span class="heroX__line heroX__line--coda" data-reveal data-delay="300"><span class="heroX__mask"><span class="heroX__word">Osobiście.</span></span></span>
+            <span class="heroX__line" data-reveal data-delay="0"><span class="heroX__mask"><span class="heroX__word">Zbuduję <i class="heroX__ci">Ci</i></span></span></span>
+            <span class="heroX__line" data-reveal data-delay="250"><span class="heroX__mask"><span class="heroX__word"><span class="g heroX__key">e&#8209;sklep.</span> <i class="heroX__coda">Osobiście.</i></span></span></span>
         </h1>
-        <p class="heroX__sub" data-reveal data-delay="420">Buduję. Uczę. <span class="g">Oddaję stery, kiedy działa.</span></p>
-        <div class="heroX__cred" data-reveal data-delay="520"><b>15 lat w e-biznesie</b><b><span class="g">70 mln zł</span></b><b>3 firmy od zera</b></div>
+        <p class="heroX__sub" data-reveal data-delay="1050"><em>Buduję. Uczę.</em> <span class="g">Oddaję stery, kiedy działa.</span></p>
+        <p class="heroX__meta" data-reveal data-delay="1500"><span>SCROLL</span><span class="heroX__arrow" aria-hidden="true">↓</span></p>
     </div>
-    <div class="heroX__scroll" aria-hidden="true"><span>scroll</span><span class="a"></span></div>
 </section>
 
 <!-- ACT 02 — PROBLEM -->
