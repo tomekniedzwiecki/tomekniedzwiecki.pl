@@ -172,12 +172,18 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .nav__brand{display:inline-flex;align-items:center;gap:10px;height:30px;transition:opacity .25s var(--ease)}
 .nav__brand:hover{opacity:.78}
 .nav__logo{height:30px;width:auto;display:block;flex-shrink:0}
+.nav__logo--icon{display:none}
 .nav__suffix{font-size:15px;font-weight:700;letter-spacing:-.01em;color:var(--accent);white-space:nowrap}
 .nav__suffix::before{content:'/ ';color:var(--text-faint);font-weight:500}
 @media (max-width:640px){.nav__suffix{display:none}}
-.nav__cta{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font-size:13.5px;font-weight:700;letter-spacing:-.01em;transition:.25s var(--ease2)}
+.nav__cta{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font-size:13.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;transition:.25s var(--ease2)}
 .nav__cta:hover{background:var(--accent);color:#00150c;box-shadow:0 8px 26px -8px rgba(0,217,126,.6)}
-@media (max-width:380px){.nav__cta{display:none}}
+/* mobile: logo-ikona zamiast wordmarku, by CTA zmieściło się w jednej linii */
+@media (max-width:560px){
+    .nav__logo--full{display:none}
+    .nav__logo--icon{display:block;height:30px;width:auto;flex-shrink:0}
+    .nav__cta{padding:8px 15px;font-size:13px}
+}
 
 /* ============================================================ PROGRESS RAIL */
 .rail{position:fixed;left:max(16px,2.2vw);top:50%;transform:translateY(-50%);z-index:80;display:flex;flex-direction:column;gap:13px;opacity:0;transition:opacity .6s ease .3s}
@@ -230,28 +236,115 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .btn--ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text)}
 .btn--ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;background:rgba(0,217,126,.05)}
 
-/* ============================================================ ACT 01 HERO */
-.hero .scene__in{max-width:1000px;position:relative;z-index:2}
-.hero__cred{margin-top:32px;display:inline-flex;flex-wrap:wrap;align-items:center}
-.hero__cred b{position:relative;font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;color:var(--text-muted);font-weight:500;padding:4px 16px}
-.hero__cred b:first-child{padding-left:0}
-.hero__cred b:not(:last-child)::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:1px;height:12px;background:var(--border-strong)}
-.hero__cred .g{color:var(--accent)}
-@media (max-width:560px){.hero__cred b{padding:4px 11px}.hero__cred b:first-child{padding-left:0}}
-.author{display:inline-flex;align-items:center;gap:12px;padding:7px 14px 7px 7px;border:1px solid var(--border-strong);border-radius:999px;background:var(--glass);margin-bottom:30px}
-.author img{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent);object-fit:cover}
-.author b{font-size:14px;font-weight:700;color:var(--text-strong);display:block;line-height:1.15}
-.author span{font-size:12px;color:var(--text-muted)}
-.hero h1{font-size:clamp(44px,8.4vw,108px);font-weight:900;letter-spacing:-.05em;line-height:.95;color:var(--text-strong)}
-.hero h1 .ci{font-style:italic;font-weight:400;color:var(--text-muted);margin-right:.1em}
-.hero h1 .g{color:var(--accent);text-shadow:0 0 70px rgba(0,217,126,.35)}
-.hero h1 .coda{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:.46em;color:var(--text-muted);letter-spacing:-.02em;margin-top:.12em}
-.hero__sub{margin-top:26px;font-family:var(--serif);font-style:italic;font-size:clamp(20px,3.2vw,32px);color:var(--text-muted);line-height:1.3}
-.hero__sub .g{color:var(--accent);font-style:italic}
-.hero__scroll{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--text-faint);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:7px}
-.hero__scroll .a{width:1px;height:26px;background:linear-gradient(var(--text-faint),transparent);animation:scrollA 2s var(--ease2) infinite}
-@keyframes scrollA{0%{opacity:0;transform:translateY(-8px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
-@media (max-width:860px){.hero__scroll{display:none}}
+/* ============================================================ ACT 01 HERO — kinetyczny masthead */
+.hero.heroX,.heroX{overflow:hidden}
+.heroX .scene__in{max-width:1080px;position:relative;z-index:2}
+
+/* --- górny hairline pasek meta (kasuje pustkę u góry) --- */
+.heroX__meta{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:16px;
+    padding:22px clamp(20px,5vw,48px);font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--text-faint);border-bottom:1px solid var(--border);z-index:3}
+.heroX__meta .heroX__idx{color:var(--accent)}
+.heroX__meta .heroX__rule{flex:1;height:1px;background:linear-gradient(90deg,var(--border-strong),transparent)}
+.heroX__meta .heroX__tag{color:var(--text-muted)}
+.heroX__meta .heroX__loc{color:var(--text-faint)}
+
+/* --- grid: nagłówek vs kolumna dorobku (asymetria) --- */
+.heroX__grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(28px,5vw,72px);align-items:end}
+.heroX__lead{min-width:0}
+
+.author.heroX__author{display:inline-flex;align-items:center;gap:12px;padding:7px 15px 7px 7px;
+    border:1px solid var(--border-strong);border-radius:999px;background:var(--glass);margin-bottom:clamp(22px,3vw,34px)}
+.heroX__author img{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--accent);object-fit:cover}
+.heroX__author b{font-size:14px;font-weight:700;color:var(--text-strong);display:block;line-height:1.15;letter-spacing:-.01em}
+.heroX__author span{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint)}
+
+/* --- kinetyczny H1: linia = wiersz z hairline; .heroX__mask = okno clip; słowo wjeżdża od dołu --- */
+.heroX__h1{font-weight:900;letter-spacing:-.055em;line-height:.86;color:var(--text-strong)}
+.heroX__line{display:block;position:relative;font-size:clamp(48px,10.5vw,124px)}
+.heroX__line + .heroX__line{margin-top:.1em}
+.heroX__mask{display:inline-block;overflow:hidden;padding-bottom:.14em;margin-bottom:-.06em;vertical-align:bottom;max-width:100%}
+.heroX__line::after{content:'';position:absolute;left:0;bottom:0;width:100%;height:1px;
+    background:var(--border);transform:scaleX(0);transform-origin:left;transition:transform 1s var(--ease) .2s}
+.heroX__line.in::after{transform:scaleX(1)}
+.heroX__word{display:inline-block;transform:translateY(115%);transition:transform 1.05s var(--ease)}
+.heroX__line.in .heroX__word{transform:translateY(0)}
+.heroX__ci{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--text-muted);letter-spacing:-.01em}
+.heroX__line--accent .g{color:var(--accent)}
+.heroX__line--coda{font-family:var(--serif);font-style:italic;font-weight:400;
+    font-size:clamp(30px,5.4vw,64px);color:var(--text-muted);letter-spacing:-.02em}
+
+/* migający karet przy zielonym słowie */
+.heroX__caret{display:inline-block;width:.055em;min-width:3px;height:.72em;margin-left:.1em;
+    background:var(--accent);vertical-align:-.02em;opacity:0;transition:opacity .3s var(--ease) .9s}
+.heroX__line--accent.in .heroX__caret{opacity:1;animation:heroXcaret 1.05s steps(1,end) .9s infinite}
+@keyframes heroXcaret{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+.heroX__sub{margin-top:clamp(22px,3vw,30px);font-family:var(--serif);font-style:italic;
+    font-size:clamp(20px,3.2vw,32px);color:var(--text-muted);line-height:1.3;max-width:24ch}
+.heroX__sub .g{color:var(--accent);font-style:italic}
+
+.heroX__cta{margin-top:clamp(26px,3.4vw,36px);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.heroX__cta .btn{display:inline-flex;align-items:center;gap:.55em}
+.heroX__cta .btn:hover{transform:translateY(-2px);box-shadow:0 16px 44px -12px rgba(0,217,126,.7)}
+.heroX__arr{display:inline-block;transition:transform .4s var(--ease)}
+.heroX__cta .btn:hover .heroX__arr{transform:translateX(4px)}
+.heroX__note{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--text-faint)}
+
+/* --- prawa kolumna: dorobek jako stos z hairline separatorami --- */
+.heroX__cred{display:flex;flex-direction:column;gap:0;text-align:right;padding-bottom:.35em}
+.heroX__stat{padding:16px 0;border-top:1px solid var(--border)}
+.heroX__stat:first-child{border-top:0;padding-top:0}
+.heroX__num{display:block;font-weight:800;letter-spacing:-.04em;line-height:1;
+    font-size:clamp(34px,4vw,52px);color:var(--text-strong);font-variant-numeric:tabular-nums}
+.heroX__stat--hi .heroX__num{color:var(--accent)}
+.heroX__num i{font-style:normal;font-family:var(--mono);font-size:.32em;font-weight:500;
+    letter-spacing:.04em;vertical-align:.55em;margin-left:.15em;color:inherit}
+.heroX__lab{display:block;margin-top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--text-muted)}
+
+/* scroll cue */
+.heroX__scroll{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-family:var(--mono);
+    font-size:11px;letter-spacing:.16em;color:var(--text-faint);text-transform:uppercase;
+    display:flex;flex-direction:column;align-items:center;gap:7px;z-index:3}
+.heroX__scroll .a{width:1px;height:26px;background:linear-gradient(var(--text-faint),transparent);animation:heroXscroll 2s var(--ease2) infinite}
+@keyframes heroXscroll{0%{opacity:0;transform:translateY(-8px)}40%{opacity:1}100%{opacity:0;transform:translateY(8px)}}
+
+/* ---------- responsywność ---------- */
+@media (max-width:960px){
+    .heroX__grid{grid-template-columns:1fr;gap:clamp(30px,6vw,44px);align-items:start}
+    .heroX__cred{flex-direction:row;text-align:left;gap:0;padding-bottom:0;
+        border-top:1px solid var(--border);padding-top:22px}
+    .heroX__stat{flex:1;padding:0 22px;border-top:0;border-left:1px solid var(--border)}
+    .heroX__stat:first-child{padding-left:0;border-left:0}
+    .heroX__lab{letter-spacing:.06em}
+}
+@media (max-width:860px){.heroX__scroll{display:none}}
+@media (max-width:640px){
+    .heroX__meta{gap:10px;font-size:10px;letter-spacing:.1em;padding:16px 20px}
+    .heroX__meta .heroX__tag{display:none}
+    .heroX__line{font-size:clamp(44px,15vw,72px)}
+    .heroX__sub{max-width:100%}
+    .heroX__cta{gap:12px}
+    .heroX__cta .btn{width:100%;justify-content:center;padding-left:18px;padding-right:18px;font-size:16.5px}
+    .heroX__note{width:100%;text-align:center}
+    .heroX__stat{padding:0 14px}
+    .heroX__num{font-size:clamp(30px,9vw,40px)}
+    .heroX__num i{font-size:.36em}
+    .heroX__lab{font-size:10px}
+}
+@media (max-width:400px){
+    .heroX__cred{flex-wrap:wrap;gap:14px 0}
+    .heroX__stat{flex:0 0 50%;padding:0 12px 0 0;border-left:0}
+    .heroX__stat:nth-child(3){flex-basis:100%}
+}
+@media (prefers-reduced-motion:reduce){
+    .heroX__word{transform:none!important;transition:none!important}
+    .heroX__line::after{transform:scaleX(1)!important;transition:none!important}
+    .heroX__caret{opacity:1!important;animation:none!important}
+    .heroX__scroll .a{animation:none!important}
+    .heroX__arr{transition:none!important}
+}
 
 /* ============================================================ ACT 02 PROBLEM */
 .walls2{margin-top:46px;border-top:1px solid var(--border)}
@@ -264,26 +357,95 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .wrow__t{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.025em;color:var(--text-strong);margin-bottom:7px}
 .wrow__d{font-size:15.5px;color:var(--text-muted);line-height:1.55;max-width:56ch}
 .wrow__d b{color:var(--text)}
-.punch{margin:54px auto 0;text-align:center;font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,38px);line-height:1.25;color:var(--text);max-width:26ch}
+.punch{margin:54px auto 0;text-align:center;font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,40px);line-height:1.25;color:var(--text);max-width:min(980px,94vw);text-wrap:balance}
+@media (max-width:600px){.punch{max-width:24ch}}
 .punch .g{color:var(--accent)}
 @media (max-width:700px){.wrow{grid-template-columns:60px 1fr;gap:18px;padding:20px 0}.wrow__n{font-size:44px;-webkit-text-stroke-width:1px}}
 
-/* ============================================================ ACT 03 MODEL */
-.roles{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:42px;position:relative}
-.roles::after{content:'+';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#000;border:1px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:500;z-index:5;box-shadow:0 0 30px rgba(0,217,126,.4)}
-.role{padding:32px 28px;border:1px solid var(--border);border-radius:18px;background:var(--glass)}
-.role--me{border-color:rgba(0,217,126,.4);background:linear-gradient(180deg,rgba(0,217,126,.07),rgba(0,217,126,.01));box-shadow:0 24px 70px -30px rgba(0,217,126,.5)}
-.role__lab{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:16px}
-.role--me .role__lab{color:var(--accent)}
-.role h3{font-size:23px;font-weight:800;letter-spacing:-.025em;color:var(--text-strong);margin-bottom:16px}
-.role ul{list-style:none;display:flex;flex-direction:column;gap:12px}
-.role li{display:flex;gap:11px;font-size:15px;color:var(--text-muted);line-height:1.45}
-.role li b{color:var(--text-strong);font-weight:700}
-.role li::before{content:'';flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--border-strong);margin-top:8px}
-.role--me li::before{background:var(--accent)}
-.role__note{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:13.5px;color:var(--text-faint);line-height:1.5}
-.role--me .role__note{border-color:rgba(0,217,126,.2)}
-@media (max-width:760px){.roles{grid-template-columns:1fr}.roles::after{display:none}}
+/* ===== ACT 03 MODEL — Pasek przekazania steru (prefiks .mdlX__) ===== */
+.mdlX{--dur:1.1s}
+.mdlX__head{max-width:20ch}
+.mdlX__sub{margin-top:16px;font-family:var(--serif);font-style:italic;font-size:clamp(17px,2.4vw,24px);color:var(--text-muted);max-width:44ch;line-height:1.3}
+.mdlX__sub .g{color:var(--accent);font-style:italic}
+
+.mdlX__rig{margin-top:clamp(30px,4.6vw,52px)}
+
+/* etykiety końców */
+.mdlX__ends{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px}
+.mdlX__end{font-size:clamp(19px,3.4vw,30px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--text-strong);display:inline-flex;align-items:baseline;gap:10px}
+.mdlX__end--me{color:var(--accent)}
+.mdlX__end--you{flex-direction:row-reverse}
+.mdlX__endrole{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2vw,22px);font-weight:400;letter-spacing:-.01em;color:var(--text-faint)}
+
+/* dwa tory */
+.mdlX__lanes{position:relative;border:1px solid var(--border);border-radius:16px;background:var(--glass);overflow:hidden}
+.mdlX__lane{position:relative;min-height:clamp(60px,9vw,78px);display:flex;align-items:center;padding:14px clamp(16px,2.4vw,26px);overflow:hidden}
+.mdlX__lane+.mdlX__lane{border-top:1px solid var(--border)}
+
+/* klin wypełnienia: Tomek kurczy się L->P, Ty rośnie P->L */
+.mdlX__fill{position:absolute;top:0;bottom:0;left:0;right:0;transform:scaleX(0);transition:transform var(--dur) var(--ease) .15s;will-change:transform;pointer-events:none}
+.in .mdlX__fill{transform:scaleX(1)}
+.mdlX__lane--me .mdlX__fill{transform-origin:left;background:linear-gradient(90deg,var(--accent-soft) 0%,var(--accent-dim) 55%,transparent 82%)}
+.mdlX__lane--me .mdlX__fill::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent)}
+.mdlX__lane--you .mdlX__fill{transform-origin:right;background:linear-gradient(270deg,rgba(237,237,237,.10) 0%,rgba(237,237,237,.045) 55%,transparent 82%)}
+.mdlX__lane--you .mdlX__fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:var(--text)}
+
+.mdlX__lbl{position:relative;z-index:2;display:flex;align-items:center;gap:clamp(14px,2vw,26px);width:100%}
+.mdlX__lname{flex:0 0 auto;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);white-space:nowrap;min-width:46px}
+.mdlX__lane--me .mdlX__lname{color:var(--accent)}
+
+/* ultra-krótkie punkty z numerem mono */
+.mdlX__pts{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
+.mdlX__pt{display:inline-flex;align-items:center;gap:8px;font-size:clamp(13.5px,1.6vw,16px);font-weight:600;letter-spacing:-.01em;color:var(--text);line-height:1.15;white-space:nowrap}
+.mdlX__lane--me .mdlX__pt{color:var(--text-strong);font-weight:700}
+.mdlX__k{flex:0 0 auto;font-family:var(--mono);font-style:normal;font-size:10.5px;font-weight:600;letter-spacing:.05em;color:var(--text-faint)}
+.mdlX__lane--me .mdlX__k{color:var(--accent)}
+.mdlX__lane--you .mdlX__lbl{flex-direction:row-reverse}
+.mdlX__lane--you .mdlX__pts{justify-content:flex-end}
+
+/* znacznik przejęcia (pionowa linia + pill) */
+.mdlX__hand{position:absolute;top:0;bottom:0;left:78%;width:1px;background:var(--border-strong);z-index:3;opacity:0;transition:opacity .5s var(--ease) 1s}
+.in .mdlX__hand{opacity:1}
+.mdlX__handlab{position:absolute;top:50%;left:78%;transform:translate(-50%,-50%);z-index:4;background:#000;border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:999px;white-space:nowrap;opacity:0;transition:opacity .5s var(--ease) 1.05s}
+.in .mdlX__handlab{opacity:1}
+
+/* oś czasu pod torami */
+.mdlX__axis{position:relative;margin-top:12px;height:22px}
+.mdlX__axisbar{position:absolute;left:0;right:0;top:4px;height:1px;background:linear-gradient(90deg,var(--border-strong),var(--accent))}
+.mdlX__ticks{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center}
+.mdlX__tick{position:relative;padding-top:11px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--text-faint);font-variant-numeric:tabular-nums}
+.mdlX__tick::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:6px;background:var(--border-strong)}
+.mdlX__tick--key{color:var(--accent)}
+.mdlX__tick--key::before{background:var(--accent);height:8px}
+
+/* puenta */
+.mdlX__punch{margin-top:clamp(26px,3.8vw,42px);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.mdlX__punchtxt{font-family:var(--serif);font-style:italic;font-size:clamp(21px,3.4vw,36px);line-height:1.18;color:var(--text);letter-spacing:-.01em}
+.mdlX__punchtxt .g{color:var(--accent);font-style:italic}
+.mdlX__seal{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-faint);border:1px solid var(--border);border-radius:999px;padding:8px 15px;white-space:nowrap}
+.mdlX__seal b{color:var(--text);font-weight:700}
+
+/* ===== responsywność ===== */
+@media(max-width:760px){
+  .mdlX__ends{display:none}
+  .mdlX__lane{min-height:0;padding:16px}
+  .mdlX__lbl{flex-direction:column!important;align-items:flex-start!important;gap:10px}
+  .mdlX__lane--you .mdlX__pts{justify-content:flex-start}
+  .mdlX__pts{gap:8px 16px}
+  .mdlX__pt{white-space:normal}
+  /* pill/handoff kolidowałby z tekstem toru gdy tory są pod sobą — ukrywamy, oś czasu pod spodem nadal komunikuje przejęcie */
+  .mdlX__hand,.mdlX__handlab{display:none}
+}
+@media(max-width:640px){
+  .mdlX__punch{gap:12px}
+  .mdlX__seal{font-size:9.5px;padding:7px 12px}
+  .mdlX__handlab{max-width:46%;white-space:normal;text-align:center;line-height:1.25}
+  .mdlX__pts{flex-direction:column;align-items:flex-start;gap:9px}
+}
+@media(prefers-reduced-motion:reduce){
+  .mdlX__fill{transform:scaleX(1)!important;transition:none!important}
+  .mdlX__hand,.mdlX__handlab{opacity:1!important;transition:none!important}
+}
 
 /* ============================================================ ACT 04 PROOF / LEDGER */
 .proof{text-align:center}
@@ -339,21 +501,81 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     .journey__sub{display:none}
 }
 
-/* ============================================================ ACT DROGA / LEKKI CIĄG KROKÓW */
+/* ============================================================ ACT DROGA — ŚCIEŻKA-LEDGER / ROSNĄCA LINIA (drw) */
+.drw__head{margin-bottom:clamp(18px,2.4vh,32px)}
+.drw__lead{margin-top:14px;font-size:clamp(15px,1.9vw,18px);color:var(--text-muted);max-width:52ch;line-height:1.5}
+
+/* siatka jednego kroku: [rynna z linią | treść] */
+.drw__track{position:relative;display:grid;gap:0}
+.drw__step{position:relative;display:grid;grid-template-columns:clamp(64px,7vw,92px) 1fr;align-items:stretch;min-height:clamp(58px,7vh,80px)}
+
+/* pionowa rynna: szary tor (::before) + rysujący się w dół zielony rdzeń (::after) */
+.drw__rail{position:relative;display:flex;justify-content:center}
+.drw__rail::before,.drw__rail::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;transform:translateX(-50%)}
+.drw__rail::before{background:var(--border)}
+.drw__rail::after{background:var(--accent);transform:translateX(-50%) scaleY(0);transform-origin:top;transition:transform .55s var(--ease);z-index:1}
+.drw__step.is-on .drw__rail::after{transform:translateX(-50%) scaleY(1)}
+.drw__step:first-child .drw__rail::before,.drw__step:first-child .drw__rail::after{top:50%}
+.drw__step:last-child .drw__rail::before,.drw__step:last-child .drw__rail::after{bottom:50%}
+.drw__step:last-child .drw__rail::after{transform-origin:bottom}
+
+/* węzeł kroku */
+.drw__node{position:relative;z-index:2;align-self:center;width:clamp(38px,4.4vw,50px);height:clamp(38px,4.4vw,50px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:#000;border:1px solid var(--border-strong);font-family:var(--mono);font-size:clamp(12px,1.3vw,15px);font-weight:600;color:var(--text-faint);font-variant-numeric:tabular-nums;letter-spacing:.02em;transition:color .45s var(--ease2),border-color .45s var(--ease2),background .45s var(--ease2),box-shadow .45s var(--ease2),transform .45s var(--ease2)}
+.drw__step.is-on .drw__node{color:var(--text-strong);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-dim)}
+
+/* treść kroku */
+.drw__body{position:relative;padding:clamp(9px,1.2vh,14px) 0 clamp(9px,1.2vh,14px) clamp(18px,2.4vw,30px);border-bottom:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0}
+.drw__step:last-child .drw__body{border-bottom:0}
+
+/* wiersz metadanych: rola/czas po lewej, przekazanie sterów po prawej */
+.drw__metaRow{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.drw__meta{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--text-faint);transition:color .45s var(--ease2)}
+.drw__step.is-on .drw__meta{color:var(--accent)}
+.drw__ster{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.drw__ster i{font-style:normal;color:var(--text-faint);margin-right:6px;letter-spacing:.11em}
+.drw__ster--you{color:var(--accent)}
+
+.drw__t{font-size:clamp(19px,2.5vw,27px);font-weight:800;letter-spacing:-.025em;line-height:1.1;color:var(--text-strong)}
+.drw__d{font-size:clamp(13px,1.55vw,14.5px);color:var(--text-muted);line-height:1.42;max-width:52ch;margin-top:1px}
+
+/* KROK 03 — KULMINACJA (bez świecących kół: ostry pierścień + skala) */
+.drw__step--key{margin:clamp(4px,.7vh,9px) 0}
+.drw__step--key .drw__body{border:1px solid rgba(0,217,126,.4);border-radius:16px;background:linear-gradient(100deg,var(--accent-dim),rgba(0,217,126,0) 62%);padding:clamp(13px,1.8vh,18px) clamp(18px,2.4vw,28px)}
+.drw__step--key .drw__t{color:var(--accent)}
+.drw__step--key .drw__node{width:clamp(44px,5vw,58px);height:clamp(44px,5vw,58px);border-color:var(--accent);color:var(--accent-ink);background:var(--accent);font-weight:700}
+.drw__step--key.is-on .drw__node{box-shadow:0 0 0 5px var(--accent-dim),0 0 0 6px var(--accent);transform:scale(1.05)}
+.drw__tag{align-self:flex-start;margin-bottom:2px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);padding:3px 10px;border-radius:999px}
+.drw__note{margin-top:9px;padding-top:9px;border-top:1px solid rgba(0,217,126,.18);font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);opacity:0;transform:translateY(4px);transition:opacity .55s var(--ease) .15s,transform .55s var(--ease) .15s}
+.drw__step--key.is-on .drw__note{opacity:.9;transform:none}
+
+/* puenta */
+.drw__foot{margin-top:clamp(18px,2.4vh,30px);padding-top:clamp(16px,2vh,24px);border-top:1px solid var(--border);display:flex;align-items:center;gap:clamp(16px,3vw,34px)}
+.drw__foot::before{content:'';flex:0 0 auto;width:clamp(30px,5vw,54px);height:1px;background:linear-gradient(90deg,var(--accent),transparent)}
+.drw__q{font-family:var(--serif);font-style:italic;font-size:clamp(19px,2.7vw,30px);line-height:1.24;color:var(--text-strong);letter-spacing:-.01em;max-width:34ch}
+.drw__q .g{color:var(--accent)}
+
+/* zawężenie sekcji DROGA */
 .journey-sec .scene__in{max-width:1000px}
-.path{display:flex;align-items:flex-start;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:50px}
-.path__s{display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;width:142px;padding:6px}
-.path__n{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;border:1px solid var(--border-strong);font-family:var(--mono);font-size:14px;color:var(--text-muted);font-variant-numeric:tabular-nums;transition:.4s var(--ease)}
-.path__t{font-size:14.5px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.3}
-.path__arr{color:var(--text-faint);font-size:20px;margin-top:13px}
-.path__s--key .path__n{background:var(--accent);border-color:var(--accent);color:#00150c;box-shadow:0 0 0 5px rgba(0,217,126,.14),0 0 44px rgba(0,217,126,.4)}
-.path__s--key .path__t{color:var(--accent);font-weight:700}
-.path__foot{text-align:center;margin-top:46px;font-family:var(--serif);font-style:italic;font-size:clamp(18px,2.5vw,26px);color:var(--text-muted);line-height:1.3}
-.path__foot .g{color:var(--accent)}
-@media (max-width:680px){
-    .path{flex-direction:column;gap:0;align-items:center}
-    .path__s{flex-direction:row;gap:18px;width:auto;max-width:300px;text-align:left;align-items:center}
-    .path__arr{transform:rotate(90deg);margin:4px 0}
+
+@media (max-width:760px){
+  .drw__step{grid-template-columns:clamp(52px,14vw,72px) 1fr;min-height:auto}
+  .drw__body{padding:16px 0 16px 16px}
+  .drw__step--key .drw__body{padding:16px}
+  .drw__metaRow{gap:8px}
+  .drw__tag{font-size:9px;padding:3px 8px}
+  .drw__foot{flex-direction:column;align-items:flex-start;gap:14px}
+  .drw__foot::before{width:44px}
+}
+@media (max-width:480px){
+  .drw__t{font-size:19px}
+  .drw__meta,.drw__ster{font-size:10px}
+  .drw__metaRow{flex-direction:column;gap:3px}
+  .drw__ster{align-self:flex-start}
+}
+@media (prefers-reduced-motion:reduce){
+  .drw__rail::after{transform:translateX(-50%) scaleY(1)!important}
+  .drw__node,.drw__meta{transition:none!important}
+  .drw__note{opacity:.9!important;transform:none!important}
 }
 
 /* ============================================================ ACT 05 MOTTO */
@@ -412,31 +634,102 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .lb img{max-width:min(440px,92vw);width:100%;border-radius:14px;border:1px solid var(--border-strong)}
 .lb__x{position:fixed;top:18px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--glass);border:1px solid var(--border-strong);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
 
-/* ============================================================ ACT 08 PROMISE / FREE LADDER */
-.free{position:relative}
-.free::before{content:'';position:absolute;left:50%;bottom:6%;width:min(60vw,640px);height:340px;transform:translateX(-50%);background:radial-gradient(60% 60% at 50% 50%,rgba(0,217,126,.11),transparent 66%);filter:blur(55px);z-index:-1;pointer-events:none}
-.free .scene__in{max-width:980px}
-.vstack{max-width:560px;margin:42px auto 0;border:1px solid var(--border-strong);border-radius:18px;background:var(--glass);overflow:hidden}
-.vrow{display:flex;align-items:center;gap:14px;padding:15px 24px;border-bottom:1px solid var(--border)}
-.vrow:last-child{border-bottom:0}
-.vrow__ck{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);border:1px solid rgba(0,217,126,.35);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
-.vrow__t{flex:1;font-size:15.5px;font-weight:600;color:var(--text);letter-spacing:-.01em}
-.vrow--sum{background:var(--accent-dim);padding:18px 24px}
-.vrow--sum .vrow__t{font-weight:800;color:var(--text-strong)}
-.vrow__v{font-family:var(--mono);font-size:14px;color:var(--text-muted);font-variant-numeric:tabular-nums}
-.vrow__v s{opacity:.55;margin-right:9px}
-.vrow--sum .vrow__v b{font-size:20px;font-weight:900}
-.free__logos{margin-top:34px;text-align:center}
-.free__logos-lab{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:18px}
-.free__logos .lmq{-webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-.free .lmq:hover .lmq__row{animation-play-state:paused}
-.free__cta{margin-top:38px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
-.free__note{font-size:14px;color:var(--text-faint)}
-.free__note b{color:var(--text)}
-.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+/* ===== ACT 08 — ZA DARMO / PARAGON 0 ZŁ (prefiks .freeR / .rcpt) ===== */
+.freeR{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.94fr);gap:clamp(32px,5vw,64px);align-items:center}
+.freeR__copy{align-self:center}
+.freeR .eyebrow{margin-bottom:18px}
+.freeR__h{margin-bottom:18px}
+.freeR__lead{font-size:15px;line-height:1.5;color:var(--text-muted);max-width:46ch;margin-bottom:26px}
+.freeR__cta .btn{width:100%;max-width:360px}
+.freeR__note{margin-top:14px;font-size:13px;color:var(--text-faint);line-height:1.5;max-width:42ch}
+.freeR__note b{color:var(--text-muted);font-weight:700}
+.freeR__chips{margin-top:24px;max-width:400px}
+.freeR__chipsLab{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);margin-bottom:10px}
+.freeR__chipsRow{display:flex;flex-wrap:wrap;gap:9px}
+.freeR__chipsRow .chip{text-align:left}
+
+/* --- paragon --- */
+.rcpt{position:relative;width:100%;max-width:420px;margin:0 auto;background:var(--glass-strong);color:var(--text);
+  font-family:var(--mono);border-radius:4px;padding:30px 30px 12px;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.9), 0 0 0 1px var(--border);
+  --notch:10px;
+  -webkit-mask:
+    radial-gradient(var(--notch) at 0 0, #0000 98%, #000) -1px -1px,
+    radial-gradient(var(--notch) at 100% 0, #0000 98%, #000) calc(100% + 1px) -1px;
+  -webkit-mask-repeat:no-repeat}
+.rcpt::before,.rcpt::after{content:'';position:absolute;left:0;right:0;height:8px;
+  background:radial-gradient(circle at 6px 8px, transparent 6px, var(--glass-strong) 6.5px);
+  background-size:12px 8px;background-repeat:repeat-x}
+.rcpt::before{top:-1px;transform:rotate(180deg)}
+.rcpt::after{bottom:-7px}
+.rcpt__head{text-align:center;padding-bottom:16px;border-bottom:1px dashed var(--border-strong)}
+.rcpt__brand{font-family:var(--sans);font-weight:800;font-size:14px;letter-spacing:-.01em;color:var(--text-strong);text-transform:uppercase}
+.rcpt__tag{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint);margin-top:6px}
+.rcpt__meta{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.06em;color:var(--text-faint);margin:12px 0 4px}
+.rcpt__cols{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-faint);padding-bottom:8px;border-bottom:1px dashed var(--border)}
+.rcpt__items{list-style:none;margin:0;padding:0}
+.rli{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dotted var(--border)}
+.rli__l{display:flex;align-items:flex-start;gap:9px;min-width:0}
+.rli__n{color:var(--text-faint);font-size:11px;font-variant-numeric:tabular-nums;flex:0 0 auto;padding-top:1px}
+.rli__tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rli__t{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--text);letter-spacing:-.01em;line-height:1.2}
+.rli__d{font-family:var(--sans);font-size:10.5px;font-weight:400;color:var(--text-faint);line-height:1.25;letter-spacing:0}
+.rli__p{flex:0 0 auto;position:relative;font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;letter-spacing:.02em;padding-top:1px;transition:color .4s var(--ease2)}
+.rli__p::after{content:'';position:absolute;left:-2px;right:-2px;top:52%;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.rcpt.is-paid .rli__p{color:var(--text-faint)}
+.rcpt.is-paid .rli__p::after{transform:scaleX(1)}
+.rcpt.is-paid .rli:nth-child(1) .rli__p::after{transition-delay:.02s}
+.rcpt.is-paid .rli:nth-child(2) .rli__p::after{transition-delay:.10s}
+.rcpt.is-paid .rli:nth-child(3) .rli__p::after{transition-delay:.18s}
+.rcpt.is-paid .rli:nth-child(4) .rli__p::after{transition-delay:.26s}
+.rcpt.is-paid .rli:nth-child(5) .rli__p::after{transition-delay:.34s}
+.rcpt.is-paid .rli:nth-child(6) .rli__p::after{transition-delay:.42s}
+.rcpt__sum{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:14px 0 6px;margin-top:2px;border-top:1px dashed var(--border-strong)}
+.rcpt__sumL{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--text-strong);letter-spacing:-.01em}
+.rcpt__sumR{display:flex;align-items:baseline;gap:10px;font-variant-numeric:tabular-nums}
+.rcpt__old{position:relative;font-size:13px;color:var(--text-faint)}
+.rcpt__old::after{content:'';position:absolute;left:-2px;right:-2px;top:52%;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease) .5s}
+.rcpt.is-paid .rcpt__old::after{transform:scaleX(1)}
+.rcpt__new{font-family:var(--sans);font-weight:800;font-size:22px;color:var(--accent);letter-spacing:-.02em;opacity:0;transform:translateY(6px);transition:opacity .5s var(--ease) .66s,transform .5s var(--ease) .66s}
+.rcpt.is-paid .rcpt__new{opacity:1;transform:none}
+.rcpt__foot{text-align:center;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);padding:12px 0 4px}
+.rcpt__barcode{height:30px;margin:6px 0 4px;opacity:.5;
+  background:repeating-linear-gradient(90deg,var(--text-faint) 0 1px,transparent 1px 3px,var(--text-faint) 3px 5px,transparent 5px 6px,var(--text-faint) 6px 8px,transparent 8px 11px)}
+.rcpt__code{text-align:center;font-size:9.5px;letter-spacing:.3em;color:var(--text-faint)}
+.rcpt__stamp{position:absolute;right:22px;top:33%;bottom:auto;width:118px;height:118px;pointer-events:none;
+  transform:rotate(-14deg) scale(1.35);opacity:0;
+  transition:transform .5s var(--ease) .84s,opacity .18s ease .84s}
+.rcpt.is-paid .rcpt__stamp{opacity:.96;transform:rotate(-14deg) scale(1)}
+.rcpt__stampIn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;
+  border:2.5px solid var(--accent);border-radius:50%;color:var(--accent);box-shadow:inset 0 0 0 4px rgba(0,217,126,.14)}
+.rcpt__stampT{font-family:var(--sans);font-weight:900;font-size:16px;letter-spacing:.01em}
+.rcpt__stampP{font-size:8px;letter-spacing:.2em;text-transform:uppercase;margin:4px 0 2px}
+.rcpt__stampV{font-family:var(--sans);font-weight:900;font-size:23px;letter-spacing:-.02em;line-height:1}
+
+/* chipsy — bazowy styl (współdzielony) */
 .chip{padding:11px 18px;border-radius:999px;border:1px solid var(--border-strong);background:var(--glass);font-size:13.5px;font-weight:600;color:var(--text-muted);transition:.25s var(--ease2)}
 .chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,217,126,.05)}
-@media (max-width:720px){.vstack{max-width:none}.vrow{padding:14px 18px}.vrow__t{font-size:14.5px}}
+
+@media (prefers-reduced-motion:reduce){
+  .rli__p::after,.rcpt__old::after,.rcpt__new,.rcpt__stamp{transition:none!important}
+}
+@media (max-width:860px){
+  .freeR{grid-template-columns:1fr;gap:38px}
+  .freeR__copy{order:1;text-align:center}
+  .freeR__receipt{order:2}
+  .freeR__lead,.freeR__note,.freeR__chips{margin-left:auto;margin-right:auto}
+  .freeR__cta .btn{margin:0 auto}
+  .freeR__chipsRow{justify-content:center}
+  .freeR__chipsRow .chip{text-align:center}
+}
+@media (max-width:560px){
+  .rcpt{padding:26px 22px 12px}
+  .rli__t{font-size:12.5px}
+  .rli__d{font-size:10px}
+  .rcpt__stamp{right:12px;top:auto;bottom:16px;width:98px;height:98px}
+  .rcpt__stampT{font-size:14px}.rcpt__stampV{font-size:20px}
+  .freeR__lead{font-size:14px}
+}
 
 /* ============================================================ ACT REKLAMY (marquee) */
 .reklamy{padding-left:0;padding-right:0;overflow:hidden}
@@ -452,16 +745,66 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .ad img{width:100%;height:100%;object-fit:cover;display:block}
 @media (max-width:640px){.ad{width:132px;height:164px}}
 
-/* ============================================================ ACT MARKI (pas przewijajacych sie logo) */
-.marki{padding-left:0;padding-right:0;overflow:hidden}
-.marki .scene__in{padding:0 clamp(20px,5vw,48px)}
-.marki .scene__in:last-child{margin-top:30px}
-.lmq{width:100%;overflow:hidden;margin-top:44px;-webkit-mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
-.lmq__row{display:flex;gap:18px;width:max-content;animation:mqScroll 46s linear infinite;will-change:transform}
-.marki .lmq:hover .lmq__row{animation-play-state:paused}
-.lchip{flex:0 0 auto;width:174px;height:118px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;padding:14px 20px;box-shadow:0 14px 34px -16px rgba(0,0,0,.65)}
-.lchip img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
-@media (max-width:640px){.lchip{width:142px;height:98px;padding:12px 16px}}
+/* ============================================================ ŚCIANA MAREK (wallX) — osobna sekcja z logami */
+.wallX .scene__in{max-width:1120px}
+.wallX__head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.wallX__title{flex:1 1 auto;margin:0}
+.wallX__ital{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--accent);letter-spacing:-.01em}
+.wallX__meta{flex:0 0 auto;display:flex;align-items:center;gap:16px;padding-bottom:6px}
+.wallX__count{display:inline-flex;align-items:baseline;gap:7px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap}
+.wallX__count b{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--accent);font-variant-numeric:tabular-nums}
+.wallX__sep{width:1px;height:22px;background:var(--border-strong)}
+.wallX__metasub{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);white-space:nowrap}
+
+/* hairline rule z mono etykietami na końcach */
+.wallX__rule{display:flex;align-items:center;gap:16px;margin:22px 0 20px}
+.wallX__ruleline{flex:1 1 auto;height:1px;background:linear-gradient(90deg,var(--border),var(--border-strong),var(--border))}
+.wallX__rulelab{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);white-space:nowrap}
+
+/* siatka: karta = biel, minimalny padding → logo dominuje */
+.wallX__grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.wallX__cell{position:relative;border-radius:14px;background:#fff;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;padding:8px 12px;overflow:hidden;box-shadow:0 12px 30px -18px rgba(0,0,0,.7);border:1px solid rgba(0,0,0,.04);transition:transform .5s var(--ease),box-shadow .5s var(--ease),opacity .45s var(--ease)}
+.wallX__cell img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;transition:transform .55s var(--ease)}
+.wallX__cell::after{content:attr(data-idx);position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;color:rgba(0,0,0,.34);opacity:0;transform:translateY(-3px);transition:opacity .4s var(--ease),transform .4s var(--ease);pointer-events:none;font-variant-numeric:tabular-nums}
+.wallX__cell::before{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+
+/* wejście z lekkim staggerem (JS ustawia --i) */
+.wallX__grid.in .wallX__cell{opacity:0;transform:translateY(16px);animation:wallXin .7s var(--ease) forwards;animation-delay:calc(var(--i,0) * 42ms)}
+@keyframes wallXin{to{opacity:1;transform:none}}
+
+/* FOCUS-FOLLOWS-POINTER */
+@media (hover:hover){
+  .wallX__grid:hover .wallX__cell{opacity:.42;transform:scale(.985)}
+  .wallX__grid .wallX__cell:hover{opacity:1;transform:translateY(-4px) scale(1.03);box-shadow:0 22px 48px -20px rgba(0,0,0,.85),0 0 0 1px var(--accent)}
+  .wallX__cell:hover img{transform:scale(1.05)}
+  .wallX__cell:hover::after{opacity:1;transform:none}
+  .wallX__cell:hover::before{transform:scaleX(1)}
+}
+
+.wallX__foot{margin-top:24px;font-family:var(--serif);font-style:italic;font-size:clamp(17px,2.3vw,24px);color:var(--text-muted);line-height:1.35;max-width:52ch;letter-spacing:-.01em}
+.wallX__foot .g{color:var(--accent)}
+
+@media (max-width:860px){
+  .wallX .scene__in{max-width:640px}
+  .wallX__grid{grid-template-columns:repeat(4,1fr);gap:12px}
+  .wallX__head{align-items:flex-start;padding-bottom:20px}
+  .wallX__meta{align-items:center;padding-bottom:0}
+}
+@media (max-width:640px){
+  .wallX__grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .wallX__cell{border-radius:12px;padding:7px 10px}
+  .wallX__rule{gap:10px;margin:18px 0 16px}
+  .wallX__rulelab:last-child{display:none}
+  .wallX__count b{font-size:22px}
+  .wallX__foot{font-size:16px}
+  .wallX__grid:hover .wallX__cell{opacity:1;transform:none}
+}
+@media (max-width:359px){
+  .wallX__grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  .wallX__grid.in .wallX__cell{opacity:1;transform:none;animation:none}
+}
 
 /* ============================================================ ACT 10 FINAL CTA */
 .final{text-align:center}
@@ -499,7 +842,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <nav class="nav" id="nav">
     <div class="nav__in">
         <a class="nav__brand" href="/home/" aria-label="tomekniedzwiecki.pl — e-sklep">
-            <img class="nav__logo" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" onerror="this.src='/img/logo/tn-logo-icon-88.png'">
+            <img class="nav__logo nav__logo--full" src="/img/logo/tn-logo-white-88.png" alt="tomekniedzwiecki.pl" onerror="this.src='/img/logo/tn-logo-icon-88.png'">
+            <img class="nav__logo nav__logo--icon" src="/img/logo/tn-logo-icon-88.png" alt="tomekniedzwiecki.pl" aria-hidden="true">
             <span class="nav__suffix">e-sklep.</span>
         </a>
         <a class="nav__cta" href="/sklep/" data-cta data-loc="nav">Zacznij za darmo <span>→</span></a>
@@ -511,18 +855,43 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
 <main id="main">
 
-<!-- ACT 01 — HERO -->
-<section class="scene hero" id="act-1" data-rail="Wstęp">
+<!-- ACT 01 — HERO / kinetyczny masthead -->
+<section class="scene hero heroX" id="act-1" data-rail="Wstęp">
     <div class="scene__in">
-        <div class="author" data-reveal>
-            <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="38" height="38">
-            <div><b>Tomek Niedźwiecki</b><span>Buduję e-biznesy od 15 lat</span></div>
+        <div class="heroX__grid">
+            <div class="heroX__lead">
+                <div class="author heroX__author" data-reveal>
+                    <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="38" height="38" loading="eager" decoding="async">
+                    <div><b>Tomek Niedźwiecki</b><span>Twój wspólnik, nie wykonawca</span></div>
+                </div>
+                <h1 class="heroX__h1">
+                    <span class="heroX__line" data-reveal data-delay="120"><span class="heroX__mask"><span class="heroX__word">Zbuduję</span> <span class="heroX__word heroX__ci">Ci</span></span></span>
+                    <span class="heroX__line heroX__line--accent" data-reveal data-delay="240"><span class="heroX__mask"><span class="heroX__word g">e&#8209;sklep.</span></span><span class="heroX__caret" aria-hidden="true"></span></span>
+                    <span class="heroX__line heroX__line--coda" data-reveal data-delay="380"><span class="heroX__mask"><span class="heroX__word">Osobiście.</span></span></span>
+                </h1>
+                <p class="heroX__sub" data-reveal data-delay="520">Buduję. Uczę. <span class="g">Oddaję stery, kiedy działa.</span></p>
+                <div class="heroX__cta" data-reveal data-delay="620">
+                    <a class="btn btn--xl heroX__btn" href="/sklep/" data-cta data-loc="hero">Zobacz swój sklep za darmo <span class="heroX__arr" aria-hidden="true">→</span></a>
+                    <span class="heroX__note">Bez karty. 10 minut rozmowy.</span>
+                </div>
+            </div>
+            <aside class="heroX__cred" data-reveal data-delay="700" aria-label="Dorobek">
+                <div class="heroX__stat">
+                    <span class="heroX__num">15</span>
+                    <span class="heroX__lab">lat w e-biznesie</span>
+                </div>
+                <div class="heroX__stat heroX__stat--hi">
+                    <span class="heroX__num">70<i>mln zł</i></span>
+                    <span class="heroX__lab">przez trzy firmy</span>
+                </div>
+                <div class="heroX__stat">
+                    <span class="heroX__num">3</span>
+                    <span class="heroX__lab">firmy od zera</span>
+                </div>
+            </aside>
         </div>
-        <h1 data-reveal data-delay="80">Zbuduję <span class="ci">Ci</span> <span class="g">e-sklep.</span><span class="coda">Osobiście.</span></h1>
-        <p class="hero__sub" data-reveal data-delay="200">Buduję. Uczę. <span class="g">Oddaję stery, kiedy działa.</span></p>
-        <div class="hero__cred" data-reveal data-delay="320"><b>15 lat w e-biznesie</b><b><span class="g">70 mln zł</span></b><b>3 firmy od zera</b></div>
     </div>
-    <div class="hero__scroll"><span>scroll</span><span class="a"></span></div>
+    <div class="heroX__scroll" aria-hidden="true"><span>scroll</span><span class="a"></span></div>
 </section>
 
 <!-- ACT 02 — PROBLEM -->
@@ -542,50 +911,129 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- ACT 03 — MODEL -->
 <section class="scene" id="act-3" data-rail="Model">
     <div class="scene__in">
-        <span class="eyebrow" data-reveal>Wspólny biznes, nie zlecenie</span>
-        <h2 class="h-sec" data-reveal data-delay="60">Ja buduję i rozkręcam.<br>Ty przejmujesz stery.</h2>
-        <div class="roles">
-            <div class="role" data-reveal data-delay="140">
-                <div class="role__lab">Ty wnosisz</div>
-                <h3>Pomysł i gotowość</h3>
-                <ul>
-                    <li>Pomysł albo zwykłą chęć — na start nie musisz znać się na e-commerce, reklamach ani technologii.</li>
-                    <li>Uczysz się ode mnie: zadajesz pytania, jesteśmy w stałym kontakcie.</li>
-                    <li>Kilka godzin tygodniowo na naukę i wspólne decyzje.</li>
-                    <li>Cel: za <b>około 6 miesięcy</b> przejmujesz prowadzenie biznesu.</li>
-                </ul>
-                <div class="role__note">Wchodzisz, żeby się nauczyć i przejąć stery — nie po to, by stać z boku.</div>
-            </div>
-            <div class="role role--me" data-reveal data-delay="220">
-                <div class="role__lab">Tomek wnosi</div>
-                <h3>Budowę i sprzedaż</h3>
-                <ul>
-                    <li>Budowę całego sklepu z zespołem — pod klucz.</li>
-                    <li>Sprzedaż i reklamy do pierwszych <b>1000 zamówień</b>.</li>
-                    <li>Pół roku skalowania i szkolenia Ciebie.</li>
-                    <li><b>15 lat</b> doświadczenia i <b>70 mln zł</b> na koncie.</li>
-                </ul>
-                <div class="role__note">Prowadzę do czasu, aż przejmiesz stery — a potem zostaję wspólnikiem-doradcą. <b>Zarabiam dopiero, gdy Ty zarabiasz.</b></div>
-            </div>
-        </div>
+<div class="mdlX">
+  <span class="eyebrow" data-reveal>Wspólny biznes, nie zlecenie</span>
+  <h2 class="h-sec mdlX__head" data-reveal data-delay="60">Ja rozkręcam. <span class="g">Ty przejmujesz stery.</span></h2>
+  <p class="mdlX__sub" data-reveal data-delay="120">Nie zlecasz roboty i nie znikasz. Przez pół roku oddaję Ci ster — kawałek po kawałku.</p>
+
+  <div class="mdlX__rig" data-reveal data-delay="180">
+    <div class="mdlX__ends" aria-hidden="true">
+      <span class="mdlX__end mdlX__end--me">Tomek <span class="mdlX__endrole">wnoszę</span></span>
+      <span class="mdlX__end mdlX__end--you">Ty <span class="mdlX__endrole">wnosisz</span></span>
+    </div>
+
+    <div class="mdlX__lanes">
+      <div class="mdlX__lane mdlX__lane--me">
+        <span class="mdlX__fill"></span>
+        <span class="mdlX__lbl">
+          <span class="mdlX__lname">Tomek</span>
+          <span class="mdlX__pts">
+            <span class="mdlX__pt"><i class="mdlX__k">01</i>Sklep pod klucz</span>
+            <span class="mdlX__pt"><i class="mdlX__k">02</i>Reklamy do 1000 zamówień</span>
+            <span class="mdlX__pt"><i class="mdlX__k">03</i>Pół roku skalowania i szkoleń</span>
+          </span>
+        </span>
+      </div>
+
+      <div class="mdlX__lane mdlX__lane--you">
+        <span class="mdlX__fill"></span>
+        <span class="mdlX__lbl">
+          <span class="mdlX__lname">Ty</span>
+          <span class="mdlX__pts">
+            <span class="mdlX__pt"><i class="mdlX__k">01</i>Pomysł albo chęć</span>
+            <span class="mdlX__pt"><i class="mdlX__k">02</i>Kilka godzin w tygodniu</span>
+            <span class="mdlX__pt"><i class="mdlX__k">03</i>Zero doświadczenia na start</span>
+          </span>
+        </span>
+      </div>
+
+      <div class="mdlX__hand" aria-hidden="true"></div>
+      <div class="mdlX__handlab" aria-hidden="true">~6 mies. · przejęcie steru</div>
+    </div>
+
+    <div class="mdlX__axis" aria-hidden="true">
+      <div class="mdlX__axisbar"></div>
+      <div class="mdlX__ticks">
+        <span class="mdlX__tick">Start</span>
+        <span class="mdlX__tick">Mies. 2</span>
+        <span class="mdlX__tick">Mies. 4</span>
+        <span class="mdlX__tick mdlX__tick--key">Twoje stery</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mdlX__punch" data-reveal data-delay="260">
+    <p class="mdlX__punchtxt">Potem zostaję <span class="g">wspólnikiem</span>. Zarabiam dopiero, <span class="g">gdy Ty zarabiasz.</span></p>
+    <span class="mdlX__seal">15 lat · <b>70 mln zł</b></span>
+  </div>
+</div>
     </div>
 </section>
 
 <!-- ACT — DROGA / OD STARTU DO STERÓW (lekka) -->
 <section class="scene journey-sec" id="act-journey" data-rail="Droga">
     <div class="scene__in">
-        <span class="eyebrow" data-reveal>Wspólny biznes, krok po kroku</span>
-        <h2 class="h-sec" data-reveal data-delay="60">Od startu <span class="g">do Twoich sterów.</span></h2>
-        <div class="path" data-reveal data-delay="140">
-            <div class="path__s"><span class="path__n">01</span><span class="path__t">Rozkręcam biznes</span></div>
-            <span class="path__arr">→</span>
-            <div class="path__s"><span class="path__n">02</span><span class="path__t">Wdrażam Cię w prowadzenie</span></div>
-            <span class="path__arr">→</span>
-            <div class="path__s path__s--key"><span class="path__n">03</span><span class="path__t">Przekazuję Ci stery</span></div>
-            <span class="path__arr">→</span>
-            <div class="path__s"><span class="path__n">04</span><span class="path__t">Zostaję wspólnikiem</span></div>
-        </div>
-        <p class="path__foot" data-reveal data-delay="220">Zarabiam dopiero, gdy Ty zarabiasz — dlatego <span class="g">gram o Twój wynik</span>, nie o fakturę.</p>
+<div class="drw__head">
+  <span class="eyebrow" data-reveal>Wspólny biznes, krok po kroku</span>
+  <h2 class="h-sec" data-reveal data-delay="60">Od startu <span class="g">do Twoich sterów.</span></h2>
+  <p class="drw__lead" data-reveal data-delay="120">Cztery etapy — od pustej strony do momentu, w którym prowadzisz to sam.</p>
+</div>
+
+<div class="drw__track" id="drw-track" data-reveal data-delay="180">
+  <div class="drw__step">
+    <div class="drw__rail"><span class="drw__node">01</span></div>
+    <div class="drw__body">
+      <div class="drw__metaRow">
+        <span class="drw__meta">Ja · miesiące 1–2</span>
+        <span class="drw__ster"><i>Stery</i> Tomek 100%</span>
+      </div>
+      <h3 class="drw__t">Rozkręcam biznes</h3>
+      <p class="drw__d">Buduję sklep pod klucz, dobieram produkt i uruchamiam sprzedaż. Ty patrzysz, jak to się robi.</p>
+    </div>
+  </div>
+
+  <div class="drw__step">
+    <div class="drw__rail"><span class="drw__node">02</span></div>
+    <div class="drw__body">
+      <div class="drw__metaRow">
+        <span class="drw__meta">My · miesiące 2–5</span>
+        <span class="drw__ster"><i>Stery</i> 65 / 35</span>
+      </div>
+      <h3 class="drw__t">Wdrażam Cię w prowadzenie</h3>
+      <p class="drw__d">Uczę Cię reklam, obsługi i decyzji na żywym biznesie — stały kontakt, realne liczby.</p>
+    </div>
+  </div>
+
+  <div class="drw__step drw__step--key">
+    <div class="drw__rail"><span class="drw__node">03</span></div>
+    <div class="drw__body">
+      <span class="drw__tag">Kulminacja</span>
+      <div class="drw__metaRow">
+        <span class="drw__meta">Ty · około 6. miesiąc</span>
+        <span class="drw__ster drw__ster--you"><i>Stery</i> Ty 80%</span>
+      </div>
+      <h3 class="drw__t">Przekazuję Ci stery</h3>
+      <p class="drw__d">Bierzesz prowadzenie działającego, zarabiającego sklepu. Od teraz to Twój biznes i Twoje decyzje.</p>
+      <span class="drw__note">To był cel od pierwszego dnia</span>
+    </div>
+  </div>
+
+  <div class="drw__step">
+    <div class="drw__rail"><span class="drw__node">04</span></div>
+    <div class="drw__body">
+      <div class="drw__metaRow">
+        <span class="drw__meta">Ja · bezterminowo</span>
+        <span class="drw__ster drw__ster--you"><i>Stery</i> Ty 90%</span>
+      </div>
+      <h3 class="drw__t">Zostaję wspólnikiem</h3>
+      <p class="drw__d">Nie znikam po przekazaniu. Zostaję na pokładzie i mam udział w wynikach — dalej gramy do jednej bramki.</p>
+    </div>
+  </div>
+</div>
+
+<div class="drw__foot" data-reveal data-delay="240">
+  <p class="drw__q">Zarabiam dopiero, gdy Ty zarabiasz — dlatego gram o <span class="g">Twój wynik</span>, nie o fakturę.</p>
+</div>
     </div>
 </section>
 
@@ -621,13 +1069,39 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     </div>
 </section>
 
+<!-- ACT — ŚCIANA MAREK (osobna sekcja z logami; dowód po 70 mln, przed makietami) -->
+<section class="scene wallX" id="act-marki" data-rail="Marki">
+    <div class="scene__in">
+        <span class="eyebrow" data-reveal>Dowód, nie deklaracja</span>
+
+        <div class="wallX__head" data-reveal data-delay="60">
+          <h2 class="h-sec wallX__title">Marki, które powstały<br><span class="wallX__ital">w jednej rozmowie.</span></h2>
+          <div class="wallX__meta">
+            <span class="wallX__count"><b id="wallX-n">13</b> marek</span>
+            <span class="wallX__sep"></span>
+            <span class="wallX__metasub">nazwa · logo · sklep — od zera</span>
+          </div>
+        </div>
+
+        <div class="wallX__rule" data-reveal data-delay="120">
+          <span class="wallX__rulelab">Stworzone na żywo</span>
+          <span class="wallX__ruleline"></span>
+          <span class="wallX__rulelab">Bez briefu, bez agencji</span>
+        </div>
+
+        <div class="wallX__grid" id="wallX-grid" data-reveal data-delay="160" aria-label="Loga marek stworzonych w rozmowach"></div>
+
+        <p class="wallX__foot" data-reveal data-delay="220">Każde z tych logo zobaczysz u siebie w <span class="g">10 minut</span> — zanim cokolwiek zdecydujesz.</p>
+    </div>
+</section>
+
 <!-- ACT 07 — MAKIETY (sklepy — dowód zaraz po liczbie 70 mln) -->
 <section class="scene scene--wide" id="act-7" data-rail="Sklepy">
     <div class="scene__in">
         <div class="mk-head">
             <div>
                 <span class="eyebrow" data-reveal>To nie są przykłady z internetu</span>
-                <h2 class="h-sec" data-reveal data-delay="60">Tak wygląda Twój sklep —<br><span class="g">zanim zapłacisz złotówkę.</span></h2>
+                <h2 class="h-sec" data-reveal data-delay="60">Tak wygląda Twój sklep<br><span class="g">— zanim zapłacisz złotówkę.</span></h2>
             </div>
             <div class="mk-nav" data-reveal data-delay="120">
                 <button class="mk-arrow" id="mk-prev" aria-label="Poprzedni">‹</button>
@@ -695,30 +1169,70 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- ACT 08 — ZA DARMO (+ logo marek) -->
 <section class="scene free" id="act-8" data-rail="Za darmo">
     <div class="scene__in">
-        <span class="eyebrow" data-reveal>Zanim cokolwiek zdecydujesz</span>
-        <h2 class="h-sec" data-reveal data-delay="60">Wszystko, co widziałeś —<br><span class="g">w 10 minut, za darmo.</span></h2>
-        <div class="vstack" data-reveal data-delay="120">
-            <div class="vrow"><span class="vrow__ck">✓</span><span class="vrow__t">Analiza rynku Twojego produktu</span></div>
-            <div class="vrow"><span class="vrow__ck">✓</span><span class="vrow__t">Marka i logo</span></div>
-            <div class="vrow"><span class="vrow__ck">✓</span><span class="vrow__t">Makiety Twojego sklepu</span></div>
-            <div class="vrow"><span class="vrow__ck">✓</span><span class="vrow__t">Gotowe reklamy pod kampanię</span></div>
-            <div class="vrow"><span class="vrow__ck">✓</span><span class="vrow__t">Podgląd działającego sklepu</span></div>
-            <div class="vrow"><span class="vrow__ck">✓</span><span class="vrow__t">Wstępny biznesplan</span></div>
-            <div class="vrow vrow--sum"><span class="vrow__t">Razem, na start</span><span class="vrow__v"><s>kilka tys. zł</s> <b class="g">0 zł</b></span></div>
-        </div>
-        <div class="free__logos" data-reveal data-delay="160">
-            <p class="free__logos-lab">Marki, które już stworzyliśmy w rozmowach:</p>
-            <div class="lmq"><div class="lmq__row" id="logos-row"></div></div>
-        </div>
-        <div class="free__cta" data-reveal data-delay="160">
-            <a class="btn btn--xl" href="/sklep/" data-cta data-loc="free">Zacznij za darmo <span class="ar">→</span></a>
-            <p class="free__note"><b>Bez karty. Bez zobowiązań.</b> Agencja policzy za to kilka tysięcy — u mnie 0 zł, żebyś zobaczył jakość.</p>
-            <div class="chips">
-                <button class="chip" data-choice="Mam już produkt do sprzedania">Mam już produkt</button>
-                <button class="chip" data-choice="Mam pomysł na produkt">Mam pomysł</button>
-                <button class="chip" data-choice="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
-            </div>
-        </div>
+<div class="freeR">
+  <div class="freeR__copy">
+    <span class="eyebrow" data-reveal>Zanim cokolwiek zdecydujesz</span>
+    <h2 class="h-sec freeR__h" data-reveal data-delay="60">Wszystko, co widziałeś<br><span class="g">— w 10 minut, za darmo.</span></h2>
+    <p class="freeR__lead" data-reveal data-delay="140">To, co zwykle wyceniają na kilka tysięcy, dostajesz na start bez złotówki — żebyś zobaczył jakość, zanim cokolwiek zapłacisz.</p>
+    <div class="freeR__cta" data-reveal data-delay="220">
+      <a class="btn btn--xl" href="/sklep/" data-cta data-loc="free">Zacznij za darmo <span class="ar">→</span></a>
+      <p class="freeR__note"><b>Bez karty. Bez zobowiązań.</b> Płacisz dopiero, gdy zarabiasz.</p>
+    </div>
+    <div class="freeR__chips" data-reveal data-delay="300">
+      <span class="freeR__chipsLab">Od czego zaczynamy?</span>
+      <div class="freeR__chipsRow">
+        <button class="chip" data-choice="Mam już produkt do sprzedania">Mam już produkt</button>
+        <button class="chip" data-choice="Mam pomysł na produkt">Mam pomysł</button>
+        <button class="chip" data-choice="Nie mam pomysłu — poszukajmy razem">Nie mam pomysłu — poszukajmy razem</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="freeR__receipt" data-reveal data-delay="160">
+    <div class="rcpt" id="freeRcpt" aria-label="Pakiet startowy — wycena rynkowa vs 0 zł">
+      <div class="rcpt__head">
+        <div class="rcpt__brand">Tomek Niedźwiecki</div>
+        <div class="rcpt__tag">Zbuduję Ci e-sklep · osobiście</div>
+      </div>
+      <div class="rcpt__meta"><span>PAKIET STARTOWY</span><span>NR 0000/DARMO</span></div>
+      <div class="rcpt__cols"><span>Pozycja</span><span>Wycena</span></div>
+      <ul class="rcpt__items">
+        <li class="rli">
+          <span class="rli__l"><span class="rli__n">01</span><span class="rli__tx"><span class="rli__t">Analiza rynku Twojego produktu</span><span class="rli__d">Czy jest popyt i za ile realnie sprzedasz.</span></span></span>
+          <span class="rli__p">890 zł</span>
+        </li>
+        <li class="rli">
+          <span class="rli__l"><span class="rli__n">02</span><span class="rli__tx"><span class="rli__t">Marka i logo</span><span class="rli__d">Nazwa, logo, kolory — gotowa tożsamość.</span></span></span>
+          <span class="rli__p">690 zł</span>
+        </li>
+        <li class="rli">
+          <span class="rli__l"><span class="rli__n">03</span><span class="rli__tx"><span class="rli__t">Makiety Twojego sklepu</span><span class="rli__d">Jak sklep wygląda — strona po stronie.</span></span></span>
+          <span class="rli__p">1&nbsp;200 zł</span>
+        </li>
+        <li class="rli">
+          <span class="rli__l"><span class="rli__n">04</span><span class="rli__tx"><span class="rli__t">Gotowe reklamy pod kampanię</span><span class="rli__d">Grafiki i teksty gotowe do startu.</span></span></span>
+          <span class="rli__p">790 zł</span>
+        </li>
+        <li class="rli">
+          <span class="rli__l"><span class="rli__n">05</span><span class="rli__tx"><span class="rli__t">Podgląd działającego sklepu</span><span class="rli__d">Klikalny sklep na żywo, nie obrazek.</span></span></span>
+          <span class="rli__p">1&nbsp;500 zł</span>
+        </li>
+        <li class="rli">
+          <span class="rli__l"><span class="rli__n">06</span><span class="rli__tx"><span class="rli__t">Wstępny biznesplan</span><span class="rli__d">Koszt startu, marża, próg zysku.</span></span></span>
+          <span class="rli__p">490 zł</span>
+        </li>
+      </ul>
+      <div class="rcpt__sum">
+        <span class="rcpt__sumL">Razem, na start</span>
+        <span class="rcpt__sumR"><span class="rcpt__old">kilka tys. zł</span><span class="rcpt__new">0 zł</span></span>
+      </div>
+      <div class="rcpt__foot">Dziękuję. Płacisz dopiero, gdy zarabiasz.</div>
+      <div class="rcpt__barcode" aria-hidden="true"></div>
+      <div class="rcpt__code">* 0 0 0 0 · D A R M O *</div>
+      <div class="rcpt__stamp" aria-hidden="true"><span class="rcpt__stampIn"><span class="rcpt__stampT">ZA DARMO</span><span class="rcpt__stampP">do zapłaty</span><span class="rcpt__stampV">0 zł</span></span></div>
+    </div>
+  </div>
+</div>
     </div>
 </section>
 
@@ -914,11 +1428,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     function closeLB(){ lb.classList.remove('is-on'); document.body.style.overflow=''; }
     if(lb){ $('#lb-x').addEventListener('click',closeLB); lb.addEventListener('click',function(e){ if(e.target===lb) closeLB(); }); document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeLB(); }); }
 
-    /* ---------- REKLAMY (marquee) + MARKI (ściana logo) ---------- */
+    /* ---------- REKLAMY (marquee) ---------- */
     (function(){
         var V='?v=2';  // cache-bust: pliki nadpisane pod tymi samymi nazwami, a vercel.json wymusza immutable
         var REKLAMY=[]; for(var i=1;i<=20;i++) REKLAMY.push('/img/reklamy/reklama-'+('0'+i).slice(-2)+'.webp'+V);
-        var MARKI=[]; for(var j=1;j<=13;j++) MARKI.push('/img/marki/marka-'+('0'+j).slice(-2)+'.webp'+V);
         function ad(src){ return '<div class="ad"><img src="'+src+'" alt="Reklama" decoding="async"></div>'; }
         var r1=$('#mq-row1'), r2=$('#mq-row2');
         if(r1&&r2){
@@ -926,8 +1439,65 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             var a=REKLAMY.slice(0,half).map(ad).join(''); var b=REKLAMY.slice(half).map(ad).join('');
             r1.innerHTML=a+a; r2.innerHTML=b+b;   // duplikat = bezszwowa pętla translateX(-50%)
         }
-        var bg=$('#logos-row');
-        if(bg){ var lh=MARKI.map(function(src){ return '<div class="lchip"><img src="'+src+'" alt="Logo marki"></div>'; }).join(''); bg.innerHTML=lh+lh; }
+    })();
+
+    /* ---------- ŚCIANA MAREK (wallX) — statyczna siatka logo ---------- */
+    (function(){
+        var grid = $('#wallX-grid');
+        if(!grid) return;
+        var V = '?v=2'; // cache-bust: pliki nadpisane pod tymi samymi nazwami, vercel.json wymusza immutable
+        var N = 13;
+        var nEl = $('#wallX-n'); if(nEl) nEl.textContent = N;
+        var html = '';
+        for(var j=1;j<=N;j++){
+            var n = ('0'+j).slice(-2);
+            html += '<div class="wallX__cell" style="--i:'+(j-1)+'" data-idx="'+n+'">'
+                 +  '<img src="/img/marki/marka-'+n+'.webp'+V+'" alt="Logo marki stworzonej w rozmowie" loading="lazy" decoding="async" width="240" height="150">'
+                 +  '</div>';
+        }
+        grid.innerHTML = html;
+        if(RM){
+            var cells = grid.querySelectorAll('.wallX__cell');
+            for(var k=0;k<cells.length;k++){ cells[k].style.opacity='1'; cells[k].style.transform='none'; cells[k].style.animation='none'; }
+        }
+    })();
+
+    /* ---------- DROGA — sekwencyjne zapalanie kroków + rysowanie linii (drw) ---------- */
+    (function(){
+        var track = document.getElementById('drw-track'); if(!track) return;
+        var steps = $$('.drw__step', track);
+        if(!steps.length) return;
+        if(RM){ steps.forEach(function(s){ s.classList.add('is-on'); }); return; }
+        var fired = false;
+        var obs = new IntersectionObserver(function(en){
+            en.forEach(function(e){
+                if(e.isIntersecting && !fired){
+                    fired = true;
+                    steps.forEach(function(s,i){
+                        var key = s.classList.contains('drw__step--key');
+                        setTimeout(function(){ s.classList.add('is-on'); }, 300 + 340*i + (key?40:0));
+                    });
+                    obs.disconnect();
+                }
+            });
+        }, {threshold:.3});
+        obs.observe(track);
+    })();
+
+    /* ---------- ZA DARMO — paragon: „ostemplowanie" (freeR) ---------- */
+    (function(){
+        var freeRcpt = document.getElementById('freeRcpt');
+        if(!freeRcpt) return;
+        if(RM){ freeRcpt.classList.add('is-paid'); return; }
+        var rcptObs = new IntersectionObserver(function(ents){
+            ents.forEach(function(e){
+                if(e.isIntersecting){
+                    setTimeout(function(){ freeRcpt.classList.add('is-paid'); }, 520);
+                    rcptObs.unobserve(e.target);
+                }
+            });
+        }, {threshold:.4});
+        rcptObs.observe(freeRcpt);
     })();
 
     /* ---------- CTA HANDOFF ---------- */
