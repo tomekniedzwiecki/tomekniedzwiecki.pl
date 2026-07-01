@@ -6496,10 +6496,16 @@
     function resetPipelineForPivot() {
         state.raport = null; state.ustalenia = null; state.mockups = null; state.mockupUrl = null;
         state.suiteAds = null; state.landingHtml = null; state.chosenStyle = null; state.verdict = null;
+        // Marka jest zależna od produktu → przy zmianie produktu resetuj (inaczej makieta-card
+        // wisiała na starym brandDone=true i nie odsłaniała się dla nowego produktu — bug pętli).
+        // budgetDeclared ZOSTAJE (to gotowość osoby, nie produktu).
+        state.brand = null; state.brandDone = false; _brandNameRetries = 0;
+        state._raportLinkShown = false; state._mockPending = false;
         extras.raport = 'idle'; extras.mockups = 'idle'; extras.ads = 'idle'; extras.landingTab = 'idle';
         mockups4Gen = false; adsGen = false; landingGen = false;
         landingRevealed = false; landingBuildStart = 0; if (landingBuildTimer) { clearInterval(landingBuildTimer); landingBuildTimer = null; }
-        ['rk-chat-card', 'zl-card', 'raport-ready', 'genfail-raport', 'genfail-makiety', 'genfail-reklamy', 'genfail-sklep'].forEach(function (id) { var e = el(id); if (e) e.remove(); });
+        ['rk-chat-card', 'zl-card', 'raport-ready', 'genfail-raport', 'genfail-makiety', 'genfail-reklamy', 'genfail-sklep',
+         'brand-card', 'mk-chat-card', 'us-chat-card', 'ad-chat-card', 'ln-chat-card', 'bud-widget'].forEach(function (id) { var e = el(id); if (e) e.remove(); });
         if (typeof updateBudNav === 'function') updateBudNav();
         if (typeof updateSideBadges === 'function') updateSideBadges();
         if (sbAuth && state.sessionId) {
@@ -10986,6 +10992,7 @@
 
     // Marker <ustalenia> z tury AI — ustalenia domknięte, ruszamy makiety.
     function onUstaleniaDone() {
+        clearWidget();   // awans etapu → zdejmij ewentualny wiszący widżet z fazy ustaleń
         // B5: karta w czacie — ustalenia to jedyny etap bez karty kierunkującej; odeślij do zakładki
         genCardReadyInChat('us-chat-card', 'Ustalenia gotowe — wiemy, dla kogo to i jak', 'ustalenia', 'Zobacz ustalenia →');
         if (activeTab !== 'makiety' && !budSeenTabs.makiety) budNewTabs.makiety = true;
@@ -12309,9 +12316,11 @@
     function removeChips() {
         var c = el('qr-chips');
         if (c) c.remove();
-        var w = el('bud-widget');
-        if (w) w.remove();
+        // UWAGA: bud-widget (suwak/ranking/wybór) NIE jest tu kasowany — pisanie pytania nie może
+        // niszczyć aktywnego pickera (req Tomka: trzymaj kierunek). Widżet usuwamy JAWNIE: renderWidget
+        // (dedup), widgetSend (po użyciu), clearWidget (awans etapu).
     }
+    function clearWidget() { var w = el('bud-widget'); if (w) w.remove(); }
     // L1: karuzela to powierzchnia wyboru produktu — pokaż ją, gdy user PISZE w openerze
     // (zamiast klikać „ZACZYNAMY"), żeby AI nie odsyłał do karuzeli/„Rozważam", której nie ma.
     function ensureCarousel() {
@@ -14136,6 +14145,7 @@
         chipStreak++;
         maybeNudgeComposer();
         removeChips();
+        clearWidget();   // widżet użyty → usuń (removeChips już go nie rusza)
         sendOpening(text);
     }
 
@@ -14148,6 +14158,7 @@
 
     function renderWidget(w) {
         removeChips();
+        clearWidget();   // dedup: usuń poprzedni widżet (removeChips już go nie rusza)
         var div = document.createElement('div');
         div.className = 'widget';
         div.id = 'bud-widget';
@@ -14705,15 +14716,30 @@
                 if (suggIsShopEdit(sugg.opts) && !state.landingHtml && state.mockups && state.mockups.length) { pendingShopSugg = sugg; }
                 else if (parseDopytanie(raw)) { setTimeout(function () { renderSuggestions(sugg.opts, sugg.multi); }, 720); }   // chipy PO osobnym dymku <dopytanie>
                 else renderSuggestions(sugg.opts, sugg.multi);
-            } else if (!el('inline-gate') && !el('qr-chips') && !el('budget-gate') && !el('phone-ask') && !el('brand-card') && verdict !== 'zielony' && !gatePending()) {
+            } else if (!el('inline-gate') && !el('qr-chips') && !el('budget-gate') && !el('phone-ask') && !el('brand-card') && !el('bud-widget') && verdict !== 'zielony' && !gatePending()) {
                 // SIATKA BEZPIECZEŃSTWA: tura skończona, mózg nie dał ani <opcje>, ani widżetu/kierunków,
                 // nie ma otwartej bramki ani werdyktu → user zostałby bez podpowiedzi. Dajemy domyślne,
                 // żeby zawsze wiedział, co i jak odpowiedzieć (req Tomka). Idempotentne — renderSuggestions
                 // sam czyści poprzednie chipy, a guard !qr-chips chroni przed dublem.
                 renderSuggestions(defaultSuggestions(), false);
             }
+            // req Tomka: gdy user PISZE pytanie zamiast klikać, bieżąca akcja (bramka budżetu /
+            // wybór nazwy marki) mogła „zginąć" wyżej w scrollu, a pipeline stoi na niej. Po każdej
+            // turze przesuń tę akcję na SAM DÓŁ — zawsze widoczna jako następny krok. Nigdy nie zostawia
+            // usera zablokowanego (trzymanie kierunku). Idempotentne (tylko przenosi istniejący element).
+            keepPendingStepAtBottom();
             updateStages();
             scrollToBottom(false);
+        });
+    }
+
+    // Trzyma otwartą bramkę/picker (blokujący następny krok) jako OSTATNI element rozmowy —
+    // żeby po dygresji user od razu widział, co ma zrobić, i pipeline nie „stał" niewidocznie.
+    function keepPendingStepAtBottom() {
+        var host = el('chat-msgs'); if (!host) return;
+        ['bud-widget', 'budget-gate', 'budget-softexit', 'brand-card', 'mk-chat-card'].forEach(function (id) {
+            var e = el(id);
+            if (e && e.parentNode === host) host.appendChild(e);   // appendChild przenosi na koniec
         });
     }
 
