@@ -287,7 +287,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .wrow:hover .wrow__n{-webkit-text-stroke-color:var(--red);color:rgba(255,75,62,.09)}
 .wrow.lit .wrow__n{-webkit-text-stroke-color:var(--red);color:rgba(255,75,62,.18);filter:drop-shadow(0 0 22px rgba(255,75,62,.28))}
 .wrow__t{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.025em;color:var(--text-strong);margin-bottom:7px}
-.wrow__d{font-size:15.5px;color:var(--text-muted);line-height:1.55;max-width:56ch}
+.wrow__d{font-size:15.5px;color:var(--text-muted);line-height:1.55}
 .wrow__d b{color:var(--text)}
 .punch{margin:54px auto 0;text-align:center;font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.6vw,40px);line-height:1.25;color:var(--text);max-width:min(980px,94vw);text-wrap:balance}
 @media (max-width:600px){.punch{max-width:24ch}}
@@ -481,33 +481,38 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .lb img{max-width:min(440px,92vw);width:100%;border-radius:14px;border:1px solid var(--border-strong)}
 .lb__x{position:fixed;top:18px;right:20px;width:44px;height:44px;border-radius:50%;background:var(--glass);border:1px solid var(--border-strong);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center}
 
-/* ===== ACT — DOMKNIĘCIE / finał (close2) — inspiracja /zwolnie ===== */
+/* ===== ACT — DOMKNIĘCIE / finał (close2) — mega proste, wzór /zwolnie ===== */
 .close2{position:relative;overflow:hidden}
-.close2__head{margin:0;font-weight:400}
-.close2__intro{display:block;margin-top:clamp(14px,2vw,22px);font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.4vw,40px);color:var(--text-muted);line-height:1.22;letter-spacing:-.01em;max-width:22ch}
-.close2__giant{display:block;font-family:var(--sans);font-weight:900;font-size:clamp(76px,13vw,180px);line-height:.9;letter-spacing:-.055em;color:var(--text-strong);margin-top:.04em}
-.close2__giant .g{color:var(--accent);text-shadow:0 0 90px rgba(0,217,126,.35)}
-.close2__lead{margin-top:clamp(20px,2.8vw,32px);font-family:var(--serif);font-style:italic;font-size:clamp(19px,2.6vw,30px);color:var(--text-muted);line-height:1.3;max-width:40ch}
-.close2__lead b{color:var(--text-strong);font-weight:600;font-style:italic}
-.close2__steps{list-style:none;counter-reset:c;display:flex;flex-direction:column;gap:14px;margin-top:clamp(26px,3.2vw,40px);max-width:620px;padding:0}
-.close2__steps li{position:relative;padding-left:46px;font-size:clamp(15px,1.9vw,18px);color:var(--text-muted);line-height:1.4}
-.close2__steps li b{color:var(--text-strong);font-weight:700}
-.close2__steps li::before{counter-increment:c;content:counter(c,decimal-leading-zero);position:absolute;left:0;top:-.05em;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);border:1px solid rgba(0,217,126,.4);border-radius:50%;font-variant-numeric:tabular-nums}
-/* CTA finałowy — duży zielony przycisk z animowaną strzałką (wzór /zwolnie) */
-.close2__cta{margin-top:clamp(34px,4vw,52px);display:flex;align-items:center;gap:22px;flex-wrap:wrap}
-.close2__btn{display:inline-flex;align-items:center;gap:clamp(14px,1.8vw,24px);padding:clamp(17px,2vw,24px) clamp(28px,3.4vw,46px);background:var(--accent-soft);color:var(--text-strong);font-family:var(--sans);font-weight:800;font-size:clamp(19px,2.4vw,30px);letter-spacing:-.025em;line-height:1;border:1px solid rgba(0,217,126,.4);border-radius:999px;transition:gap .4s var(--ease),background .35s var(--ease),border-color .35s var(--ease),color .3s var(--ease),box-shadow .4s var(--ease),transform .3s var(--ease)}
+.close2 .scene__in{text-align:center}
+/* przewijana pętla słowa (pełny rozlew) */
+.close2__mq{width:100vw;margin-left:calc(50% - 50vw);overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.close2__mqrow{display:flex;align-items:center;gap:clamp(18px,3vw,44px);width:max-content;animation:mqScroll 40s linear infinite;will-change:transform}
+.close2__word{font-family:var(--sans);font-weight:900;font-size:clamp(40px,6.5vw,92px);letter-spacing:-.035em;color:var(--text-muted);line-height:1;white-space:nowrap}
+.close2__sep{color:var(--text-faint);font-size:clamp(22px,3.4vw,46px);line-height:1}
+.close2__loopsub{margin-top:clamp(10px,1.6vh,18px);font-family:var(--serif);font-style:italic;font-size:clamp(16px,2.2vw,24px);color:var(--text-muted)}
+.close2__loopsub .r{color:var(--red)}
+/* divider albo */
+.close2__or{display:flex;align-items:center;justify-content:center;gap:clamp(14px,2vw,22px);margin:clamp(16px,2.6vh,30px) 0}
+.close2__or .ln{width:clamp(40px,9vw,110px);height:1px;background:var(--border-strong)}
+.close2__or .w{font-family:var(--serif);font-style:italic;font-size:clamp(20px,2.6vw,30px);color:var(--text-faint)}
+/* jedno wielkie słowo */
+.close2__big{font-family:var(--sans);font-weight:900;font-size:clamp(84px,15vw,180px);line-height:.86;letter-spacing:-.055em;color:var(--accent);text-shadow:0 0 90px rgba(0,217,126,.35);margin:0}
+.close2__bigsub{margin:clamp(16px,2.2vh,26px) auto 0;font-family:var(--serif);font-style:italic;font-size:clamp(18px,2.6vw,28px);color:var(--text-muted);line-height:1.3;max-width:34ch}
+.close2__bigsub .g{color:var(--accent);font-style:italic}
+/* CTA — duży zielony przycisk z animowaną strzałką (wzór /zwolnie) */
+.close2__cta{margin-top:clamp(30px,3.6vw,46px);display:flex;flex-direction:column;align-items:center;gap:14px}
+.close2__btn{display:inline-flex;align-items:center;gap:clamp(14px,1.8vw,24px);padding:clamp(17px,2vw,24px) clamp(30px,3.6vw,50px);background:var(--accent-soft);color:var(--text-strong);font-family:var(--sans);font-weight:800;font-size:clamp(20px,2.6vw,32px);letter-spacing:-.025em;line-height:1;border:1px solid rgba(0,217,126,.4);border-radius:999px;transition:gap .4s var(--ease),background .35s var(--ease),border-color .35s var(--ease),color .3s var(--ease),box-shadow .4s var(--ease),transform .3s var(--ease)}
 .close2__btn:hover{gap:clamp(20px,2.6vw,32px);background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 16px 50px -12px rgba(0,217,126,.5);transform:translateY(-2px)}
 .close2__arrow{color:var(--accent);font-size:.9em;font-weight:800;transition:transform .4s var(--ease),color .3s var(--ease)}
 .close2__btn:hover .close2__arrow{color:var(--accent-ink);transform:translateX(4px)}
 .close2__note{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--text-faint)}
 @media (max-width:640px){
-  .close2__intro{max-width:100%}
-  .close2__lead{max-width:100%}
+  .close2__bigsub{max-width:100%}
   .close2__btn{width:100%;justify-content:center}
-  .close2__note{width:100%}
 }
 @media (prefers-reduced-motion:reduce){
-  .close2__giant .g{text-shadow:none}
+  .close2__mqrow{animation:none}
+  .close2__big{text-shadow:none}
 }
 
 /* ============================================================ ACT REKLAMY (marquee) */
@@ -788,20 +793,14 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- ACT — DOMKNIĘCIE / GŁÓWNY PRZEKAZ + CTA -->
 <section class="scene close2" id="act-close" data-rail="Start">
     <div class="scene__in">
-        <span class="eyebrow" data-reveal>Twoja kolej</span>
-        <h2 class="close2__head">
-            <span class="close2__intro" data-reveal data-delay="60">W 10 minut zobaczysz prototyp biznesu, który poprowadzimy</span>
-            <span class="close2__giant" data-reveal data-delay="180"><span class="g">razem.</span></span>
-        </h2>
-        <p class="close2__lead" data-reveal data-delay="300">Zostajemy wspólnikami — biorę <b>20% od dochodu</b>. Zarabiam dopiero, gdy Ty zarabiasz.</p>
-        <ol class="close2__steps" data-reveal data-delay="380">
-            <li><b>Rozkręcam</b> sklep do pierwszych 1000 zamówień.</li>
-            <li><b>Wdrażam Cię</b> w prowadzenie — w stałym kontakcie.</li>
-            <li><b>Przekazuję Ci stery</b> — i dalej doradzam strategicznie.</li>
-        </ol>
-        <div class="close2__cta" data-reveal data-delay="460">
-            <a class="close2__btn" href="/sklep/" data-cta data-loc="close">Zobacz swój prototyp <span class="close2__arrow" aria-hidden="true">→</span></a>
-            <span class="close2__note">10 minut rozmowy · za darmo · bez zobowiązań</span>
+        <div class="close2__mq" aria-hidden="true"><div class="close2__mqrow" id="close2-loop"></div></div>
+        <p class="close2__loopsub" data-reveal>w tym roku. w przyszłym. <span class="r">może.</span></p>
+        <div class="close2__or" data-reveal data-delay="140"><span class="ln"></span><span class="w">albo</span><span class="ln"></span></div>
+        <h2 class="close2__big" data-reveal data-delay="280">dziś.</h2>
+        <p class="close2__bigsub" data-reveal data-delay="420">W 10 minut zobaczysz swój sklep. Reszta — <span class="g">wspólny biznes.</span></p>
+        <div class="close2__cta" data-reveal data-delay="560">
+            <a class="close2__btn" href="/sklep/" data-cta data-loc="close">Zacznij rozmowę <span class="close2__arrow" aria-hidden="true">→</span></a>
+            <span class="close2__note">za darmo · bez zobowiązań</span>
         </div>
     </div>
 </section>
@@ -1005,6 +1004,15 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             html += '<div class="marki2__chip"><img src="/img/marki/marka-'+n+'.webp'+V+'" alt="Logo marki stworzonej w rozmowie" loading="eager" decoding="async"></div>';
         }
         row.innerHTML = html + html; // duplikat = bezszwowa pętla translateX(-50%)
+    })();
+
+    /* ---------- FINAŁ — przewijana pętla słowa ---------- */
+    (function(){
+        var row = $('#close2-loop');
+        if(!row) return;
+        var unit = '<span class="close2__word">KIEDYŚ</span><span class="close2__sep">·</span>';
+        var half = ''; for(var k=0;k<12;k++) half += unit;
+        row.innerHTML = half + half; // duplikat = bezszwowa pętla translateX(-50%)
     })();
 
     /* ---------- DROGA — sekwencyjne zapalanie kroków + rysowanie linii (drw) ---------- */
