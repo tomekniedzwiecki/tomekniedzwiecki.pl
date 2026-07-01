@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /zbuduje-old/
+
+Sitemap: https://tomekniedzwiecki.pl/sitemap.xml

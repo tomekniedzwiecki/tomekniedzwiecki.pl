@@ -18,6 +18,15 @@
     <meta property="og:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
     <meta property="og:locale" content="pl_PL">
 
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Tomek Niedźwiecki — Zbuduję Ci biznes online. Osobiście.">
+    <meta name="twitter:description" content="Buduję Ci sklep online osobiście i zostaję wspólnikiem z udziałem w Twojej sprzedaży.">
+    <meta name="twitter:image" content="https://tomekniedzwiecki.pl/img/tn_kwadrat.png">
+
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"Person","name":"Tomek Niedźwiecki","url":"https://tomekniedzwiecki.pl/zbuduje/","description":"15 lat w e-commerce, 70 mln zł przychodu w trzech firmach. Buduję e-sklepy osobiście i zostaję wspólnikiem z udziałem w sprzedaży.","sameAs":["https://tomekniedzwiecki.pl/"],"makesOffer":{"@type":"Offer","name":"Zbuduję Ci e-sklep","description":"Buduję sklep online pod klucz, wdrażam w prowadzenie i zostaję wspólnikiem z udziałem w Twojej sprzedaży.","url":"https://tomekniedzwiecki.pl/zbuduje/"}}
+    </script>
+
     <!-- ===================== POMIAR / TRACKING ===================== -->
     <!-- Google Consent Mode v2 -->
     <script>
@@ -30,37 +39,31 @@
             'analytics_storage': 'granted'
         });
     </script>
-    <!-- GA4 + Google Ads -->
+    <!-- GA4 + Google Ads (ładowane od razu, async — wcześniejszy PageView/atrybucja z płatnego ruchu) -->
     <script>
-        window.addEventListener('DOMContentLoaded', function() {
+        (function() {
             var s = document.createElement('script');
             s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
             document.head.appendChild(s);
-            s.onload = function() {
-                gtag('js', new Date());
-                gtag('set', 'user_properties', { persona: 'build' });
-                gtag('config', 'G-W8CLDSHVFC', {
-                    'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
-                });
-                gtag('config', 'AW-17886093904');
-            };
-        });
+            gtag('js', new Date());
+            gtag('set', 'user_properties', { persona: 'build' });
+            gtag('config', 'G-W8CLDSHVFC', {
+                'linker': { 'domains': ['tomekniedzwiecki.pl', 'crm.tomekniedzwiecki.pl'], 'accept_incoming': true }
+            });
+            gtag('config', 'AW-17886093904');
+        })();
     </script>
-    <!-- Meta Pixel -->
+    <!-- Meta Pixel (od razu — PageView nie czeka na DOMContentLoaded) -->
     <script>
-    window.addEventListener('DOMContentLoaded', function() {
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init','1668188210820080'); fbq('track','PageView');
-    });
     </script>
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1668188210820080&ev=PageView&noscript=1"/></noscript>
-    <!-- TikTok Pixel -->
+    <!-- TikTok Pixel (od razu — page() nie czeka na DOMContentLoaded) -->
     <script>
-    window.addEventListener('DOMContentLoaded', function() {
         !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-            ttq.load('D6AP4E3C77U3L7SP8O7G'); ttq.page();
+        ttq.load('D6AP4E3C77U3L7SP8O7G'); ttq.page();
         }(window,document,'ttq');
-    });
     </script>
 
     <!-- Capture click-ID / UTM do sessionStorage — przenoszone na /sklep (ten sam origin).
@@ -92,6 +95,10 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://yxmavwkwnfuphjqbelws.supabase.co" crossorigin>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://connect.facebook.net">
+    <link rel="dns-prefetch" href="https://analytics.tiktok.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
     <link rel="preload" as="image" href="https://tomekniedzwiecki.pl/img/tn_kwadrat_small.webp" fetchpriority="high">
 
@@ -595,8 +602,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
 /* ============================================================ FOOTER */
 .foot{padding:38px 24px calc(38px + env(safe-area-inset-bottom));text-align:center;border-top:1px solid var(--border);background:var(--bg-elev)}
-.foot a{font-size:13px;color:var(--text-faint);margin:0 12px;transition:color .2s}
-.foot a:hover{color:var(--text-muted)}
+.foot a{font-size:13px;color:var(--text-muted);margin:0 12px;transition:color .2s}
+.foot a:hover{color:var(--text-strong)}
 @media (max-width:860px){.foot{padding-bottom:calc(86px + env(safe-area-inset-bottom))}}
 </style>
 </head>
@@ -909,7 +916,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         var label = sc.getAttribute('data-rail')||'';
         var n = ('0'+(i+1)).slice(-2);
         var a = document.createElement('a');
-        a.className='rail__i'; a.href='#'+sc.id;
+        a.className='rail__i'; a.href='#'+sc.id; a.tabIndex=-1;
         a.innerHTML='<span class="n">'+n+'</span><span class="b"></span><span class="l">'+label+'</span>';
         a.addEventListener('click',function(e){ e.preventDefault(); sc.scrollIntoView({behavior:RM?'auto':'smooth'}); });
         rail.appendChild(a);
@@ -1138,6 +1145,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             phone.appendChild(w);
             card.classList.add('is-playing');
             playing = card;
+            // pomiar odtworzenia wideo — silny sygnał intencji (multi-platform, jak fireCta)
+            try{ gtag('event','video_play',{persona:'build',product:(p.name||''),cat:(p.category||'')}); }catch(e){}
+            try{ if(window.fbq) fbq('trackCustom','VideoPlay',{name:(p.name||'')}); }catch(e){}
+            try{ if(window.ttq) ttq.track('ViewContent',{content_type:'product',content_id:(p.id||p.name||''),content_name:(p.name||'')}); }catch(e){}
             // kliknięte (często częściowo schowane) wideo od razu na środek karuzeli (poziomo, bez ruszania pionu)
             try {
                 var tr = track.getBoundingClientRect(), cr = card.getBoundingClientRect();
