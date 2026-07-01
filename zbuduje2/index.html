@@ -256,9 +256,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 /* ============================================================ ACT 02 PROBLEM */
 .walls2{margin-top:46px;border-top:1px solid var(--border)}
 .wrow{display:grid;grid-template-columns:150px 1fr;gap:32px;align-items:center;padding:26px 4px;border-bottom:1px solid var(--border);transition:.4s var(--ease)}
-.wrow:hover,.wrow.lit{background:linear-gradient(90deg,rgba(255,75,62,.07),transparent 60%)}
+.wrow:hover{background:linear-gradient(90deg,rgba(255,75,62,.07),transparent 60%)}
+.wrow.lit{background:linear-gradient(90deg,rgba(255,75,62,.14),transparent 66%)}
 .wrow__n{font-family:var(--mono);font-weight:700;font-size:clamp(60px,7vw,108px);line-height:.8;color:transparent;-webkit-text-stroke:1.5px rgba(255,75,62,.42);letter-spacing:-.04em;font-variant-numeric:tabular-nums;transition:.4s var(--ease)}
-.wrow:hover .wrow__n,.wrow.lit .wrow__n{-webkit-text-stroke-color:var(--red);color:rgba(255,75,62,.09)}
+.wrow:hover .wrow__n{-webkit-text-stroke-color:var(--red);color:rgba(255,75,62,.09)}
+.wrow.lit .wrow__n{-webkit-text-stroke-color:var(--red);color:rgba(255,75,62,.18);filter:drop-shadow(0 0 22px rgba(255,75,62,.28))}
 .wrow__t{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.025em;color:var(--text-strong);margin-bottom:7px}
 .wrow__d{font-size:15.5px;color:var(--text-muted);line-height:1.55;max-width:56ch}
 .wrow__d b{color:var(--text)}
@@ -841,8 +843,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
                 if(e.isIntersecting && !fired){
                     fired=true;
                     rows.forEach(function(r,i){
-                        setTimeout(function(){ r.classList.add('lit'); }, 320 + 260*i);
-                        setTimeout(function(){ r.classList.remove('lit'); }, 320 + 260*i + 760);
+                        setTimeout(function(){ r.classList.add('lit'); }, 450 + 620*i);
+                        setTimeout(function(){ r.classList.remove('lit'); }, 450 + 620*i + 1050);
                     });
                 }
             });
