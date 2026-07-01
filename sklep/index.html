@@ -6970,11 +6970,9 @@
     // 1. projekt darmowy; każdy następny wymaga zakupu oferty „Aplikacja —
     // kolejna rozmowa" (lub grantu admina). Stan = 1 + paidConvos (z serwera).
     function allowedConvos() {
-        // ⏸ TYMCZASOWO ODBLOKOWANE (2026-06-23, testy): dowolna liczba rozmów za darmo.
-        //    Przywrócenie paywallu 49 zł za kolejną rozmowę → usuń `return 9999;`
-        //    i odkomentuj oryginalną linię poniżej.
-        return 9999;
-        // return FREE_CONVOS + (paidConvos || 0);
+        // 1. projekt darmowy; każdy kolejny wymaga zakupu „kolejnej rozmowy" (49 zł) lub grantu admina.
+        // (Bypass testowy `return 9999` przywrócony do paywallu 2026-07-01 na życzenie Tomka.)
+        return FREE_CONVOS + (paidConvos || 0);
     }
     function refreshConvoEntitlement() {
         if (!authState.user || !authState.token) { paidConvos = 0; return Promise.resolve(0); }
@@ -13336,6 +13334,23 @@
             }
         } catch (e) {}
     }
+    // Meta/TikTok „Contact" — odpala się, gdy user PODA TELEFON (parytet z /zapisy, gdzie
+    // fbq('track','Contact') leciało przy numerze). OSOBNY dedup od Lead: kontakt telefoniczny
+    // to inne zdarzenie w lejku niż sam zapis (Lead na mailu). Klient (pixel) + serwer (CAPI).
+    function fireContactEvent() {
+        try {
+            if (!state.phone) return;
+            var k = 'bud_contact_evt_' + state.sessionId;
+            if (sessionStorage.getItem(k)) return;
+            sessionStorage.setItem(k, '1');
+            var id = 'contact_' + state.sessionId;
+            gaEvent('add_contact_info', { method: 'phone_gate' });
+            if (window.fbq) fbq('track', 'Contact', { content_name: 'sklep_contact' }, { eventID: id });
+            if (window.ttq) ttq.track('Contact', { content_name: 'sklep_contact' }, { event_id: id });
+            if (typeof metaCapi === 'function') metaCapi('Contact', { event_id: id, content_name: 'sklep_contact' });
+            if (typeof tiktokCapi === 'function') tiktokCapi('Contact', { event_id: id, content_name: 'sklep_contact' });
+        } catch (e) {}
+    }
     // R1: domknięcie bramki kontaktu (konto + imię) → raport rusza. Wyodrębnione z dawnego
     // kroku-telefon, bo proof (raport) startuje teraz PO imieniu — telefon dopytujemy
     // osobno i później (renderPhoneAsk), gdy lead już zobaczył pierwszy dowód.
@@ -13470,6 +13485,7 @@
             // Telefon prosto do bazy — nie czekamy na kolejną turę.
             syncContactToServer();
             fireContactLeadEvents();
+            fireContactEvent();
             div.remove();
             // #19 FIX: bramka domknięta (ostatni krok) — ODSŁOŃ composer, który bramka
             // schowała. Ta ścieżka nie woła renderInlineGate, więc musi przywrócić sama,
@@ -13546,6 +13562,7 @@
             persistSession();
             syncContactToServer();
             fireContactLeadEvents();
+            fireContactEvent();
             div.remove();
             run();
         });
@@ -13563,6 +13580,7 @@
         state.lastBrief = null;
         state.chosenProduct = null; state.mockupUrl = null; state.suiteAds = null; state.landingHtml = null;
         state.mockups = null; state.chosenStyle = null; state.ustalenia = null; renderChosenProduct();
+        state.brand = null; state.brandDone = false; _brandNameRetries = 0;   // #1: „Nowa rozmowa" NIE dziedziczy marki (logo/nazwy) poprzedniego projektu
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
