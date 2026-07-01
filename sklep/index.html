@@ -14740,7 +14740,10 @@
         // WSZYSTKIE akcje blokujące/wyboru w całym lejku (nie tylko budżet) — po każdej turze
         // trzymamy bieżącą na dole, żeby dygresja nigdy nie zgubiła następnego kroku.
         // inline-gate (imię/konto) NIE jest tu — ono blokuje kompozytor, więc pisania nie ma.
-        ['bud-widget', 'kr-card', 'budget-gate', 'budget-softexit', 'phone-ask', 'brand-card', 'mk-chat-card', 'zl-card'].forEach(function (id) {
+        // Kolejność = ta, w jakiej lądują na dole (ostatni na SAMYM dole). Karty generowania
+        // sklepu/reklam i zielone światło na końcu — panel „coś się generuje" ma być POD rozmową,
+        // bo przechodzi w okno rezerwacji (req Tomka #22).
+        ['bud-widget', 'kr-card', 'budget-gate', 'budget-softexit', 'phone-ask', 'brand-card', 'mk-chat-card', 'ad-chat-card', 'ln-chat-card', 'zl-card'].forEach(function (id) {
             var e = el(id);
             if (e && e.parentNode === host) host.appendChild(e);   // appendChild przenosi na koniec
         });
