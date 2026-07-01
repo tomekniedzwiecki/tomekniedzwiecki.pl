@@ -2,6 +2,8 @@
   "redirects": [
     { "source": "/v2", "destination": "/zbuduje/", "permanent": false },
     { "source": "/v2/", "destination": "/zbuduje/", "permanent": false },
+    { "source": "/zbuduje2", "destination": "/zbuduje/", "permanent": false },
+    { "source": "/zbuduje2/", "destination": "/zbuduje/", "permanent": false },
     { "source": "/home", "destination": "/", "permanent": false },
     { "source": "/home/", "destination": "/", "permanent": false },
     { "source": "/stworze", "destination": "/aplikacja/", "permanent": true },
