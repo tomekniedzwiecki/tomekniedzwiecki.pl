@@ -475,6 +475,29 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .mk-cta{margin-top:26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .mk-cta__note{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--text-faint)}
 @media (max-width:600px){.mk-cta{gap:12px}.mk-cta .btn{width:100%;justify-content:center}.mk-cta__note{width:100%}}
+
+/* ===== ACT — PICKER PRODUKTÓW (co sprzedajemy → wybór) ===== */
+.picker__lede{margin-top:18px;font-size:clamp(15px,1.9vw,18px);color:var(--text-muted);line-height:1.55;max-width:62ch}
+.picker__stage{width:100vw;margin-left:calc(50% - 50vw);margin-top:clamp(28px,3.4vw,44px)}
+.picker__track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px max(calc((100vw - var(--page-max))/2), var(--page-pad)) 22px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.picker__track::-webkit-scrollbar{display:none}
+.pcard{flex:0 0 auto;width:clamp(200px,58vw,236px);scroll-snap-align:start;cursor:pointer;display:flex;flex-direction:column;gap:12px;transition:transform .3s var(--ease)}
+.pcard:hover{transform:translateY(-4px)}
+.pcard:focus-visible{outline:2px solid var(--accent);outline-offset:6px;border-radius:22px}
+.pcard__phone{position:relative;aspect-ratio:9/16;border-radius:20px;overflow:hidden;background:var(--glass-strong);border:1px solid var(--border-strong);box-shadow:0 20px 44px -22px rgba(0,0,0,.75);transition:border-color .3s var(--ease),box-shadow .3s var(--ease)}
+.pcard:hover .pcard__phone{border-color:rgba(0,217,126,.5);box-shadow:0 26px 60px -24px rgba(0,217,126,.4)}
+.pcard__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
+.pcard:hover .pcard__img{transform:scale(1.04)}
+.pcard__grad{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,rgba(0,0,0,.62));pointer-events:none}
+.pcard__cat{position:absolute;top:12px;left:12px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-strong);background:rgba(0,0,0,.5);padding:4px 9px;border-radius:999px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.pcard__saves{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:10.5px;color:var(--accent);background:rgba(0,0,0,.5);padding:4px 9px;border-radius:999px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.pcard__play{position:absolute;bottom:12px;right:12px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);z-index:2;transition:background .25s,transform .25s}
+.pcard__play:hover{background:var(--accent);color:var(--accent-ink);transform:scale(1.08)}
+.pcard__name{font-size:15px;font-weight:700;color:var(--text-strong);letter-spacing:-.01em;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pcard__pick{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--accent);display:inline-flex;align-items:center;gap:7px;transition:gap .25s var(--ease)}
+.pcard:hover .pcard__pick{gap:11px}
+.picker__load,.picker__empty{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--text-muted);padding:24px 0}
+@media (prefers-reduced-motion:reduce){.picker__track{scroll-behavior:auto}.pcard,.pcard__img{transition:none}}
 /* lightbox */
 .lb{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.92);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
 .lb.is-on{display:flex}
@@ -751,6 +774,20 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     </div>
 </section>
 
+<!-- ACT — PICKER PRODUKTÓW (co sprzedajemy → wybór → /sklep z tym produktem) -->
+<section class="scene picker" id="act-picker" data-rail="Produkty">
+    <div class="scene__in">
+        <span class="eyebrow" data-reveal>Co sprzedajemy</span>
+        <h2 class="h-sec" data-reveal data-delay="60">Wybierz produkt. <span class="g">Zobacz swój sklep.</span></h2>
+        <p class="picker__lede" data-reveal data-delay="120">Realne, viralowe produkty z TikToka — te same, które proponuję w rozmowie. Kliknij ten, który Cię ciekawi, a zaczniemy właśnie od niego.</p>
+    </div>
+    <div class="picker__stage" data-reveal data-delay="160">
+        <div class="picker__track" id="picker-track" aria-label="Produkty do wyboru">
+            <div class="picker__load">Ładuję viralowe produkty…</div>
+        </div>
+    </div>
+</section>
+
 <!-- ACT — WSPÓLNIK / BEZPOŚREDNIA WSPÓŁPRACA -->
 <section class="scene coop" id="act-coop" data-rail="Wspólnik">
     <div class="scene__in">
@@ -1015,6 +1052,55 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         row.innerHTML = half + half; // duplikat = bezszwowa pętla translateX(-50%)
     })();
 
+    /* ---------- PICKER PRODUKTÓW — realny katalog z bud-tt-featured → klik → /sklep z produktem ---------- */
+    (function(){
+        var track = $('#picker-track');
+        if(!track) return;
+        var EP = 'https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/bud-tt-featured';
+        var ITEMS = [], loaded = false;
+        function fmt(n){ n = +n||0; return n>=1000 ? (Math.round(n/100)/10)+'k' : String(n); }
+        function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+        function load(){
+            if(loaded) return; loaded = true;
+            fetch(EP + '?n=10&seed=zbuduje')
+                .then(function(r){ return r.json(); })
+                .then(function(j){
+                    ITEMS = (j && j.products) || [];
+                    if(!ITEMS.length){ track.innerHTML = '<div class="picker__empty">Zaraz dorzucę świeże produkty — kliknij „Zacznij rozmowę", a poszukamy razem.</div>'; return; }
+                    track.innerHTML = ITEMS.map(function(p,i){
+                        var cover = p.cover || p.image || '';
+                        return '<div class="pcard" role="button" tabindex="0" data-idx="'+i+'" aria-label="Wybierz produkt: '+esc(p.name)+'">'
+                            + '<div class="pcard__phone">'
+                            + (cover ? '<img class="pcard__img" src="'+esc(cover)+'" alt="'+esc(p.name)+'" loading="lazy" decoding="async" referrerpolicy="no-referrer">' : '')
+                            + '<div class="pcard__grad"></div>'
+                            + (p.category ? '<span class="pcard__cat">'+esc(p.category)+'</span>' : '')
+                            + (p.saves ? '<span class="pcard__saves">▲ '+fmt(p.saves)+'</span>' : '')
+                            + (p.tiktok_url ? '<span class="pcard__play" data-tt="'+i+'" role="link" aria-label="Zobacz na TikToku">▶</span>' : '')
+                            + '</div>'
+                            + '<div class="pcard__name">'+esc(p.name)+'</div>'
+                            + '<span class="pcard__pick">Zbuduj ten sklep →</span>'
+                            + '</div>';
+                    }).join('');
+                })
+                .catch(function(){ track.innerHTML = '<div class="picker__empty">Nie udało się załadować — kliknij „Zacznij rozmowę", a poszukamy produktu razem.</div>'; });
+        }
+        var sec = document.getElementById('act-picker');
+        if('IntersectionObserver' in window && sec){
+            var io = new IntersectionObserver(function(en){ en.forEach(function(e){ if(e.isIntersecting){ load(); io.disconnect(); } }); }, {rootMargin:'300px'});
+            io.observe(sec);
+        } else { load(); }
+        function pick(i){ var p = ITEMS[i]; if(p) goSklep({product:p, loc:'picker'}); }
+        track.addEventListener('click', function(e){
+            var tt = e.target.closest('[data-tt]');
+            if(tt){ e.stopPropagation(); var pt = ITEMS[+tt.getAttribute('data-tt')]; if(pt && pt.tiktok_url) window.open(pt.tiktok_url,'_blank','noopener'); return; }
+            var card = e.target.closest('.pcard'); if(card) pick(+card.getAttribute('data-idx'));
+        });
+        track.addEventListener('keydown', function(e){
+            if(e.key!=='Enter' && e.key!==' ') return;
+            var card = e.target.closest('.pcard'); if(card){ e.preventDefault(); pick(+card.getAttribute('data-idx')); }
+        });
+    })();
+
     /* ---------- DROGA — sekwencyjne zapalanie kroków + rysowanie linii (drw) ---------- */
     (function(){
         var track = document.getElementById('drw-track'); if(!track) return;
@@ -1049,6 +1135,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         try{
             if(opts.idea) sessionStorage.setItem('bud_prefill_idea', opts.idea);
             if(opts.choice) sessionStorage.setItem('bud_autosend_choice', opts.choice);
+            if(opts.product) sessionStorage.setItem('bud_selected_product', JSON.stringify(opts.product));
         }catch(e){}
         fireCta(opts.loc||'cta');
         var qs=trackingQS();

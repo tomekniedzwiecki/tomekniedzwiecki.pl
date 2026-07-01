@@ -16300,13 +16300,15 @@
         try {
             var heroChoice = sessionStorage.getItem('bud_autosend_choice');
             var heroIdea = sessionStorage.getItem('bud_prefill_idea');
+            var heroProd = sessionStorage.getItem('bud_selected_product');
             var convoFresh = !state.verdict &&
                 messages.filter(function (m) { return m.role === 'user'; }).length === 0;
-            if ((heroChoice || heroIdea) && !convoFresh) {
+            if ((heroChoice || heroIdea || heroProd) && !convoFresh) {
                 if (convoIndex().length >= allowedConvos()) {
                     // limit projektów — zostajemy w aktywnej rozmowie, sprzątamy klucze
                     sessionStorage.removeItem('bud_autosend_choice');
                     sessionStorage.removeItem('bud_prefill_idea');
+                    sessionStorage.removeItem('bud_selected_product');
                 } else {
                     newConvo(); // startFresh → enterChat — klucze obsłuży świeża rozmowa
                     return;
@@ -16335,6 +16337,25 @@
                     removeChips();
                     var _sc = el('start-cta'); if (_sc) _sc.remove();   // deep-link auto-wyboru pomija button
                     sendOpening(autoChoice.slice(0, 200));
+                }
+            }
+        } catch (e) { /* sessionStorage niedostępny — pomijamy */ }
+        // produkt wybrany na landingu (/zbuduje picker) — preselekcja: ustaw produkt od razu
+        // i wyślij opener „Wybieram produkt", pomijając karuzelę. Deep-link niesie pełny obiekt
+        // produktu (kształt bud-tt-featured), więc setChosenProduct działa bez dodatkowego fetcha.
+        try {
+            var selRaw = sessionStorage.getItem('bud_selected_product');
+            if (selRaw && !state.chosenProduct && !state.verdict && !el('inline-gate') && !streaming &&
+                messages.filter(function (m) { return m.role === 'user'; }).length === 0) {
+                sessionStorage.removeItem('bud_selected_product');
+                var selP = null; try { selP = JSON.parse(selRaw); } catch (e) { selP = null; }
+                if (selP && selP.id) {
+                    removeChips();
+                    var _scPk = el('start-cta'); if (_scPk) _scPk.remove();
+                    var _vpPk = el('vp-picker'); if (_vpPk) _vpPk.remove();
+                    setChosenProduct(selP);
+                    removePicker();
+                    sendOpening('Wybieram produkt: ' + (selP.name || ''));
                 }
             }
         } catch (e) { /* sessionStorage niedostępny — pomijamy */ }
