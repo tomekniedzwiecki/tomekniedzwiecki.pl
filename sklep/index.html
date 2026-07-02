@@ -8207,10 +8207,13 @@
         if (!state.chosenProduct || !state.sessionId) return;
         if (extras.raport === 'gen') return;
         if (!force && state.raport) return;
-        // TWARDY GATE: raport (płatna generacja) nie rusza bez kompletu kontaktu —
-        // konto + imię+nazwisko + telefon. Bramka odkłada genFn; po kroku 3
-        // resumePendingGen ponawia kickReport, tym razem z kompletem → przechodzi dalej.
-        if (requireLeadBeforeReport(function () { kickReport(force); })) return;
+        // BRAMKA (decyzja Tomka 2026-07-02): raport z KARUZELI jest uniwersalny per produkt
+        // (cache w bud_product_packages) → generuje się ANONIMOWO (koszt ~0 przy cache-hit,
+        // capy IP chronią świeże generacje). Kontakt zbieramy DOPIERO przy starcie makiet
+        // (kickMockup → requireContactBeforeGen) — najpierw dajemy wartość, potem prosimy.
+        // WYJĄTEK: produkt WŁASNY (bez id — bez cache, realny koszt) dalej wymaga kontaktu.
+        if (!(state.chosenProduct && state.chosenProduct.id)
+            && requireLeadBeforeReport(function () { kickReport(force); })) return;
         slReset();   // start raportu = produkt definitywnie wybrany → schowaj pasek „Rozważam"
         extras.raport = 'gen'; extrasStart.raport = Date.now();
         _doReport(state.sessionId, !!force, 0);
@@ -8226,13 +8229,11 @@
     // makiety/marka/reklamy/sklep, gdy F5 trafił w okno generacji.
     function resumeReportIfNeeded() {
         if (!state.chosenProduct || !state.chosenProduct.id) return;
-        // RAPORT: brak raportu → wznów (kickReport jest twardo gated kontaktem)
+        // RAPORT: brak raportu → wznów (dla karuzeli anonimowo; własny produkt gated w kickReport)
         if (!state.raport && extras.raport !== 'gen') kickReport(false);
-        // Dalej tylko z kompletem kontaktu — inaczej bramka prowadzi rozmowę
-        if (gateContactMissing()) return;
-        // #3 ZACZEPKA USTALEŃ: proaktywna tura po bramce nie domknęła się (F5 ją zjadł) → ponów.
-        // reportEngagePending czyści się po pierwszej realnej turze AI (lub wiadomości usera).
-        if (state.reportEngagePending && !state.ustalenia && !streaming && !el('inline-gate') && !el('qr-chips')) {
+        // #3 ZACZEPKA USTALEŃ (tylko po domkniętej bramce — trigger mówi o zebranym kontakcie):
+        // proaktywna tura po bramce nie domknęła się (F5 ją zjadł) → ponów.
+        if (!gateContactMissing() && state.reportEngagePending && !state.ustalenia && !streaming && !el('inline-gate') && !el('qr-chips')) {
             streamReply('', false, { reportEngage: true });
             return;
         }
@@ -8259,7 +8260,9 @@
         // strzelała). Zdejmujemy chipy i mózg proponuje komplet ustaleń (reportPropose — trigger
         // „raport GOTOWY", nie reportEngage, który twierdzi, że raportu jeszcze nie ma).
         if (state.reportProposeDone) { state.reportProposePending = false; return; }   // już zaproponowane (przeżywa F5)
-        if (state.ustalenia || gateContactMissing() || streaming || el('inline-gate') || el('bud-widget')) return;
+        // 2026-07-02: propozycja działa też ANONIMOWO (raport jest darmowy/uniwersalny;
+        // kontakt zbieramy dopiero przy makietach) — bramka NIE blokuje.
+        if (state.ustalenia || streaming || el('inline-gate') || el('bud-widget')) return;
         state.reportProposePending = false;
         setTimeout(function () {
             if (streaming || el('inline-gate') || el('bud-widget') || state.ustalenia || state.reportProposeDone) return;
@@ -10923,6 +10926,11 @@
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && Array.isArray(state.mockups) && state.mockups.length) return;
         if (mockups4Gen) return;
+        // BRAMKA KONTA (decyzja Tomka 2026-07-02): imię+konto zbieramy TERAZ — przy starcie
+        // makiet, tuż po akceptacji kierunku (commitment + szczyt ciekawości). Raport był
+        // darmowy i anonimowy (uniwersalny per produkt). Po domknięciu bramki
+        // resumePendingGen ponawia kickMockup → bramka budżetu → generacja.
+        if (requireContactBeforeGen(function () { kickMockup(force); })) return;
         // EARLY BUDGET GATE (req Tomka): zanim ruszy DROGA generacja (makiety→reklamy→sklep),
         // po dostarczeniu raportu (tani proof) — jedno pytanie o budżet startowy. Niezadeklarowany
         // → karta budżetu; „none" (brak budżetu) → soft-exit (raport zostaje, NIE palimy compute).
@@ -13159,13 +13167,11 @@
         // (rozmowa potrafi dojść do zielonego/projektu bez złapania danych — wtedy
         // i tak pytamy, zamiast tracić leada). To realizuje „ponów, jeśli się nie udało".
         if (state.verdict) return gateContactMissing();
-        var userCount = messages.filter(function (m) { return m.role === 'user'; }).length;
-        if (userCount < GATE_AFTER_USER_MSGS) return false;
-        // Decyzja Tomka: po paru wymianach pytamy o kontakt (mail, potem telefon)
-        // PRZED generowaniem ekranów/raportu. Nie czekamy już na pierwszy podgląd
-        // („wow" przychodzi PO kontakcie) — generowanie i tak jest twardo bramkowane
-        // przez requireContactBeforeGen.
-        return gateContactMissing();
+        // 2026-07-02 (decyzja Tomka): bramka NIE wyskakuje już „po paru wiadomościach" —
+        // raport jest darmowy i anonimowy (uniwersalny per produkt). Kontakt zbieramy
+        // dopiero przy starcie makiet (kickMockup → requireContactBeforeGen ustawia
+        // forceContactGate) albo awaryjnie po werdykcie (wyżej).
+        return false;
     }
 
     // ── Bramka LEAD PRZED raportem (nowy lejek /sklep) ──────────────────────────
@@ -13378,12 +13384,19 @@
         forceContactGate = false;
         renderAuthUI();
         if (pendingGen) {
-            sysMsg('Dzięki, ' + first + '. Raport rynku zbieram w tle — a my lecimy dalej.');
-            resumePendingGen();              // raport rusza w tle (bud-raport)
-            showRaportProgressInChat();      // od razu widoczny pasek „raport powstaje"
+            // Nowy flow: bramka zwykle przy MAKIETACH (raport już jest) → pendingGen=kickMockup.
+            // Stara ścieżka (własny produkt/backstop): raport dopiero rusza → pasek + zaczepka.
+            var raportInFlight = !state.raport;
+            sysMsg(raportInFlight
+                ? 'Dzięki, ' + first + '. Raport rynku zbieram w tle — a my lecimy dalej.'
+                : 'Dzięki, ' + first + '. Projekt zapisany na Twoim koncie — lecimy dalej.');
+            resumePendingGen();
             setComposerEnabled(true);
-            state.reportEngagePending = true; persistSession();
-            if (!streaming) streamReply('', false, { reportEngage: true });
+            if (raportInFlight) {
+                showRaportProgressInChat();
+                state.reportEngagePending = true; persistSession();
+                if (!streaming) streamReply('', false, { reportEngage: true });
+            }
             return;
         }
         sysMsg('Dzięki, ' + first + '. Wracamy do rozmowy — pisz śmiało.');
@@ -13466,8 +13479,8 @@
             var hi = (state.name && state.name.trim()) ? ('Cześć ' + esc(state.name.trim().split(/\s+/)[0]) + ' — ') : '';
             div.innerHTML = '<div class="sg">' + head +
                 '<h3 class="sg-title">' + hi + 'załóż konto albo zaloguj się</h3>' +
-                '<p class="sg-sub">Żeby ten projekt był Twój — wrócisz do niego z każdego urządzenia, a raport zapiszemy na Twoim koncie.</p>' +
-                authFormHTML('sg', 'Generuj mój raport', true) +
+                '<p class="sg-sub">Za chwilę makiety Twojego sklepu. Konto zapisuje cały projekt (raport, markę, makiety) — wrócisz do niego z każdego urządzenia.</p>' +
+                authFormHTML('sg', 'Zapisz projekt — pokaż makiety', true) +
                 '<p class="sg-note">Bez spamu i bez nachalnej sprzedaży. Konto służy tej rozmowie i projektowi.</p>' +
                 '</div>';
             el('chat-msgs').appendChild(div);
@@ -13512,17 +13525,21 @@
             forceContactGate = false;
             renderAuthUI();
             var first = (state.name || 'super').split(' ')[0];
-            // Komplet kontaktu → jeśli czekał raport/generowanie, ruszamy je teraz.
+            // Komplet kontaktu → jeśli czekało generowanie, ruszamy je teraz.
+            // Nowy flow: bramka zwykle przy MAKIETACH (raport już jest) → pendingGen=kickMockup;
+            // stara ścieżka (własny produkt/backstop) → raport dopiero rusza (pasek + zaczepka).
             if (pendingGen) {
-                sysMsg('Dzięki, ' + first + '. Raport rynku zbieram w tle — a my lecimy dalej.');
-                resumePendingGen();              // raport rusza w tle (bud-raport)
-                showRaportProgressInChat();      // #4: od razu widoczny pasek „raport powstaje" (idempotentny)
+                var raportInFlight2 = !state.raport;
+                sysMsg(raportInFlight2
+                    ? 'Dzięki, ' + first + '. Raport rynku zbieram w tle — a my lecimy dalej.'
+                    : 'Dzięki, ' + first + '. Projekt zapisany na Twoim koncie — lecimy dalej.');
+                resumePendingGen();
                 setComposerEnabled(true);        // NIE blokujemy rozmowy podczas generacji
-                // #3: proaktywna tura ustaleń MA się odbyć — flaga przeżyje F5 (resume ją ponowi,
-                // czyści się po pierwszej realnej turze AI lub wiadomości usera).
-                state.reportEngagePending = true; persistSession();
-                // Proaktywna tura: mózg od razu prowadzi ustalenia, gdy raport leci w tle (bez tury usera).
-                if (!streaming) streamReply('', false, { reportEngage: true });
+                if (raportInFlight2) {
+                    showRaportProgressInChat();
+                    state.reportEngagePending = true; persistSession();
+                    if (!streaming) streamReply('', false, { reportEngage: true });
+                }
                 return;
             }
             sysMsg('Dzięki, ' + first + '. Wracamy do rozmowy — pisz śmiało.');
@@ -14332,7 +14349,9 @@
             track: switchTrk || undefined,
             // Raport wstrzymany na froncie (bramka kontaktu otwarta) → mózg NIE może
             // udawać, że „zaczyna analizę"/„raport leci 2 min" ani pytać o ustalenia.
-            reportGated: !!(state.chosenProduct && state.chosenProduct.id && !state.raport && gateContactMissing()) || undefined,
+            // reportGated: raport wstrzymany bramką — od 2026-07-02 dotyczy TYLKO produktu
+            // własnego (karuzela generuje anonimowo, więc nie jest „wstrzymana").
+            reportGated: !!(state.chosenProduct && !state.chosenProduct.id && !state.raport && gateContactMissing()) || undefined,
             tracking: isFirst ? getTracking() : null
         };
 
