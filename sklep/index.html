@@ -11905,7 +11905,9 @@
         .vp-card--more{align-items:center;justify-content:center;gap:9px;flex-direction:column;color:var(--text-muted);cursor:pointer;font-size:14px;font-weight:700;line-height:1.15;text-align:center;background:rgba(255,255,255,.02);border-style:dashed;border-color:var(--text-muted);min-height:160px;transition:color .15s,border-color .15s,background .15s}
         .vp-card--more:hover{color:#fff;border-color:#fff;background:rgba(255,255,255,.05)}
         .vp-card--more .vpm-plus{font-size:30px;font-weight:300;line-height:1}
-        .vp-card--more.is-loading{opacity:.6;pointer-events:none}
+        .vp-card--more.is-loading{opacity:.75;pointer-events:none}
+        .vp-card--more.is-loading .vpm-plus{animation:vpMoreSpin .8s linear infinite}
+        @keyframes vpMoreSpin{to{transform:rotate(360deg)}}
         /* Karta-zachęta na końcu karuzeli (po limicie „Pokaż więcej") */
         .vp-card--done{align-items:center;justify-content:center;gap:9px;flex-direction:column;text-align:center;background:rgba(0,217,126,.05);border-style:solid;border-color:rgba(0,217,126,.28);min-height:160px;padding:18px 16px;cursor:default}
         .vp-card--done .vpd-ico{width:34px;height:34px;border-radius:50%;background:rgba(0,217,126,.14);display:flex;align-items:center;justify-content:center;color:var(--accent);flex:0 0 auto}
@@ -12292,6 +12294,10 @@
             if (!_keepMore && moreBtn) { moreBtn.insertAdjacentHTML('afterend', vpDoneCardHTML()); moreBtn.remove(); }
             else if (moreBtn) moreBtn.classList.remove('is-loading');
             if (track.__updEdges) track.__updEdges();
+            // FIX mobile (feedback Tomka): nowe karty wchodziły do toru, ale kadr stał w miejscu —
+            // user nie widział, że COKOLWIEK doszło. Dowieź pierwszą nową kartę w kadr.
+            var firstNew = track.querySelectorAll('.vp-card:not(.vp-card--more):not(.vp-card--done)')[base];
+            if (firstNew && firstNew.scrollIntoView) { try { firstNew.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' }); } catch (e) { track.scrollBy({ left: 260, behavior: 'smooth' }); } }
         }).catch(function () { vpMoreBusy = false; if (moreBtn) moreBtn.classList.remove('is-loading'); });
     }
 
