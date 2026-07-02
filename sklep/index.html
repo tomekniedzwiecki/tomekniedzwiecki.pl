@@ -3974,6 +3974,14 @@
     .rpw-steps li { padding-left: 4px; }
     .rpw-steps li::marker { color: var(--accent, #00d97e); font-weight: 700; }
     .rpw-steps strong { color: var(--text-strong, #fff); font-weight: 700; }
+    /* GLOBALNY POWRÓT DO ROZMOWY (feedback Tomka 2026-07-02, „zaorane i od nowa"):
+       jedyny, ZAWSZE widoczny powrót z każdej zakładki — fixed, poza pane'ami, więc
+       niezależny od scrolla i asynchronicznych re-renderów (stary pasek stagebar ginął,
+       bo re-render pane'a robił innerHTML i go zjadał, a przy długiej treści i tak
+       zostawał poza kadrem). Sterowany wyłącznie w switchTab. */
+    .back-chat-fab { position: fixed; right: 14px; bottom: 14px; z-index: 140; display: none; align-items: center; gap: 8px; padding: 12px 17px; border-radius: 999px; border: 1px solid var(--glass-border, rgba(255,255,255,.18)); background: rgba(10,10,12,.94); color: var(--text-strong, #fff); font-weight: 700; font-size: 13.5px; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 6px 22px -6px rgba(0,0,0,.65); }
+    .back-chat-fab i { color: var(--accent, #00d97e); font-size: 17px; }
+    .back-chat-fab.is-on { display: inline-flex; }
     /* U3: pływający CTA rezerwacji (tylko mobile) — decyzja dojrzewa przy makietach/sklepie,
        a kafel rezerwacji żyje w drawerze; CTA musi podróżować z userem. Pod modalami (z-index 200). */
     .rsv-fab { position: fixed; right: 12px; bottom: 86px; z-index: 150; display: none; align-items: center; gap: 7px; padding: 12px 16px; border-radius: 999px; border: 1px solid rgba(0,217,126,.55); background: rgba(6,24,16,.94); color: #eafff5; font-weight: 700; font-size: 13.5px; line-height: 1; box-shadow: 0 6px 24px -6px rgba(0,217,126,.45); cursor: pointer; backdrop-filter: blur(6px); }
@@ -7591,6 +7599,22 @@
         }
         pushTabHash(tab === 'chat' ? '' : tab);
         closeSide();
+        ensureBackChatFab(isPane);
+    }
+    // Globalny FAB powrotu — tworzony raz, poza pane'ami (odporny na ich re-rendery).
+    function ensureBackChatFab(show) {
+        var f = el('back-chat-fab');
+        if (!f) {
+            f = document.createElement('button');
+            f.type = 'button'; f.id = 'back-chat-fab'; f.className = 'back-chat-fab';
+            f.innerHTML = '<i class="ph ph-chat-circle-dots" aria-hidden="true"></i>Wróć do rozmowy';
+            f.addEventListener('click', function () {
+                try { gaEvent('app_back_to_chat', { from: activeTab }); } catch (e) {}
+                switchTab('chat');
+            });
+            document.body.appendChild(f);
+        }
+        f.classList.toggle('is-on', !!show);
     }
 
     // ── E/F: uniwersalny pasek etapu „Co dalej" + powrót (we wszystkich zakładkach panelu) ──
@@ -7624,8 +7648,10 @@
             s = { txt: 'Zostaw w rozmowie kontakt — konto oraz imię i nazwisko — wtedy od razu ruszam z raportem.', cta: 'Wróć do rozmowy →', tab: 'chat' };
         }
         var bar = document.createElement('div'); bar.className = 'stagebar';
+        // Powrót do rozmowy robi GLOBALNY FAB (zawsze widoczny) — przycisk w pasku tylko,
+        // gdy prowadzi GDZIE INDZIEJ (np. „Przejdź do współpracy"); dubel CTA = szum.
         bar.innerHTML = '<div class="stagebar__txt"><b>Co dalej:</b> ' + s.txt + '</div>' +
-            '<button type="button" class="stagebar__cta">' + s.cta + '</button>';
+            (s.tab !== 'chat' ? '<button type="button" class="stagebar__cta">' + s.cta + '</button>' : '');
         body.insertBefore(bar, body.firstChild);
         var c = bar.querySelector('.stagebar__cta'); if (c) c.addEventListener('click', function () { switchTab(s.tab); });
     }
