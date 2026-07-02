@@ -8391,6 +8391,21 @@
     // (bramka konta jest przy makietach, dociera tam garstka). To NIE bramka: kartę można
     // pominąć („Nie teraz") i nic się nie blokuje. Mail → drip wyśle raport (reveal_raport,
     // due od razu; cron co 30 min) z linkiem powrotnym = comeback-ścieżka dla dryfujących.
+    // Karta wchodzi TYLKO przy realnym DRYFIE (feedback Tomka 2026-07-02: wpadała w środek
+    // czytania propozycji = kolejna ściana). Planner: pierwsza próba po 75 s od raportu;
+    // jeśli user w międzyczasie COKOLWIEK napisał/kliknął (nowa wiadomość) — odsuwamy o 60 s,
+    // aż ucichnie (max ~6 min). Aktywnego usera i tak złapie bramka konta przy makietach.
+    function scheduleReportMailOffer(attempt) {
+        attempt = attempt || 0;
+        if (attempt > 5) return;
+        var snapshot = messages.filter(function (m) { return m.role === 'user'; }).length;
+        setTimeout(function () {
+            if (state.email || state._mailCardDismissed || state.ustalenia || el('rk-mail-card')) return;
+            var now = messages.filter(function (m) { return m.role === 'user'; }).length;
+            if (now !== snapshot || streaming || el('inline-gate') || el('budget-gate')) { scheduleReportMailOffer(attempt + 1); return; }
+            maybeOfferReportMail();
+        }, attempt === 0 ? 75000 : 60000);
+    }
     function maybeOfferReportMail() {
         if (state.email || state._mailCardDismissed) return;
         if (!state.raport || state.ustalenia) return;   // po ustaleniach mail zbiera bramka konta
@@ -8514,8 +8529,8 @@
                     // #5: gdy raport wskoczył a ustaleń jeszcze nie domknęliśmy, mózg ma SAM
                     // poprowadzić temat dalej (zaproponować kierunek), nie zostawiać „za chwilę…".
                     if (!state.ustalenia) { state.reportProposePending = true; maybeProposeAfterReport(); }
-                    // Miękka karta maila 45 s po raporcie — pod propozycją kierunku, nie zamiast niej.
-                    setTimeout(function () { try { maybeOfferReportMail(); } catch (e) {} }, 45000);
+                    // Miękka karta maila — planner czeka na DRYF (bezczynność), nie wpada w propozycję.
+                    try { scheduleReportMailOffer(0); } catch (e) {}
                     return;
                 }
                 // Backstop: serwer odmówił generacji bez kontaktu (anonimowa sesja) — pokaż bramkę.
@@ -8649,22 +8664,21 @@
         if (done) {
             return gcardInner('rk-chat-card', 'Raport potencjału rynku — gotowy', 'rk-chat-open', 'Zobacz raport →', '', 'gotowe');
         }
-        // Loader raportu = pasek postępu + lista WSZYSTKIEGO, co powstaje za darmo w tej
-        // rozmowie (żeby cisza w trakcie liczenia raportu była „produktywna" i było widać,
-        // co jeszcze przed nami — aż do rozmowy o współpracy).
+        // ODCHUDZONY loader (feedback Tomka 2026-07-02: „ściana tekstu po wyborze produktu,
+        // MEGA przytłaczająco"): domyślnie TYLKO pasek postępu; pełna lista „co tu powstanie"
+        // schowana w zwijanym <details> — kto ciekawy, kliknie. Social proof wycięty z loadera
+        // (żyje w momentach decyzji: zielone światło / paywall — tam pracuje, tu przytłaczał).
         return genProgressHTML('raport', 'Raport potencjału rynku', 'konkurencja · ceny · luka rynkowa') +
-            '<div class="rk-free">' +
-            '<div class="rk-free__h">Co robimy w tej rozmowie — za darmo, na żywo:</div>' +
-            '<ul class="rk-free__list">' +
-            '<li class="rk-free__now"><span class="rk-free__d"></span>Raport rynku — konkurencja, ceny, luka <em>· powstaje teraz</em></li>' +
+            '<details class="rk-free" style="margin-top:8px">' +
+            '<summary style="cursor:pointer;font-size:12.5px;color:var(--text-muted);list-style:none;display:flex;align-items:center;gap:6px"><span style="font-size:10px">▸</span>Co jeszcze tu powstanie — za darmo</summary>' +
+            '<ul class="rk-free__list" style="margin-top:8px">' +
             '<li><span class="rk-free__d"></span>Ustalenia marki — dla kogo i jaki przekaz</li>' +
             '<li><span class="rk-free__d"></span>Nazwa, domena .pl i logo</li>' +
             '<li><span class="rk-free__d"></span>4 makiety sklepu do wyboru</li>' +
             '<li><span class="rk-free__d"></span>4 gotowe reklamy na Facebooka i Instagram</li>' +
             '<li><span class="rk-free__d"></span>Podgląd Twojego sklepu — strona sprzedażowa</li>' +
             '</ul>' +
-            '<div class="rk-free__f">To pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy projekt — zanim w ogóle zaczniemy rozmawiać o współpracy.<br><span style="opacity:.8">Za Tomkiem: 15 lat e-commerce · ~70 mln zł obrotu · 5000+ uruchomionych sklepów.</span></div>' +
-            '</div>';
+            '</details>';
     }
     function showRaportProgressInChat() {
         if (!el('chat-msgs')) return;
@@ -8727,7 +8741,7 @@
         // Karta maila: sprzątnij gdy mail już jest (np. bramka konta go zebrała); zaproponuj na
         // resume sesji z raportem bez maila (dryfujący wraca — druga szansa na comeback-ścieżkę).
         if (state.email) { var _mc = el('rk-mail-card'); if (_mc) _mc.remove(); }
-        else if (state.raport && !state.ustalenia) { setTimeout(function () { try { maybeOfferReportMail(); } catch (e) {} }, 6000); }
+        else if (state.raport && !state.ustalenia && !state._mailOfferPlanned) { state._mailOfferPlanned = true; try { scheduleReportMailOffer(0); } catch (e) {} }
     }
     // ── SEKWENCYJNE ODSŁANIANIE (anty-przytłoczenie, decyzja Tomka) ──────────────
     // W czacie pokazujemy JEDNĄ kartę etapu na raz — najbliższą realizacji. Reszta
@@ -15022,7 +15036,9 @@
 
             // req Tomka (#14): gdy raport JUŻ gotowy, a bot właśnie o nim napisał — dołóż
             // wyraźny link do zakładki, żeby łatwo tam przejść. Raz na sesję (pierwsza tura po raporcie).
-            if (state.raport && !state._raportLinkShown && !el('inline-gate') && !meta.projekt && verdict !== 'zielony') {
+            // ALE nie dubluj: karta „Raport gotowy" z własnym przyciskiem (rk-chat-open) często
+            // wisi tuż wyżej — drugi identyczny przycisk to szum (feedback Tomka 2026-07-02).
+            if (state.raport && !state._raportLinkShown && !el('rk-chat-open') && !el('inline-gate') && !meta.projekt && verdict !== 'zielony') {
                 state._raportLinkShown = true; persistSession();
                 var _rl = document.createElement('div');
                 _rl.style.cssText = 'margin:2px 0 8px';
