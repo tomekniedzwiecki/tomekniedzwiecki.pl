@@ -8244,10 +8244,16 @@
     // mózg sam zaproponował kierunek (zamiast „za chwilę zaproponuję…" i ciszy). Odpala się raz.
     function maybeProposeAfterReport() {
         if (!state.reportProposePending) return;
-        if (state.ustalenia || gateContactMissing() || streaming || el('inline-gate') || el('qr-chips')) return;
+        // FIX 2026-07-02: chipy (qr-chips) NIE blokują propozycji — odkąd chipy są przy każdej
+        // turze, stary guard robił z tej mechaniki martwy kod (u bezczynnego usera nigdy nie
+        // strzelała). Zdejmujemy chipy i mózg proponuje komplet ustaleń (reportPropose — trigger
+        // „raport GOTOWY", nie reportEngage, który twierdzi, że raportu jeszcze nie ma).
+        if (state.ustalenia || gateContactMissing() || streaming || el('inline-gate') || el('bud-widget')) return;
         state.reportProposePending = false;
         setTimeout(function () {
-            if (!streaming && !el('inline-gate') && !el('qr-chips') && !state.ustalenia) streamReply('', false, { reportEngage: true });
+            if (streaming || el('inline-gate') || el('bud-widget') || state.ustalenia) return;
+            removeChips();
+            streamReply('', false, { reportPropose: true });
         }, 600);
     }
     // req Tomka: gdy po wyborze stylu sklep/reklamy powstają w tle — proaktywne pytanie
@@ -14268,6 +14274,7 @@
     function streamReply(text, isFirst, opts) {
         var khResume = !!(opts && opts.knowhowResume); // zaczepka „wróć do rozmowy" (bez tury usera)
         var rEngage = !!(opts && opts.reportEngage); // zaczepka po bramce: angażuj rozmowę, gdy raport leci w tle (bez tury usera)
+        var rPropose = !!(opts && opts.reportPropose); // #5: raport GOTOWY + cisza → mózg sam proponuje komplet ustaleń
         var qEngage = !!(opts && opts.qualifyEngage); // zaczepka KWALIFIKUJĄCA: pytanie z ankiety, gdy sklep/reklamy lecą w tle
         genScreen = null; // user aktywnie pisze → nie jest „utknięty" na ekranie generowania
         streaming = true;
@@ -14306,6 +14313,7 @@
             message: text,
             knowhowResume: khResume ? true : undefined,
             reportEngage: rEngage ? true : undefined,
+            reportPropose: rPropose ? true : undefined,
             qualifyEngage: qEngage ? true : undefined,
             event: switchTrk ? 'switch_track' : undefined,
             track: switchTrk || undefined,
