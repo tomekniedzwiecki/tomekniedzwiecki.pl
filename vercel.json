@@ -16,6 +16,7 @@
   ],
   "rewrites": [
     { "source": "/p/:code", "destination": "https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/spar-go?c=:code" },
+    { "source": "/b/:code", "destination": "https://yxmavwkwnfuphjqbelws.supabase.co/functions/v1/bud-go?c=:code" },
     { "source": "/crm", "destination": "https://tn-crm.vercel.app/crm" },
     { "source": "/crm/", "destination": "https://tn-crm.vercel.app/crm" },
     { "source": "/crm/funkcje", "destination": "https://tn-crm.vercel.app/crm/funkcje" },
