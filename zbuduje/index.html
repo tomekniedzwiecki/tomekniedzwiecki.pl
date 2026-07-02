@@ -479,6 +479,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .mk-foot{margin-top:18px;font-size:14.5px;color:var(--text-faint)}
 .mk-foot .g{color:var(--accent)}
 .mk-cta{margin-top:26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.heroX__cta{margin-top:clamp(20px,3vh,34px)}
+.motto__cta{justify-content:center;margin-top:34px}
+.scene__cta--center{justify-content:center;text-align:center}
+.motto__cta .mk-cta__note{width:100%;text-align:center}
+@media (max-width:600px){#act-2 .mk-cta,#act-coop .mk-cta,#act-reklamy .mk-cta{margin-top:16px}}
 .mk-cta__note{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--text-faint)}
 @media (max-width:600px){.mk-cta{gap:12px}.mk-cta .btn{width:100%;justify-content:center}.mk-cta__note{width:100%}}
 
@@ -637,7 +642,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 <!-- ACT 01 — HERO / lewa, wielki tekst (styl /aplikacja) -->
 <section class="scene hero heroX" id="act-1" data-rail="Wstęp">
     <div class="scene__in">
-        <div class="author heroX__author" data-reveal data-delay="900">
+        <div class="author heroX__author" data-reveal data-delay="250">
             <img src="/img/tn_kwadrat_small.webp" alt="Tomek Niedźwiecki" width="44" height="44" loading="eager" decoding="async">
             <div><b>Tomek Niedźwiecki</b></div>
         </div>
@@ -645,8 +650,12 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             <span class="heroX__line" data-reveal data-delay="0"><span class="heroX__mask"><span class="heroX__word">Zbuduję <i class="heroX__ci">Ci</i></span></span></span>
             <span class="heroX__line" data-reveal data-delay="250"><span class="heroX__mask"><span class="heroX__word"><span class="g heroX__key">e&#8209;sklep.</span> <i class="heroX__coda">Osobiście.</i></span></span></span>
         </h1>
-        <p class="heroX__sub" data-reveal data-delay="1050"><em>Buduję. Uczę.</em> <span class="g">Oddaję stery, kiedy działa.</span></p>
-        <p class="heroX__meta" data-reveal data-delay="1500"><span>SCROLL</span><span class="heroX__arrow" aria-hidden="true">↓</span></p>
+        <p class="heroX__sub" data-reveal data-delay="450"><em>Buduję. Uczę.</em> <span class="g">Oddaję stery, kiedy działa.</span></p>
+        <div class="mk-cta heroX__cta" data-reveal data-delay="650">
+            <a class="btn" href="/sklep/" data-cta data-loc="hero">Zbuduj swój sklep za darmo <span class="ar">→</span></a>
+            <span class="mk-cta__note">Darmowy raport rynku — bez zakładania konta</span>
+        </div>
+        <p class="heroX__meta" data-reveal data-delay="1000"><span>SCROLL</span><span class="heroX__arrow" aria-hidden="true">↓</span></p>
     </div>
 </section>
 
@@ -661,6 +670,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             <div class="wrow"><div class="wrow__n">03</div><div><div class="wrow__t">Prowadzenie</div><div class="wrow__d">Strona, płatności, reklamy, formalności. Łatwo się pogubić i odpuścić po miesiącu.</div></div></div>
         </div>
         <p class="punch" data-reveal data-delay="340">Biznesy nie umierają dlatego, że pomysł był zły. Umierają, bo <span class="g">nie miał ich kto dowieźć.</span></p>
+        <div class="mk-cta scene__cta--center" data-reveal data-delay="460">
+            <a class="btn" href="/sklep/" data-cta data-loc="problem">Sprawdź gotowy produkt <span class="ar">→</span></a>
+            <span class="mk-cta__note">Darmowy raport rynku w 2 minuty</span>
+        </div>
     </div>
 </section>
 
@@ -778,6 +791,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             <span class="line g">Bo ma udział w Twojej sprzedaży.</span>
         </blockquote>
         <div class="motto__by" data-reveal data-delay="200"><img src="/img/tn_kwadrat_small.webp" alt="">— Tomek Niedźwiecki</div>
+        <div class="mk-cta motto__cta" data-reveal data-delay="300">
+            <a class="btn" href="/sklep/" data-cta data-loc="motto">Przekonaj się — zacznij za darmo <span class="ar">→</span></a>
+            <span class="mk-cta__note">Raport, marka i makiety sklepu — wszystko zostaje Twoje</span>
+        </div>
     </div>
 </section>
 
@@ -797,7 +814,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         <div class="mk-track" id="mk-track" data-reveal data-delay="160"></div>
         <div class="mk-cta" data-reveal>
             <a class="btn" href="/sklep/" data-cta data-loc="makiety">Zbuduj swój sklep <span class="ar">→</span></a>
-            <span class="mk-cta__note">W 10 minut, za darmo — bez zobowiązań.</span>
+            <span class="mk-cta__note">Zobaczysz podgląd SWOJEGO sklepu na żywo — za darmo.</span>
         </div>
     </div>
 </section>
@@ -825,6 +842,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
             </div>
         </div>
         </div>
+        <div class="mk-cta" data-reveal data-delay="320">
+            <a class="btn" href="/sklep/" data-cta data-loc="coop">Zbuduj swój sklep ze mną <span class="ar">→</span></a>
+            <span class="mk-cta__note">Start za darmo — od rezerwacji rozmawiamy 1:1</span>
+        </div>
     </div>
 </section>
 
@@ -838,7 +859,11 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         <div class="mq__row" id="mq-row1"></div>
         <div class="mq__row mq__row--rev" id="mq-row2"></div>
     </div>
-    <div class="scene__in"><p class="mk-foot" data-reveal>Każdy sklep dostaje <span class="g">własny zestaw kreacji</span> — pod produkt i grupę docelową.</p></div>
+    <div class="scene__in"><p class="mk-foot" data-reveal>Każdy sklep dostaje <span class="g">własny zestaw kreacji</span> — pod produkt i grupę docelową.</p>
+        <div class="mk-cta scene__cta--center" data-reveal data-delay="140">
+            <a class="btn" href="/sklep/" data-cta data-loc="reklamy">Zobacz reklamy dla swojego produktu <span class="ar">→</span></a>
+        </div>
+    </div>
 </section>
 
 <!-- ACT — DOMKNIĘCIE / GŁÓWNY PRZEKAZ + CTA -->
@@ -884,9 +909,21 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
         $('#rail').classList.add('is-on');
         startReveal();
     }
-    if(RM){ if(intro){intro.style.display='none';} startRevealImmediate(); $('#rail').classList.add('is-on'); }
+    // Ruch z reklam (utm/click-id) i powroty w tej samej sesji OMIJAJĄ intro:
+    // GA pokazał śr. zaangażowanie 2 s na /zbuduje — user z TikToka odpadał na czarnej
+    // planszy, zanim pojawiło się cokolwiek klikalnego. Brand-moment zostaje dla organic.
+    var AD_VISIT = /[?&](utm_|fbclid=|ttclid=|gclid=)/.test(location.search);
+    var INTRO_SEEN = false; try { INTRO_SEEN = sessionStorage.getItem('zb_intro') === '1'; } catch(e){}
+    if(RM || AD_VISIT || INTRO_SEEN){
+        if(intro){intro.style.display='none';}
+        document.body.classList.add('ready');
+        $('#rail').classList.add('is-on');
+        if(RM) startRevealImmediate(); else startReveal();
+        dismissed = true;
+    }
     else {
-        var auto = window.innerWidth < 760 ? 1700 : 2400;
+        try { sessionStorage.setItem('zb_intro','1'); } catch(e){}
+        var auto = window.innerWidth < 760 ? 1100 : 1800;
         var t = setTimeout(dismissIntro, auto);
         ['click','touchstart','keydown'].forEach(function(ev){ intro.addEventListener(ev,function(e){ if(ev==='keydown' && !(e.key==='Enter'||e.key===' '||e.key==='Escape')) return; clearTimeout(t); dismissIntro(); }, {passive:true}); });
     }
