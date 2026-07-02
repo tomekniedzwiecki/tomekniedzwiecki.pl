@@ -3974,6 +3974,11 @@
     .rpw-steps li { padding-left: 4px; }
     .rpw-steps li::marker { color: var(--accent, #00d97e); font-weight: 700; }
     .rpw-steps strong { color: var(--text-strong, #fff); font-weight: 700; }
+    /* U3: pływający CTA rezerwacji (tylko mobile) — decyzja dojrzewa przy makietach/sklepie,
+       a kafel rezerwacji żyje w drawerze; CTA musi podróżować z userem. Pod modalami (z-index 200). */
+    .rsv-fab { position: fixed; right: 12px; bottom: 86px; z-index: 150; display: none; align-items: center; gap: 7px; padding: 12px 16px; border-radius: 999px; border: 1px solid rgba(0,217,126,.55); background: rgba(6,24,16,.94); color: #eafff5; font-weight: 700; font-size: 13.5px; line-height: 1; box-shadow: 0 6px 24px -6px rgba(0,217,126,.45); cursor: pointer; backdrop-filter: blur(6px); }
+    .rsv-fab b { color: var(--accent, #00d97e); font-weight: 800; }
+    @media (max-width: 720px) { .rsv-fab { display: inline-flex; } }
     .fct-grp { margin: 14px 0 0; }
     .fct-h { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--accent, #00d97e); margin-bottom: 7px; }
     .fct-row { display: flex; justify-content: space-between; gap: 14px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 13px; line-height: 1.4; }
@@ -6597,6 +6602,7 @@
         state.zielone = saved.zielone || null;                // #4 resume personalizacji zielonej karty
         state.brandDone = !!saved.brandDone;                  // #2 resume marki
         state._mockPending = !!saved.mockPending;             // #1 resume makiet
+        if (state._mockPending) { try { armMockFallback(); } catch (e) {} }   // T8: bezpiecznik działa też po F5
         state.reportEngagePending = !!saved.reportEngagePending;  // #3 resume zaczepki ustaleń
         state.reportProposeDone = !!saved.reportProposeDone;       // #5 resume flagi propozycji
         extras.summary = 'idle';
@@ -7095,10 +7101,33 @@
                     else b.textContent = 'Jeszcze nie widzę wpłaty — kliknij ponownie';
                 });
             });
-            setTimeout(function () { try { digits[0].focus(); } catch (e) {} }, 120);
+            // U6: autofocus TYLKO desktop (na dotyku klawiatura zasłaniała treść pod polem)
+            if (window.matchMedia && matchMedia('(hover:hover)').matches) setTimeout(function () { try { digits[0].focus(); } catch (e) {} }, 120);
         } else {
             el('cpw-login').addEventListener('click', function () { close(); openAuthModal('Zaloguj się, żeby otworzyć kolejny projekt na swoim koncie.'); });
         }
+    }
+    // U3: podgląd dowodu (makiety/reklamy) NAD paywallem rezerwacji — bez zamykania go.
+    // Prosty lightbox: duże zdjęcie + strzałki; zamknięcie wraca do paywalla (decyzja zostaje).
+    function showProofLightbox(urls) {
+        urls = (urls || []).filter(Boolean);
+        if (!urls.length || el('proof-lb')) return;
+        var i = 0;
+        var ov = document.createElement('div');
+        ov.id = 'proof-lb';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:20px';
+        ov.innerHTML =
+            '<button type="button" id="plb-x" aria-label="Zamknij" style="position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:17px;cursor:pointer">✕</button>' +
+            '<button type="button" id="plb-prev" aria-label="Poprzednie" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:17px;cursor:pointer">‹</button>' +
+            '<button type="button" id="plb-next" aria-label="Następne" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:17px;cursor:pointer">›</button>' +
+            '<img id="plb-img" referrerpolicy="no-referrer" src="' + esc(urls[0]) + '" alt="Podgląd" style="max-width:min(92vw,560px);max-height:84vh;border-radius:12px;object-fit:contain">' +
+            '<div id="plb-count" style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-size:12.5px;color:rgba(255,255,255,.75)">1 / ' + urls.length + '</div>';
+        document.body.appendChild(ov);
+        var show = function (n) { i = (n + urls.length) % urls.length; el('plb-img').src = urls[i]; el('plb-count').textContent = (i + 1) + ' / ' + urls.length; };
+        el('plb-x').addEventListener('click', function () { ov.remove(); });
+        el('plb-prev').addEventListener('click', function (e) { e.stopPropagation(); show(i - 1); });
+        el('plb-next').addEventListener('click', function (e) { e.stopPropagation(); show(i + 1); });
+        ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });
     }
     // BLIK inline: utwórz zamówienie (serwer) → tpay-create-transaction z kodem →
     // potwierdzenie w banku → odpytuj uprawnienia aż +1 → otwórz nową rozmowę.
@@ -7158,13 +7187,44 @@
     // (spar_session_id=sid → webhook ustawi bud_sessions.paid_at; opis 'Rezerwacja … sklep').
     function reservationConfirmed() {
         var box = el('reserv-paywall'); if (box) box.remove();
+        var _fab = el('rsv-fab'); if (_fab) _fab.remove();   // U3: opłacone → pływające CTA znika
         if (activeTab !== 'chat') switchTab('chat');
-        sysMsg('Rezerwacja przyjęta — dziękuję! 🤝 Tomek osobiście ułoży plan Twojego sklepu i odezwie się do Ciebie.');
+        // U2: po płatności NIE „dziękuję i cisza" — karta „co się teraz dzieje" z jasnym SLA.
+        // Konwersja ginęła dokładnie tu: user płacił „w próżnię" i nie wiedział, na co czeka.
+        var host = el('chat-msgs');
+        if (host && !el('resv-next')) {
+            var d = document.createElement('div');
+            d.id = 'resv-next'; d.className = 'mk-card';
+            d.style.cssText = 'border:1px solid rgba(0,217,126,.5);box-shadow:0 0 40px -16px rgba(0,217,126,.4)';
+            d.innerHTML =
+                tomekFaceRow(44) +
+                '<div class="mk-card__title">Rezerwacja przyjęta ✓ Oto co się teraz dzieje</div>' +
+                '<ol class="rpw-steps" style="margin:10px 0 4px">' +
+                '<li><strong>Teraz:</strong> Twój projekt (raport, marka, makiety, podgląd sklepu) trafia na biurko Tomka.</li>' +
+                '<li><strong>Do 48 h roboczych:</strong> Tomek osobiście analizuje projekt i układa plan wejścia.</li>' +
+                '<li><strong>Potem:</strong> odzywa się do Ciebie i wspólnie przegadujecie plan — dopiero wtedy decydujecie o budowie.</li>' +
+                '</ol>' +
+                '<p class="mk-card__note">Nie wejdziecie we współpracę → 500 zł wraca w całości. Masz pytanie w międzyczasie? Pisz śmiało tutaj, w rozmowie.</p>';
+            host.appendChild(d);
+            scrollToBottom(true);
+        }
+        sysMsg('Rezerwacja przyjęta — dziękuję! 🤝');
     }
     function openReservationCheckout() {
         var u = checkoutURL();
         if (typeof isInAppWebView === 'function' && isInAppWebView()) { try { window.location.assign(u); } catch (e) { window.location.href = u; } }
         else window.open(u, '_blank', 'noopener');
+    }
+    // U1: twarz Tomka (wideo jak na stronie głównej /) w momentach decyzji — scam-lęk #1
+    // leadów to anonimowość; awatar-logo jej nie zbija, żywa twarz TAK. Poster = webp fallback.
+    function tomekFaceHTML(size, extraStyle) {
+        return '<video src="/img/tn_twarz.mp4?v=2" poster="/img/tn_kwadrat_small.webp" width="' + size + '" height="' + size + '"' +
+            ' autoplay muted loop playsinline preload="metadata" aria-label="Tomek Niedźwiecki"' +
+            ' style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover;display:block;flex:none;' + (extraStyle || '') + '"></video>';
+    }
+    function tomekFaceRow(size, sub) {
+        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' + tomekFaceHTML(size) +
+            '<div style="font-size:12.5px;line-height:1.35;color:var(--text-muted)"><b style="color:var(--text-strong,#fff);font-size:13.5px">Tomek Niedźwiecki</b><br>' + (sub || '15 lat e-commerce · 70 mln zł obrotu') + '</div></div>';
     }
     // „POKAŻ KONKRETY — koszty i zasady" (audyt OpenAI, genius #1): twarda, jawna karta dla sceptyka/
     // analityka/haglera. Odwraca dynamikę — bierzemy obiekcje na klatę. Wzmacnia reframe (realne partnerstwo,
@@ -7177,6 +7237,7 @@
             '<div class="auth-modal__backdrop" id="fct-bd"></div>' +
             '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Koszty i zasady" style="max-width:560px">' +
             '<button type="button" class="auth-modal__close" id="fct-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
+            tomekFaceRow(44) +
             '<h2 class="auth-modal__title">Konkrety — koszty i zasady, bez marketingu</h2>' +
             '<p class="auth-modal__sub" style="margin-top:2px">Masz prawo być nieufny. Tu jest wszystko wprost.</p>' +
             '<div class="fct-grp"><div class="fct-h">Ile to kosztuje</div>' +
@@ -7188,7 +7249,7 @@
             '<div class="fct-grp"><div class="fct-h">Jak działa rezerwacja 500 zł</div>' +
             '<ol class="rpw-steps" style="margin-bottom:0">' +
               '<li>Rezerwujesz <b>czas Tomka</b> na osobistą analizę projektu — nie kupujesz sklepu.</li>' +
-              '<li>Tomek przygotowuje plan wejścia i odzywa się online.</li>' +
+              '<li>Tomek przygotowuje plan wejścia i odzywa się <b>w ciągu 48 h roboczych</b> (zwykle szybciej).</li>' +
               '<li><b>Nie wchodzicie we współpracę → 500 zł wraca w całości</b> (do 5 dni roboczych, na to samo źródło).</li>' +
               '<li>Wchodzicie → 500 zł wlicza się w budowę.</li>' +
             '</ol></div>' +
@@ -7276,6 +7337,7 @@
             '<div class="auth-modal__backdrop" id="rpw-bd"></div>' +
             '<div class="auth-modal__card" role="dialog" aria-modal="true" aria-label="Rezerwacja rozmowy z Tomkiem">' +
             '<button type="button" class="auth-modal__close" id="rpw-x" aria-label="Zamknij"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>' +
+            tomekFaceRow(48) +
             '<h2 class="auth-modal__title">Zarezerwuj wejście we współpracę z Tomkiem</h2>' +
             '<div class="rpw-anchor"><span class="rpw-anchor__lead">Pokaz, co już przygotowaliśmy — za darmo:</span>' +
             '<span class="rpw-anchor__items"><i>✓ Raport rynku</i><i>✓ Marka i logo</i><i>✓ Podgląd sklepu</i><i>✓ Reklamy</i></span>' +
@@ -7284,7 +7346,7 @@
             '<p class="auth-modal__sub"><strong>500 zł, w pełni zwrotne.</strong> Nie kupujesz dziś sklepu — <strong>rezerwujesz czas Tomka</strong>, żeby osobiście przeanalizował Twój projekt i ułożył plan wejścia. To pierwszy krok wspólnego biznesu.</p>' +
             '<ol class="rpw-steps">' +
               '<li>Wpłacasz <strong>500 zł</strong> zwrotnej rezerwacji.</li>' +
-              '<li>Tomek osobiście analizuje Twój projekt i odzywa się z planem.</li>' +
+              '<li>Tomek osobiście analizuje Twój projekt i odzywa się z planem — <strong>w ciągu 48 h roboczych</strong> (zwykle szybciej).</li>' +
               '<li>Decydujecie, czy wchodzicie w pełną budowę (9400 zł brutto pod klucz).</li>' +
               '<li><strong>Nie wchodzicie → 500 zł wraca w całości.</strong> Wchodzicie → wlicza się w budowę.</li>' +
               '<li>Tomek buduje, odpala sprzedaż, prowadzi do 1000 zamówień, uczy — potem przejmujesz stery.</li>' +
@@ -7295,15 +7357,25 @@
               '<button type="button" id="rpw-facts" class="fct-link">Koszty i zasady</button>' +
               '<button type="button" id="rpw-questions" class="fct-link">Mam pytania — wróć do rozmowy</button>' +
             '</div>' +
-            '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.</p>' +
+            '<p class="auth-modal__note">Płatność przez Tpay. BLIK potwierdzasz w aplikacji banku — bez wychodzenia stąd.<br><strong>Zwrot bez pytań:</strong> jeśli nie wejdziecie we współpracę, 500 zł wraca na to samo źródło do 5 dni roboczych.<br>Tomek prowadzi ograniczoną liczbę projektów jednocześnie — rezerwacja trzyma Twoje miejsce w kolejce do planu.</p>' +
             '</div>';
         document.body.appendChild(ov);
         pushModalState();   // gest WSTECZ zamyka paywall rezerwacji, nie wyrzuca z lejka
         var close = function () { ov.remove(); };
-        el('rpw-x').addEventListener('click', close);
-        el('rpw-bd').addEventListener('click', close);
-        // genius #3: klik miniatur → podgląd makiet (proof bez utraty kontekstu)
-        var _proof = el('rpw-proof'); if (_proof) _proof.addEventListener('click', function () { close(); switchTab('makiety'); });
+        // U4: zamknięcie paywalla (X/tło) = moment OBIEKCJI — jedyny dotąd nieopomiarowany.
+        // Chipy łapią powód od razu (bot ma bank obiekcji z FAKTÓW), event daje dane.
+        var closeWithObjections = function () {
+            close();
+            try { gaEvent('app_paywall_close', {}); } catch (e) {}
+            if (!state.paid) {
+                try { renderSuggestions(['Muszę to przemyśleć', '500 zł to teraz dużo', 'Skąd pewność, że 500 zł wróci?', 'Mam jeszcze pytania']); } catch (e) {}
+            }
+        };
+        el('rpw-x').addEventListener('click', closeWithObjections);
+        el('rpw-bd').addEventListener('click', closeWithObjections);
+        // U3 (fix genius #3): klik miniatur NIE zamyka już paywalla (gubił moment płatności) —
+        // podgląd otwiera się w lightboxie NAD paywallem, decyzja zostaje na stole.
+        var _proof = el('rpw-proof'); if (_proof) _proof.addEventListener('click', function () { showProofLightbox(proofUrls); });
         // #8: ścieżka niskiego oporu dla wahających się — wróć do czatu z pytaniami zamiast zamykać i odpływać
         var _q = el('rpw-questions'); if (_q) _q.addEventListener('click', function () { close(); switchTab('chat'); try { unlockComposer(); } catch (e) {} var ci = el('chat-input'); if (ci) { try { ci.focus(); } catch (e) {} } });
         var _f = el('rpw-facts'); if (_f) _f.addEventListener('click', function () { showFactsModal(); });
@@ -7329,7 +7401,9 @@
                 try { syncProjectFromServer(); } catch (e) { }
                 setTimeout(function () { if (state.paid) reservationConfirmed(); else b.textContent = 'Jeszcze nie widzę wpłaty — kliknij ponownie'; }, 1600);
             });
-            setTimeout(function () { try { digits[0].focus(); } catch (e) { } }, 120);
+            // U6: autofocus TYLKO desktop — na dotyku wywoływał klawiaturę, która zasłaniała
+            // gwarancję zwrotu i przyciski pod polem BLIK.
+            if (window.matchMedia && matchMedia('(hover:hover)').matches) setTimeout(function () { try { digits[0].focus(); } catch (e) { } }, 120);
         } else {
             el('rpw-login').addEventListener('click', function () { close(); openAuthModal('Zaloguj się, żeby zarezerwować rozmowę.'); });
         }
@@ -7664,6 +7738,17 @@
         var show = state.verdict === 'zielony';
         if (show && cta.hidden) cta.classList.add('is-in'); // animacja momentu odblokowania
         cta.hidden = !show;
+        // U3: pływający CTA rezerwacji na mobile — po zielonym, dopóki nie opłacono.
+        // Desktop ma kafel w sidebarze; na mobile kafel znika w drawerze i CTA ginęło.
+        var fab = el('rsv-fab');
+        var fabShow = show && !state.paid && state.stage !== 'knowhow' && state.stage !== 'build';
+        if (fabShow && !fab) {
+            fab = document.createElement('button');
+            fab.type = 'button'; fab.id = 'rsv-fab'; fab.className = 'rsv-fab';
+            fab.innerHTML = '<b>✓</b> Rezerwuję rozmowę <b>→ 500 zł</b>';
+            fab.addEventListener('click', function () { try { gaEvent('app_fab_reserve', {}); } catch (e) {} showReservationPaywall(); });
+            document.body.appendChild(fab);
+        } else if (!fabShow && fab) fab.remove();
         if (show && state.stage === 'knowhow') {
             cta.classList.add('side-cta--kh');
             cta.innerHTML =
@@ -8286,7 +8371,7 @@
         // #1 MAKIETY: ustalenia domknięte, makiety nie ruszyły → domknij przejście
         if (state.ustalenia && !(state.mockups && state.mockups.length) && !state.chosenStyle && extras.mockups !== 'gen') {
             if (state.raport) kickMockup(false);
-            else state._mockPending = true;   // raport jeszcze leci → makiety po jego gotowości
+            else { state._mockPending = true; armMockFallback(); }   // raport jeszcze leci → makiety po jego gotowości (z bezpiecznikiem T8)
         }
         // #2 MARKA: ustalenia domknięte, marka nie sfinalizowana → wznów picker (idempotentny)
         if (state.ustalenia && !state.brandDone && (!state.brand || !state.brand.chosen_logo) && !el('brand-card')) {
@@ -8529,7 +8614,7 @@
             '<li><span class="rk-free__d"></span>4 gotowe reklamy na Facebooka i Instagram</li>' +
             '<li><span class="rk-free__d"></span>Podgląd Twojego sklepu — strona sprzedażowa</li>' +
             '</ul>' +
-            '<div class="rk-free__f">To pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy projekt — zanim w ogóle zaczniemy rozmawiać o współpracy.</div>' +
+            '<div class="rk-free__f">To pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy projekt — zanim w ogóle zaczniemy rozmawiać o współpracy.<br><span style="opacity:.8">Za Tomkiem: 15 lat e-commerce · ~70 mln zł obrotu · 5000+ uruchomionych sklepów.</span></div>' +
             '</div>';
     }
     function showRaportProgressInChat() {
@@ -10578,7 +10663,10 @@
         body.innerHTML =
             '<div class="tabpane__head"><div class="tabpane__eyebrow">Wspólny biznes</div>' +
             '<h2 class="tabpane__title">Budujemy to razem</h2>' +
-            '<p class="tabpane__sub">Ty wnosisz pomysł i chęć prowadzenia. Tomek z zespołem buduje sklep, odpala reklamy i rozkręca sprzedaż — aż przejmiesz stery.</p></div>' +
+            '<p class="tabpane__sub">Ty wnosisz pomysł i chęć prowadzenia. Tomek z zespołem buduje sklep, odpala reklamy i rozkręca sprzedaż — aż przejmiesz stery.</p>' +
+            // U1: wspólnik ma twarz — wideo Tomka (jak na stronie głównej), nie anonimowa oferta.
+            '<div style="display:flex;align-items:center;gap:12px;margin-top:14px">' + tomekFaceHTML(56) +
+            '<div style="font-size:12.5px;line-height:1.4;color:var(--text-muted)"><b style="color:var(--text-strong,#fff);font-size:14px">Tomek Niedźwiecki</b><br>15 lat e-commerce · ~70 mln zł obrotu · 5000+ uruchomionych sklepów</div></div></div>' +
 
             '<div class="cw-stats">' +
             '<div class="cw-stat"><b>500 zł</b><span>rezerwacja rozmowy<br><em>w pełni zwrotna</em></span></div>' +
@@ -11071,6 +11159,22 @@
     }
 
     // Marker <ustalenia> z tury AI — ustalenia domknięte, ruszamy makiety.
+    // T8: BEZPIECZNIK makiet — czekanie na raport jest narracyjne, nie techniczne
+    // (bud-mockup traktuje market_report jako OPCJONALNY kontekst). Gdy raport utknie
+    // (429/timeout po stronie serwera), user NIE może wisieć w nieskończoność przed
+    // swoim „wow": po 75 s odpalamy makiety bez raportu. Jednorazowo na uzbrojenie.
+    var _mockFallbackArmed = false;
+    function armMockFallback() {
+        if (_mockFallbackArmed) return;
+        _mockFallbackArmed = true;
+        setTimeout(function () {
+            _mockFallbackArmed = false;
+            if (state._mockPending && !state.raport && !(state.mockups && state.mockups.length) && extras.mockups !== 'gen') {
+                state._mockPending = false;
+                try { kickMockup(false); } catch (e) {}
+            }
+        }, 75000);
+    }
     function onUstaleniaDone() {
         clearWidget();   // awans etapu → zdejmij ewentualny wiszący widżet z fazy ustaleń
         // B5: karta w czacie — ustalenia to jedyny etap bez karty kierunkującej; odeślij do zakładki
@@ -11079,7 +11183,7 @@
         // L4: makiety+reklamy ruszają na bazie RAPORTU + USTALEŃ — dopiero gdy raport gotowy
         // (nazwa+logo i ustalenia biegły PODCZAS generowania raportu).
         if (state.raport) kickMockup(false);
-        else state._mockPending = true;   // raport jeszcze się liczy → makiety odpalą się po jego gotowości
+        else { state._mockPending = true; armMockFallback(); }   // raport jeszcze się liczy → makiety odpalą się po jego gotowości (bezpiecznik T8)
         updateBudNav();
         // B: nazwa marki + logo DOPIERO po domknięciu ustaleń (max 2 pytania) — logo oddaje już kierunek z ustaleń
         setTimeout(renderBrandPicker, 500);
@@ -11554,15 +11658,43 @@
         s.textContent = '.lb-wrap{max-width:560px;margin:8px auto 0}.lb-head{display:flex;align-items:center;gap:10px;font-size:14.5px;color:var(--text,#e7e7ea);margin-bottom:14px}.lb-timer{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:13px}.lb-spin{width:15px;height:15px;border:2px solid rgba(0,217,126,.25);border-top-color:var(--accent,#00d97e);border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite}.lb-steps{display:flex;flex-direction:column;gap:2px}.lb-step{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:13.5px;color:var(--text-muted);transition:color .3s,background .3s,opacity .3s;opacity:.45}.lb-step .lb-dot{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--text-muted);flex:0 0 auto;transition:.3s}.lb-step.is-active{opacity:1;color:var(--text,#e7e7ea);background:rgba(255,255,255,.03)}.lb-step.is-active .lb-dot{border-color:var(--accent,#00d97e);box-shadow:0 0 0 4px rgba(0,217,126,.15);animation:dotPulse 1s ease-in-out infinite}.lb-step.is-done{opacity:1;color:var(--text,#e7e7ea)}.lb-step.is-done .lb-dot{background:var(--accent,#00d97e);border-color:var(--accent,#00d97e)}.lb-note{font-size:12.5px;color:var(--text-muted);margin-top:16px;line-height:1.5;text-align:center}';
         document.head.appendChild(s);
     }
+    // U7: 4 minuty czekania na sklep = SZCZYT oczekiwania — najlepszy moment na priming
+    // współpracy. Rotator podmienia hasła „co dalej z Tomkiem" (fakty, nie marketing).
+    var LB_ROTATOR = [
+        'Tak może wyglądać Twój wspólny biznes z Tomkiem — to, co widzisz, powstaje w 10 minut.',
+        'Po tej stronie: Tomek osobiście układa plan wejścia i prowadzi sprzedaż do pierwszych 1000 zamówień.',
+        'Sklep jest Twój od pierwszego dnia — Tomek bierze 10% od przychodu, więc zarabia tylko razem z Tobą.',
+        'Za Tomkiem 15 lat e-commerce i 5000+ uruchomionych sklepów — wie, co robi z Twoim.',
+        'Finalną wersję (płatności, dostawca, kampanie) Tomek z zespołem dopina po starcie współpracy.'
+    ];
+    var lbRotTimer = null;
     function renderLandingBuild(body, head) {
         injectBuildStyle();
         if (!landingBuildStart) landingBuildStart = Date.now();
         var rows = BUILD_STEPS.map(function (s, i) { return '<div class="lb-step" data-i="' + i + '"><span class="lb-dot"></span><span class="lb-txt">' + esc(s) + '</span></div>'; }).join('');
+        // U7: miniatura WYBRANEJ makiety obok kroków — user widzi, CO się materializuje.
+        var _mk = (state.mockups || []).filter(function (m) { return m && m.style === state.chosenStyle; })[0] || (state.mockups || [])[0];
+        var mkThumb = (_mk && _mk.url)
+            ? '<div style="display:flex;gap:12px;align-items:center;margin:0 0 14px;padding:10px 12px;border:1px solid var(--glass-border,rgba(255,255,255,.1));border-radius:12px;background:rgba(255,255,255,.03)">' +
+              '<img referrerpolicy="no-referrer" src="' + esc(_mk.url) + '" alt="Wybrana makieta" style="width:56px;height:74px;object-fit:cover;border-radius:8px;flex:none">' +
+              '<div style="font-size:12.5px;line-height:1.45;color:var(--text-muted)">Buduję stronę według <b style="color:var(--text-strong,#fff)">wybranej przez Ciebie makiety</b>' + (_mk.label ? ' — styl „' + esc(_mk.label) + '"' : '') + '.</div></div>'
+            : '';
         body.innerHTML = head +
-            '<div class="lb-wrap"><div class="lb-head"><span class="lb-spin"></span><b>Składam Twój sklep — sekcja po sekcji…</b><span class="lb-timer" id="lb-timer">0:00</span></div>' +
+            '<div class="lb-wrap">' + mkThumb +
+            '<div class="lb-head"><span class="lb-spin"></span><b>Składam Twój sklep — sekcja po sekcji…</b><span class="lb-timer" id="lb-timer">0:00</span></div>' +
             '<div class="lb-steps">' + rows + '</div>' +
-            '<div class="lb-note">Strona buduje się w tle (~3 min). Możesz w tym czasie wrócić do rozmowy — dam znać, gdy będzie gotowa.</div></div>';
+            '<div class="lb-note" id="lb-rot" style="transition:opacity .4s">' + esc(LB_ROTATOR[0]) + '</div>' +
+            '<div class="lb-note" style="margin-top:6px;opacity:.75">Strona buduje się w tle (~3 min). Możesz w tym czasie wrócić do rozmowy — dam znać, gdy będzie gotowa.</div></div>';
         startLandingBuildTicker();
+        if (lbRotTimer) clearInterval(lbRotTimer);
+        var rotI = 0;
+        lbRotTimer = setInterval(function () {
+            var n = el('lb-rot');
+            if (!n) { clearInterval(lbRotTimer); lbRotTimer = null; return; }
+            rotI = (rotI + 1) % LB_ROTATOR.length;
+            n.style.opacity = '0';
+            setTimeout(function () { var m = el('lb-rot'); if (m) { m.textContent = LB_ROTATOR[rotI]; m.style.opacity = '1'; } }, 400);
+        }, 8000);
     }
     function startLandingBuildTicker() {
         if (landingBuildTimer) clearInterval(landingBuildTimer);
@@ -13856,8 +13988,12 @@
         div.className = 'mk-card';
         div.style.cssText = 'border:1px solid rgba(0,217,126,.5);box-shadow:0 0 40px -16px rgba(0,217,126,.5)';
         div.innerHTML =
-            '<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.05em;color:#00d97e;background:rgba(0,217,126,.12);border:1px solid rgba(0,217,126,.4);padding:5px 11px;border-radius:999px;margin-bottom:10px"><span style="font-size:14px">✓</span> ZIELONE ŚWIATŁO — WERDYKT TOMKA</div>' +
+            // U1: twarz Tomka przy werdykcie — to „werdykt TOMKA", więc ma go firmować człowiek, nie logo.
+            '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">' + tomekFaceHTML(46) +
+            '<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.05em;color:#00d97e;background:rgba(0,217,126,.12);border:1px solid rgba(0,217,126,.4);padding:5px 11px;border-radius:999px"><span style="font-size:14px">✓</span> ZIELONE ŚWIATŁO — WERDYKT TOMKA</div></div>' +
             '<div class="mk-card__title">Przeanalizowaliśmy Twój produkt i rynek — wchodzimy w to z Tobą.</div>' +
+            // U5: dowód w momencie decyzji (dotąd schowany w modalu „Konkrety")
+            '<div style="display:flex;flex-wrap:wrap;gap:5px 14px;margin:6px 0 2px;font-size:11.5px;color:var(--text-muted)"><span>✓ 15 lat e-commerce</span><span>✓ ~70 mln zł obrotu</span><span>✓ 5000+ uruchomionych sklepów</span></div>' +
             '<div style="display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 4px">' +
             '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#00d97e;margin-bottom:5px">Dlaczego mówimy „tak"</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(mocne, '#00d97e') + '</ul></div>' +
             '<div style="flex:1;min-width:175px"><div style="font-size:12px;font-weight:700;color:#e7e7ea;margin-bottom:5px">Co dopracujemy razem</div><ul style="list-style:none;margin:0;padding:0;font-size:12.5px;color:var(--text-muted)">' + li(dopr, '#a1a1aa') + '</ul></div>' +
@@ -13866,6 +14002,8 @@
             '<p class="mk-card__d">To <strong>nie koniec — to wejście we wspólny biznes z Tomkiem.</strong> Rezerwacja = Tomek osobiście układa plan → buduje sklep pod klucz → wspólnie dochodzicie do pierwszych 1000 zamówień → uczy Cię prowadzenia → <strong>przejmujesz stery</strong> (Tomek zostaje wspólnikiem, 10% od przychodu).</p>' +
             '<a class="side-cta__btn" href="' + esc(checkoutURL()) + '" target="_blank" rel="noopener">Rezerwuję wejście we współpracę → 500 zł</a>' +
             '<p class="mk-card__note">w pełni zwrotne · 500 zł wlicza się w budowę, a wraca w całości, jeśli nie wejdziemy we współpracę · rezerwujesz czas Tomka, nie kupujesz sklepu</p>' +
+            // U9: UCZCIWA pilność (bez zmyślonych liczników) — realne ograniczenie mocy przerobowych.
+            '<p class="mk-card__note" style="margin-top:4px">Tomek prowadzi ograniczoną liczbę projektów jednocześnie — rezerwacja ustawia Twój w kolejce do planu.</p>' +
             '<div style="text-align:center;margin-top:8px"><button type="button" class="fct-link" data-fear>Boję się, że nie dam rady</button></div>';
         return div;
     }
@@ -13881,9 +14019,30 @@
             try { gaEvent('app_verdict', { verdict: 'zielony', source: 'zielone_swiatlo' }); } catch (e) {}
         };
         if (animate) {
-            wrap.innerHTML = '<div class="mk-card" style="display:flex;align-items:center;gap:10px;border-color:rgba(0,217,126,.4)"><span style="width:15px;height:15px;border:2px solid rgba(0,217,126,.25);border-top-color:#00d97e;border-radius:50%;display:inline-block;animation:budSpinT .8s linear infinite"></span><span style="font-size:13.5px;color:var(--text,#e7e7ea)">Oceniamy potencjał Twojego sklepu…</span></div>';
+            // U10: werdykt „ZAROBIONY" — 3 kryteria odhaczane sekwencyjnie (z realnymi danymi
+            // produktu, bez zmyślania) zamiast anonimowego spinnera 2,8 s. Werdykt, który
+            // widać jak powstaje, znaczy więcej niż taki, który „wyskakuje".
+            var _p = state.chosenProduct || {};
+            var _fmt = function (n) { n = Number(n) || 0; return n >= 1000000 ? (Math.round(n / 100000) / 10 + ' mln').replace('.', ',') : n >= 1000 ? (Math.round(n / 100) / 10 + ' tys.').replace('.', ',') : String(n); };
+            var _crits = [
+                'Popyt: ' + (Number(_p.saves) ? '~' + _fmt(_p.saves) + ' zapisów produktu na TikToku' : 'produkt viraluje na TikToku'),
+                'Marża i przestrzeń na własną markę — potwierdzone w raporcie',
+                'Format idealny pod sprzedaż z reklam wideo (Meta / TikTok)'
+            ];
+            wrap.innerHTML = '<div class="mk-card" style="border-color:rgba(0,217,126,.4)">' +
+                '<div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--text,#e7e7ea);margin-bottom:8px"><span style="width:15px;height:15px;border:2px solid rgba(0,217,126,.25);border-top-color:#00d97e;border-radius:50%;display:inline-block;flex:none;animation:budSpinT .8s linear infinite"></span>Oceniamy potencjał Twojego sklepu…</div>' +
+                _crits.map(function (t, i) { return '<div class="zl-crit" data-i="' + i + '" style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text-muted);margin:5px 0;opacity:.32;transition:opacity .35s"><span class="zl-crit__m" style="width:16px;flex:none;text-align:center;color:#00d97e">·</span><span>' + esc(t) + '</span></div>'; }).join('') +
+                '</div>';
             scrollToBottom(false);
-            setTimeout(reveal, 2800);
+            _crits.forEach(function (_, i) {
+                setTimeout(function () {
+                    var n = wrap.querySelector('.zl-crit[data-i="' + i + '"]'); if (!n) return;
+                    n.style.opacity = '1'; n.style.color = 'var(--text,#e7e7ea)';
+                    var m = n.querySelector('.zl-crit__m'); if (m) m.textContent = '✓';
+                    scrollToBottom(false);
+                }, 950 * (i + 1));
+            });
+            setTimeout(reveal, 950 * _crits.length + 900);
         } else { reveal(); }
     }
 
