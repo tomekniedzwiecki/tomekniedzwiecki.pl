@@ -8231,6 +8231,17 @@
         if (!state.chosenProduct || !state.chosenProduct.id) return;
         // RAPORT: brak raportu → wznów (dla karuzeli anonimowo; własny produkt gated w kickReport)
         if (!state.raport && extras.raport !== 'gen') kickReport(false);
+        // STRAŻNIK <ustalenia> na resume (F5 po martwym punkcie): propozycja padła, user
+        // zaakceptował, ale marker przepadł → wymuś blok, inaczej rozmowa stoi na zawsze.
+        if (state.raport && !state.ustalenia && state.reportProposeDone && !state._ustaleniaEnforced) {
+            var _lu = null;
+            for (var _i2 = messages.length - 1; _i2 >= 0; _i2--) { if (messages[_i2].role === 'user') { _lu = String(messages[_i2].content || ''); break; } }
+            if (_lu && /pasuje|jed[źz]my|dawaj|zgoda|lecimy|bierzemy|rób|idziemy/i.test(_lu)) {
+                state._ustaleniaEnforced = true;
+                setTimeout(function () { if (!streaming && !state.ustalenia) streamReply('', false, { ustaleniaEnforce: true }); }, 800);
+                return;
+            }
+        }
         // #3 ZACZEPKA USTALEŃ (tylko po domkniętej bramce — trigger mówi o zebranym kontakcie):
         // proaktywna tura po bramce nie domknęła się (F5 ją zjadł) → ponów.
         if (!gateContactMissing() && state.reportEngagePending && !state.ustalenia && !streaming && !el('inline-gate') && !el('qr-chips')) {
@@ -14305,6 +14316,7 @@
         var khResume = !!(opts && opts.knowhowResume); // zaczepka „wróć do rozmowy" (bez tury usera)
         var rEngage = !!(opts && opts.reportEngage); // zaczepka po bramce: angażuj rozmowę, gdy raport leci w tle (bez tury usera)
         var rPropose = !!(opts && opts.reportPropose); // #5: raport GOTOWY + cisza → mózg sam proponuje komplet ustaleń
+        var uEnforce = !!(opts && opts.ustaleniaEnforce); // strażnik: akceptacja padła, markera <ustalenia> brak → wymuś
         var qEngage = !!(opts && opts.qualifyEngage); // zaczepka KWALIFIKUJĄCA: pytanie z ankiety, gdy sklep/reklamy lecą w tle
         genScreen = null; // user aktywnie pisze → nie jest „utknięty" na ekranie generowania
         streaming = true;
@@ -14344,6 +14356,7 @@
             knowhowResume: khResume ? true : undefined,
             reportEngage: rEngage ? true : undefined,
             reportPropose: rPropose ? true : undefined,
+            ustaleniaEnforce: uEnforce ? true : undefined,
             qualifyEngage: qEngage ? true : undefined,
             event: switchTrk ? 'switch_track' : undefined,
             track: switchTrk || undefined,
@@ -14581,6 +14594,20 @@
             }
             maybeProposeAfterReport();   // #5: raport wskoczył w trakcie tury → po niej mózg sam proponuje kierunek
             maybeQualifyDuringGen();      // req Tomka: po wyborze stylu, gdy sklep/reklamy lecą — pytanie kwalifikujące
+            // STRAŻNIK <ustalenia> (fix E2E 2026-07-02): model potrafi przyjąć akceptację kierunku
+            // i ZAPOWIEDZIEĆ budżet/markę/makiety, ale zapomnieć markera <ustalenia> → pipeline
+            // stoi na zawsze (bug: „Teraz strona zapyta o budżet…" bez bloku). Warunki: propozycja
+            // padła, user właśnie AKCEPTOWAŁ, bot OGŁASZA przejście dalej, markera brak → jedna
+            // cicha tura wymusza sam blok (USTALENIA_ENFORCE_TRIGGER w bud-chat).
+            if (!khResume && !rPropose && !qEngage && state.raport && !state.ustalenia
+                && state.reportProposeDone && !state._ustaleniaEnforced
+                && /pasuje|jed[źz]my|dawaj|zgoda|lecimy|bierzemy|rób|idziemy/i.test(text || '')
+                && /budżet|mark[ęi]|makiet/i.test(raw) && raw.indexOf('<ustalenia') === -1) {
+                state._ustaleniaEnforced = true;
+                setTimeout(function () {
+                    if (!streaming && !state.ustalenia) streamReply('', false, { ustaleniaEnforce: true });
+                }, 900);
+            }
 
             // Nie porzucaj tury, jeśli przyszły propozycje/brak (przez SSE) — trzeba je utrwalić
             // niżej, inaczej po abort/błędzie streamu kafelki znikają po F5.
