@@ -6995,6 +6995,9 @@
         if (activeTab !== 'chat') switchTab('chat');
         enterChat(true);
         renderConvoList();
+        // STRAŻNIK (fix audytu 2026-07-02): przełączenie rozmowy MUSI wznowić jej pipeline
+        // (wiszący raport/makiety/karuzela) — init robi to tylko dla rozmowy startowej.
+        setTimeout(function () { try { resumeReportIfNeeded(); } catch (e) {} }, 400);
     }
     // ── Płatna kolejna rozmowa (49 zł) ───────────────────────────────────────
     // 1. projekt darmowy; każdy następny wymaga zakupu oferty „Aplikacja —
@@ -8268,7 +8271,7 @@
         if (state.raport && !state.ustalenia && state.reportProposeDone && !state._ustaleniaEnforced) {
             var _lu = null;
             for (var _i2 = messages.length - 1; _i2 >= 0; _i2--) { if (messages[_i2].role === 'user') { _lu = String(messages[_i2].content || ''); break; } }
-            if (_lu && /pasuje|jed[źz]my|dawaj|zgoda|lecimy|bierzemy|rób|idziemy/i.test(_lu)) {
+            if (_lu && /pasuje|jed[źz]my|dawaj|zgoda|lecimy|bierzemy|bior[ęe]|rób|idziemy|działamy|dobra\b|ok(ej)?\b|super\b|start(ujemy)?\b/i.test(_lu)) {
                 state._ustaleniaEnforced = true;
                 setTimeout(function () { if (!streaming && !state.ustalenia) streamReply('', false, { ustaleniaEnforce: true }); }, 800);
                 return;
@@ -10943,10 +10946,20 @@
         div.innerHTML = renderRich('Doceniam szczerość. Żeby ruszyć z własnym sklepem na poważnie, warto mieć trochę na start — reklamy i pierwsze zamówienia. **Zostawiam Ci gotowy raport rynku** — wróć, kiedy będziesz gotowy, a wtedy dokończymy resztę: markę, sklep i kreacje reklamowe. Trzymam Twój projekt. A jeśli budżet się znajdzie — po prostu napisz.') +
             '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">' +
               '<button type="button" class="gcard__cta" id="bse-raport" style="margin-top:0">Pokaż mój raport →</button>' +
+              '<button type="button" class="gcard__cta" id="bse-again" style="margin-top:0">Mam już budżet — wracamy →</button>' +
               '<button type="button" class="fct-link" id="bse-back">Wróć do rozmowy</button>' +
             '</div>';
         el('chat-msgs').appendChild(div); scrollToBottom(true);
         var r = el('bse-raport'); if (r) r.addEventListener('click', function () { switchTab('rynek'); });
+        // DROGA POWROTU (fix audytu 2026-07-02): „none" nie jest już dead-endem — user może
+        // wrócić z budżetem (przycisk TERAZ i przy każdym resume; tekstową deklarację w czacie
+        // łapie detekcja w sendMessage).
+        var ag = el('bse-again'); if (ag) ag.addEventListener('click', function () {
+            state.budgetDeclared = null; persistSession();
+            div.remove();
+            renderBudgetGate();
+            try { gaEvent('app_budget_softexit_return', {}); } catch (e) {}
+        });
         var bk = el('bse-back'); if (bk) bk.addEventListener('click', function () { var ci = el('chat-input'); if (ci) { try { ci.focus(); } catch (e) {} } });
         try { gaEvent('app_budget_softexit', {}); } catch (e) {}
     }
@@ -14029,6 +14042,13 @@
         }
         var priorUser = messages.filter(function (m) { return m.role === 'user'; }).length;
         chipStreak = 0; // własny tekst — zeruj licznik nudge'a
+        // Po soft-exicie budżetu: user deklaruje w czacie, że MA środki → odblokuj pipeline
+        // (bot nie może zmienić budgetDeclared — to stan frontu; fix dead-endu 2026-07-02).
+        if (state.budgetDeclared === 'none'
+            && /mam|znalaz|uzbiera|zebra|jest|uda[łl]o|dosta[łl]|gotów|gotowy/i.test(text)
+            && /bud[żz]et|środk|pieni|kas[ęa]|złot|finans|zainwestowa/i.test(text)) {
+            state.budgetDeclared = null; state._budgetRetryPending = true; persistSession();
+        }
         // user sam prowadzi → zaczepka/propozycja ustaleń nie jest już potrzebna (#3/#5)
         state.reportProposePending = false; if (state.reportEngagePending) { state.reportEngagePending = false; persistSession(); }
         messages.push({ role: 'user', content: text });
@@ -14397,6 +14417,13 @@
             // reportGated: raport wstrzymany bramką — od 2026-07-02 dotyczy TYLKO produktu
             // własnego (karuzela generuje anonimowo, więc nie jest „wstrzymana").
             reportGated: !!(state.chosenProduct && !state.chosenProduct.id && !state.raport && gateContactMissing()) || undefined,
+            // pendingUi: na ekranie wisi karta-decyzja, a user pisze zamiast klikać →
+            // bot ma odpowiedzieć i skierować z powrotem do karty (prowadzenie za rękę).
+            pendingUi: (el('budget-gate') ? 'budzet'
+                : (el('brand-card') && !state.brandDone) ? 'marka'
+                : el('phone-ask') ? 'telefon'
+                : (Array.isArray(state.mockups) && state.mockups.length && !state.chosenStyle) ? 'styl'
+                : undefined),
             tracking: isFirst ? getTracking() : null
         };
 
@@ -14620,6 +14647,12 @@
             updateSendState();
             // flush odłożonego wyboru stylu (user kliknął styl w trakcie streamu) — tura skończona,
             // wyślij potwierdzenie, by serwer zapisał chosen_style (inaczej landing bierze zły styl)
+            // Powrót do bramki budżetu po deklaracji „mam już budżet" (soft-exit nie jest dead-endem)
+            if (state._budgetRetryPending && !state.budgetDeclared && state.ustalenia) {
+                state._budgetRetryPending = false;
+                var _bse = el('budget-softexit'); if (_bse) _bse.remove();
+                setTimeout(function () { if (!streaming && !el('budget-gate') && !state.budgetDeclared) renderBudgetGate(); }, 700);
+            }
             // flush odłożonego WYBORU PRODUKTU (klik podczas streamu — fix E2E 2026-07-02)
             if (state._pendingProductPick) {
                 var _ppk = state._pendingProductPick; state._pendingProductPick = null; persistSession();
@@ -14638,7 +14671,7 @@
             // cicha tura wymusza sam blok (USTALENIA_ENFORCE_TRIGGER w bud-chat).
             if (!khResume && !rPropose && !qEngage && state.raport && !state.ustalenia
                 && state.reportProposeDone && !state._ustaleniaEnforced
-                && /pasuje|jed[źz]my|dawaj|zgoda|lecimy|bierzemy|rób|idziemy/i.test(text || '')
+                && /pasuje|jed[źz]my|dawaj|zgoda|lecimy|bierzemy|bior[ęe]|rób|idziemy|działamy|dobra\b|ok(ej)?\b|super\b|start(ujemy)?\b/i.test(text || '')
                 && /budżet|mark[ęi]|makiet/i.test(raw) && raw.indexOf('<ustalenia') === -1) {
                 state._ustaleniaEnforced = true;
                 setTimeout(function () {
