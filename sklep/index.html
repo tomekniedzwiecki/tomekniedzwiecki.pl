@@ -6050,10 +6050,11 @@
     var OPENER_PROMISE = 'Który bierzemy?';
 
     // Otwarcie w DWÓCH wiadomościach: P1 od razu, potem (efekt pisania ~3,5s) P2 + karuzela produktów.
-    var OPENER_P1 = 'Cześć, tu AI Tomka Niedźwieckiego 👋 **Zbudujemy teraz Twój sklep online** — i zobaczysz na żywo, jak z produktu powstaje prawdziwy biznes.';
-    var OPENER_P1B = 'Wskażesz produkt, a ja na żywo przygotuję dla Ciebie **analizę rynku, markę, stronę sprzedażową i reklamy** — za darmo. To **pokaz, z jaką jakością Tomek z zespołem wchodzą w każdy biznes**, i Twój grunt pod start.';
-    var OPENER_P2 = 'Bo to nie generator sklepów z automatu — to **wstęp do wspólnego biznesu z Tomkiem.** On buduje go z Tobą na poważnie, doprowadza do **pierwszych 1000 zamówień** i uczy Cię prowadzenia, aż **przejmiesz stery** — a Tomek zostaje wspólnikiem z udziałem w obrocie (10% od przychodu). Wybierz produkt, od którego zaczniemy 👇';
-    var OPENER_GENERIC = OPENER_P1 + '\n\n' + OPENER_P2;
+    // LEKKI OPENER (feedback Tomka 2026-07-02): user przychodzi z /zbuduje albo reklamy —
+    // narrację „wspólny biznes / 1000 zamówień / 10%" już zna (strona) albo dostanie ją
+    // w 1. odpowiedzi bota po wyborze produktu i w zakładce Współpraca. Trzy akapity
+    // wykładu na dzień dobry = ściana tekstu przed pierwszą akcją. Jeden dymek + produkty.
+    var OPENER_P1 = 'Cześć, tu AI Tomka 👋 **Wybierz produkt, który Cię kręci** — a ja od razu zrobię do niego **raport rynku, markę, reklamy i podgląd Twojego sklepu**. Za darmo, na żywo, w ~10 minut 👇';
 
     // Chipy startowe = trzy drogi wejścia (od zera / mam produkt / mam pomysł)
     var START_CHIPS = [
@@ -11847,41 +11848,19 @@
         // (koniec routingu po zainteresowaniach z reklamy ?p=).
         messages.push({ role: 'assistant', content: OPENER_P1, local: true });   // P2 dochodzi z efektem pisania (stageOpener2)
     }
-    // Otwarcie cz.2: po ~3,5s efektu pisania dochodzi DRUGA wiadomość, a zaraz po niej — od razu produkty.
+    // Otwarcie cz.2 (LEKKI OPENER 2026-07-02): opener to jeden krótki dymek — produkty
+    // wchodzą OD RAZU (bez sekwencji bąbelków; pierwsza akcja ma być na ekranie w 2 sekundy).
+    // Scroll zostaje na górze: krótki dymek + początek karuzeli mieszczą się w kadrze razem.
     function stageOpener2() {
         if (state.chosenProduct || el('vp-picker')) { ensureCarousel(); return; }
-        // Sekwencja „oddechu" (feedback Tomka): P1 jest już w czacie; dochodzi P1B, potem P2 —
-        // krótkimi bąbelkami z efektem pisania, żeby treść nie była jedną ścianą.
-        function bubble(txt, ms, then) {
-            var typing = document.createElement('div');
-            typing.className = 'msg msg--ai';
-            typing.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
-            el('chat-msgs').appendChild(typing);
-            setTimeout(function () {
-                if (!el('chat-msgs') || state.chosenProduct) { if (typing) typing.remove(); return; }
-                typing.remove();
-                messages.push({ role: 'assistant', content: txt, local: true });
-                appendMessage('assistant', txt);
-                saveMessages();
-                if (then) then();
-            }, ms);
-        }
-        bubble(OPENER_P1B, 1100, function () {
-            bubble(OPENER_P2, 1100, function () {
-                // feedback Tomka: NIE zjeżdżaj do produktów — zostaw opener widoczny u góry,
-                // a o produktach poniżej informuje przycisk „przewiń w dół" (jump). User czyta wstęp,
-                // potem scrolluje sam, gdy zechce. _openerHold blokuje auto-scroll z asynchronicznego
-                // renderu produktów (ensureCarousel ładuje karty z opóźnieniem i sam by ściągnął na dół).
-                _openerHold = true;
-                stickBottom = false;
-                ensureCarousel();   // produkty (przypięte do dołu)
-                var sc = el('chat-scroll'); if (sc) sc.scrollTop = 0;
-                setJumpVisible(true);
-                // dobicie po asynchronicznym renderze kart (gdyby coś jednak ruszyło scroll)
-                setTimeout(function () { var s = el('chat-scroll'); if (_openerHold && s && s.scrollTop > 20) s.scrollTop = 0; }, 350);
-                setTimeout(function () { var s = el('chat-scroll'); if (_openerHold && s && s.scrollTop > 20) s.scrollTop = 0; }, 900);
-            });
-        });
+        _openerHold = true;
+        stickBottom = false;
+        ensureCarousel();   // produkty (przypięte do dołu)
+        var sc = el('chat-scroll'); if (sc) sc.scrollTop = 0;
+        setJumpVisible(true);
+        // dobicie po asynchronicznym renderze kart (gdyby coś jednak ruszyło scroll)
+        setTimeout(function () { var s = el('chat-scroll'); if (_openerHold && s && s.scrollTop > 20) s.scrollTop = 0; }, 350);
+        setTimeout(function () { var s = el('chat-scroll'); if (_openerHold && s && s.scrollTop > 20) s.scrollTop = 0; }, 900);
     }
 
     // EKRAN WYBORU 3 KIERUNKÓW (start świeżej rozmowy). Karty reużywają stylu
