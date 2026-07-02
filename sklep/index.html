@@ -30,9 +30,13 @@
             'analytics_storage': 'granted'
         });
     </script>
+    <!-- Tryb podglądu admina (?podglad=admin — iframe z panelu Sklep (AWE)):
+         zero analytics, zero pikseli. Flaga czytana też w głównym skrypcie. -->
+    <script>window.__BUD_PREVIEW = /[?&]podglad=admin(?:&|$)/.test(window.location.search);</script>
     <!-- GA4 + Google Ads -->
     <script>
         window.addEventListener('DOMContentLoaded', function() {
+            if (window.__BUD_PREVIEW) return;
             var s = document.createElement('script');
             s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-W8CLDSHVFC';
             document.head.appendChild(s);
@@ -49,6 +53,7 @@
     <!-- Meta Pixel -->
     <script>
     window.addEventListener('DOMContentLoaded', function() {
+        if (window.__BUD_PREVIEW) return;
         !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init','1668188210820080'); fbq('track','PageView');
     });
@@ -58,6 +63,7 @@
     <!-- TikTok Pixel -->
     <script>
     window.addEventListener('DOMContentLoaded', function() {
+        if (window.__BUD_PREVIEW) return;
         !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script");n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
             ttq.load('D6AP4E3C77U3L7SP8O7G'); ttq.page();
         }(window,document,'ttq');
@@ -6030,6 +6036,64 @@
     function sessionKey(sid) { return 'bud_session:' + sid; }
     function messagesKey(sid) { return 'bud_messages:' + sid; }
     function previewKey(sid) { return 'bud_preview:' + sid; } // {images:{view:url}}
+
+    /* ============================================================
+       PODGLĄD ADMINA (?id=<sid>&podglad=admin#admintok=<JWT panelu>)
+       Zakładka „Rozmowa" panelu Sklep (AWE) osadza tę stronę w iframe —
+       admin widzi rozmowę i artefakty DOKŁADNIE tak, jak lead.
+       Zasady twarde:
+        • read-only — jedyny dozwolony strzał to bud-project 'admin_get'
+          (zero efektów ubocznych po stronie serwera),
+        • zero analytics (flaga w <head> wyłącza GA/Meta/TikTok),
+        • zero zapisu do localStorage (izolacja od rozmów admina),
+        • zero wyzwalania generacji / wysyłania wiadomości jako lead.
+       ============================================================ */
+    var PREVIEW = (function () {
+        if (!window.__BUD_PREVIEW) return null;
+        try {
+            var q = new URLSearchParams(window.location.search);
+            var sid = (q.get('id') || '').trim();
+            var m = (window.location.hash || '').match(/admintok=([^&]+)/);
+            var tok = m ? decodeURIComponent(m[1]) : null;
+            // Nawigacja zakładek podmienia hash (#makiety) — token przeżywa F5 w sessionStorage (per karta)
+            if (tok) { try { sessionStorage.setItem('bud_admintok', tok); } catch (e) { } }
+            else { try { tok = sessionStorage.getItem('bud_admintok'); } catch (e) { } }
+            if (!sid || !tok || !/^[0-9a-f-]{36}$/i.test(sid)) return null;
+            return { sid: sid, tok: tok };
+        } catch (e) { return null; }
+    })();
+    var _previewStore = {};   // izolowany „localStorage" podglądu (żyje tylko w pamięci karty)
+    if (PREVIEW) {
+        // Bezpiecznik sieciowy: każdy strzał do edge functions poza odczytem
+        // 'admin_get' zostaje ucięty — admin nie może niechcący pisać, generować
+        // ani płacić jako lead, nawet gdyby jakiś handler się prześlizgnął.
+        var _realFetch = window.fetch.bind(window);
+        window.fetch = function (url, opts) {
+            var u = String(url || '');
+            if (u.indexOf('/functions/v1/') >= 0) {
+                var b = opts && typeof opts.body === 'string' ? opts.body : '';
+                var allowed = u.indexOf('/bud-project') >= 0 && b.indexOf('"admin_get"') >= 0;
+                if (!allowed) return Promise.resolve(new Response('{"error":"podglad_admina_read_only"}', { status: 403, headers: { 'Content-Type': 'application/json' } }));
+            }
+            return _realFetch(url, opts);
+        };
+        document.documentElement.classList.add('is-admin-preview');
+    }
+    // Twardy dead-end podglądu (brak/wygaśnięcie tokenu) — NIGDY nie wpadamy do
+    // normalnego trybu z cudzym ?id= (to by adoptowało sesję leada i stemplowało aktywność).
+    function previewDead(msg) {
+        var ov = document.createElement('div');
+        ov.setAttribute('style', 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(8,8,11,.96);color:#fff;text-align:center;font-family:Inter,system-ui,sans-serif');
+        ov.innerHTML = '<div style="max-width:400px"><div style="font-size:17px;font-weight:700;margin-bottom:8px">Podgląd admina niedostępny</div><div style="font-size:14px;line-height:1.55;color:#9a9aa2">' + esc(msg) + '</div></div>';
+        document.body.appendChild(ov);
+    }
+    function mountPreviewBadge() {
+        var d = document.createElement('div');
+        d.id = 'admin-preview-badge';
+        d.textContent = 'PODGLĄD ADMINA — oczami leada · tylko odczyt';
+        d.setAttribute('style', 'position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:99998;background:#b45309;color:#fff;font:600 10.5px/1 Inter,system-ui,sans-serif;padding:5px 12px;border-radius:0 0 8px 8px;letter-spacing:.05em;pointer-events:none;opacity:.92;white-space:nowrap');
+        document.body.appendChild(d);
+    }
     var DEMO_PREVIEW_URL = '/sklep/demo-podglad.png'; // ?demo=podglad (statyczny asset w repo)
     // 4 widoki podglądu — kolejność = kolejność kafelków i nawigacji lightboxa
     var VIEW_META = [
@@ -6201,9 +6265,13 @@
        ============================================================ */
     function el(id) { return document.getElementById(id); }
     function loadJSON(key) {
+        // Podgląd admina: pełna izolacja od localStorage przeglądarki (nie czytamy
+        // prywatnych rozmów admina, nie zostawiamy po podglądzie żadnych śladów).
+        if (PREVIEW) { try { return _previewStore.hasOwnProperty(key) ? JSON.parse(_previewStore[key]) : null; } catch (e) { return null; } }
         try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
     }
     function saveJSON(key, val) {
+        if (PREVIEW) { _previewStore[key] = JSON.stringify(val); return true; }
         try { localStorage.setItem(key, JSON.stringify(val)); return true; }
         catch (e) {
             // QuotaExceeded (słabsze telefony, tryb prywatny) — zwolnij miejsce usuwając
@@ -6725,9 +6793,14 @@
         fetch(SPAR_PROJECT_ENDPOINT, {
             method: 'POST',
             headers: authHeaders(),
-            body: JSON.stringify({ sessionId: sid, action: 'get' })
+            // Podgląd admina: 'admin_get' = pełny stan + historia, ZERO efektów
+            // ubocznych (bez stempla wizyt, bez seeda reveals, bez bumpów pipeline)
+            body: JSON.stringify({ sessionId: sid, action: PREVIEW ? 'admin_get' : 'get' })
         }).then(function (r) {
-            if (r.status === 403 || r.status === 401) { onOwnerDenied(sid, hadToken); return null; }
+            if (r.status === 403 || r.status === 401) {
+                if (PREVIEW) { previewDead('Token podglądu wygasł albo konto nie ma uprawnień zespołu. Wróć do panelu Sklep (AWE) i otwórz podgląd ponownie.'); return null; }
+                onOwnerDenied(sid, hadToken); return null;
+            }
             return r.ok ? r.json() : null;
         }).then(function (d) {
             // #11: ?id= na świeżym urządzeniu wskazał PUSTĄ sesję → pokaż jednak karuzelę.
@@ -6739,7 +6812,9 @@
             resumeById = false;   // udany resume — karuzela pozostaje ukryta
             // Serwer wydał treść = jesteśmy uprawnieni → zdejmij ewentualny blok.
             unlockSession(); if (ownerGate[sid]) ownerGate[sid] = {};
-            if (Array.isArray(d.historia) && !historySynced[sid]) {
+            // Podgląd admina: historia porównywana przy KAŻDYM sync — gdy lead dopisze
+            // wiadomości w trakcie podglądu, czat dociąga je na żywo (replay).
+            if (Array.isArray(d.historia) && (!historySynced[sid] || PREVIEW)) {
                 var localReal = messages.filter(function (m) { return !m.local; }).length;
                 if (d.historia.length > localReal) {
                     historySynced[sid] = true;
@@ -7465,6 +7540,7 @@
         }).catch(function () { fail(); });
     }
     function newConvo() {
+        if (PREVIEW) { showToast('Podgląd admina — nowa rozmowa niedostępna'); return; }
         if (convoIndex().length < allowedConvos()) { startFresh(true); return; }
         // może właśnie opłacił — odśwież raz, potem ewentualnie paywall
         refreshConvoEntitlement().then(function () {
@@ -8343,6 +8419,7 @@
     // PICKER-FIRST: raport strategiczny generujemy ZARAZ po wyborze produktu (w tle),
     // bez czekania na werdykt. Bazuje na wybranym produkcie + imieniu (jeśli znane).
     function kickReport(force) {
+        if (PREVIEW) return;   // podgląd admina: zero generacji
         if (!state.chosenProduct || !state.sessionId) return;
         if (extras.raport === 'gen') return;
         if (!force && state.raport) return;
@@ -8367,6 +8444,7 @@
     // (własne guardy), więc bezpiecznie wołać je przy każdym wejściu. To zamyka dead-endy
     // makiety/marka/reklamy/sklep, gdy F5 trafił w okno generacji.
     function resumeReportIfNeeded() {
+        if (PREVIEW) return;   // podgląd admina: watchdog NIE wznawia generacji ani tur AI
         // Etap 1 po F5 (rozmowa trwa, produktu brak): karuzela MUSI wrócić — bez tego user
         // w pułapce (fix E2E 2026-07-02). Świeża rozmowa (0 tur usera) zostaje przy „Zaczynamy".
         if (!state.chosenProduct) {
@@ -8422,6 +8500,7 @@
     // jeśli user w międzyczasie COKOLWIEK napisał/kliknął (nowa wiadomość) — odsuwamy o 60 s,
     // aż ucichnie (max ~6 min). Aktywnego usera i tak złapie bramka konta przy makietach.
     function scheduleReportMailOffer(attempt) {
+        if (PREVIEW) return;   // podgląd admina: bez kart łapania maila
         attempt = attempt || 0;
         if (attempt > 5) return;
         var snapshot = messages.filter(function (m) { return m.role === 'user'; }).length;
@@ -8473,6 +8552,7 @@
     // (nie streamuje, brak chipów do odpowiedzi, brak bramki) — odpal proaktywną turę, żeby
     // mózg sam zaproponował kierunek (zamiast „za chwilę zaproponuję…" i ciszy). Odpala się raz.
     function maybeProposeAfterReport() {
+        if (PREVIEW) return;   // podgląd admina: bez proaktywnych tur AI
         if (!state.reportProposePending) return;
         // FIX 2026-07-02: chipy (qr-chips) NIE blokują propozycji — odkąd chipy są przy każdej
         // turze, stary guard robił z tej mechaniki martwy kod (u bezczynnego usera nigdy nie
@@ -8598,6 +8678,7 @@
     var SPAR_ADS_ENDPOINT = SB_URL + '/functions/v1/bud-ads';
     var adsGen = false;
     function kickAds(force) {
+        if (PREVIEW) return;   // podgląd admina: zero generacji
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && state.suiteAds) return;
         if (adsGen) return;
@@ -8633,6 +8714,7 @@
     var SPAR_LANDING_ENDPOINT = SB_URL + '/functions/v1/bud-landing-gen';
     var landingGen = false;
     function kickLanding(force) {
+        if (PREVIEW) return;   // podgląd admina: zero generacji
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && state.landingHtml) return;
         if (landingGen) return;
@@ -9121,6 +9203,7 @@
     // banner_url. Generacja w tle po stronie bud-gtm; wynik dociągamy pollem
     // ze bud-project (banery pojawiają się stopniowo, jeden po drugim).
     function ensureGtmBanners() {
+        if (PREVIEW) return;   // podgląd admina: bez dogenerowywania bannerów
         if (extras.gtmBanners === 'gen') return;
         if (state.verdict !== 'zielony' || !state.sessionId || !state.gtm) return;
         var rek = (state.gtm.pakiet && Array.isArray(state.gtm.pakiet.reklamy)) ? state.gtm.pakiet.reklamy : [];
@@ -11167,6 +11250,7 @@
     function kickMockup(force) {
         // NOWE: makiety pipeline (4 style). Nazwa zachowana — woła ją marker <ustalenia>
         // oraz renderPaneMakiety. Stary single-mockup do raportu już nieużywany.
+        if (PREVIEW) return;   // podgląd admina: zero generacji
         if (!state.chosenProduct || !state.sessionId) return;
         if (!force && Array.isArray(state.mockups) && state.mockups.length) return;
         if (mockups4Gen) return;
@@ -11265,6 +11349,7 @@
     // swoim „wow": po 75 s odpalamy makiety bez raportu. Jednorazowo na uzbrojenie.
     var _mockFallbackArmed = false;
     function armMockFallback() {
+        if (PREVIEW) return;   // podgląd admina: zero generacji
         if (_mockFallbackArmed) return;
         _mockFallbackArmed = true;
         setTimeout(function () {
@@ -12783,7 +12868,8 @@
 
     function authHeaders(extra) {
         var h = { 'Content-Type': 'application/json', 'apikey': SB_PUBLISHABLE };
-        if (authState.token) h['Authorization'] = 'Bearer ' + authState.token;
+        if (PREVIEW && PREVIEW.tok) h['Authorization'] = 'Bearer ' + PREVIEW.tok;   // podgląd admina: JWT panelu
+        else if (authState.token) h['Authorization'] = 'Bearer ' + authState.token;
         if (extra) for (var k in extra) h[k] = extra[k];
         return h;
     }
@@ -12792,6 +12878,7 @@
        sygnał (left_screen_at), z którego spar-followups robi SMS powrotu (tylko
        gdy WIEMY, że wyszedł i nie wrócił). keepalive: dochodzi mimo zamykania. */
     function sendLeaveBeacon() {
+        if (PREVIEW) return;   // podgląd admina: zero sygnałów aktywności leada
         if (!genScreen || leaveBeaconSent || !state.sessionId) return;
         leaveBeaconSent = true;
         try {
@@ -13253,6 +13340,7 @@
     }
 
     function openAuthModal(reason) {
+        if (PREVIEW) return;   // podgląd admina: bez logowania (konto leada niepotrzebne)
         var modal = el('auth-modal');
         if (!modal) return;
         el('auth-modal-title').textContent = 'Zaloguj się'; // przywróć domyślny tytuł (mógł go zmienić reset hasła)
@@ -13688,6 +13776,7 @@
     // krok2(konto)→koniec robi setAuthSession/onSignedIn → completeContactGateIfReady.
     // Raport (i każde gated generowanie) rusza DOPIERO po komplecie → resumePendingGen.
     function renderInlineGate() {
+        if (PREVIEW) return;   // podgląd admina: bramka kontaktu to formularz leada, nie admina
         if (el('inline-gate')) return;   // bramka już jest
         if (!gatePending()) {
             // Bramka NIE jest potrzebna. Jeśli composer wyłączyła/schowała chwilowa bramka
@@ -14218,6 +14307,9 @@
         el('chat-locked-text').textContent = text;
     }
     function unlockComposer() {
+        // Podgląd admina: composer NIGDY nie wraca — każda ścieżka odblokowania
+        // (enterChat, koniec generacji, sync) trafia z powrotem na blokadę.
+        if (PREVIEW) { lockComposer('Podgląd admina — patrzysz na rozmowę oczami leada (tylko odczyt)'); return; }
         el('composer').hidden = false;
         el('chat-locked').hidden = true;
         setComposerEnabled(true);
@@ -14271,6 +14363,7 @@
        WYSYŁKA + STREAMING SSE
        ============================================================ */
     function sendMessage() {
+        if (PREVIEW) return;   // podgląd admina = tylko odczyt
         var ta = el('chat-input');
         var text = ta.value.trim();
         if (!text || streaming) return;
@@ -14309,6 +14402,7 @@
 
     // Wysyłka programowa (chip profesji / dymek odpowiedzi) — jak sendMessage, bez composera
     function sendOpening(text) {
+        if (PREVIEW) return;   // podgląd admina = tylko odczyt (chipy/karuzele nie piszą jako lead)
         if (streaming) return;
         _openerHold = false; // user prowadzi (klik produktu/chip) → zwalniamy hold openera
         markActivity();   // engage ticker: aktywność
@@ -14608,6 +14702,7 @@
     }
 
     function streamReply(text, isFirst, opts) {
+        if (PREVIEW) return;   // podgląd admina: żadnych tur AI w imieniu leada
         var khResume = !!(opts && opts.knowhowResume); // zaczepka „wróć do rozmowy" (bez tury usera)
         var rEngage = !!(opts && opts.reportEngage); // zaczepka po bramce: angażuj rozmowę, gdy raport leci w tle (bez tury usera)
         var rPropose = !!(opts && opts.reportPropose); // #5: raport GOTOWY + cisza → mózg sam proponuje komplet ustaleń
@@ -16009,6 +16104,10 @@
             }
         }
 
+        // Podgląd admina: NIGDY nie generujemy ekranów (koszt + mutacja sesji leada).
+        // Brak gotowych obrazów = po prostu brak kafla w replayu; galeria żyje w zakładkach.
+        if (PREVIEW) { wrap.remove(); settle(); return; }
+
         // Które widoki generujemy: "zmien" z markera; pierwszy podgląd = wszystkie
         var ALL_VIEWS = VIEW_META.map(function (vm) { return vm[0]; });
         var views = [];
@@ -16929,6 +17028,26 @@
         var shareId = (qs.get('projekt') || '').trim();
         if (shareId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(shareId)) {
             renderShareView(shareId);
+            return;
+        }
+
+        // ── PODGLĄD ADMINA (iframe z zakładki „Rozmowa" panelu Sklep (AWE)) ──
+        // Rozmowa + artefakty oczami leada, read-only. Bez auth leada (JWT admina
+        // w hashu), bez trackingu, bez migracji/adopcji localStorage. ?podglad=admin
+        // bez ważnego tokenu = twardy dead-end — NIGDY nie bootujemy normalnego
+        // trybu z cudzym ?id= (adoptowałby sesję i stemplował aktywność leada).
+        if (window.__BUD_PREVIEW) {
+            if (!PREVIEW) { previewDead('Brak lub wygaśnięcie tokenu podglądu. Wróć do panelu Sklep (AWE) i otwórz podgląd ponownie.'); return; }
+            authState.ready = true;   // bez initAuth — konto leada nie jest potrzebne
+            bindChat();               // nawigacja zakładek/lightbox; wysyłka i tak ma guardy PREVIEW
+            mountPreviewBadge();
+            state.sessionId = PREVIEW.sid;
+            resumeById = true;        // sync (admin_get) dociąga historię + artefakty, bez karuzeli
+            messages = [];
+            enterChat(false);         // na końcu woła syncProjectFromServer → pełny replay
+            applyHashTab();
+            // Na żywo: lead pisze / generują się artefakty → dociągaj stan co 20 s
+            setInterval(function () { try { syncProjectFromServer(); } catch (e) { } }, 20000);
             return;
         }
 
