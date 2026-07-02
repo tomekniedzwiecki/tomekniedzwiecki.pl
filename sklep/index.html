@@ -6321,6 +6321,7 @@
             budgetDeclared: state.budgetDeclared || null,
             lastBrief: state.lastBrief || null,
             chosenProduct: state.chosenProduct || null,
+            _pendingProductPick: state._pendingProductPick || null,   // klik podczas streamu — dokończ po F5
             mockupUrl: state.mockupUrl || null,
             mockups: state.mockups || null,
             chosenStyle: state.chosenStyle || null,
@@ -6466,6 +6467,22 @@
             renderConvoList();
         }
     }
+    // Wybór produktu — WSPÓLNY dla karuzeli / lightboxa / porównywarki. FIX audytu E2E
+    // 2026-07-02: klik podczas STREAMU był cicho gubiony (guard `if (streaming) return`)
+    // → user myślał, że wybrał; po F5 sesja bez produktu i bez karuzeli = pułapka.
+    // Teraz: stan + persist NATYCHMIAST (przeżywa F5), wiadomość po turze (flush w finalizerze).
+    function pickProductFlow(p, name) {
+        if (!p || el('inline-gate')) return;
+        setChosenProduct(p);
+        removePicker();
+        var label = name || p.name || '';
+        if (streaming) {
+            state._pendingProductPick = label; persistSession();
+            showToast('Wybrano: ' + label + ' — ruszam zaraz po tej odpowiedzi');
+            return;
+        }
+        sendOpening('Wybieram produkt: ' + label);
+    }
     // Karta WYBRANEGO produktu w sidebarze — widać, co wybrano (miniatura z AliExpress + dowód viralu).
     function setChosenProduct(p) {
         if (!p) return;
@@ -6555,6 +6572,7 @@
         state.budgetDeclared = saved.budgetDeclared || null;
         state.lastBrief = saved.lastBrief || null;
         state.chosenProduct = saved.chosenProduct || null;
+        state._pendingProductPick = saved._pendingProductPick || null;
         state.mockupUrl = saved.mockupUrl || null;
         state.mockups = saved.mockups || null;
         state.chosenStyle = saved.chosenStyle || null;
@@ -8230,9 +8248,21 @@
     // (własne guardy), więc bezpiecznie wołać je przy każdym wejściu. To zamyka dead-endy
     // makiety/marka/reklamy/sklep, gdy F5 trafił w okno generacji.
     function resumeReportIfNeeded() {
-        if (!state.chosenProduct || !state.chosenProduct.id) return;
+        // Etap 1 po F5 (rozmowa trwa, produktu brak): karuzela MUSI wrócić — bez tego user
+        // w pułapce (fix E2E 2026-07-02). Świeża rozmowa (0 tur usera) zostaje przy „Zaczynamy".
+        if (!state.chosenProduct) {
+            if (messages.some(function (m) { return m.role === 'user'; })) ensureCarousel();
+            return;
+        }
+        if (!state.chosenProduct.id) return;   // produkt własny — pipeline prowadzi bot, nie watchdog
         // RAPORT: brak raportu → wznów (dla karuzeli anonimowo; własny produkt gated w kickReport)
         if (!state.raport && extras.raport !== 'gen') kickReport(false);
+        // Klik produktu podczas streamu przerwany przez F5 → dokończ wybór teraz.
+        if (state._pendingProductPick && !streaming) {
+            var _pq = state._pendingProductPick; state._pendingProductPick = null; persistSession();
+            sendOpening('Wybieram produkt: ' + _pq);
+            return;
+        }
         // STRAŻNIK <ustalenia> na resume (F5 po martwym punkcie): propozycja padła, user
         // zaakceptował, ale marker przepadł → wymuś blok, inaczej rozmowa stoi na zawsze.
         if (state.raport && !state.ustalenia && state.reportProposeDone && !state._ustaleniaEnforced) {
@@ -11833,7 +11863,7 @@
             if (e.target.closest('.vpm-next')) { lbStep(1); return; }
             var th = e.target.closest('.vpm-thumb');
             if (th) { var ti = +th.getAttribute('data-idx'); var its = VP_STATE.items || []; if (ti >= 0 && ti < its.length) { VP_STATE.lbIndex = ti; vpMarkSeen(its[ti]); renderLightbox(); } return; }
-            var pk = e.target.closest('.vpm-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct((VP_STATE.items || [])[VP_STATE.lbIndex || 0]); closeVP(); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+            var pk = e.target.closest('.vpm-pick'); if (pk) { closeVP(); pickProductFlow((VP_STATE.items || [])[VP_STATE.lbIndex || 0], pk.getAttribute('data-pick')); return; }
             var ad = e.target.closest('.vpm-add'); if (ad) { var cur = (VP_STATE.items || [])[VP_STATE.lbIndex || 0]; if (!cur) return; if (slHas(cur)) removeFromShortlist(slKey(cur)); else addToShortlist(cur); renderLightbox(); return; }
             var pt = e.target.closest('.vpm-pot'); if (pt) { if (streaming || el('inline-gate')) return; closeVP(); sendOpening(potOpening(pt)); return; }
         });
@@ -12186,7 +12216,7 @@
                 var vd = e.target.closest('.sl-verdict');
                 if (vd) { if (streaming || el('inline-gate')) return; closeCompare(); shortlistVerdict(); return; }
                 var pk = e.target.closest('.sl-pick');
-                if (pk) { if (streaming || el('inline-gate')) return; var p = VP_STATE.shortlist[+pk.getAttribute('data-idx')]; if (!p) return; closeCompare(); setChosenProduct(p); removePicker(); sendOpening('Wybieram produkt: ' + (p.name || '')); return; }
+                if (pk) { var p = VP_STATE.shortlist[+pk.getAttribute('data-idx')]; if (!p) return; closeCompare(); pickProductFlow(p, p.name || ''); return; }
             });
             document.body.appendChild(ov);
             document.addEventListener('keydown', function (e) {
@@ -12330,7 +12360,7 @@
             if (mr) { VP_STATE.seed = Math.floor(Math.random() * 1e9) + 1; VP_STATE.page = 0; vpFetch(wrap); return; }   // „Pokaż inne" → przetasuj
             var fs = e.target.closest('.vp-fs'); if (fs) { e.stopPropagation(); openProductLightbox(+fs.getAttribute('data-idx')); return; }
             var ad = e.target.closest('.vp-add'); if (ad) { e.stopPropagation(); var pa = VP_STATE.items[+ad.getAttribute('data-idx')]; if (!pa) return; if (slHas(pa)) removeFromShortlist(slKey(pa)); else addToShortlist(pa); return; }
-            var pk = e.target.closest('.vp-pick'); if (pk) { if (streaming || el('inline-gate')) return; setChosenProduct(VP_STATE.items[+pk.getAttribute('data-idx')]); removePicker(); sendOpening('Wybieram produkt: ' + pk.getAttribute('data-pick')); return; }
+            var pk = e.target.closest('.vp-pick'); if (pk) { pickProductFlow(VP_STATE.items[+pk.getAttribute('data-idx')], pk.getAttribute('data-pick')); return; }
             var pt = e.target.closest('.vp-pot'); if (pt) { if (streaming || el('inline-gate')) return; sendOpening(potOpening(pt)); return; }
             var v = e.target.closest('.vp-vid'); if (v) {
                 var vi = +v.getAttribute('data-idx');
@@ -14590,6 +14620,11 @@
             updateSendState();
             // flush odłożonego wyboru stylu (user kliknął styl w trakcie streamu) — tura skończona,
             // wyślij potwierdzenie, by serwer zapisał chosen_style (inaczej landing bierze zły styl)
+            // flush odłożonego WYBORU PRODUKTU (klik podczas streamu — fix E2E 2026-07-02)
+            if (state._pendingProductPick) {
+                var _ppk = state._pendingProductPick; state._pendingProductPick = null; persistSession();
+                switchTab('chat'); sendOpening('Wybieram produkt: ' + _ppk);
+            }
             if (state._pendingStylePick) {
                 var _sp = state._pendingStylePick; state._pendingStylePick = null; persistSession();
                 switchTab('chat'); sendOpening('Wybieram styl: ' + _sp);
