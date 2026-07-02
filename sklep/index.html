@@ -6353,7 +6353,8 @@
             brandDone: !!state.brandDone,             // #2: marka sfinalizowana (przeżywa F5)
             mockPending: !!state._mockPending,        // #1: ustalenia gotowe, makiety czekają na raport
             reportEngagePending: !!state.reportEngagePending,  // #3: proaktywna tura ustaleń jeszcze nie domknięta
-            reportProposeDone: !!state.reportProposeDone       // #5: propozycja po raporcie już padła (nie duplikuj po F5/powrocie)
+            reportProposeDone: !!state.reportProposeDone,      // #5: propozycja po raporcie już padła (nie duplikuj po F5/powrocie)
+            mailCardDismissed: !!state._mailCardDismissed      // miękka karta maila: „Nie teraz" przeżywa F5
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -6603,6 +6604,7 @@
         state.brandDone = !!saved.brandDone;                  // #2 resume marki
         state._mockPending = !!saved.mockPending;             // #1 resume makiet
         if (state._mockPending) { try { armMockFallback(); } catch (e) {} }   // T8: bezpiecznik działa też po F5
+        state._mailCardDismissed = !!saved.mailCardDismissed; // miękka karta maila — „Nie teraz" trwałe
         state.reportEngagePending = !!saved.reportEngagePending;  // #3 resume zaczepki ustaleń
         state.reportProposeDone = !!saved.reportProposeDone;       // #5 resume flagi propozycji
         extras.summary = 'idle';
@@ -8383,6 +8385,48 @@
         if (state.chosenStyle && !state.suiteAds && extras.ads !== 'gen' && typeof kickAds === 'function') kickAds(false);
         if (state.chosenStyle && !state.landingHtml && !landingGen && typeof kickLanding === 'function') kickLanding(false);
     }
+    // MIĘKKIE łapanie maila po raporcie (decyzja Tomka 2026-07-02, runda 3): anonim, który
+    // obejrzał raport i wyszedł, był NIEODZYSKIWALNY — followupy startują dopiero od maila
+    // (bramka konta jest przy makietach, dociera tam garstka). To NIE bramka: kartę można
+    // pominąć („Nie teraz") i nic się nie blokuje. Mail → drip wyśle raport (reveal_raport,
+    // due od razu; cron co 30 min) z linkiem powrotnym = comeback-ścieżka dla dryfujących.
+    function maybeOfferReportMail() {
+        if (state.email || state._mailCardDismissed) return;
+        if (!state.raport || state.ustalenia) return;   // po ustaleniach mail zbiera bramka konta
+        if (el('rk-mail-card') || el('inline-gate') || el('budget-gate') || streaming) return;
+        var host = el('chat-msgs'); if (!host) return;
+        var div = document.createElement('div');
+        div.className = 'msg msg--ai'; div.id = 'rk-mail-card';
+        div.innerHTML = '<div class="sg">' +
+            '<h3 class="sg-title">Chcesz ten raport na maila?</h3>' +
+            '<p class="sg-sub">Wyślę Ci go z linkiem powrotnym do projektu — wrócisz do raportu, marki i makiet z każdego urządzenia, kiedy chcesz.</p>' +
+            '<form id="rkm-form" class="sg-form" novalidate>' +
+              '<input class="f-input" type="email" id="rkm-email" inputmode="email" placeholder="twoj@email.pl" autocomplete="email" maxlength="120">' +
+              '<div class="f-error" id="rkm-err">Podaj poprawny adres e-mail.</div>' +
+              '<button type="submit" class="btn" style="width:100%;margin-top:8px">Wyślij mi raport →</button>' +
+            '</form>' +
+            '<div style="text-align:center;margin-top:8px"><button type="button" class="fct-link" id="rkm-skip">Nie teraz — czytam tutaj</button></div>' +
+            '</div>';
+        host.appendChild(div); scrollToBottom(false);
+        try { gaEvent('app_report_mail_offer', {}); } catch (e) {}
+        el('rkm-skip').addEventListener('click', function () {
+            state._mailCardDismissed = true; persistSession();
+            div.remove();
+            try { gaEvent('app_report_mail_skip', {}); } catch (e) {}
+        });
+        el('rkm-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var mail = el('rkm-email').value.trim();
+            if (!LEAD_EMAIL_RE.test(mail)) { el('rkm-err').classList.add('is-shown'); return; }
+            el('rkm-err').classList.remove('is-shown');
+            state.email = mail; state.emailKnown = true; persistSession();
+            try { syncContactToServer(); } catch (e2) {}
+            fireLeadConversion();
+            div.remove();
+            sysMsg('Zapisane — raport z linkiem powrotnym poleci na ' + mail + ' w ciągu ok. pół godziny. Lecimy dalej 📩');
+            try { gaEvent('app_report_mail_capture', {}); } catch (e3) {}
+        });
+    }
     // #5: gdy raport wskoczył, a ustaleń jeszcze nie domknęliśmy i rozmowa STOI bezczynnie
     // (nie streamuje, brak chipów do odpowiedzi, brak bramki) — odpal proaktywną turę, żeby
     // mózg sam zaproponował kierunek (zamiast „za chwilę zaproponuję…" i ciszy). Odpala się raz.
@@ -8469,6 +8513,8 @@
                     // #5: gdy raport wskoczył a ustaleń jeszcze nie domknęliśmy, mózg ma SAM
                     // poprowadzić temat dalej (zaproponować kierunek), nie zostawiać „za chwilę…".
                     if (!state.ustalenia) { state.reportProposePending = true; maybeProposeAfterReport(); }
+                    // Miękka karta maila 45 s po raporcie — pod propozycją kierunku, nie zamiast niej.
+                    setTimeout(function () { try { maybeOfferReportMail(); } catch (e) {} }, 45000);
                     return;
                 }
                 // Backstop: serwer odmówił generacji bez kontaktu (anonimowa sesja) — pokaż bramkę.
@@ -8677,6 +8723,10 @@
         if (state.verdict === 'zielony' && !el('zl-card') && !state.paid) { try { showGreenLight(state.karta || {}, false); } catch (e) {} }
         // OPŁACONY user po F5 też ma widzieć „co się teraz dzieje" (audyt #6: karta żyła tylko w DOM).
         if (state.paid && !el('resv-next')) { try { reservationConfirmed(); } catch (e) {} }
+        // Karta maila: sprzątnij gdy mail już jest (np. bramka konta go zebrała); zaproponuj na
+        // resume sesji z raportem bez maila (dryfujący wraca — druga szansa na comeback-ścieżkę).
+        if (state.email) { var _mc = el('rk-mail-card'); if (_mc) _mc.remove(); }
+        else if (state.raport && !state.ustalenia) { setTimeout(function () { try { maybeOfferReportMail(); } catch (e) {} }, 6000); }
     }
     // ── SEKWENCYJNE ODSŁANIANIE (anty-przytłoczenie, decyzja Tomka) ──────────────
     // W czacie pokazujemy JEDNĄ kartę etapu na raz — najbliższą realizacji. Reszta
@@ -11004,7 +11054,10 @@
               '<button type="button" data-b="high"><b>Jestem gotów zainwestować w porządny start</b><span>mam środki na budowę + reklamy</span></button>' +
               '<button type="button" data-b="mid"><b>Mam część — chcę poznać pełny plan</b><span>policzmy to wspólnie</span></button>' +
               '<button type="button" data-b="unknown"><b>Najpierw chcę zobaczyć całość</b><span>budżet dopniemy później</span></button>' +
-              '<button type="button" data-b="none"><b>Szczerze — teraz nie mam budżetu</b><span>wrócę w przyszłości</span></button>' +
+              // Raty zamiast czystego soft-exitu (decyzja Tomka 2026-07-02): lęk #1 persony to
+              // pieniądze — dajemy drzwi (kontynuacja + warunki u Tomka), nie ścianę. „none"
+              // zostaje w kodzie (detekcja tekstowa + stare sesje), ale znika z przycisków.
+              '<button type="button" data-b="raty"><b>Nie mam całości naraz — interesują mnie raty</b><span>warunki ustalisz indywidualnie z Tomkiem</span></button>' +
             '</div></div>';
         el('chat-msgs').appendChild(div); scrollToBottom(true);
         Array.prototype.forEach.call(div.querySelectorAll('.bgt-opts button'), function (b) {
@@ -11012,7 +11065,7 @@
         });
         try { gaEvent('app_budget_gate_shown', {}); } catch (e) {}
     }
-    var BUDGET_LABELS = { high: 'Mam budżet na start (3 000 zł+)', mid: 'Coś uzbieram (1 000–3 000 zł)', unknown: 'Jeszcze nie wiem', none: 'Na razie bez budżetu' };
+    var BUDGET_LABELS = { high: 'Mam budżet na start (3 000 zł+)', mid: 'Coś uzbieram (1 000–3 000 zł)', unknown: 'Jeszcze nie wiem', raty: 'Nie mam całości naraz — interesują mnie raty', none: 'Na razie bez budżetu' };
     function pickBudget(b) {
         if (!b) return;
         state.budgetDeclared = b; persistSession();
@@ -11025,7 +11078,9 @@
         if (b === 'none') { renderBudgetSoftExit(); return; }
         // budżet OK → krótkie potwierdzenie + ruszamy z resztą (makiety→reklamy→sklep)
         var ok = document.createElement('div'); ok.className = 'msg msg--ai';
-        ok.innerHTML = renderRich(b === 'unknown'
+        ok.innerHTML = renderRich(b === 'raty'
+            ? 'Jasne — **rozłożenie na raty jest jak najbardziej możliwe**, a warunki ustalisz bezpośrednio z Tomkiem przy planie (zawsze indywidualnie). Nie blokuje nas to w niczym. **Zacznijmy od marki** — zaraz dobiorę kilka nazw z wolnymi domenami, a sklep i reklamy składam w tle.'
+            : b === 'unknown'
             ? 'Jasne — pokażę Ci całość, a budżet dopniemy na spokojnie. **Zacznijmy od marki** — zaraz dobiorę kilka nazw z wolnymi domenami, a sklep i reklamy składam w tle.'
             : 'Super — to realny plan. **Zacznijmy od marki** — zaraz dobiorę kilka nazw z wolnymi domenami, a sklep i reklamy składam w tle. Wszystko zostaje Twoje.');
         el('chat-msgs').appendChild(ok); scrollToBottom(true);
