@@ -6344,7 +6344,8 @@
             zielone: state.zielone || null,           // #4: personalizacja zielonej karty (mocne/dopracujemy)
             brandDone: !!state.brandDone,             // #2: marka sfinalizowana (przeżywa F5)
             mockPending: !!state._mockPending,        // #1: ustalenia gotowe, makiety czekają na raport
-            reportEngagePending: !!state.reportEngagePending  // #3: proaktywna tura ustaleń jeszcze nie domknięta
+            reportEngagePending: !!state.reportEngagePending,  // #3: proaktywna tura ustaleń jeszcze nie domknięta
+            reportProposeDone: !!state.reportProposeDone       // #5: propozycja po raporcie już padła (nie duplikuj po F5/powrocie)
         });
         saveJSON(LS_ACTIVE, state.sessionId);
         updateConvoMeta();
@@ -6495,6 +6496,7 @@
     // dostawał raport/makiety/stronę poprzedniego produktu).
     function resetPipelineForPivot() {
         state.raport = null; state.ustalenia = null; state.mockups = null; state.mockupUrl = null;
+        state.reportProposeDone = false; state.reportProposePending = false;   // pivot = nowy raport → nowa propozycja
         state.suiteAds = null; state.landingHtml = null; state.chosenStyle = null; state.verdict = null;
         // Marka jest zależna od produktu → przy zmianie produktu resetuj (inaczej makieta-card
         // wisiała na starym brandDone=true i nie odsłaniała się dla nowego produktu — bug pętli).
@@ -6576,6 +6578,7 @@
         state.brandDone = !!saved.brandDone;                  // #2 resume marki
         state._mockPending = !!saved.mockPending;             // #1 resume makiet
         state.reportEngagePending = !!saved.reportEngagePending;  // #3 resume zaczepki ustaleń
+        state.reportProposeDone = !!saved.reportProposeDone;       // #5 resume flagi propozycji
         extras.summary = 'idle';
         extras.plan = 'idle';
         extras.raport = 'idle';
@@ -6953,6 +6956,13 @@
                 // Na ?id=-resume init() odpala to PRZED hydracją (stan pusty); tu robimy to PO
                 // hydracji, więc makiety/marka/sklep nie „stoją" bez następnego kroku.
                 try { resumeReportIfNeeded(); } catch (e) {}
+                // RATUNEK „utknął po raporcie" (2026-07-02): powracający user (np. klik z maila
+                // stalled_report) z gotowym raportem, ale bez ustaleń → bot od razu proponuje
+                // komplet kierunku. Raz na sesję (guard reportProposeDone w maybePropose…).
+                if (state.raport && !state.ustalenia && !state.reportProposeDone) {
+                    state.reportProposePending = true;
+                    try { maybeProposeAfterReport(); } catch (e) {}
+                }
             }
         }).catch(function () { });
     }
@@ -8248,10 +8258,12 @@
         // turze, stary guard robił z tej mechaniki martwy kod (u bezczynnego usera nigdy nie
         // strzelała). Zdejmujemy chipy i mózg proponuje komplet ustaleń (reportPropose — trigger
         // „raport GOTOWY", nie reportEngage, który twierdzi, że raportu jeszcze nie ma).
+        if (state.reportProposeDone) { state.reportProposePending = false; return; }   // już zaproponowane (przeżywa F5)
         if (state.ustalenia || gateContactMissing() || streaming || el('inline-gate') || el('bud-widget')) return;
         state.reportProposePending = false;
         setTimeout(function () {
-            if (streaming || el('inline-gate') || el('bud-widget') || state.ustalenia) return;
+            if (streaming || el('inline-gate') || el('bud-widget') || state.ustalenia || state.reportProposeDone) return;
+            state.reportProposeDone = true; persistSession();
             removeChips();
             streamReply('', false, { reportPropose: true });
         }, 600);
@@ -13587,6 +13599,7 @@
         state.chosenProduct = null; state.mockupUrl = null; state.suiteAds = null; state.landingHtml = null;
         state.mockups = null; state.chosenStyle = null; state.ustalenia = null; renderChosenProduct();
         state.brand = null; state.brandDone = false; _brandNameRetries = 0;   // #1: „Nowa rozmowa" NIE dziedziczy marki (logo/nazwy) poprzedniego projektu
+        state.reportProposeDone = false; state.reportProposePending = false;  // #5: świeża rozmowa = świeża propozycja po raporcie
         state.editsUsed = 0;
         state.editPending = false;
         state.bizplan = null;
