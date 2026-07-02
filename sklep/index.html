@@ -7191,6 +7191,7 @@
         if (activeTab !== 'chat') switchTab('chat');
         // U2: po płatności NIE „dziękuję i cisza" — karta „co się teraz dzieje" z jasnym SLA.
         // Konwersja ginęła dokładnie tu: user płacił „w próżnię" i nie wiedział, na co czeka.
+        if (el('resv-next')) return;   // audyt #6: ponowny klik nie dubluje karty ANI sysMsg
         var host = el('chat-msgs');
         if (host && !el('resv-next')) {
             var d = document.createElement('div');
@@ -7735,7 +7736,8 @@
         var pulpitLabel = document.querySelector('.side__item[data-tab="projekt"]:not([data-pjview]) .side__label');
         if (pulpitLabel) pulpitLabel.textContent = khMode ? 'Etap 1 — ustalenia' : 'Pulpit projektu';
         var cta = el('side-cta');
-        var show = state.verdict === 'zielony';
+        // Po OPŁACENIU kafel rezerwacji znika (audyt #6 — wisiał i dublował komunikaty).
+        var show = state.verdict === 'zielony' && !state.paid;
         if (show && cta.hidden) cta.classList.add('is-in'); // animacja momentu odblokowania
         cta.hidden = !show;
         // U3: pływający CTA rezerwacji na mobile — po zielonym, dopóki nie opłacono.
@@ -8673,6 +8675,8 @@
         // W CZACIE (nie tylko w zakładce Współpraca). Bez tego najgorętszy lead (zakwalifikowany,
         // wraca) widzi 5 kart proof, ale NIE wie, że następny krok = rezerwacja. zl-card guard = idempotentne.
         if (state.verdict === 'zielony' && !el('zl-card') && !state.paid) { try { showGreenLight(state.karta || {}, false); } catch (e) {} }
+        // OPŁACONY user po F5 też ma widzieć „co się teraz dzieje" (audyt #6: karta żyła tylko w DOM).
+        if (state.paid && !el('resv-next')) { try { reservationConfirmed(); } catch (e) {} }
     }
     // ── SEKWENCYJNE ODSŁANIANIE (anty-przytłoczenie, decyzja Tomka) ──────────────
     // W czacie pokazujemy JEDNĄ kartę etapu na raz — najbliższą realizacji. Reszta
